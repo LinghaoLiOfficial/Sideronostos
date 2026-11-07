@@ -10,8 +10,12 @@ import {
 } from "kanx-gantt";
 import "kanx-gantt/style.css";
 import { cn } from "@/lib/utils";
+import { useSurface } from "@/components/ui/surface";
 import { getGanttTaskColor, isGanttParentTask, type GanttRoleColorSet } from "./color-scheme";
 import styles from "./gantt.module.css";
+
+// kanx-gantt mounts truncated-name tooltips directly in document.body.
+let tooltipOwner: HTMLElement | null = null;
 
 export {
   defaultGanttColorScheme,
@@ -66,6 +70,28 @@ export function GanttChart({
   className,
 }: GanttChartProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const surface = useSurface();
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const claimTooltip = () => { tooltipOwner = root; };
+    root.addEventListener("pointerover", claimTooltip);
+    root.addEventListener("focusin", claimTooltip);
+    const observer = new MutationObserver((records) => {
+      if (tooltipOwner !== root) return;
+      for (const record of records) for (const node of record.addedNodes) {
+        if (node instanceof HTMLElement && node.classList.contains("kanx-tooltip")) node.dataset.surface = surface;
+      }
+    });
+    observer.observe(document.body, { childList: true });
+    return () => {
+      observer.disconnect();
+      root.removeEventListener("pointerover", claimTooltip);
+      root.removeEventListener("focusin", claimTooltip);
+      if (tooltipOwner === root) tooltipOwner = null;
+    };
+  }, [surface]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -144,7 +170,7 @@ export function GanttChart({
     return () => observer.disconnect();
   }, [snapshot.taskData, colorScheme, taskColorPalette, taskRenderers]);
 
-  return <div ref={rootRef} data-color-scheme="light" className={cn(styles.root, "min-w-0 overflow-x-auto", className)} style={{ height }}>
+  return <div ref={rootRef} data-surface={surface} data-color-scheme={surface} className={cn(styles.root, "min-w-0 overflow-x-auto", className)} style={{ height }}>
     <div className="h-full min-w-[960px]">
       <SvarGantt
         className="h-full"

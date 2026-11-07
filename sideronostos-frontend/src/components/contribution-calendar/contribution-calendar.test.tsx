@@ -104,7 +104,7 @@ describe("ContributionCalendar", () => {
     expect(screen.getByRole("heading", { name: "第二天" })).toBeTruthy();
     expect(screen.getByText("第二条记录")).toBeTruthy();
     expect(screen.queryByText("第一条记录")).toBeNull();
-    expect(screen.getByRole("button", { name: "2024-01-02：1 个事项" }).className).toContain("ring-white");
+    expect(screen.getByRole("button", { name: "2024-01-02：1 个事项" }).className).toContain("ring-1 ring-ring");
     expect(screen.getByRole("button", { name: "2024-01-02：1 个事项" }).className).toContain("border-[0.5px]");
   });
 
@@ -119,7 +119,7 @@ describe("ContributionCalendar", () => {
     await userEvent.click(screen.getByRole("button", { name: "页面其他位置" }));
 
     expect(screen.getByRole("region", { name: "日期详情" }).textContent).toContain("点击任意单元格查看事项明细");
-    expect(screen.getByRole("button", { name: "2024-01-01：1 个事项" }).className).not.toContain("ring-white");
+    expect(screen.getByRole("button", { name: "2024-01-01：1 个事项" }).className).not.toContain("ring-1 ring-ring");
   });
 
   it("closes selected details when changing years", async () => {
@@ -201,7 +201,7 @@ describe("ContributionCalendar", () => {
     />);
 
     const day = screen.getByRole("button", { name: "2024-01-01：4 个事项" });
-    expect(day.className).toContain("bg-[#A332A5]");
+    expect(day.className).toContain("bg-(--calendar-3)");
 
     await userEvent.click(day);
     await userEvent.click(screen.getByRole("button", { name: "编辑日期事项" }));
@@ -211,7 +211,7 @@ describe("ContributionCalendar", () => {
     await userEvent.click(screen.getByRole("button", { name: "保存日期事项" }));
 
     const updatedDay = screen.getByRole("button", { name: "2024-01-01：1 个事项" });
-    expect(updatedDay.className).toContain("bg-[#321276]");
+    expect(updatedDay.className).toContain("bg-(--calendar-1)");
   });
 
   it("keeps the detail card at a fixed height and scrolls long item lists", async () => {

@@ -11,13 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 afterEach(cleanup);
 
-describe("knowledge theme", () => {
-  it("keeps the exact brand endpoints and themed neutral surfaces", () => {
+describe("Sideronostos theme", () => {
+  it("defines the shared dark palette and optional light surface", () => {
     const css = readFileSync("src/app/globals.css", "utf8");
-    expect(css).toContain("--brand-start: #FF0076; --brand-end: #590FB7;");
-    expect(css).toContain("--brand-gradient: linear-gradient(135deg, var(--brand-start), var(--brand-end));");
-    expect(css).toMatch(/--secondary: #32243e;/);
-    expect(css).toMatch(/--popover: #251d31f2;/);
+    expect(css).toContain("--brand-start: #bdff72; --brand-end: #bdff72;");
+    expect(css).toContain("--background: #090a0a; --foreground: #f5f6f3;");
+    expect(css).toMatch(/--secondary: #303330;/);
+    expect(css).toMatch(/--popover: #1c1e1d;/);
     expect(css).toContain(".glass-surface");
     expect(css).toContain(".glass-popover");
     expect(css).toContain(".glass-field");
@@ -35,12 +35,13 @@ describe("knowledge theme", () => {
     expect(screen.getByText("YL").className).toContain("brand-gradient-soft");
   });
 
-  it("uses glass surfaces for reusable panels", () => {
+  it("uses neutral surfaces and semantic hover states for reusable panels", () => {
     render(<><Card interactive>卡片</Card><Alert>提示</Alert><Button variant="secondary">次级操作</Button></>);
-    expect(screen.getByText("卡片").className).toContain("glass-surface");
+    expect(screen.getByText("卡片").className).toContain("bg-card");
+    expect(screen.getByText("卡片").getAttribute("data-surface")).toBe("dark");
     expect(screen.getByText("卡片").getAttribute("data-interactive")).toBe("true");
     expect(screen.getByText("卡片").className).toContain("cursor-pointer");
-    expect(screen.getByText("卡片").className).toContain("hover:bg-primary/15!");
+    expect(screen.getByText("卡片").className).toContain("hover:bg-accent!");
     expect(screen.getByText("卡片").className).not.toContain("hover:-translate-y");
     expect(screen.getByRole("alert").className).toContain("glass-surface");
     expect(screen.getByRole("button", { name: "次级操作" }).className).toContain("glass-surface");

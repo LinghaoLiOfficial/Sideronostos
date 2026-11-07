@@ -36,13 +36,13 @@ export function DocumentRow({ document, onOpen, selected = false }: {
 }) {
   return <button type="button" onClick={() => onOpen(document.id)}
     className={cn("glass-surface group flex min-h-56 w-full flex-col rounded-md border p-4 text-left", interactiveCardClassName, selected && "brand-gradient-subtle border-primary/40")}>
-    <span className="brand-gradient-soft flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/20 text-pink-100"><FileText className="size-5" /></span>
+    <span className="brand-gradient-soft flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/20 text-accent-foreground"><FileText className="size-5" /></span>
     <span className="mt-5 min-w-0">
       <span className="block line-clamp-2 text-sm font-medium leading-5">{document.title}</span>
       <span className="mt-2 block line-clamp-2 text-xs leading-5 text-muted-foreground">{document.summary}</span>
       <span className="mt-3 flex min-h-6 flex-wrap gap-1.5">{document.tags.map((tag) => <Badge key={tag} variant="secondary" className="text-[11px]">{tag}</Badge>)}</span>
     </span>
-    <span className="mt-auto flex w-full items-center gap-2 border-t border-white/10 pt-4">
+    <span className="mt-auto flex w-full items-center gap-2 border-t border-border pt-4">
       <Avatar className="size-7"><AvatarFallback className="text-[10px]">{document.initials ?? "KM"}</AvatarFallback></Avatar>
       <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{document.collection}</span>
       <span className="shrink-0 text-xs text-muted-foreground">{document.updatedAt}</span>
@@ -57,7 +57,7 @@ export function TagPicker({ tags, selected, onChange }: {
     {tags.map((tag) => <button key={tag} type="button" aria-pressed={selected.includes(tag)}
       onClick={() => onChange(selected.includes(tag) ? selected.filter((item) => item !== tag) : [...selected, tag])}
       className={cn("inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs transition-colors focus-visible:outline-ring",
-        selected.includes(tag) ? "brand-gradient-soft border-primary/50 text-pink-50" : "border-white/15 bg-white/5 text-muted-foreground hover:text-foreground")}>
+        selected.includes(tag) ? "brand-gradient-soft border-primary/50 text-accent-foreground" : "border-border bg-muted/50 text-muted-foreground hover:text-foreground")}>
       <Hash className="size-3" />{tag}
     </button>)}
   </div>;
@@ -70,8 +70,8 @@ export function CollectionNav({ collections, value, onChange }: {
   return <nav aria-label="知识集合" className="space-y-1">
     {collections.map((item) => <button key={item.id} type="button" onClick={() => onChange(item.id)}
       aria-current={value === item.id ? "page" : undefined}
-      className={cn("flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground",
-        value === item.id && "brand-gradient-soft text-pink-50")}>
+      className={cn("flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+        value === item.id && "brand-gradient-soft text-accent-foreground")}>
       <Folder className="size-4" /><span className="flex-1 truncate">{item.name}</span><span className="text-xs opacity-70">{item.count}</span>
     </button>)}
   </nav>;
@@ -89,7 +89,7 @@ export function CitationItem({ index, title, source, href }: {
 }) {
   return <a href={href}
     className="glass-surface flex items-start gap-3 rounded-md border p-3 hover:border-primary/40">
-    <span className="brand-gradient-soft flex size-6 shrink-0 items-center justify-center rounded text-xs text-pink-50">{index}</span>
+    <span className="brand-gradient-soft flex size-6 shrink-0 items-center justify-center rounded text-xs text-accent-foreground">{index}</span>
     <span className="min-w-0 flex-1"><span className="block truncate text-sm">{title}</span><span className="text-xs text-muted-foreground">{source}</span></span>
     <Link2 className="size-4 shrink-0 text-muted-foreground" />
   </a>;
@@ -99,7 +99,7 @@ export function KnowledgeEmpty({ title = "暂无内容", description = "当前�
   title?: string; description?: string; action?: React.ReactNode;
 }) {
   return <div className="flex min-h-48 flex-col items-center justify-center gap-3 py-8 text-center">
-    <BookOpen className="size-7 text-pink-200/70" /><div><h3 className="text-sm font-medium">{title}</h3>
+    <BookOpen className="size-7 text-accent-foreground" /><div><h3 className="text-sm font-medium">{title}</h3>
     <p className="mt-1 text-xs text-muted-foreground">{description}</p></div>{action}
   </div>;
 }
@@ -107,10 +107,10 @@ export function KnowledgeEmpty({ title = "暂无内容", description = "当前�
 export function KnowledgeStat({ label, value, change, progress, tone = "cyan" }: {
   label: string; value: string; change: string; progress: number; tone?: "cyan" | "violet" | "blue";
 }) {
-  const colors = { cyan: "text-pink-200", violet: "text-fuchsia-200", blue: "text-purple-200" };
-  return <div className="min-w-0 border-l border-white/10 pl-5 first:border-l-0 first:pl-0">
+  const colors = { cyan: "text-accent-foreground", violet: "text-accent-foreground", blue: "text-accent-foreground" };
+  return <div className="min-w-0 border-l border-border pl-5 first:border-l-0 first:pl-0">
     <p className="text-xs text-muted-foreground">{label}</p>
     <div className="mt-2 flex items-baseline gap-2"><strong className={cn("text-2xl font-semibold", colors[tone])}>{value}</strong><span className="text-xs text-muted-foreground">{change}</span></div>
-    <Progress value={progress} aria-label={label} className="mt-3 h-1 bg-white/10" />
+    <Progress value={progress} aria-label={label} className="mt-3 h-1 bg-muted" />
   </div>;
 }

@@ -28,7 +28,7 @@ export type ContributionCalendarProps = {
 
 const monthNames = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
 const weekNames = ["一", "二", "三", "四", "五", "六", "日"];
-const intensityClasses = ["bg-white/5", "bg-[#321276]", "bg-[#590FB7]", "bg-[#A332A5]", "bg-[#FF0076]"];
+const intensityClasses = ["bg-(--calendar-0)", "bg-(--calendar-1)", "bg-(--calendar-2)", "bg-(--calendar-3)", "bg-(--calendar-4)"];
 
 function pad(value: number) { return String(value).padStart(2, "0"); }
 function dateKey(year: number, month: number, day: number) { return `${year}-${pad(month + 1)}-${pad(day)}`; }
@@ -141,14 +141,14 @@ export function ContributionCalendar({ year: controlledYear, years, onYearChange
                 return <Tooltip key={cell.date} open={activeDate === cell.date} onOpenChange={(open) => {
                   if (open) setActiveDate(cell.date);
                   else clearActiveDate();
-                }}><TooltipTrigger asChild><button type="button" aria-label={label} onPointerEnter={() => setActiveDate(cell.date)} onFocus={() => setActiveDate(cell.date)} onBlur={clearActiveDate} onClick={() => { setEditing(false); setDraftItems([]); setSelectedDate(cell.date); onDayClick?.(cell.date, contributionCount); }} className={cn("size-3 rounded-[3px] border-[0.5px] border-white/10 transition-transform hover:scale-125 focus-visible:z-10 focus-visible:scale-125 focus-visible:ring-2 focus-visible:ring-pink-300", intensityClasses[level], selectedDate === cell.date && "ring-1 ring-white")} /></TooltipTrigger><TooltipContent side="top" sideOffset={-4} className="pointer-events-none">{label}</TooltipContent></Tooltip>;
+                }}><TooltipTrigger asChild><button type="button" aria-label={label} onPointerEnter={() => setActiveDate(cell.date)} onFocus={() => setActiveDate(cell.date)} onBlur={clearActiveDate} onClick={() => { setEditing(false); setDraftItems([]); setSelectedDate(cell.date); onDayClick?.(cell.date, contributionCount); }} className={cn("size-3 rounded-[3px] border-[0.5px] border-border transition-transform hover:scale-125 focus-visible:z-10 focus-visible:scale-125 focus-visible:ring-2 focus-visible:ring-ring", intensityClasses[level], selectedDate === cell.date && "ring-1 ring-ring")} /></TooltipTrigger><TooltipContent side="top" sideOffset={-4} className="pointer-events-none">{label}</TooltipContent></Tooltip>;
               }))}
             </div>
           </div>
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
           <span aria-live="polite">{activeDate ? `${activeDate}：${countForDate(activeDate)} 个事项` : "选中单元格查看详情"}</span>
-          <span className="flex items-center gap-2"><span>少</span>{intensityClasses.map((tone, index) => <span key={tone} aria-label={`事项数量等级 ${index}`} className={cn("size-3 rounded-[3px] border border-white/10", tone)} />)}<span>多</span></span>
+          <span className="flex items-center gap-2"><span>少</span>{intensityClasses.map((tone, index) => <span key={tone} aria-label={`事项数量等级 ${index}`} className={cn("size-3 rounded-[3px] border border-border", tone)} />)}<span>多</span></span>
         </div>
       </div>
       <aside role="region" aria-label="日期详情" className="glass-surface flex h-56 min-w-0 flex-col rounded-lg border p-4">
@@ -158,7 +158,7 @@ export function ContributionCalendar({ year: controlledYear, years, onYearChange
           {!readOnly && editing && <div className="flex shrink-0 items-center gap-1"><Button type="button" variant="ghost" size="icon" className="size-7" aria-label="保存日期事项" onClick={saveEditing}><Check /></Button><Button type="button" variant="ghost" size="icon" className="size-7" aria-label="取消编辑日期事项" onClick={cancelEditing}><X /></Button></div>}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-1">
-          {editing ? <div className="space-y-2"><div className="space-y-2">{draftItems.map((item, index) => <div key={index} className="flex items-center gap-2"><Input aria-label={`事项 ${index + 1}`} value={item} onChange={(event) => setDraftItems((items) => items.map((current, itemIndex) => itemIndex === index ? event.target.value : current))} /><Button type="button" variant="ghost" size="icon" className="size-8 shrink-0" aria-label={`删除事项 ${index + 1}`} onClick={() => setDraftItems((items) => items.filter((_, itemIndex) => itemIndex !== index))}><Trash2 /></Button></div>)}</div><Button type="button" variant="outline" size="sm" onClick={() => setDraftItems((items) => [...items, ""])}><Plus />新增事项</Button></div> : <ul className="space-y-2 text-xs leading-relaxed text-muted-foreground">{selectedDetails?.items?.length ? selectedDetails.items.map((item, index) => <li key={`${item}-${index}`} className="flex min-w-0 gap-2"><span aria-hidden="true" className="mt-[0.45em] size-1.5 shrink-0 rounded-full bg-[#FF0076]" /><span className="min-w-0 break-words">{item}</span></li>) : <li className="text-muted-foreground">{selectedDate ? "暂无事项" : "点击任意单元格查看事项明细"}</li>}</ul>}
+          {editing ? <div className="space-y-2"><div className="space-y-2">{draftItems.map((item, index) => <div key={index} className="flex items-center gap-2"><Input aria-label={`事项 ${index + 1}`} value={item} onChange={(event) => setDraftItems((items) => items.map((current, itemIndex) => itemIndex === index ? event.target.value : current))} /><Button type="button" variant="ghost" size="icon" className="size-8 shrink-0" aria-label={`删除事项 ${index + 1}`} onClick={() => setDraftItems((items) => items.filter((_, itemIndex) => itemIndex !== index))}><Trash2 /></Button></div>)}</div><Button type="button" variant="outline" size="sm" onClick={() => setDraftItems((items) => [...items, ""])}><Plus />新增事项</Button></div> : <ul className="space-y-2 text-xs leading-relaxed text-muted-foreground">{selectedDetails?.items?.length ? selectedDetails.items.map((item, index) => <li key={`${item}-${index}`} className="flex min-w-0 gap-2"><span aria-hidden="true" className="mt-[0.45em] size-1.5 shrink-0 rounded-full bg-primary" /><span className="min-w-0 break-words">{item}</span></li>) : <li className="text-muted-foreground">{selectedDate ? "暂无事项" : "点击任意单元格查看事项明细"}</li>}</ul>}
         </div>
       </aside>
     </div>

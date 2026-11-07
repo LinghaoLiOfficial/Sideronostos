@@ -52,10 +52,10 @@ describe("GanttChart", () => {
     expect(screen.getByTestId("svar-gantt").parentElement?.parentElement?.getAttribute("style")).toContain("height: 42rem");
   });
 
-  it("uses a light local color scheme and keeps dependency arrows disabled by default", () => {
+  it("inherits the default dark surface and keeps dependency arrows disabled by default", () => {
     render(<GanttChart snapshot={snapshot} onChange={vi.fn()} />);
 
-    expect(screen.getByTestId("svar-gantt").parentElement?.parentElement?.getAttribute("data-color-scheme")).toBe("light");
+    expect(screen.getByTestId("svar-gantt").parentElement?.parentElement?.getAttribute("data-color-scheme")).toBe("dark");
     expect(screen.getByTestId("dependency-arrows").textContent).toBe("false");
   });
 
@@ -74,8 +74,8 @@ describe("GanttChart", () => {
     expect(getGanttTaskVisualRole(tasks[3], tasks)).toBe("milestone-parent");
     expect(getGanttTaskVisualRole(tasks[4], tasks)).toBe("milestone-child");
     expect(tasks.map((task, index) => getGanttTaskColor(task, tasks, index).barColor))
-      .toEqual(["#9870D4", "#E565A0", "#718CDD", "#C56BCB", "#DF817E"]);
-    expect(getGanttTaskColor(tasks[0], tasks, 5).barColor).toBe("#9870D4");
+      .toEqual(["#BDDF8A", "#78C9C1", "#92B9E6", "#E7C77B", "#D8A386"]);
+    expect(getGanttTaskColor(tasks[0], tasks, 5).barColor).toBe("#BDDF8A");
     expect(tasks.map((task, index) => getGanttTaskColor(task, tasks, index).fontColor))
       .toEqual(Array(5).fill("#000000"));
   });
@@ -88,9 +88,9 @@ describe("GanttChart", () => {
     render(<GanttChart snapshot={{ taskData: tasks, edgeData: [] }} onChange={vi.fn()} />);
     const bars = screen.getByTestId("timeline").querySelectorAll<HTMLElement>(".wx-bar");
 
-    expect(bars[0].style.getPropertyValue("--wx-gantt-milestone-color")).toBe("#9870D4");
-    expect(bars[0].style.getPropertyValue("--kanx-parent-outline")).toBe("#9870D4");
-    expect(bars[1].style.getPropertyValue("--wx-gantt-milestone-color")).toBe("#E565A0");
+    expect(bars[0].style.getPropertyValue("--wx-gantt-milestone-color")).toBe("#BDDF8A");
+    expect(bars[0].style.getPropertyValue("--kanx-parent-outline")).toBe("#BDDF8A");
+    expect(bars[1].style.getPropertyValue("--wx-gantt-milestone-color")).toBe("#78C9C1");
     expect(bars[1].style.getPropertyValue("--kanx-parent-outline")).toBe("");
   });
 

@@ -18,6 +18,27 @@ surface styles are centralized in `src/app/globals.css`. Knowledge components re
 callbacks as props, so pages can connect them to their own queries without coupling the library
 to the API client. The gallery uses local sample data and does not mutate backend state.
 
+The design system uses a single dark theme with a lime action color. Every gallery category
+has independent dark and light surface examples. Light is a local information surface, not
+an application theme toggle. `Surface` scopes semantic CSS variables and provides the React
+context used by portaled menus, dialogs, sheets, tooltips and searchable selects:
+
+```tsx
+import { Surface } from "@/components/ui/surface";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+
+<Surface tone="light">
+  <Card><CardContent><Input aria-label="Title" /></CardContent></Card>
+  <Card surface="dark"><CardContent>A nested dark panel</CardContent></Card>
+</Surface>
+```
+
+`Card` inherits its containing surface; use `surface="light"` for a standalone light card.
+Use semantic colors (`foreground`, `muted-foreground`, `border`, `accent-foreground`) inside
+local surfaces. The older `glass-*` and `brand-gradient-*` CSS names remain compatibility
+aliases for neutral surfaces and solid lime fills; they no longer add glass or gradients.
+
 ```bash
 pnpm lint
 pnpm test

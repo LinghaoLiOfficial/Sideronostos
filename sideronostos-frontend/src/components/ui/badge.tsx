@@ -10,14 +10,14 @@ const badgeVariants = cva(
       variant: {
         default: "brand-gradient-control border-0! text-primary-foreground",
         secondary:
-          "brand-gradient-soft border-primary/30 text-pink-50 [a]:hover:brightness-125",
+          "brand-gradient-soft border-primary/30 text-accent-foreground [a]:hover:brightness-125",
         destructive:
           "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
         outline:
-          "brand-gradient-subtle border-primary/30 text-pink-50 [a]:hover:brightness-125",
+          "brand-gradient-subtle border-primary/30 text-accent-foreground [a]:hover:brightness-125",
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
-        link: "text-pink-200 underline-offset-4 hover:text-pink-100 hover:underline",
+        link: "text-accent-foreground underline-offset-4 hover:text-accent-foreground hover:underline",
       },
     },
     defaultVariants: {

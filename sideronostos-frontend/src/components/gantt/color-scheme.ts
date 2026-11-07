@@ -13,11 +13,11 @@ export type GanttColorSchemeInput = Partial<GanttColorScheme>;
 
 const brandColors: readonly GanttRoleColorSet[] = [
   // Alternate warm and cool hues at a similar brightness to distinguish rows.
-  { barColor: "#9870D4", progressColor: "#8058BC", fontColor: "#000000", borderColor: "#9870D4" },
-  { barColor: "#E565A0", progressColor: "#CD4D88", fontColor: "#000000", borderColor: "#E565A0" },
-  { barColor: "#718CDD", progressColor: "#5974C5", fontColor: "#000000", borderColor: "#718CDD" },
-  { barColor: "#C56BCB", progressColor: "#AD53B3", fontColor: "#000000", borderColor: "#C56BCB" },
-  { barColor: "#DF817E", progressColor: "#C76966", fontColor: "#000000", borderColor: "#DF817E" },
+  { barColor: "#BDDF8A", progressColor: "#96BA61", fontColor: "#000000", borderColor: "#BDDF8A" },
+  { barColor: "#78C9C1", progressColor: "#54AAA2", fontColor: "#000000", borderColor: "#78C9C1" },
+  { barColor: "#92B9E6", progressColor: "#709AC9", fontColor: "#000000", borderColor: "#92B9E6" },
+  { barColor: "#E7C77B", progressColor: "#C7A655", fontColor: "#000000", borderColor: "#E7C77B" },
+  { barColor: "#D8A386", progressColor: "#BC8465", fontColor: "#000000", borderColor: "#D8A386" },
 ];
 
 export const defaultGanttColorScheme: GanttColorScheme = {
