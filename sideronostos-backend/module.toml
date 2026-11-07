@@ -1,0 +1,8 @@
+composition_version = 2
+name = "sideronostos-backend"
+version = "0.1.0"
+description = "Generated backend project"
+slug = "sideronostos"
+package = "sideronostos_backend"
+profile = "full"
+modules = ["database", "temporal", "jobs", "users", "rbac", "email", "auth", "storage", "ai"]

@@ -1,0 +1,6 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agent": "sideronostos_backend.modules.ai.graph:compiled_graph"
+  }
+}

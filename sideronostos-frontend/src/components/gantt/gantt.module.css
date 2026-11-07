@@ -1,0 +1,66 @@
+.root,
+.root :global(.kanx-gantt) {
+  color-scheme: light;
+  border-radius: 8px;
+}
+
+.root :global(.kanx-gantt select),
+.root :global(.kanx-gantt input),
+.root :global(.kanx-gantt button) {
+  color-scheme: light;
+}
+
+.root :global(.kanx-gantt select) {
+  color: #243247;
+  background-color: #fff;
+}
+
+.root :global(.kanx-gantt) {
+  scrollbar-color: #94a3b8 #f1f5f9;
+  overflow: hidden;
+}
+
+.root :global(.kanx-chart .wx-task:not(.wx-split)) {
+  border-color: var(--wx-gantt-task-border-color, var(--wx-gantt-task-color));
+}
+
+.root :global(.kanx-chart .wx-summary:not(.wx-split)) {
+  border-color: var(--wx-gantt-summary-border-color, var(--wx-gantt-summary-color));
+}
+
+.root :global(.kanx-chart .wx-task .wx-progress-wrapper) {
+  background-color: var(--wx-gantt-task-color);
+}
+
+.root :global(.kanx-chart .wx-summary .wx-progress-wrapper) {
+  background-color: var(--wx-gantt-summary-color);
+}
+
+/* Suppress the library's pale inset outline on idle parent bars. */
+.root :global(.kanx-chart .wx-bar[data-kanx-hierarchy="parent"]:not(:hover):not(.wx-selected)) {
+  box-shadow: none;
+}
+
+.root :global(.kanx-chart .wx-bar[data-kanx-hierarchy="parent"]),
+.root :global(.kanx-chart .wx-bar[data-kanx-hierarchy="parent"] .wx-text-out) {
+  font-weight: normal;
+}
+
+.root :global(.kanx-gantt *)::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.root :global(.kanx-gantt *)::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.root :global(.kanx-gantt *)::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border: 3px solid #f1f5f9;
+  border-radius: 999px;
+}
+
+.root :global(.kanx-gantt *)::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}

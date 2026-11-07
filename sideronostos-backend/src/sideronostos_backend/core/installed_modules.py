@@ -1,0 +1,14 @@
+INSTALLED_MODULES = (
+    "database",
+    "temporal",
+    "jobs",
+    "users",
+    "rbac",
+    "email",
+    "auth",
+    "storage",
+    "workspace_files",
+    "personal_schedule",
+    "collaboration",
+    "ai",
+)
