@@ -1,7 +1,32 @@
 .root,
 .root :global(.kanx-gantt) {
   color: var(--foreground);
-  border-radius: 8px;
+  border-radius: 16px;
+}
+
+.root :global(.kanx-modal-backdrop) {
+  width: var(--gantt-viewport-width, 100%);
+  left: var(--gantt-viewport-offset, 0px);
+  right: auto;
+  background: #090a0a80;
+}
+.root :global(.kanx-confirm) {
+  min-width: 0;
+  max-width: calc(100% - 24px);
+  max-height: calc(100% - 24px);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+}
+.root :global(.kanx-create-dates),
+.root :global(.kanx-field) { min-width: 0; }
+.root :global(.kanx-create-dates) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.root :global(.kanx-create input:not([type=radio])) { min-width: 0; width: 100%; }
+.root[data-gantt-material="glass"] :global(.kanx-confirm) { background: #242626eb; }
+@media (max-width: 520px) {
+  .root :global(.kanx-create-dates) { grid-template-columns: minmax(0, 1fr); }
+  .root :global(.kanx-create > .kanx-create-milestone-date) { width: 100%; }
 }
 
 .root :global(.kanx-gantt select),

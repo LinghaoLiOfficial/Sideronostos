@@ -10,11 +10,11 @@ const badgeVariants = cva(
       variant: {
         default: "brand-gradient-control border-0! text-primary-foreground",
         secondary:
-          "brand-gradient-soft border-primary/30 text-accent-foreground [a]:hover:brightness-125",
+          "bg-secondary border-transparent text-secondary-foreground [a]:hover:bg-muted",
         destructive:
           "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
         outline:
-          "brand-gradient-subtle border-primary/30 text-accent-foreground [a]:hover:brightness-125",
+          "bg-transparent border-border text-muted-foreground [a]:hover:text-foreground",
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-accent-foreground underline-offset-4 hover:text-accent-foreground hover:underline",

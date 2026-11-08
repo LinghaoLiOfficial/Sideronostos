@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 afterEach(cleanup);
 
-describe("Sideronostos theme", () => {
+describe("Agrisata theme", () => {
   it("defines the shared dark palette and optional light surface", () => {
     const css = readFileSync("src/app/globals.css", "utf8");
     expect(css).toContain("--brand-start: #bdff72; --brand-end: #bdff72;");
@@ -24,15 +24,15 @@ describe("Sideronostos theme", () => {
     expect(css).toContain(".brand-gradient-soft");
   });
 
-  it("uses brand styles for primary controls, badges and avatar fallbacks", () => {
+  it("reserves lime for primary controls and keeps supporting elements neutral", () => {
     render(<><Button>新建</Button><Badge>进行中</Badge><Badge variant="secondary">更新</Badge><Badge variant="outline">筛选</Badge>
       <Avatar><AvatarFallback>YL</AvatarFallback></Avatar></>);
     expect(screen.getByRole("button", { name: "新建" }).className).toContain("brand-gradient-control");
     expect(screen.getByText("进行中").className).toContain("brand-gradient-control");
     expect(screen.getByText("进行中").className).toContain("border-0!");
-    expect(screen.getByText("更新").className).toContain("brand-gradient-soft");
-    expect(screen.getByText("筛选").className).toContain("brand-gradient-subtle");
-    expect(screen.getByText("YL").className).toContain("brand-gradient-soft");
+    expect(screen.getByText("更新").className).toContain("bg-secondary");
+    expect(screen.getByText("筛选").className).toContain("border-border");
+    expect(screen.getByText("YL").className).toContain("bg-secondary");
   });
 
   it("uses neutral surfaces and semantic hover states for reusable panels", () => {
@@ -44,7 +44,17 @@ describe("Sideronostos theme", () => {
     expect(screen.getByText("卡片").className).toContain("hover:bg-accent!");
     expect(screen.getByText("卡片").className).not.toContain("hover:-translate-y");
     expect(screen.getByRole("alert").className).toContain("glass-surface");
-    expect(screen.getByRole("button", { name: "次级操作" }).className).toContain("glass-surface");
+    expect(screen.getByRole("button", { name: "次级操作" }).className).toContain("bg-secondary");
+  });
+
+  it("keeps legacy glass aliases opaque and glass material opt-in with a solid fallback", () => {
+    const css = readFileSync("src/app/globals.css", "utf8");
+    expect(css).toMatch(/\.glass-surface\s*{\s*background-color: var\(--card\);/);
+    expect(css).toContain('[data-material="glass"]');
+    expect(css).toContain("backdrop-filter: blur(14px)");
+    expect(css).toContain("background-color: #242626ad");
+    expect(css).toContain("background-color: #242626eb");
+    expect(css).toContain("@supports not ((backdrop-filter:");
   });
 
   it("highlights selected navigation in the same palette", () => {

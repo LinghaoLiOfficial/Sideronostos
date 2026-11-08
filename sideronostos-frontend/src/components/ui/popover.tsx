@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "cn"
-import { useSurface } from "./surface"
+import { useSurfaceAppearance } from "./surface"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
 function Popover({
@@ -23,12 +23,14 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
-  const surface = useSurface()
+  const { tone: surface, material } = useSurfaceAppearance()
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         data-slot="popover-content"
         data-surface={surface}
+        data-material={material}
+        data-surface-overlay=""
         align={align}
         sideOffset={sideOffset}
         className={cn(

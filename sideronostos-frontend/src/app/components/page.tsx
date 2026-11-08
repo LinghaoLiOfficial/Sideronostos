@@ -1,9 +1,10 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ArrowRight, Bell, Check, ChevronDown, CircleHelp, Command as CommandIcon, Ellipsis, FilePlus2, Filter, Menu, Plus, Search, Settings2, Sparkles, Loader2 } from "lucide-react";
+import { ArrowRight, Bell, Check, ChevronDown, CircleHelp, Command as CommandIcon, Ellipsis, FilePlus2, Filter, Menu, Plus, Search, Settings2, Loader2 } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarGroup } from "@/components/ui/avatar";
@@ -35,9 +36,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ContributionCalendar, type ContributionDayDetails } from "@/components/contribution-calendar";
 import { GanttChart, defaultGanttColorScheme, type GanttSnapshot } from "@/components/gantt";
-import { CitationItem, CollectionNav, DocumentRow, KnowledgeEmpty, KnowledgeSearch, KnowledgeStat, MetadataPanel, TagPicker, type KnowledgeDocument } from "@/components/knowledge";
+import { CitationItem, CollectionNav, DocumentRow, KnowledgeEmpty, KnowledgeSearch, MetadataPanel, TagPicker, type KnowledgeDocument } from "@/components/knowledge";
 
-import { Surface, type SurfaceTone } from "@/components/ui/surface";
+import { Surface, type SurfaceTone, type SurfaceMaterial } from "@/components/ui/surface";
+import { ActionTile, FloatingToolbar, MetricPanel } from "@/components/ui/patterns";
 import "./components.css";
 const collections = [
   { id: "all", name: "全部知识", count: 128 },
@@ -79,8 +81,8 @@ function Demo({ title, children, className = "" }: { title: string; children: Re
   return <div className={className}><h3 className="mb-4 text-xs font-medium text-muted-foreground">{title}</h3>{children}</div>;
 }
 
-function Examples({ sectionId, tone }: { sectionId: string; tone: SurfaceTone }) {
-  const toastOptions = { className: `surface-toast surface-toast-${tone}`, style: { colorScheme: tone } };
+function Examples({ sectionId, tone, material }: { sectionId: string; tone: SurfaceTone; material: SurfaceMaterial }) {
+  const toastOptions = { className: `surface-toast surface-toast-${tone}${material === "glass" ? " surface-toast-glass" : ""}`, style: { colorScheme: tone } };
   const notify = {
     success: (message: string, options = {}) => toast.success(message, { ...toastOptions, ...options }),
     error: (message: string, options = {}) => toast.error(message, { ...toastOptions, ...options }),
@@ -91,6 +93,8 @@ function Examples({ sectionId, tone }: { sectionId: string; tone: SurfaceTone })
   const [tags, setTags] = useState<string[]>([]);
   const [collection, setCollection] = useState("all");
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [documentOpen, setDocumentOpen] = useState(false);
+  const documentTrigger = useRef<HTMLElement | null>(null);
   const [density, setDensity] = useState([65]);
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -105,22 +109,29 @@ function Examples({ sectionId, tone }: { sectionId: string; tone: SurfaceTone })
     (!query || [item.title, item.summary, item.collection, ...item.tags].some((value) => value.toLowerCase().includes(query.toLowerCase())))
   ), [query, tags, collection]);
   const openDocument = (id: string) => {
+    documentTrigger.current = window.document.activeElement as HTMLElement | null;
     setSelectedDocument(id);
-    notify.info("已选中文档", { description: documents.find((item) => item.id === id)?.title });
+    setDocumentOpen(true);
   };
 
 
+  const activeDocument = documents.find(item => item.id === selectedDocument);
   return <>
-    {sectionId === "overview" && <><div className="grid gap-6 @2xl:grid-cols-[1.3fr_1fr]">
-              <div className="glass rounded-md p-6 @sm:p-8"><div className="flex items-center gap-2 text-xs text-accent-foreground"><Sparkles className="size-4" /> WORKSPACE PULSE</div><h3 className="mt-6 text-lg font-medium">让信息保持清晰、有序</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">中性表面承载信息，荧光绿标记关键操作。以清晰的层级，让复杂的工作保持有序。</p><div className="mt-9 grid grid-cols-3 gap-3"><KnowledgeStat label="知识条目" value="128" change="+12%" progress={73} /><KnowledgeStat label="已连接来源" value="24" change="+4" progress={56} tone="violet" /><KnowledgeStat label="本周引用" value="86" change="+18%" progress={82} tone="blue" /></div></div>
-              <div className="space-y-6"><Demo title="色彩与表面"><div className="glass flex flex-wrap items-start gap-3 rounded-md p-5">{["#090a0a", "#242626", "#bdff72", "#e9ebe5"].map((color) => <div key={color} className="text-center"><span className="block size-11 rounded-md border border-border" style={{ background: color }} /><span className="mt-2 block text-[10px] text-muted-foreground">{color}</span></div>)}</div></Demo><Demo title="卡片 · 徽标 · 头像 · 分隔线"><Card><CardHeader><CardTitle>研究空间</CardTitle><CardDescription>团队知识的共同入口</CardDescription></CardHeader><CardContent className="flex items-center gap-3"><Badge>进行中</Badge><Badge variant="secondary">12 条更新</Badge><Separator orientation="vertical" className="h-5" /><AvatarGroup><Avatar className="size-7"><AvatarFallback>YL</AvatarFallback></Avatar><Avatar className="size-7"><AvatarFallback>LC</AvatarFallback></Avatar></AvatarGroup></CardContent></Card></Demo></div>
-            </div></>}
+    <Dialog open={documentOpen} onOpenChange={setDocumentOpen}><DialogContent onCloseAutoFocus={event => { event.preventDefault(); documentTrigger.current?.focus(); }}><DialogHeader><DialogTitle>{activeDocument?.title ?? "文档详情"}</DialogTitle><DialogDescription>{activeDocument?.summary}</DialogDescription></DialogHeader><div className="flex flex-wrap gap-2">{activeDocument?.tags.map(tag => <Badge key={tag} variant="secondary">{tag}</Badge>)}</div><MetadataPanel fields={[{ label: "所属集合", value: activeDocument?.collection ?? "" }, { label: "最近更新", value: activeDocument?.updatedAt ?? "" }]} /></DialogContent></Dialog>
+    {sectionId === "overview" && <div className="ds-pattern-stack">
+      <MetricPanel title="让信息，流动起来。" eyebrow="WORKSPACE / LIVE PULSE" action={<Badge>实时同步</Badge>}
+        metrics={[{ label: "知识条目", value: "128", detail: "+12% 本月增长" }, { label: "连接来源", value: "24", detail: "+4 新增来源" }, { label: "本周引用", value: "86", detail: "+18% 使用增长" }]} />
+      <div className="grid gap-3 @xl:grid-cols-2"><ActionTile icon={<Search className="size-5" />} title="发现知识" description="连接来源，找到可信答案" onClick={() => notify.info("已打开知识搜索")} /><ActionTile icon={<FilePlus2 className="size-5" />} title="开始记录" description="将想法沉淀为团队资产" onClick={() => setDialogOpen(true)} /></div>
+      <Card size="sm"><CardHeader><CardTitle>共同构建，而非孤立存储。</CardTitle><CardDescription>信息卡使用紧凑标题，指标面板以大数字和分隔线建立层次。</CardDescription></CardHeader><CardContent className="flex flex-wrap items-center gap-3"><Badge>进行中</Badge><Badge variant="secondary">12 条更新</Badge><Badge variant="outline">团队空间</Badge><Separator orientation="vertical" className="h-5" /><AvatarGroup><Avatar className="size-7"><AvatarFallback>YL</AvatarFallback></Avatar><Avatar className="size-7"><AvatarFallback>LC</AvatarFallback></Avatar></AvatarGroup></CardContent></Card>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogContent><DialogHeader><DialogTitle>开始记录</DialogTitle><DialogDescription>捕获一个值得保留的想法。</DialogDescription></DialogHeader><Input aria-label="记录标题" placeholder="输入标题" /><Button onClick={() => { setDialogOpen(false); notify.success("已创建记录"); }}>创建记录</Button></DialogContent></Dialog>
+    </div>}
     {sectionId === "knowledge" && <><div className="grid gap-6 @2xl:grid-cols-[180px_minmax(0,1fr)]">
               <div className="space-y-8"><Demo title="集合导航"><CollectionNav collections={collections} value={collection} onChange={setCollection} /></Demo><Demo title="标签选择"><TagPicker tags={["检索", "AI", "图谱", "研究", "产品", "设计"]} selected={tags} onChange={setTags} /></Demo></div>
               <div className="min-w-0"><Demo title="搜索 · 文档网格 · 空状态"><div className="glass rounded-md p-4 @sm:p-5"><div className="mb-4 flex flex-wrap items-center gap-3"><KnowledgeSearch value={query} onChange={setQuery} className="min-w-0 flex-1" /><Badge variant="outline">{filtered.length} 条结果</Badge></div><div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @3xl:grid-cols-3">{filtered.length ? filtered.map((item) => <DocumentRow key={item.id} document={item} selected={selectedDocument === item.id} onOpen={openDocument} />) : <div className="col-span-full"><KnowledgeEmpty action={<Button variant="outline" size="sm" onClick={() => { setQuery(""); setTags([]); setCollection("all"); }}>清除筛选</Button>} /></div>}</div></div></Demo></div>
             </div>
             <div className="mt-8 grid gap-8 @2xl:grid-cols-2"><Demo title="元数据"><MetadataPanel fields={[{ label: "所属集合", value: "研究笔记" }, { label: "最近编辑", value: "2026-09-30 09:42" }, { label: "创建者", value: "Y. Lin" }, { label: "访问级别", value: "团队可见" }]} /></Demo><Demo title="引用条目"><div className="space-y-2"><CitationItem index={1} title="语义检索的设计原则" source="研究笔记 · 第 4 段" href="#knowledge" /><CitationItem index={2} title="工作空间信息架构" source="产品资料 · 第 2 段" href="#knowledge" /></div></Demo></div></>}
     {sectionId === "inputs" && <><div className="grid gap-x-6 gap-y-10 @2xl:grid-cols-2">
+              <Demo title="行动尺寸 · 搜索操作栏" className="col-span-full"><div className="mb-5 flex flex-wrap gap-3"><Button size="hero" onClick={() => notify.success("已开始探索")}>开始探索 <ArrowRight /></Button><Button size="action" variant="secondary" onClick={() => notify.info("设置已保存")}><Settings2 />管理来源</Button></div><FloatingToolbar tone={tone} material={material} aria-label="搜索操作栏" className="w-full rounded-2xl"><KnowledgeSearch value={query} onChange={setQuery} className="min-w-0 flex-1" /><Button size="action" onClick={() => notify.info(query ? `搜索：${query}` : "请输入搜索内容")}><Search />搜索</Button></FloatingToolbar></Demo>
               <Demo title="按钮 · 尺寸 · 状态"><div className="flex flex-wrap items-center gap-2"><Button onClick={() => notify.success("已创建文档")}><Plus />新建文档</Button><Button variant="secondary"><Filter />筛选</Button><Button variant="outline">描边按钮</Button><Button variant="ghost">次要操作</Button><Button variant="destructive">移除</Button><Button disabled>不可用</Button><Button disabled aria-busy="true"><Loader2 className="animate-spin" />加载中</Button><Button variant="link">链接按钮</Button><Button size="sm">小按钮</Button><Button size="icon" variant="outline" aria-label="更多操作"><Ellipsis /></Button></div></Demo>
               <Demo title="文本输入 · 标签 · 错误状态"><div className="grid gap-4"><div className="grid gap-2"><Label htmlFor={`${uid}-demo-title`}>文档标题</Label><Input id={`${uid}-demo-title`} placeholder="输入文档标题" /></div><div className="grid gap-2"><Label htmlFor={`${uid}-demo-error`}>必填字段</Label><Input id={`${uid}-demo-error`} aria-invalid="true" aria-describedby={`${uid}-demo-error-hint`} placeholder="请输入内容" /><span id={`${uid}-demo-error-hint`} className="text-xs text-destructive">此字段不能为空</span></div><div className="grid gap-2"><Label htmlFor={`${uid}-demo-note`}>摘要</Label><Textarea id={`${uid}-demo-note`} placeholder="记录关键想法..." /></div></div></Demo>
               <Demo title="复选框 · 单选 · 开关"><div className="space-y-5"><label className="flex items-center gap-3 text-sm"><Checkbox defaultChecked />允许团队成员评论</label><div className="flex items-center gap-3"><Switch id={`${uid}-demo-notify`} defaultChecked /><Label htmlFor={`${uid}-demo-notify`}>开启更新提醒</Label></div><RadioGroup defaultValue="team" className="flex gap-6"><label className="flex items-center gap-2 text-sm"><RadioGroupItem value="team" />团队可见</label><label className="flex items-center gap-2 text-sm"><RadioGroupItem value="private" />仅自己</label></RadioGroup></div></Demo>
@@ -143,20 +154,20 @@ function Examples({ sectionId, tone }: { sectionId: string; tone: SurfaceTone })
   </>;
 }
 
-function BrandMark() {
-  return <span className="landing-brand-mark is-small" aria-hidden="true"><span className="landing-brand-ray ray-one" /><span className="landing-brand-ray ray-two" /><span className="landing-brand-ray ray-three" /><span className="landing-brand-ray ray-four" /></span>;
-}
-
 export default function ComponentsPage() {
   return <div className="design-system gallery-surface">
-    <header className="ds-header"><Link href="/landing" className="ds-wordmark"><BrandMark /><span>Sideronostos.</span></Link><span className="ds-header-label">Design system / 01</span><Button asChild variant="outline" size="sm"><Link href="/landing">探索平台 <ArrowRight /></Link></Button></header>
+    <header className="ds-header"><Link href="/landing" aria-label="Agrisata" className="ds-wordmark"><BrandLogo className="w-44" /></Link><span className="ds-header-label">Design system / 01</span><Button asChild variant="outline" size="sm"><Link href="/landing">探索平台 <ArrowRight /></Link></Button></header>
     <div className="ds-layout">
       <aside className="ds-sidebar"><p className="ds-index-label">THE LIBRARY</p><nav aria-label="组件分类">{sections.map(item => <a key={item.id} href={`#${item.id}`}><span>{item.number}</span>{item.label}</a>)}</nav><div className="ds-sidebar-note"><span className="ds-status-dot" /> One system.<br />Every surface.<p>黑灰为底，荧光绿点亮行动。<br />米白表面为重点信息留白。</p></div></aside>
       <main className="ds-main">
-        <div className="ds-intro"><p className="ds-eyebrow"><span className="ds-status-dot" /> SIDERONOSTOS / DESIGN LANGUAGE</p><h1>Clarity, by design.<br /><em>让复杂，归于清晰。</em></h1><div className="ds-intro-bottom"><p>从一个按钮到完整工作流。为 Sideronostos 构建一致、平静而清晰的界面语言。</p><Badge variant="outline">深色主题 · 双表面规范</Badge></div></div>
-        <section className="ds-foundations" aria-label="基础设计规范"><div><span className="ds-eyebrow">01 / PALETTE</span><div className="ds-swatches">{[{color:"#090a0a",label:"Canvas"},{color:"#242626",label:"Panel"},{color:"#bdff72",label:"Action"},{color:"#e9ebe5",label:"Soft surface"}].map(item=><div key={item.color}><i style={{background:item.color}} /><strong>{item.label}</strong><code>{item.color}</code></div>)}</div></div><div className="ds-type-spec"><span className="ds-eyebrow">02 / TYPE & SPACE</span><strong>Aa <span>清晰有序</span></strong><p>Geist / 系统中文字体 · 正文 14px / 1.6</p><p>间距 4 / 8 / 12 / 16 / 24 / 32 · 圆角 8px</p><p>深灰默认。米白用于重点信息与局部容器。</p></div></section>
-        {sections.map(section => <section key={section.id} id={section.id} className="gallery-section ds-section"><div className="ds-section-heading"><div><span className="ds-eyebrow">{section.number} / COMPONENTS</span><h2>{section.label}</h2></div><span className="ds-section-caption">同一组件，两种表面。</span></div><div className={`ds-preview-pair ${["activity","gantt"].includes(section.id) ? "ds-preview-pair-wide" : ""}`}>{(["dark","light"] as const).map(tone=><Surface key={tone} tone={tone} className="ds-preview @container" aria-label={`${section.label} · ${tone === "dark" ? "深灰" : "米白"}示例`}><div className="ds-preview-label"><span><i />{tone === "dark" ? "DARK / 深灰表面" : "LIGHT / 米白表面"}</span><code>{`surface="${tone}"`}</code></div><div className="ds-preview-content"><Examples sectionId={section.id} tone={tone} /></div></Surface>)}</div></section>)}
-        <footer className="ds-footer"><span>SIDERONOSTOS. / BUILT FOR CLARITY.</span><Link href="/landing">探索 Sideronostos <ArrowRight className="size-3" /></Link></footer>
+        <div className="ds-intro"><p className="ds-eyebrow"><span className="ds-status-dot" /> AGRISATA / DESIGN LANGUAGE</p><h1>Clarity, by design.<br /><em>让复杂，归于清晰。</em></h1><div className="ds-intro-bottom"><p>从一个按钮到完整工作流。为 Agrisata 构建一致、平静而清晰的界面语言。</p><Badge variant="outline">单一主题 · 三种组件表面</Badge></div></div>
+        <section className="ds-foundations" aria-label="基础设计规范"><div><span className="ds-eyebrow">01 / PALETTE</span><div className="ds-swatches">{[{color:"#090a0a",label:"Canvas"},{color:"#242626",label:"Panel"},{color:"#bdff72",label:"Action"},{color:"#e9ebe5",label:"Soft surface"}].map(item=><div key={item.color}><i style={{background:item.color}} /><strong>{item.label}</strong><code>{item.color}</code></div>)}</div></div><div className="ds-type-spec"><span className="ds-eyebrow">02 / TYPE & SPACE</span><strong>Aa <span>清晰有序</span></strong><p>Geist / 系统中文字体 · 正文 14px / 1.6</p><p>间距 4 / 8 / 12 / 16 / 24 / 32 · 圆角 8 / 16 / 20px</p><p>深灰承载操作，米白突出内容，烟灰玻璃连接环境。</p></div></section>
+        <section className="ds-reference-patterns" aria-label="参考页组合模式">
+          <div className="ds-pattern-copy"><span className="ds-eyebrow">FROM THE PRODUCT / INTO THE SYSTEM</span><h2>界面有层次，<br />行动有焦点。</h2><p>提炼自 Landing 的横向流程卡、Agriculture 的数据叠层和 Agriculture App 的浮动导航。实心与玻璃各司其职，共用一套交互语言。</p><Button size="action" asChild><a href="#overview">探索组件 <ArrowRight /></a></Button></div>
+          <div className="ds-photo-stage"><MetricPanel material="glass" title="Field intelligence." eyebrow="NORTH FIELD / CONNECTED" metrics={[{label:"覆盖面积",value:"128",detail:"公顷 / 已连接"},{label:"健康指数",value:"86",detail:"状态良好"},{label:"节省投入",value:"24%",detail:"相比上一季"}]} /><FloatingToolbar aria-label="浮动操作示例"><Button variant="ghost" size="icon" aria-label="查找地块"><Search /></Button><Button variant="ghost" size="icon" aria-label="地块通知"><Bell /></Button><Button size="action" asChild><a href="#knowledge">进入工作空间 <ArrowRight /></a></Button></FloatingToolbar></div>
+        </section>
+        {sections.map(section => <section key={section.id} id={section.id} className="gallery-section ds-section"><div className="ds-section-heading"><div><span className="ds-eyebrow">{section.number} / COMPONENTS</span><h2>{section.label}</h2></div><span className="ds-section-caption">同一数据 · 独立交互 · 局部表面</span></div><div className={`ds-preview-pair ${["activity","gantt"].includes(section.id) ? "ds-preview-pair-wide" : ""}`}>{([{tone:"dark",material:"solid",label:"深灰表面"},{tone:"light",material:"solid",label:"米白表面"},{tone:"dark",material:"glass",label:"烟灰玻璃"}] as const).map(({tone,material,label})=><div key={label} className={`ds-preview-stage ${material === "glass" ? "ds-preview-stage-glass" : ""}`}><Surface tone={tone} material={material} className="ds-preview @container" aria-label={`${section.label} · ${label}示例`}><div className="ds-preview-label"><span><i />{label}</span><code>{material === "glass" ? 'material="glass"' : `tone="${tone}"`}</code></div><div className="ds-preview-content"><Examples sectionId={section.id} tone={tone} material={material} /></div></Surface></div>)}</div></section>)}
+        <footer className="ds-footer"><span>AGRISATA. / BUILT FOR CLARITY.</span><Link href="/landing">探索 Agrisata <ArrowRight className="size-3" /></Link></footer>
       </main>
     </div>
   </div>;

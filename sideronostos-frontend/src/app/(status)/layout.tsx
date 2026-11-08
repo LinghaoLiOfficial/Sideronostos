@@ -1,12 +1,12 @@
 import Link from "next/link";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { capabilities } from "@/config/capabilities";
-import { env } from "@/lib/env";
 
 export default function StatusLayout({ children }: { children: React.ReactNode }) {
   return <div className="status-app">
     <header className="topbar"><div className="shell topbar-inner">
-      <strong>{env.NEXT_PUBLIC_APP_NAME}</strong>
+      <Link href="/" aria-label="Agrisata status"><BrandLogo surface="light" className="w-40" /></Link>
       <nav className="nav" aria-label="Primary navigation">
         <Link href="/">Status</Link>
         <Link href="/components">Components</Link>

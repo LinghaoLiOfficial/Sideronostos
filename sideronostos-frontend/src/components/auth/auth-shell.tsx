@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { BookOpen, CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { Badge } from "@/components/ui/badge";
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
@@ -10,10 +11,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
       <div className="mx-auto grid min-h-[calc(100vh-4rem)] min-w-0 w-full max-w-[1280px] items-stretch overflow-hidden rounded-lg border border-white/10 bg-[#160f1d]/45 shadow-2xl shadow-black/30 backdrop-blur-xl lg:grid-cols-[1.05fr_.95fr]">
         <section className="relative hidden overflow-hidden border-r border-white/10 p-12 lg:flex lg:flex-col lg:justify-between">
           <div className="relative">
-            <Link href="/components" className="inline-flex items-center gap-3 text-sm font-semibold">
-              <span className="brand-gradient-soft flex size-9 items-center justify-center rounded-lg border border-primary/30 text-pink-100"><BookOpen className="size-4" /></span>
-              ATLAS <span className="font-normal text-muted-foreground">/ Workspace</span>
-            </Link>
+            <Link href="/components" aria-label="Agrisata" className="inline-flex"><BrandLogo priority className="w-44" /></Link>
             <Badge variant="outline" className="mt-16">KNOWLEDGE OS · 2026</Badge>
             <h1 className="mt-6 max-w-lg text-4xl font-semibold leading-tight">让团队知识保持清晰、可信、随时可用</h1>
             <p className="mt-5 max-w-lg text-sm leading-7 text-muted-foreground">连接研究、文档与灵感，让每一次检索都有来源，每一次协作都留下上下文</p>
@@ -26,10 +24,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         </section>
         <section className="flex min-w-0 w-full max-w-full items-center justify-center p-5 sm:p-10 lg:p-14">
           <div className="min-w-0 w-full max-w-md">
-            <Link href="/components" className="mb-10 flex items-center gap-3 text-sm font-semibold lg:hidden">
-              <span className="brand-gradient-soft flex size-9 items-center justify-center rounded-lg border border-primary/30 text-pink-100"><Sparkles className="size-4" /></span>
-              ATLAS / Workspace
-            </Link>
+            <Link href="/components" aria-label="Agrisata" className="mb-10 inline-flex lg:hidden"><BrandLogo priority className="w-44" /></Link>
             {children}
           </div>
         </section>

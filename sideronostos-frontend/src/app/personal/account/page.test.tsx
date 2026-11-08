@@ -54,7 +54,7 @@ describe("personal center", () => {
     expect(screen.getByText("已验证").getAttribute("data-slot")).toBe("badge");
     expect(screen.queryByText("8–256 个字符")).toBeNull();
     expect(screen.getByRole("link", { name: "个人中心：测试用户" }).getAttribute("href")).toBe("/personal/notifications");
-    expect(screen.getByRole("link", { name: /ATLAS/ }).getAttribute("href")).toBe("/workspace/files");
+    expect(screen.getByRole("link", { name: /Agrisata/ }).getAttribute("href")).toBe("/workspace/files");
     const nav = screen.getByRole("navigation", { name: "个人中心导航" });
     expect(within(nav).getAllByRole("link")).toHaveLength(2);
     expect(within(nav).getByRole("link", { name: "账号管理" }).getAttribute("aria-current")).toBe("page");

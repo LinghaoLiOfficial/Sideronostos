@@ -24,6 +24,7 @@ import {
   UserRound,
   Image as ImageIcon,
 } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -34,7 +35,7 @@ import { Surface } from "@/components/ui/surface";
 type Screen = "weather" | "fields" | "analysis";
 
 function AppBrand() {
-  return <a className="ag-app-brand" href="/agriculture"><span>✳</span>Sideronostos.</a>;
+  return <a className="ag-app-brand" href="/agriculture" aria-label="Agrisata agriculture"><BrandLogo surface="light" className="w-44" /></a>;
 }
 
 function PhoneShell({ children, className = "" }: { children: React.ReactNode; className?: string }) {

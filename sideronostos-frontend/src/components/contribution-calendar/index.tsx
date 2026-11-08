@@ -116,9 +116,9 @@ export function ContributionCalendar({ year: controlledYear, years, onYearChange
     setEditing(false);
   };
 
-  return <TooltipProvider><div ref={calendarRef} className={cn(embedded ? "p-5 sm:p-6" : "glass-surface rounded-lg border p-5 sm:p-6", className)} aria-label={ariaLabel}>
+  return <TooltipProvider><div ref={calendarRef} className={cn(embedded ? "p-5 sm:p-6" : "glass-surface rounded-2xl border p-5 sm:p-6", className)} aria-label={ariaLabel}>
     <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-      <div><p className="text-lg font-semibold">{total.toLocaleString()} 个事项</p></div>
+      <div><p className="text-3xl font-normal tracking-tight">{total.toLocaleString()} 个事项</p></div>
       <Select value={String(year)} onValueChange={changeYear}>
       <SelectTrigger aria-label="选择年份" className="w-28"><SelectValue /></SelectTrigger>
         <SelectContent>{availableYears.map((item) => <SelectItem key={item} value={String(item)}>{item}</SelectItem>)}</SelectContent>
@@ -151,7 +151,7 @@ export function ContributionCalendar({ year: controlledYear, years, onYearChange
           <span className="flex items-center gap-2"><span>少</span>{intensityClasses.map((tone, index) => <span key={tone} aria-label={`事项数量等级 ${index}`} className={cn("size-3 rounded-[3px] border border-border", tone)} />)}<span>多</span></span>
         </div>
       </div>
-      <aside role="region" aria-label="日期详情" className="glass-surface flex h-56 min-w-0 flex-col rounded-lg border p-4">
+      <aside role="region" aria-label="日期详情" className="glass-surface flex h-56 min-w-0 flex-col rounded-xl border p-4">
         <div className="mb-3 flex items-center justify-between gap-2">
           <h3 className="min-w-0 break-words text-sm font-semibold">{selectedTitle}</h3>
           {!readOnly && selectedDate && !editing && <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" aria-label="编辑日期事项" onClick={beginEditing}><Pencil /></Button>}

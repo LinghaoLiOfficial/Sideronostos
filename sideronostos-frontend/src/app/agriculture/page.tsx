@@ -16,6 +16,7 @@ import {
   Volume2,
   X,
 } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -35,18 +36,18 @@ const risks = [
   { id: "west", label: "Pigweed 8%", x: "69%", y: "70%", tone: "low" },
 ];
 
-function Brand({ inverse = false }: { inverse?: boolean }) {
-  return <a href="#vision" className={`ag-brand ${inverse ? "inverse" : ""}`} aria-label="Sideronostos agriculture home"><span className="ag-brand-symbol">✳</span><span>Sideronostos.</span></a>;
+function Brand() {
+  return <a href="#vision" className="ag-brand" aria-label="Agrisata agriculture home"><BrandLogo className="w-44" /></a>;
 }
 
 function SectionTag({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
-  return <Badge variant="outline" className={`ag-section-tag ${dark ? "dark" : ""}`}>{children}</Badge>;
+  return <Badge variant="outline" className={`ag-section-tag ${dark ? "dark" : ""}`}><BrandLogo variant="icon" surface={dark ? "dark" : "light"} alt="" className="size-3" />{children}</Badge>;
 }
 
 function AgricultureHeader({ muted, onMute }: { muted: boolean; onMute: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return <header className="ag-header">
-    <Brand inverse />
+    <Brand />
     <nav className={`ag-nav ${menuOpen ? "open" : ""}`}>
       <a href="#vision" onClick={() => setMenuOpen(false)}>Vision</a>
       <a href="#risk-map" onClick={() => setMenuOpen(false)}>Field intelligence</a>
@@ -67,7 +68,7 @@ function VisionSection() {
   return <section id="vision" className="ag-vision ag-dark-section">
     <div className="ag-noise" />
     <div className="ag-section-inner">
-      <SectionTag dark>✳ &nbsp; About Sideronostos.</SectionTag>
+      <SectionTag dark>About Agrisata.</SectionTag>
       <div className="ag-vision-heading"><h1>We Combine AI Vision,<br />Precision Robotics, and Biology</h1><p>We use AI, robotics, and biology to protect crops with fewer chemicals, lower costs, and less environmental impact.</p></div>
       <div className="ag-soil-visual">
         <div className="ag-soil-image" />
@@ -91,14 +92,14 @@ function RiskMapSection() {
 }
 
 function OutcomesSection() {
-  return <section id="outcomes" className="ag-outcomes"><div className="ag-outcomes-inner"><div className="ag-outcomes-heading"><SectionTag>✳ &nbsp; Outcomes</SectionTag><h2>Better Economics,<br />with Less Chemistry</h2></div><div className="ag-outcome-body"><div className="ag-outcome-copy"><h3>Better margins</h3><p>Produce more efficiently while keeping input costs under control and margins strong.</p><Button asChild className="ag-green-button"><a href="#contact">Book a Demo <ArrowRight /></a></Button></div><Card className="ag-seedling-card"><div className="ag-seedling-image" /><div className="ag-margin-panel"><span>✳</span><strong>+14%</strong><small>margin gain</small><div className="ag-mini-chart"><i /><i /><i /><i /></div><div className="ag-mini-months"><span>Jan</span><span>Feb</span><span>March</span><span>Apr</span></div></div></Card></div></div></section>;
+  return <section id="outcomes" className="ag-outcomes"><div className="ag-outcomes-inner"><div className="ag-outcomes-heading"><SectionTag>Outcomes</SectionTag><h2>Better Economics,<br />with Less Chemistry</h2></div><div className="ag-outcome-body"><div className="ag-outcome-copy"><h3>Better margins</h3><p>Produce more efficiently while keeping input costs under control and margins strong.</p><Button asChild className="ag-green-button"><a href="#contact">Book a Demo <ArrowRight /></a></Button></div><Card className="ag-seedling-card"><div className="ag-seedling-image" /><div className="ag-margin-panel"><BrandLogo variant="icon" alt="" className="size-4" /><strong>+14%</strong><small>margin gain</small><div className="ag-mini-chart"><i /><i /><i /><i /></div><div className="ag-mini-months"><span>Jan</span><span>Feb</span><span>March</span><span>Apr</span></div></div></Card></div></div></section>;
 }
 
 function PrecisionSection() {
-  return <section className="ag-precision"><div className="ag-precision-image" /><div className="ag-precision-shade" /><div className="ag-precision-title"><SectionTag dark>✳ &nbsp; The market shift</SectionTag><h2>From Blanket Chemistry<br />to Precision Agriculture</h2></div><Card className="ag-data-panel ag-field-panel"><h3>Field Risk Score <span>✳</span></h3><small>Max</small><div className="ag-risk-bars"><i><b>6–12%</b></i><i><b>30–52%</b></i><i><b>10–12%</b></i></div><footer><span>Min</span><span>Humidity</span><span>Weed Growth</span><span>Pest Activity</span></footer></Card><Card className="ag-data-panel ag-chemical-panel"><h3>Chemical Reduction <span>✳</span></h3><p><Leaf /> vs. conventional methods</p><div className="ag-chemical-chart"><span>↓12% vs Apr</span><i /><i /><i /><i /><i /></div><footer><span>Jan</span><span>Feb</span><span>March</span><span>Apr</span><span>May</span><span>Jun</span></footer></Card><div className="ag-precision-scroll"><ArrowDown /> Scroll to Explore</div></section>;
+  return <section className="ag-precision"><div className="ag-precision-image" /><div className="ag-precision-shade" /><div className="ag-precision-title"><SectionTag dark>The market shift</SectionTag><h2>From Blanket Chemistry<br />to Precision Agriculture</h2></div><Card className="ag-data-panel ag-field-panel"><h3>Field Risk Score <BrandLogo variant="icon" alt="" className="size-4" /></h3><small>Max</small><div className="ag-risk-bars"><i><b>6–12%</b></i><i><b>30–52%</b></i><i><b>10–12%</b></i></div><footer><span>Min</span><span>Humidity</span><span>Weed Growth</span><span>Pest Activity</span></footer></Card><Card className="ag-data-panel ag-chemical-panel"><h3>Chemical Reduction <BrandLogo variant="icon" alt="" className="size-4" /></h3><p><Leaf /> vs. conventional methods</p><div className="ag-chemical-chart"><span>↓12% vs Apr</span><i /><i /><i /><i /><i /></div><footer><span>Jan</span><span>Feb</span><span>March</span><span>Apr</span><span>May</span><span>Jun</span></footer></Card><div className="ag-precision-scroll"><ArrowDown /> Scroll to Explore</div></section>;
 }
 
 export default function AgriculturePage() {
   const [muted, setMuted] = useState(false);
-  return <main className={`agriculture-page ${muted ? "is-muted" : ""}`}><AgricultureHeader muted={muted} onMute={() => setMuted((value) => !value)} /><VisionSection /><RiskMapSection /><OutcomesSection /><PrecisionSection /><section id="contact" className="ag-contact"><SectionTag>Start with Sideronostos.</SectionTag><h2>Grow smarter from the ground up.</h2><div className="ag-contact-actions"><Button asChild className="ag-green-button"><a href="mailto:hello@sideronostos.dev">Talk to our team <ArrowRight /></a></Button><Button asChild variant="outline"><a href="/agriculture-app#showcase">Explore the App Experience <ArrowRight /></a></Button></div></section></main>;
+  return <main className={`agriculture-page ${muted ? "is-muted" : ""}`}><AgricultureHeader muted={muted} onMute={() => setMuted((value) => !value)} /><VisionSection /><RiskMapSection /><OutcomesSection /><PrecisionSection /><section id="contact" className="ag-contact"><SectionTag dark>Start with Agrisata.</SectionTag><h2>Grow smarter from the ground up.</h2><div className="ag-contact-actions"><Button asChild className="ag-green-button"><a href="mailto:hello@agrisata.dev">Talk to our team <ArrowRight /></a></Button><Button asChild variant="outline"><a href="/agriculture-app#showcase">Explore the App Experience <ArrowRight /></a></Button></div></section></main>;
 }

@@ -10,7 +10,7 @@ import {
 } from "kanx-gantt";
 import "kanx-gantt/style.css";
 import { cn } from "@/lib/utils";
-import { useSurface } from "@/components/ui/surface";
+import { useSurfaceAppearance } from "@/components/ui/surface";
 import { getGanttTaskColor, isGanttParentTask, type GanttRoleColorSet } from "./color-scheme";
 import styles from "./gantt.module.css";
 
@@ -70,7 +70,23 @@ export function GanttChart({
   className,
 }: GanttChartProps) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const surface = useSurface();
+  const { tone: surface, material } = useSurfaceAppearance();
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    // Native dialogs live inside the wide timeline. Anchor them to its visible
+    // viewport, including after the user scrolls horizontally, without moving DOM.
+    const measure = () => {
+      if (root.clientWidth) root.style.setProperty("--gantt-viewport-width", `${root.clientWidth}px`);
+      root.style.setProperty("--gantt-viewport-offset", `${root.scrollLeft}px`);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(root);
+    root.addEventListener("scroll", measure, { passive: true });
+    return () => { observer.disconnect(); root.removeEventListener("scroll", measure); };
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -81,7 +97,11 @@ export function GanttChart({
     const observer = new MutationObserver((records) => {
       if (tooltipOwner !== root) return;
       for (const record of records) for (const node of record.addedNodes) {
-        if (node instanceof HTMLElement && node.classList.contains("kanx-tooltip")) node.dataset.surface = surface;
+        if (node instanceof HTMLElement && node.classList.contains("kanx-tooltip")) {
+          node.dataset.surface = surface;
+          node.dataset.material = material;
+          node.dataset.surfaceOverlay = "";
+        }
       }
     });
     observer.observe(document.body, { childList: true });
@@ -91,7 +111,7 @@ export function GanttChart({
       root.removeEventListener("focusin", claimTooltip);
       if (tooltipOwner === root) tooltipOwner = null;
     };
-  }, [surface]);
+  }, [surface, material]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -170,7 +190,7 @@ export function GanttChart({
     return () => observer.disconnect();
   }, [snapshot.taskData, colorScheme, taskColorPalette, taskRenderers]);
 
-  return <div ref={rootRef} data-surface={surface} data-color-scheme={surface} className={cn(styles.root, "min-w-0 overflow-x-auto", className)} style={{ height }}>
+  return <div ref={rootRef} data-surface={surface} data-gantt-material={material} data-color-scheme={surface} className={cn(styles.root, "min-w-0 overflow-x-auto", className)} style={{ height }}>
     <div className="h-full min-w-[960px]">
       <SvarGantt
         className="h-full"

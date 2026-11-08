@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, FileText, Folder, Hash, Link2, Search, X } from "lucide-react";
+import { ArrowUpRight, BookOpen, FileText, Folder, Hash, Link2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -35,14 +35,15 @@ export function DocumentRow({ document, onOpen, selected = false }: {
   document: KnowledgeDocument; onOpen: (id: string) => void; selected?: boolean;
 }) {
   return <button type="button" onClick={() => onOpen(document.id)}
-    className={cn("glass-surface group flex min-h-56 w-full flex-col rounded-md border p-4 text-left", interactiveCardClassName, selected && "brand-gradient-subtle border-primary/40")}>
-    <span className="brand-gradient-soft flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/20 text-accent-foreground"><FileText className="size-5" /></span>
-    <span className="mt-5 min-w-0">
-      <span className="block line-clamp-2 text-sm font-medium leading-5">{document.title}</span>
+    aria-pressed={selected}
+    className={cn("glass-surface group flex min-h-60 w-full flex-col gap-5 rounded-2xl border p-5 text-left", interactiveCardClassName, selected && "brand-gradient-subtle border-ring")}>
+    <span className="flex w-full items-center justify-between"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-foreground"><FileText className="size-5" /></span><ArrowUpRight aria-hidden="true" className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span>
+    <span className="min-w-0">
+      <span className="block line-clamp-2 text-base font-medium leading-6 tracking-tight">{document.title}</span>
       <span className="mt-2 block line-clamp-2 text-xs leading-5 text-muted-foreground">{document.summary}</span>
       <span className="mt-3 flex min-h-6 flex-wrap gap-1.5">{document.tags.map((tag) => <Badge key={tag} variant="secondary" className="text-[11px]">{tag}</Badge>)}</span>
     </span>
-    <span className="mt-auto flex w-full items-center gap-2 border-t border-border pt-4">
+    <span className="mt-auto flex w-full flex-wrap items-center gap-2 border-t border-border pt-4">
       <Avatar className="size-7"><AvatarFallback className="text-[10px]">{document.initials ?? "KM"}</AvatarFallback></Avatar>
       <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{document.collection}</span>
       <span className="shrink-0 text-xs text-muted-foreground">{document.updatedAt}</span>
@@ -56,7 +57,7 @@ export function TagPicker({ tags, selected, onChange }: {
   return <div className="flex flex-wrap gap-2" role="group" aria-label="按标签筛选">
     {tags.map((tag) => <button key={tag} type="button" aria-pressed={selected.includes(tag)}
       onClick={() => onChange(selected.includes(tag) ? selected.filter((item) => item !== tag) : [...selected, tag])}
-      className={cn("inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs transition-colors focus-visible:outline-ring",
+      className={cn("inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs transition-colors focus-visible:outline-ring",
         selected.includes(tag) ? "brand-gradient-soft border-primary/50 text-accent-foreground" : "border-border bg-muted/50 text-muted-foreground hover:text-foreground")}>
       <Hash className="size-3" />{tag}
     </button>)}

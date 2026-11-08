@@ -1,6 +1,7 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { GanttChart, getGanttTaskColor, getGanttTaskVisualRole, isGanttParentTask, type GanttSnapshot } from ".";
+import { Surface } from "@/components/ui/surface";
 
 const nextSnapshot: GanttSnapshot = {
   taskData: [{ id: "next", name: "已更新任务", type: "task", start: "2026-10-04", end: "2026-10-05" }],
@@ -57,6 +58,21 @@ describe("GanttChart", () => {
 
     expect(screen.getByTestId("svar-gantt").parentElement?.parentElement?.getAttribute("data-color-scheme")).toBe("dark");
     expect(screen.getByTestId("dependency-arrows").textContent).toBe("false");
+  });
+
+  it.each(["solid", "glass"] as const)("carries the owning %s surface to the external tooltip", async material => {
+    render(<Surface tone="light" material={material}><GanttChart snapshot={snapshot} onChange={vi.fn()} /></Surface>);
+    fireEvent.pointerOver(screen.getByTestId("timeline"));
+    const tooltip = document.createElement("div");
+    tooltip.className = "kanx-tooltip";
+    document.body.append(tooltip);
+    try {
+      await waitFor(() => expect(tooltip.dataset.material).toBe(material));
+      expect(tooltip.dataset.surface).toBe(material === "glass" ? "dark" : "light");
+      expect(tooltip.hasAttribute("data-surface-overlay")).toBe(true);
+    } finally {
+      tooltip.remove();
+    }
   });
 
   it("resolves parent and child roles for periods and milestones", () => {
@@ -128,6 +144,16 @@ describe("GanttChart", () => {
     expect(timeline.scrollLeft).toBe(68);
     expect(fireEvent.wheel(sidebar, { deltaY: 48 })).toBe(true);
     expect(timeline.scrollLeft).toBe(68);
+  });
+
+  it("anchors native dialogs to the visible chart width and scroll position", () => {
+    render(<GanttChart snapshot={snapshot} onChange={vi.fn()} />);
+    const root = screen.getByTestId("svar-gantt").parentElement!.parentElement!;
+    Object.defineProperty(root, "clientWidth", { value: 280 });
+    root.scrollLeft = 140;
+    fireEvent.scroll(root);
+    expect(root.style.getPropertyValue("--gantt-viewport-width")).toBe("280px");
+    expect(root.style.getPropertyValue("--gantt-viewport-offset")).toBe("140px");
   });
 
   it("returns all gantt changes to the controlled caller", () => {

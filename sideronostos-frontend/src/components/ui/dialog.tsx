@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "cn"
-import { useSurface } from "./surface"
+import { useSurfaceAppearance } from "./surface"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { Button } from "@/components/ui/button"
@@ -56,13 +56,15 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
-  const surface = useSurface()
+  const { tone: surface, material } = useSurfaceAppearance()
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         data-surface={surface}
+        data-material={material}
+        data-surface-overlay=""
         className={cn(
           "glass-popover fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border p-4 text-sm text-popover-foreground duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className

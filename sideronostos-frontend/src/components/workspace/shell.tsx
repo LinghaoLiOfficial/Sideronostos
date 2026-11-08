@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Bell, BookOpen, CalendarDays, FolderKanban, UserRound, Users } from "lucide-react";
+import { Bell, CalendarDays, FolderKanban, UserRound, Users } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -65,7 +66,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   });
   return <main className="gallery-surface flex h-screen flex-col overflow-hidden">
     <header className="border-b border-white/10 bg-[#191020]/70 backdrop-blur-xl"><div className="mx-auto flex h-16 max-w-[1500px] items-center justify-between px-5 sm:px-8">
-      <Link href="/workspace/files" className="flex items-center gap-3 text-sm font-semibold"><span className="brand-gradient-soft flex size-8 items-center justify-center rounded-lg border border-primary/30"><BookOpen className="size-4" /></span>ATLAS <span className="font-normal text-muted-foreground">/ Workspace</span></Link>
+      <Link href="/workspace/files" aria-label="Agrisata workspace" className="flex items-center"><BrandLogo priority className="w-40 sm:w-44" /></Link>
       {user && <Link href="/personal/notifications" aria-label={`个人中心：${user.display_name}`} className="flex shrink-0 items-center justify-center gap-3 rounded-md px-4 py-2 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-primary sm:min-w-36"><Avatar className="size-8"><AvatarFallback>{user.display_name.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar><span className="hidden text-sm sm:block">{user.display_name}</span></Link>}
     </div></header>
     <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col gap-6 overflow-hidden px-4 py-5 sm:px-8 md:flex-row"><aside className="w-full shrink-0 md:w-56"><div className="space-y-3 md:sticky md:top-5"><div className="pr-4 pl-2 text-base tracking-wider text-white">{personal ? "个人中心" : "工作区"}</div><nav aria-label={personal ? "个人中心导航" : "工作区导航"} className="flex flex-wrap gap-1 md:block md:space-y-1">{renderLinks()}</nav></div></aside>

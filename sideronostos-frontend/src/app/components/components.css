@@ -1,6 +1,6 @@
 .design-system { --ds-max: 1600px; }
 .ds-header { position: sticky; top: 0; z-index: 30; height: 76px; display: flex; align-items: center; gap: 24px; padding: 0 36px; border-bottom: 1px solid #ffffff1c; background: #090a0af5; }
-.ds-wordmark { display: flex; align-items: center; gap: 14px; font-size: 21px; font-weight: 600; letter-spacing: -.055em; }
+.ds-wordmark { display: flex; align-items: center; }
 .ds-header-label { margin-left: auto; color: #a7ada5; font-size: 12px; }
 .ds-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); max-width: var(--ds-max); margin: auto; }
 .ds-sidebar { position: sticky; top: 76px; align-self: start; height: calc(100dvh - 76px); padding: 42px 22px; border-right: 1px solid #ffffff1c; }
@@ -38,7 +38,18 @@
 .ds-section-caption { color: #a7ada5; font-size: 11px; }
 .ds-preview-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 18px; }
 .ds-preview { min-width: 0; overflow: clip; border: 1px solid var(--border); border-radius: 10px; }
-.ds-preview[data-surface="dark"] { --background: #171a17; }
+.ds-preview-stage { min-width: 0; }
+.ds-preview-stage-glass { grid-column: 1 / -1; padding: 32px; border-radius: 20px; background: linear-gradient(#090a0a18, #090a0a55), url("/agriculture-app/field-aerial.jpg") center / cover; }
+.ds-preview[data-surface="light"] { background-color: #e9ebe5; }
+.ds-preview[data-material="glass"] { border-radius: 20px; }
+.ds-pattern-stack { display: grid; gap: 16px; }
+.ds-reference-patterns { display: grid; grid-template-columns: .8fr 1.2fr; gap: 36px; padding: 20px 0 48px; }
+.ds-pattern-copy { align-self: center; }
+.ds-pattern-copy > .ds-eyebrow { color: #a7ada5; font-size: 9px; }
+.ds-pattern-copy h2 { margin: 24px 0 16px; font-size: clamp(28px, 3vw, 42px); font-weight: 400; line-height: 1.2; letter-spacing: -.055em; }
+.ds-pattern-copy > p { max-width: 370px; margin-bottom: 24px; color: #a7ada5; font-size: 13px; line-height: 1.8; }
+.ds-photo-stage { display: flex; min-width: 0; min-height: 420px; flex-direction: column; align-items: center; justify-content: flex-end; gap: 22px; padding: 24px; border-radius: 24px; background: linear-gradient(#090a0a05, #090a0a50), url("/agriculture-app/crop-rows.jpg") center / cover; }
+.ds-photo-stage .metric-panel { width: 100%; }
 .ds-preview-label { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border); color: var(--muted-foreground); font-size: 9px; letter-spacing: .04em; }
 .ds-preview-label > span { display: inline-flex; align-items: center; gap: 7px; }
 .ds-preview-label i { width: 5px; height: 5px; border-radius: 50%; background: var(--ring); }
@@ -51,8 +62,8 @@
 @media (min-width: 1900px) { .ds-preview-pair-wide { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 1150px) { .ds-main { padding-inline: 26px; } .ds-preview-pair { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 800px) {
+  .ds-reference-patterns { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .ds-header { height: 64px; padding: 0 20px; gap: 14px; }
-  .ds-wordmark { font-size: 18px; gap: 9px; }
   .ds-header-label { display: none; }
   .ds-header > [data-slot="button"] { margin-left: auto; }
   .ds-layout { display: block; }
@@ -67,6 +78,8 @@
   .ds-type-spec { padding-left: 24px; }
 }
 @media (max-width: 520px) {
+  .ds-preview-stage-glass { padding: 12px; }
+  .ds-photo-stage { padding: 14px; min-height: 380px; }
   .ds-intro h1 { font-size: 40px; }
   .ds-intro-bottom { align-items: flex-start; flex-direction: column; gap: 16px; }
   .ds-foundations { grid-template-columns: minmax(0, 1fr); }

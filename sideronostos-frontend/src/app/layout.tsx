@@ -9,7 +9,10 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-export const metadata: Metadata = { title: "Sideronostos" };
+export const metadata: Metadata = {
+  title: "Agrisata",
+  icons: { icon: "/brand/app-logo-favicon-centered.png" },
+};
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

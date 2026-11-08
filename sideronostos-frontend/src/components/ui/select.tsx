@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "cn"
-import { useSurface } from "./surface"
+import { useSurfaceAppearance } from "./surface"
 import { Select as SelectPrimitive } from "radix-ui"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
@@ -64,12 +64,14 @@ function SelectContent({
   align = "start",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
-  const surface = useSurface()
+  const { tone: surface, material } = useSurfaceAppearance()
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         data-slot="select-content"
         data-surface={surface}
+        data-material={material}
+        data-surface-overlay=""
         data-align-trigger={position === "item-aligned"}
         className={cn(
           "relative z-50 max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",

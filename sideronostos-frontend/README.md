@@ -1,4 +1,4 @@
-# Sideronostos
+# Agrisata
 
 Independent Next.js frontend for the generated `custom` profile.
 

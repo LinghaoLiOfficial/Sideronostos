@@ -32,7 +32,7 @@
 [data-surface="light"], .surface-toast-light {
   color-scheme: light;
   --background: #e9ebe5; --foreground: #151711;
-  --card: #f4f5ef; --card-foreground: #151711;
+  --card: #e9ebe5; --card-foreground: #151711;
   --popover: #f4f5ef; --popover-foreground: #151711;
   --primary: #bdff72; --primary-foreground: #14200d;
   --secondary: #daddd3; --secondary-foreground: #252b20;
@@ -193,6 +193,34 @@
   background-size: 40px 40px; mask-image: linear-gradient(to bottom, #0009, transparent 85%);
 }
 .glass { background: var(--card); border: 1px solid var(--border); }
+/* Opt-in material only. Legacy glass-* aliases intentionally remain opaque. */
+[data-material="glass"] {
+  --card: #242626ad;
+  --popover: #242626eb;
+  --field: #161818e6;
+  --border: #ffffff30;
+  --input: #ffffff57;
+  --muted-foreground: #c0c6be;
+  background-color: #242626ad;
+  border-color: var(--border);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 #ffffff12, 0 16px 40px #00000026;
+}
+[data-material="glass"][data-surface-overlay], .surface-toast-glass {
+  background-color: #242626eb;
+  --card: #242626eb;
+}
+[data-material="glass"][data-material-nested="true"] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* Controls use opaque field tokens, never their own backdrop blur. */
+@supports not ((backdrop-filter: blur(14px)) or (-webkit-backdrop-filter: blur(14px))) {
+  [data-material="glass"], [data-material="glass"][data-surface-overlay], .surface-toast-glass {
+    --card: #242626; --popover: #242626; background-color: #242626;
+  }
+}
 .gallery-section { scroll-margin-top: 88px; }
 .kanx-tooltip[data-surface] { color: var(--popover-foreground); background: var(--popover); border-color: var(--border); }
 
@@ -212,17 +240,7 @@
 .landing-page a { color: inherit; }
 .landing-header { position: relative; z-index: 10; height: 132px; background: rgba(8, 9, 9, .97); border-bottom: 1px solid rgba(255,255,255,.06); }
 .landing-nav-shell { width: min(2380px, calc(100% - 140px)); height: 100%; margin: 0 auto; display: flex; align-items: center; gap: 72px; }
-.landing-wordmark { display: inline-flex; align-items: center; gap: 14px; font-size: clamp(24px, 1.05vw, 30px); font-weight: 600; letter-spacing: -.04em; white-space: nowrap; }
-.landing-brand-mark { position: relative; display: inline-block; width: 74px; height: 74px; transform: rotate(45deg); }
-.landing-brand-mark.is-small { width: 34px; height: 34px; }
-.landing-brand-ray { position: absolute; left: 50%; top: 50%; width: 24px; height: 10px; border-radius: 999px; background: #f5f6f3; transform-origin: 0 50%; }
-.landing-brand-mark.is-small .landing-brand-ray { width: 13px; height: 5px; }
-.ray-one { transform: translate(0, -50%) rotate(0deg); }
-.ray-two { transform: translate(0, -50%) rotate(90deg); }
-.ray-three { transform: translate(-100%, -50%) rotate(180deg); }
-.ray-four { transform: translate(-50%, -50%) rotate(270deg); }
-.landing-brand-ray::after { content: ""; position: absolute; right: -2px; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: inherit; transform: translateY(-50%); }
-.landing-brand-mark.is-small .landing-brand-ray::after { width: 5px; height: 5px; }
+.landing-wordmark { display: inline-flex; align-items: center; flex: 0 0 auto; }
 .landing-nav { display: flex; align-items: center; gap: clamp(28px, 2.2vw, 48px); width: 100%; font-size: clamp(17px, 0.82vw, 22px); color: #e5e6e3; }
 .landing-nav > a, .landing-nav-dropdown > button { display: inline-flex; align-items: center; gap: 15px; padding: 10px 0; border: 0; color: inherit; background: transparent; cursor: pointer; font: inherit; white-space: nowrap; }
 .landing-nav-dropdown { position: relative; }
@@ -258,7 +276,7 @@
 .landing-workflow-icon { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 6px; color: #a4a8a3; background: #262827; }
 .landing-workflow-card.green .landing-workflow-icon { color: var(--landing-green); }
 .landing-workflow-card.blue .landing-workflow-icon { color: #76cdf0; }
-.landing-workflow-card.purple .landing-workflow-icon { color: #d17fff; }
+.landing-workflow-card.purple .landing-workflow-icon { color: #bdff72; }
 .landing-workflow-copy { min-width: 0; display: grid; gap: 5px; }
 .landing-workflow-copy strong { overflow: hidden; color: inherit; font-size: 18px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .landing-workflow-copy small { color: #808580; font-size: 15px; }
@@ -271,9 +289,6 @@
 .landing-core-glow { position: absolute; inset: 10px; border-radius: 50%; background: rgba(189,255,114,.26); filter: blur(54px); }
 .landing-core-node { position: relative; width: 180px; height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px solid rgba(190,255,114,.29); clip-path: polygon(50% 0%, 91% 24%, 91% 76%, 50% 100%, 9% 76%, 9% 24%); color: #f5f6f3; background: #101310; box-shadow: 0 0 40px rgba(189,255,114,.35); }
 .landing-core-node::before { content: ""; position: absolute; inset: 7px; border: 1px solid rgba(255,255,255,.1); clip-path: inherit; }
-.landing-core-node .landing-brand-mark { width: 48px; height: 48px; margin-bottom: 4px; }
-.landing-core-node .landing-brand-ray { width: 16px; height: 7px; }
-.landing-core-node .landing-brand-ray::after { width: 7px; height: 7px; }
 .landing-core-node strong { font-size: 18px; font-weight: 500; }
 .landing-core-node span:last-child { color: #838a80; font-size: 11px; }
 .landing-core-top { position: absolute; top: 14px; color: var(--landing-green); }
@@ -300,9 +315,7 @@
 .agriculture-page { --ag-green: #b9f85e; --ag-dark: #060706; --ag-ink: #0b0d0b; min-height: 100vh; overflow: hidden; color: #f4f5ef; background: var(--ag-dark); font-family: Arial, Helvetica, sans-serif; }
 .agriculture-page a { color: inherit; }
 .ag-header { position: absolute; z-index: 20; top: 0; left: 0; right: 0; height: 84px; padding: 0 5.5vw; display: flex; align-items: center; justify-content: space-between; }
-.ag-brand { display: inline-flex; align-items: center; gap: 10px; color: #0c110c; font-size: 22px; font-weight: 600; letter-spacing: -.035em; }
-.ag-brand.inverse { color: white; }
-.ag-brand-symbol { font-size: 24px; line-height: 1; }
+.ag-brand { display: inline-flex; align-items: center; }
 .ag-nav { display: flex; gap: 38px; margin-left: auto; margin-right: 34px; color: rgba(255,255,255,.85); font-size: 14px; }
 .ag-nav a:hover { color: var(--ag-green); }
 .ag-header-actions { display: flex; align-items: center; gap: 10px; }
@@ -341,7 +354,7 @@
 .ag-risk-map::before { content: ""; position: absolute; inset: 0; background: rgba(44,58,25,.12); filter: saturate(1.2) contrast(1.05); pointer-events: none; }
 .ag-map-overlay { background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(42,52,22,.12) 80%, rgba(20,30,15,.36)); }
 .ag-map-top { position: absolute; z-index: 2; top: 24px; left: 5.5vw; right: 5.5vw; display: flex; justify-content: space-between; align-items: center; }
-.ag-map-top .ag-brand { color: white; } .ag-map-top > div { display: flex; gap: 12px; align-items: center; color: white; font-size: 14px; }
+.ag-map-top > div { display: flex; gap: 12px; align-items: center; color: white; font-size: 14px; }
 .ag-map-top [data-slot="badge"] { color: white; border-color: rgba(255,255,255,.25); background: rgba(0,0,0,.2); }
 .ag-map-markers { position: absolute; z-index: 2; inset: 0; }
 .ag-risk-marker { position: absolute; width: 230px; padding: 13px 20px; display: flex; align-items: center; gap: 9px; border: 1px solid rgba(255,255,255,.8); color: white; background: rgba(80,37,34,.42); clip-path: polygon(0 14px, 14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px)); transform: translate(-50%, -50%); cursor: pointer; transition: transform .2s ease, background .2s ease; }
@@ -382,8 +395,7 @@
 .agriculture-app-page { --app-lime: #c4ff4b; --app-ink: #151711; --app-muted: #697066; min-height: 100vh; overflow: hidden; color: var(--app-ink); background: #e9ebe5; font-family: Arial, Helvetica, sans-serif; }
 .agriculture-app-page a { color: inherit; text-decoration: none; }
 .ag-app-header { width: min(1440px, calc(100% - 80px)); height: 86px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-.ag-app-brand { display: inline-flex; align-items: center; gap: 9px; font-size: 20px; font-weight: 700; letter-spacing: -.04em; }
-.ag-app-brand span { font-size: 22px; }
+.ag-app-brand { display: inline-flex; align-items: center; }
 .ag-app-header nav { display: flex; gap: 28px; margin-left: auto; margin-right: 34px; color: #5c6259; font-size: 13px; }
 .ag-app-header nav a:hover { color: #15200e; }
 .ag-app-header button { height: 38px; border-color: rgba(21,23,17,.22); background: rgba(255,255,255,.45); }
@@ -508,7 +520,7 @@
   .ag-app-showcase { padding: 72px 18px 90px; }.ag-app-showcase-heading { display: block; margin-bottom: 42px; }.ag-app-showcase-heading h2 { margin-top: 20px; font-size: clamp(51px, 15vw, 76px); }.ag-app-showcase-heading p { margin-top: 22px; }.ag-app-desktop-wall { display: none; }.ag-app-tabs { display: block; }.ag-app-phone, .ag-app-phone-featured { width: min(100%, 350px); }.ag-app-cta { padding: 90px 18px 110px; }.ag-app-cta h2 { font-size: clamp(54px, 15vw, 78px); }.ag-app-cta p { font-size: 16px; }.ag-app-cta > div { flex-direction: column; align-items: stretch; max-width: 350px; margin: 0 auto; }
 }
 @media (max-width: 900px) {
-  .ag-header { height: 70px; padding: 0 18px; } .ag-brand { font-size: 18px; } .ag-nav { position: absolute; top: 70px; right: 0; left: 0; display: none; margin: 0; padding: 14px 18px; flex-direction: column; gap: 0; background: rgba(7,12,7,.96); } .ag-nav.open { display: flex; } .ag-nav a { padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.1); } .ag-header-actions { margin-left: auto; } .ag-mobile-menu { display: inline-flex !important; }
+  .ag-header { height: 70px; padding: 0 18px; } .ag-nav { position: absolute; top: 70px; right: 0; left: 0; display: none; margin: 0; padding: 14px 18px; flex-direction: column; gap: 0; background: rgba(7,12,7,.96); } .ag-nav.open { display: flex; } .ag-nav a { padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.1); } .ag-header-actions { margin-left: auto; } .ag-mobile-menu { display: inline-flex !important; }
   .ag-section-inner { width: calc(100% - 36px); min-height: 850px; padding-top: 110px; } .ag-vision-heading { display: block; margin-top: 28px; } .ag-vision-heading h1 { font-size: clamp(39px, 11vw, 58px); } .ag-vision-heading p { margin-top: 26px; font-size: 16px; } .ag-soil-visual { height: 330px; margin-top: 45px; } .ag-analysis-window { left: 8%; width: 84%; } .ag-analysis-photo { height: 175px; } .ag-analysis-line { bottom: -12px; } .ag-metric-heading { margin-top: 45px; } .ag-metrics { grid-template-columns: 1fr 1fr; } .ag-metric-card { min-height: 82px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,.5); } .ag-metric-card strong { font-size: 14px; } .ag-metric-card small { font-size: 11px; }
   .ag-risk-map { min-height: 720px; } .ag-map-top { left: 18px; right: 18px; } .ag-map-top > div span { display: none; } .ag-risk-marker { width: 150px; padding: 9px 10px; } .ag-risk-marker strong { font-size: 12px; } .ag-marker-pin { left: -24px; } .ag-map-legend { right: 18px; bottom: 18px; left: 18px; overflow: hidden; } .ag-legend-labels, .ag-months { min-width: 520px; gap: 22px; } .ag-gradient-bar { min-width: 520px; }
   .ag-outcomes-inner { width: calc(100% - 36px); padding: 68px 0; } .ag-outcomes-heading h2 { font-size: clamp(42px, 12vw, 62px); } .ag-outcome-body { display: flex; flex-direction: column-reverse; gap: 45px; margin-top: 60px; align-items: stretch; } .ag-seedling-card { min-height: 440px; } .ag-outcome-copy { max-width: none; } .ag-outcome-copy h3 { font-size: 36px; }
@@ -626,9 +638,6 @@
   .landing-header { height: 76px; }
   .landing-nav-shell { width: calc(100% - 34px); }
   .landing-wordmark { gap: 9px; font-size: 21px; }
-  .landing-brand-mark.is-small { width: 25px; height: 25px; }
-  .landing-brand-mark.is-small .landing-brand-ray { width: 10px; height: 4px; }
-  .landing-brand-mark.is-small .landing-brand-ray::after { width: 4px; height: 4px; }
   .landing-menu-button { display: block; }
   .landing-nav { position: absolute; top: 76px; left: 0; right: 0; display: none; padding: 18px; flex-direction: column; align-items: stretch; gap: 4px; border-bottom: 1px solid rgba(255,255,255,.1); background: #111312; box-shadow: 0 20px 40px #0009; }
   .landing-nav.is-open { display: flex; }
@@ -653,9 +662,6 @@
   .landing-flow-inputs { order: 1; }
   .landing-flow-outputs { order: 3; }
   .landing-core-node { width: 135px; height: 135px; }
-  .landing-core-node .landing-brand-mark { width: 36px; height: 36px; }
-  .landing-core-node .landing-brand-ray { width: 12px; height: 5px; }
-  .landing-core-node .landing-brand-ray::after { width: 5px; height: 5px; }
   .landing-core-node strong { font-size: 14px; }
   .landing-footer { width: calc(100% - 34px); padding: 20px 0; font-size: 12px; }
   .landing-section-shell { width: calc(100% - 34px); }

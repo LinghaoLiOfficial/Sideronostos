@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "cn"
-import { SurfaceProvider, useSurface, type SurfaceTone } from "./surface"
+import { SurfaceProvider, useSurfaceAppearance, type SurfaceTone, type SurfaceMaterial } from "./surface"
 
 const interactiveCardClassName = "cursor-pointer transition-[border-color,background-color,box-shadow] hover:border-ring/60! hover:bg-accent! has-[:focus-visible]:border-ring! has-[:focus-visible]:bg-accent!"
 
@@ -11,22 +11,26 @@ function Card({
   size = "default",
   interactive = false,
   surface,
+  material = "solid",
   ...props
 }: React.ComponentProps<"div"> & {
   size?: "default" | "sm"
   interactive?: boolean
   surface?: SurfaceTone
+  material?: SurfaceMaterial
 }) {
-  const inherited = useSurface()
-  const tone = surface ?? inherited
+  const inherited = useSurfaceAppearance()
+  const tone = material === "glass" ? "dark" : surface ?? inherited.tone
   return (
-    <SurfaceProvider tone={tone}><div
+    <SurfaceProvider tone={tone} material={material}><div
       data-slot="card"
       data-surface={tone}
+      data-material={material}
+      data-material-nested={material === "glass" && inherited.material === "glass" || undefined}
       data-size={size}
       data-interactive={interactive || undefined}
       className={cn(
-        "bg-card group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-lg border border-border py-(--card-spacing) text-sm text-card-foreground [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg",
+        "bg-card group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-2xl border border-border py-(--card-spacing) text-sm text-card-foreground [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-2xl *:[img:last-child]:rounded-b-2xl",
         interactive && interactiveCardClassName,
         className
       )}
@@ -53,7 +57,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-title"
       className={cn(
-        "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
+        "font-heading text-base leading-snug font-medium tracking-tight group-data-[size=sm]/card:text-sm",
         className
       )}
       {...props}

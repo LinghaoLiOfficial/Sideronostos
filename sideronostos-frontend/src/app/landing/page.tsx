@@ -21,6 +21,7 @@ import {
   Zap,
   X,
 } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -82,22 +83,11 @@ const benefits = [
 ];
 
 const howItWorksSteps = [
-  { eyebrow: "01 / The Idea", title: "Describe", description: "Tell Sideronostos what you want to automate, using simple everyday language.", active: true },
+  { eyebrow: "01 / The Idea", title: "Describe", description: "Tell Agrisata what you want to automate, using simple everyday language.", active: true },
   { eyebrow: "02 / The Connection", title: "Connect", description: "Bring your favorite apps, tools, and data together in one seamless workspace.", active: false },
   { eyebrow: "03 / The Intelligence", title: "Generate", description: "Let AI transform your instructions into intelligent, ready-to-run workflows.", active: false },
   { eyebrow: "04 / The Launch", title: "Launch", description: "Put your automation to work and keep your team moving forward.", active: false },
 ];
-
-function BrandMark({ small = false }: { small?: boolean }) {
-  return (
-    <span className={`landing-brand-mark${small ? " is-small" : ""}`} aria-hidden="true">
-      <span className="landing-brand-ray ray-one" />
-      <span className="landing-brand-ray ray-two" />
-      <span className="landing-brand-ray ray-three" />
-      <span className="landing-brand-ray ray-four" />
-    </span>
-  );
-}
 
 function LandingNavMenu({ label, items }: { label: string; items: string[] }) {
   return (
@@ -139,7 +129,7 @@ function AboutSection() {
   return (
     <section id="about" className="landing-about">
       <div className="landing-section-shell">
-        <LandingSectionLabel number="02">About Sideronostos.</LandingSectionLabel>
+        <LandingSectionLabel number="02">About Agrisata.</LandingSectionLabel>
         <div className="landing-about-intro">
           <h2><span>Less Complexity.</span><em>More Possibility.</em></h2>
           <p>We bring your tools, data, and workflows together in one intelligent platform. Making automation simpler, faster, and accessible to every team.</p>
@@ -237,9 +227,9 @@ function FinalCtaSection() {
       <div className="landing-cta-lines landing-cta-line-bottom-left" aria-hidden="true"><span /></div>
       <div className="landing-cta-lines landing-cta-line-bottom-right" aria-hidden="true"><span /></div>
       <div className="landing-final-cta-content">
-        <Badge variant="outline" className="landing-final-cta-badge">Get Started with Sideronostos.</Badge>
+        <Badge variant="outline" className="landing-final-cta-badge">Get Started with Agrisata.</Badge>
         <h2>Ready to Work <em>Smarter?</em></h2>
-        <p>Turn your ideas into intelligent workflows and let AI handle the busywork. Start automating with Sideronostos today.</p>
+        <p>Turn your ideas into intelligent workflows and let AI handle the busywork. Start automating with Agrisata today.</p>
         <div className="landing-final-cta-actions">
           <Button asChild size="lg" className="landing-primary-button"><a href="#workflow">Start Building</a></Button>
           <Button asChild size="lg" variant="outline" className="landing-secondary-button"><a href="#demo">Explore Platforms</a></Button>
@@ -256,10 +246,7 @@ export default function LandingPage() {
     <main className="landing-page">
       <header className="landing-header">
         <div className="landing-nav-shell">
-          <a className="landing-wordmark" href="#top" aria-label="Sideronostos home">
-            <BrandMark small />
-            <span>Sideronostos.</span>
-          </a>
+          <a className="landing-wordmark" href="#top" aria-label="Agrisata home"><BrandLogo priority className="w-52" /></a>
 
           <nav className={`landing-nav ${menuOpen ? "is-open" : ""}`} aria-label="Primary navigation">
             <a href="#top" onClick={() => setMenuOpen(false)}>Home</a>
@@ -300,8 +287,8 @@ export default function LandingPage() {
           <div className="landing-core-glow" />
           <div className="landing-core-node">
             <div className="landing-core-top"><Plus size={20} /></div>
-            <BrandMark />
-            <strong>Sideronostos.</strong>
+            <BrandLogo variant="icon" className="size-12" />
+            <strong>Agrisata</strong>
             <span>AI workflow engine</span>
           </div>
         </div>
@@ -316,8 +303,8 @@ export default function LandingPage() {
       <HowItWorksSection />
       <FinalCtaSection />
 
-      <footer id="pricing" className="landing-footer"><span>Build the way your team thinks.</span><a id="demo" href="mailto:hello@sideronostos.dev">Talk to our team <ArrowRight size={15} /></a><Settings2 size={16} aria-hidden="true" /></footer>
-      <span className="sr-only">Sideronostos workflow automation platform</span>
+      <footer id="pricing" className="landing-footer"><span>Build the way your team thinks.</span><a id="demo" href="mailto:hello@agrisata.dev">Talk to our team <ArrowRight size={15} /></a><Settings2 size={16} aria-hidden="true" /></footer>
+      <span className="sr-only">Agrisata workflow automation platform</span>
     </main>
   );
 }
