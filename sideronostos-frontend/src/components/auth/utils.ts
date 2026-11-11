@@ -28,5 +28,28 @@ export function authErrorMessage(error: unknown) {
 }
 
 export function safeNextPath(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/workspace/files";
+  const fallback = "/workspace/files";
+  if (!value?.startsWith("/")) return fallback;
+  try {
+    const decoded = decodeURIComponent(value);
+    if (decoded.startsWith("//") || decoded.includes("\\") || [...decoded].some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127)) return fallback;
+    return new URL(value, "https://agrisata.invalid").origin === "https://agrisata.invalid" ? value : fallback;
+  } catch { return fallback; }
+}
+
+export function registrationNextPath(value: string | null) {
+  const next = safeNextPath(value);
+  const path = next.split(/[?#]/, 1)[0];
+  if (next.length > 2048 || path.includes("%") || path.split("/").some((part) => part === "." || part === "..")) return "/workspace/files";
+  return ["/field-shift", "/workspace", "/personal"].some((prefix) => path === prefix || path.startsWith(`${prefix}/`)) ? next : "/workspace/files";
+}
+
+export function authHref(route: "/login" | "/register" | "/verify-email", next: string | null, values: Record<string, string> = {}) {
+  const params = new URLSearchParams(values);
+  if (next) params.set("next", route === "/login" ? safeNextPath(next) : registrationNextPath(next));
+  return `${route}${params.size ? `?${params}` : ""}`;
+}
+
+export function isFieldShiftDestination(next: string | null) {
+  return new URL(safeNextPath(next), "https://agrisata.invalid").pathname === "/field-shift";
 }

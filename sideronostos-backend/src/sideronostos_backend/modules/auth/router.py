@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,13 +19,23 @@ from .service import (
     AuthService,
     RefreshTokenReuseError,
     digest,
+    safe_return_path,
 )
 from .settings import get_auth_settings
 
 router = APIRouter(tags=["auth"])
 
 
-class RegisterRequest(BaseModel):
+class VerificationDestination(BaseModel):
+    next: str | None = Field(default=None, max_length=2048)
+
+    @field_validator("next")
+    @classmethod
+    def validate_destination(cls, value: str | None) -> str | None:
+        return safe_return_path(value)
+
+
+class RegisterRequest(VerificationDestination):
     email: EmailStr
     password: str = Field(min_length=MIN_PASSWORD_LENGTH, max_length=256)
     display_name: str = Field(min_length=1, max_length=120)
@@ -37,6 +47,10 @@ class LoginRequest(BaseModel):
 
 
 class EmailRequest(BaseModel):
+    email: EmailStr
+
+
+class VerificationEmailRequest(VerificationDestination):
     email: EmailStr
 
 
@@ -89,7 +103,11 @@ async def register(
 ) -> dict[str, str]:
     try:
         await AuthService().register(
-            session, email=str(body.email), password=body.password, display_name=body.display_name
+            session,
+            email=str(body.email),
+            password=body.password,
+            display_name=body.display_name,
+            next_path=body.next,
         )
         await record_audit(session, "auth.register", details={"email": str(body.email)})
         await session.commit()
@@ -194,22 +212,10 @@ async def forgot_password(
 
 @router.post("/auth/resend-verification", status_code=202)
 async def resend_verification(
-    body: EmailRequest, session: Annotated[AsyncSession, Depends(get_session)]
+    body: VerificationEmailRequest, session: Annotated[AsyncSession, Depends(get_session)]
 ) -> dict[str, str]:
-    service = AuthService()
-    user = await service.users.by_email(session, str(body.email))
-    if user is not None and user.email_verified_at is None:
-        from .models import AuthTokenType
-
-        token = await service._issue_one_time_token(session, user, AuthTokenType.VERIFY_EMAIL)
-        await service.email.enqueue(
-            session,
-            to=user.email,
-            template="verify_email",
-            context={"url": f"{service.email_url}/verify-email?token={token}"},
-            idempotency_key=f"verify:{user.id}:{digest(token)}",
-        )
-        await session.commit()
+    await AuthService().resend_verification(session, str(body.email), next_path=body.next)
+    await session.commit()
     return {"message": "If the account exists, a verification email will be sent."}
 
 

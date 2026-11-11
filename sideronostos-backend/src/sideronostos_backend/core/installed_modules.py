@@ -11,4 +11,5 @@ INSTALLED_MODULES = (
     "personal_schedule",
     "collaboration",
     "ai",
+    "field_shift",
 )

@@ -78,8 +78,14 @@ def install_error_handling(app: FastAPI, settings: Settings) -> None:
         )
 
     async def validation_error(request: Request, error: RequestValidationError) -> JSONResponse:
+        # Validator contexts may contain Python exceptions, and invalid inputs may
+        # contain NaN or secrets. Return actionable locations without echoing them.
+        details = [
+            {"type": item["type"], "loc": item["loc"], "msg": item["msg"]}
+            for item in error.errors()
+        ]
         return _response(
-            request, 422, "validation_error", "Request validation failed", error.errors()
+            request, 422, "validation_error", "Request validation failed", details
         )
 
     async def unexpected_error(request: Request, error: Exception) -> JSONResponse:

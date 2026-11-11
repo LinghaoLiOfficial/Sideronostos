@@ -132,10 +132,10 @@ export async function signIn(email: string, password: string) {
   return result;
 }
 
-export async function signUp(email: string, password: string, displayName: string) {
+export async function signUp(email: string, password: string, displayName: string, next?: string) {
   return apiRequest<MessageResponse>("/auth/register", {
     method: "POST",
-    body: { email, password, display_name: displayName },
+    body: { email, password, display_name: displayName, ...(next ? { next } : {}) },
     authenticate: false,
   });
 }
@@ -146,9 +146,9 @@ export async function verifyEmail(token: string) {
   });
 }
 
-export async function resendVerification(email: string) {
+export async function resendVerification(email: string, next?: string) {
   return apiRequest<MessageResponse>("/auth/resend-verification", {
-    method: "POST", body: { email }, authenticate: false,
+    method: "POST", body: { email, ...(next ? { next } : {}) }, authenticate: false,
   });
 }
 

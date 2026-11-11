@@ -131,9 +131,9 @@ describe("mindmap file page", () => {
     api.getWorkspaceFile.mockResolvedValueOnce({ id: "file-1", name: "我的词汇库", type: "vocabulary", content: { version: 1, entries: [] } });
     render(<MindMapFilePage />);
     expect(await screen.findByTestId("vocabulary-editor")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "添加词汇", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "添加词汇" }));
     fireEvent.change(screen.getByLabelText("词汇"), { target: { value: "run" } });
-    fireEvent.click(screen.getByRole("button", { name: "确认", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "确认" }));
     fireEvent.click(screen.getByRole("link", { name: "返回文件管理" }));
     await waitFor(() => expect(api.replace).toHaveBeenCalledWith(organization ? `/workspace/groups/${organization}?tab=files` : "/workspace/files"));
     expect(api.saveWorkspaceFileContent).toHaveBeenCalledWith(organization ?? "personal-1", "file-1", { version: 1, entries: [{ id: expect.any(String), word: "run", senses: [] }] });
@@ -146,7 +146,7 @@ describe("mindmap file page", () => {
     await screen.findByTestId("vocabulary-editor");
     fireEvent.click(screen.getByRole("button", { name: "修改词汇" }));
     fireEvent.change(screen.getByLabelText("词汇"), { target: { value: "walk" } });
-    fireEvent.click(screen.getByRole("button", { name: "确认", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "确认" }));
     fireEvent.click(screen.getByRole("link", { name: "返回文件管理" }));
     await screen.findByText("保存失败");
     expect(api.replace).not.toHaveBeenCalled();

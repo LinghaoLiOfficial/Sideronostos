@@ -1,0 +1,219 @@
+{
+  "measured_at": "2026-11-11T16:43:12.234Z",
+  "mode": "next start production; same-machine HTTP, existing authenticated browser, no CPU/network throttling; one priming navigation then five full navigations per route; readiness = expected heading visible plus two animation frames",
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "samples": [
+    {
+      "state": "field",
+      "sample": 1,
+      "ready_ms": 65,
+      "ttfb_ms": 1.400000000372529,
+      "dom_content_loaded_ms": 6,
+      "load_ms": 12.300000000745058,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 36,
+      "resource_count": 42,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "field",
+      "sample": 2,
+      "ready_ms": 74,
+      "ttfb_ms": 1.599999999627471,
+      "dom_content_loaded_ms": 6.300000000745058,
+      "load_ms": 12.599999999627471,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 42,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "field",
+      "sample": 3,
+      "ready_ms": 66,
+      "ttfb_ms": 1.800000000745058,
+      "dom_content_loaded_ms": 6.5,
+      "load_ms": 12.900000000372529,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 36,
+      "resource_count": 42,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "field",
+      "sample": 4,
+      "ready_ms": 107,
+      "ttfb_ms": 1.5,
+      "dom_content_loaded_ms": 6.099999999627471,
+      "load_ms": 12.599999999627471,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 76,
+      "resource_count": 43,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "field",
+      "sample": 5,
+      "ready_ms": 77,
+      "ttfb_ms": 1.800000000745058,
+      "dom_content_loaded_ms": 6.400000000372529,
+      "load_ms": 13.099999999627471,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 42,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "comparison",
+      "sample": 1,
+      "ready_ms": 74,
+      "ttfb_ms": 1.599999999627471,
+      "dom_content_loaded_ms": 6.299999998882413,
+      "load_ms": 13,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 43,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "comparison",
+      "sample": 2,
+      "ready_ms": 74,
+      "ttfb_ms": 1.799999998882413,
+      "dom_content_loaded_ms": 6.5,
+      "load_ms": 12.699999999254942,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 43,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "comparison",
+      "sample": 3,
+      "ready_ms": 124,
+      "ttfb_ms": 2.400000000372529,
+      "dom_content_loaded_ms": 7.400000000372529,
+      "load_ms": 14.099999999627471,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 84,
+      "resource_count": 44,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "comparison",
+      "sample": 4,
+      "ready_ms": 107,
+      "ttfb_ms": 2.100000001490116,
+      "dom_content_loaded_ms": 7.200000001117587,
+      "load_ms": 13.900000000372529,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 84,
+      "resource_count": 44,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "comparison",
+      "sample": 5,
+      "ready_ms": 75,
+      "ttfb_ms": 1.8999999985098839,
+      "dom_content_loaded_ms": 7.399999998509884,
+      "load_ms": 14.299999998882413,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 68,
+      "resource_count": 43,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "saved",
+      "sample": 1,
+      "ready_ms": 83,
+      "ttfb_ms": 1.5,
+      "dom_content_loaded_ms": 6.400000000372529,
+      "load_ms": 13,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 44,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "saved",
+      "sample": 2,
+      "ready_ms": 74,
+      "ttfb_ms": 1.5,
+      "dom_content_loaded_ms": 6.199999999254942,
+      "load_ms": 12.699999999254942,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 43,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "saved",
+      "sample": 3,
+      "ready_ms": 74,
+      "ttfb_ms": 1.5,
+      "dom_content_loaded_ms": 6.099999999627471,
+      "load_ms": 12.799999998882413,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 43,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "saved",
+      "sample": 4,
+      "ready_ms": 74,
+      "ttfb_ms": 1.5,
+      "dom_content_loaded_ms": 6.399999998509884,
+      "load_ms": 13,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 44,
+      "resource_count": 43,
+      "known_resource_transfer_bytes": 8358
+    },
+    {
+      "state": "saved",
+      "sample": 5,
+      "ready_ms": 126,
+      "ttfb_ms": 1.599999999627471,
+      "dom_content_loaded_ms": 6.5,
+      "load_ms": 13.099999999627471,
+      "fcp_ms": 36,
+      "lcp_at_ready_ms": 92,
+      "resource_count": 44,
+      "known_resource_transfer_bytes": 8358
+    }
+  ],
+  "summary": {
+    "field": {
+      "samples": 5,
+      "median_ready_ms": 74,
+      "p95_ready_ms": 107,
+      "min_ready_ms": 65,
+      "max_ready_ms": 107
+    },
+    "comparison": {
+      "samples": 5,
+      "median_ready_ms": 75,
+      "p95_ready_ms": 124,
+      "min_ready_ms": 74,
+      "max_ready_ms": 124
+    },
+    "saved": {
+      "samples": 5,
+      "median_ready_ms": 74,
+      "p95_ready_ms": 126,
+      "min_ready_ms": 74,
+      "max_ready_ms": 126
+    }
+  },
+  "limitations": [
+    "Five measured serial warm navigations per state, same machine; empirical P95 equals max. Not mobile hardware, wide-area network, deployment or concurrent load.",
+    "Readiness is heading visibility plus two animation frames, not all possible future requests or final LCP.",
+    "Resource transferSize can be zero for cache hits and cross-origin requests without Timing-Allow-Origin; not a complete payload total."
+  ]
+}

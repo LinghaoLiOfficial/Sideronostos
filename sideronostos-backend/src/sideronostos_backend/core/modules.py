@@ -169,6 +169,10 @@ def load_modules(settings: Settings) -> tuple[ModuleSpec, ...]:
         from ..modules.collaboration.module import module as collaboration
 
         registry[collaboration.name] = collaboration
+    if "field_shift" in INSTALLED_MODULES:
+        from ..modules.field_shift.module import module as field_shift
+
+        registry[field_shift.name] = field_shift
     modules = resolve_modules(INSTALLED_MODULES, registry)
     validate_module_registrations(modules)
     return modules

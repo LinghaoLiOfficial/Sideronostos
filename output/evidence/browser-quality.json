@@ -1,0 +1,204 @@
+{
+  "scans": [
+    {
+      "state": "production-field",
+      "violations": [],
+      "passes": 25,
+      "incomplete": [],
+      "viewport": 1440,
+      "width": 1440
+    },
+    {
+      "state": "production-environment",
+      "violations": [],
+      "passes": 27,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "text[x=\"4\"]"
+            ],
+            [
+              "text[x=\"18\"]"
+            ],
+            [
+              "text[x=\"666\"][y=\"30\"]"
+            ],
+            [
+              "text[x=\"666\"][y=\"154\"]"
+            ],
+            [
+              "text[x=\"61\"]"
+            ],
+            [
+              "text[x=\"112\"]"
+            ],
+            [
+              "text[x=\"163\"]"
+            ],
+            [
+              "text[x=\"214\"]"
+            ],
+            [
+              "text[x=\"265\"]"
+            ],
+            [
+              "text[x=\"316\"]"
+            ],
+            [
+              "text[x=\"367\"]"
+            ],
+            [
+              "text[x=\"418\"]"
+            ],
+            [
+              "text[x=\"469\"]"
+            ],
+            [
+              "text[x=\"520\"]"
+            ],
+            [
+              "text[x=\"571\"]"
+            ],
+            [
+              "text[x=\"622\"]"
+            ]
+          ]
+        }
+      ],
+      "viewport": 1440,
+      "width": 1440
+    },
+    {
+      "state": "production-planning",
+      "violations": [],
+      "passes": 27,
+      "incomplete": [],
+      "viewport": 1440,
+      "width": 1440
+    },
+    {
+      "state": "production-comparison-pending-scenario",
+      "violations": [],
+      "passes": 30,
+      "incomplete": [
+        "aria-prohibited-attr"
+      ],
+      "viewport": 1440,
+      "width": 1440
+    },
+    {
+      "state": "production-save-dialog",
+      "violations": [],
+      "passes": 23,
+      "incomplete": [
+        "aria-hidden-focus",
+        "color-contrast"
+      ],
+      "viewport": 1440,
+      "width": 1440
+    },
+    {
+      "state": "production-mobile-saved-before-timeline-role-fix",
+      "violations": [],
+      "passes": 28,
+      "incomplete": [
+        "aria-prohibited-attr"
+      ],
+      "viewport": 390,
+      "width": 390
+    },
+    {
+      "state": "final-production-comparison",
+      "violations": [],
+      "passes": 30,
+      "incomplete": [],
+      "viewport": 1440,
+      "width": 1440,
+      "escapeFocus": {
+        "tag": "BUTTON",
+        "label": "保存田豌豆 Field pea → 向日葵 Sunflower → 春小麦 Spring wheat"
+      }
+    },
+    {
+      "state": "final-production-mobile-saved",
+      "violations": [],
+      "passes": 28,
+      "incomplete": [],
+      "viewport": 390,
+      "width": 390,
+      "saveFocus": "field-shift-main",
+      "url": "http://localhost:3040/field-shift?field=2722dbd6-48cf-4e2f-a08b-4986c3506edb&step=saved&plan=ca986abe-ba15-4766-b14c-3cd62b7f091f"
+    }
+  ],
+  "reflow": [
+    {
+      "viewport": 320,
+      "width": 320
+    },
+    {
+      "viewport": 720,
+      "width": 720
+    },
+    {
+      "viewport": 390,
+      "width": 390
+    }
+  ],
+  "dialog_focus_cycle": [
+    {
+      "tag": "INPUT",
+      "label": "计划名称",
+      "text": null,
+      "inside": true
+    },
+    {
+      "tag": "TEXTAREA",
+      "label": "计划备注",
+      "text": null,
+      "inside": true
+    },
+    {
+      "tag": "BUTTON",
+      "label": null,
+      "text": "确认保存计划",
+      "inside": true
+    },
+    {
+      "tag": "BUTTON",
+      "label": null,
+      "text": "关闭",
+      "inside": true
+    },
+    {
+      "tag": "INPUT",
+      "label": "计划名称",
+      "text": null,
+      "inside": true
+    },
+    {
+      "tag": "TEXTAREA",
+      "label": "计划备注",
+      "text": null,
+      "inside": true
+    },
+    {
+      "tag": "BUTTON",
+      "label": null,
+      "text": "确认保存计划",
+      "inside": true
+    }
+  ],
+  "measured_at": "2026-11-12 Asia/Shanghai",
+  "tool": "axe-core 4.10.3, WCAG 2 A/AA and 2.1 AA, Chromium 157",
+  "manual_review": {
+    "timeline": "aria-prohibited-attr was confirmed as a real unnamed-role wrapper issue, fixed with role=group; final comparison/saved scans have no incomplete items.",
+    "chart_contrast": "SVG text rgb(167,173,165) on rgb(36,38,38): calculated 6.64:1; visually inspected.",
+    "dialog_focus": "Seven Tab positions stayed inside Radix modal. Final Escape returns to originating button; successful save focuses field-shift-main. Hidden-focus incomplete nodes are the trapped background/focus guards.",
+    "dialog_contrast": "Description rgb(167,173,165) on rgb(28,30,29): 7.31:1; textarea placeholder 7.34:1 and input text 15.51:1, using actual computed colors. Rendered dialog inspected.",
+    "keyboard": "Range ArrowLeft/Right, checkbox Space, Tab/Enter submission, modal Escape/Tab, and main focus across navigation exercised.",
+    "reflow": "320/390/720 CSS px widths preserve document width. 720px is equivalent viewport space for a 1440px window at 200%, not a browser zoom-device study.",
+    "limits": "Not a screen-reader certification or real-device/farmer usability study."
+  }
+}

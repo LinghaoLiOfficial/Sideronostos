@@ -1,0 +1,444 @@
+{
+  "verified_at_utc": "2026-11-11T16:13:26.896298+00:00",
+  "scope": "Local loopback development API + PostgreSQL. Not a deployed service, production capacity test, external network benchmark, browser benchmark, provider cold-fetch benchmark, or restart-persistence verification.",
+  "base_url": "http://127.0.0.1:8040",
+  "authentication": {
+    "method": "real /auth/login + bearer access token",
+    "login_status": 200,
+    "credentials_and_tokens_recorded": false
+  },
+  "source_resources": {
+    "field_id": "56b9c29e-cadb-43b4-9948-98ce2c4d4a86",
+    "field_version": 1,
+    "field_history": [
+      {
+        "year": 2026,
+        "crop_id": "maize"
+      }
+    ],
+    "baseline_analysis_id": "a54b7bf3-6b72-43e9-9c31-d2c6590241aa",
+    "scenario_analysis_id": "f27ef48a-30d1-4255-a01f-beb968390719",
+    "saved_plan_id": "54b953e1-8c24-457c-b5c4-a138b0830ee4",
+    "saved_analysis_id": "f27ef48a-30d1-4255-a01f-beb968390719",
+    "saved_option_id": "rotation-a94ce998f0469bf9",
+    "field_sha256_canonical_json": "73a3c23dbf6abad99a727295a975105a763923745e2d3ce87329d06e334cba8e",
+    "plan_sha256_canonical_json": "9b7919d4456eb89e706f2180fe863fdb93fea6c5ba7e5fcf54e2b9abe10cada4",
+    "profile_snapshot_sha256_canonical_json": "a3744ba39b85e5eae4e844302bd26d3c783888d8accd32ca44d54624f587876a"
+  },
+  "environment": {
+    "status": "cached",
+    "source_name": "NASA POWER · 历史气象",
+    "source_url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42.0&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+    "reference_year": 2025,
+    "fetched_at": "2026-11-11T16:05:41.927883Z",
+    "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12",
+    "spatial_resolution": "气象再分析约 0.5° × 0.625°（非田块分辨率）"
+  },
+  "snapshot": {
+    "crop_count": 6,
+    "rule_count": 5,
+    "source_count": 3,
+    "environment_month_count": 12,
+    "valid_days": 365,
+    "saved_plan_top_level_keys": [
+      "id",
+      "title",
+      "notes",
+      "created_at",
+      "field_id",
+      "field_name",
+      "option",
+      "analysis",
+      "field_snapshot"
+    ],
+    "profile_snapshot_keys": [
+      "id",
+      "name",
+      "version",
+      "is_demo",
+      "description",
+      "assumptions",
+      "crops",
+      "rules",
+      "sources"
+    ]
+  },
+  "scenario_comparison": [
+    {
+      "option_id": "baseline",
+      "is_baseline": true,
+      "crop_ids": [
+        "maize",
+        "maize",
+        "maize"
+      ],
+      "baseline_metrics": {
+        "irrigation_gap_mm": 666.31,
+        "water_demand_mm": 2099.61,
+        "cover_days": 450,
+        "diversity": 1,
+        "cost_usd_ha": 2550.0,
+        "labor_days_ha": 21.0
+      },
+      "scenario_metrics": {
+        "irrigation_gap_mm": 989.36,
+        "water_demand_mm": 2209.19,
+        "cover_days": 450,
+        "diversity": 1,
+        "cost_usd_ha": 2550.0,
+        "labor_days_ha": 21.0
+      },
+      "delta_scenario_minus_baseline": {
+        "irrigation_gap_mm": 323.05,
+        "water_demand_mm": 109.58,
+        "cover_days": 0,
+        "diversity": 0,
+        "cost_usd_ha": 0.0,
+        "labor_days_ha": 0.0
+      }
+    },
+    {
+      "option_id": "rotation-a94ce998f0469bf9",
+      "is_baseline": false,
+      "crop_ids": [
+        "pea",
+        "sunflower",
+        "wheat"
+      ],
+      "baseline_metrics": {
+        "irrigation_gap_mm": 227.06,
+        "water_demand_mm": 1127.68,
+        "cover_days": 330,
+        "diversity": 3,
+        "cost_usd_ha": 1170.0,
+        "labor_days_ha": 15.0
+      },
+      "scenario_metrics": {
+        "irrigation_gap_mm": 382.6,
+        "water_demand_mm": 1190.89,
+        "cover_days": 330,
+        "diversity": 3,
+        "cost_usd_ha": 1170.0,
+        "labor_days_ha": 15.0
+      },
+      "delta_scenario_minus_baseline": {
+        "irrigation_gap_mm": 155.54,
+        "water_demand_mm": 63.21,
+        "cover_days": 0,
+        "diversity": 0,
+        "cost_usd_ha": 0.0,
+        "labor_days_ha": 0.0
+      }
+    },
+    {
+      "option_id": "rotation-386b1d155df1bc08",
+      "is_baseline": false,
+      "crop_ids": [
+        "sunflower",
+        "soybean",
+        "wheat"
+      ],
+      "baseline_metrics": {
+        "irrigation_gap_mm": 331.06,
+        "water_demand_mm": 1423.66,
+        "cover_days": 380,
+        "diversity": 3,
+        "cost_usd_ha": 1400.0,
+        "labor_days_ha": 16.0
+      },
+      "scenario_metrics": {
+        "irrigation_gap_mm": 509.81,
+        "water_demand_mm": 1499.18,
+        "cover_days": 380,
+        "diversity": 3,
+        "cost_usd_ha": 1400.0,
+        "labor_days_ha": 16.0
+      },
+      "delta_scenario_minus_baseline": {
+        "irrigation_gap_mm": 178.75,
+        "water_demand_mm": 75.52,
+        "cover_days": 0,
+        "diversity": 0,
+        "cost_usd_ha": 0.0,
+        "labor_days_ha": 0.0
+      }
+    }
+  ],
+  "checks": {
+    "response_contracts_valid": true,
+    "history_retained": true,
+    "analysis_field_version_matches": true,
+    "saved_field_snapshot_exact": true,
+    "saved_analysis_snapshot_exact": true,
+    "saved_profile_snapshot_exact": true,
+    "profile_snapshot_has_rules_crops_sources": true,
+    "saved_option_exact_and_feasible": true,
+    "saved_environment_snapshot_exact": true,
+    "environment_same_original_observations": true,
+    "real_environment_with_complete_year": true,
+    "source_traceability_retained": true,
+    "only_scenario_inputs_change": true,
+    "scenario_increases_water_baseline": true,
+    "scenario_keeps_nonclimate_metrics_baseline": true,
+    "scenario_increases_water_rotation-a94ce998f0469bf9": true,
+    "scenario_keeps_nonclimate_metrics_rotation-a94ce998f0469bf9": true,
+    "scenario_increases_water_rotation-386b1d155df1bc08": true,
+    "scenario_keeps_nonclimate_metrics_rotation-386b1d155df1bc08": true,
+    "baseline_baseline_retained_infeasible": true,
+    "baseline_full_candidate_count": true,
+    "baseline_distinct_crop_mix_alternatives": true,
+    "baseline_alternative_0_hard_budgets_per_year": true,
+    "baseline_alternative_0_three_year_totals": true,
+    "baseline_alternative_1_hard_budgets_per_year": true,
+    "baseline_alternative_1_three_year_totals": true,
+    "scenario_baseline_retained_infeasible": true,
+    "scenario_full_candidate_count": true,
+    "scenario_distinct_crop_mix_alternatives": true,
+    "scenario_alternative_0_hard_budgets_per_year": true,
+    "scenario_alternative_0_three_year_totals": true,
+    "scenario_alternative_1_hard_budgets_per_year": true,
+    "scenario_alternative_1_three_year_totals": true,
+    "cached_environment_0_same_snapshot": true,
+    "cached_environment_1_same_snapshot": true,
+    "cached_environment_2_same_snapshot": true,
+    "cached_environment_3_same_snapshot": true,
+    "cached_environment_4_same_snapshot": true,
+    "cached_environment_5_same_snapshot": true,
+    "cached_environment_6_same_snapshot": true,
+    "cached_environment_7_same_snapshot": true,
+    "cached_environment_8_same_snapshot": true,
+    "cached_environment_9_same_snapshot": true,
+    "created_analysis_0_reproducible": true,
+    "created_analysis_1_reproducible": true,
+    "created_analysis_2_reproducible": true,
+    "created_analysis_3_reproducible": true,
+    "created_analysis_4_reproducible": true,
+    "created_analysis_5_reproducible": true,
+    "created_analysis_6_reproducible": true,
+    "created_analysis_7_reproducible": true,
+    "created_analysis_8_reproducible": true,
+    "created_analysis_9_reproducible": true,
+    "existing_field_unchanged_after_requests": true,
+    "existing_plan_unchanged_after_requests": true,
+    "existing_analyses_unchanged_after_requests": true
+  },
+  "performance": {
+    "method": "10 serial HTTP requests per endpoint; httpx persistent client; perf_counter around complete response; bytes are decompressed JSON response bytes; p95 is nearest rank (10 samples -> maximum); no sleep, no concurrent clients; analysis endpoint includes auth/database/existing environmental cache/engine/serialization; response contract and result reproducibility checked after timing.",
+    "cached_environment_get": {
+      "summary": {
+        "samples": 10,
+        "successes": 10,
+        "median_ms": 3.681,
+        "p95_nearest_rank_ms": 4.885,
+        "min_ms": 3.539,
+        "max_ms": 4.885,
+        "payload_min_bytes": 3249,
+        "payload_max_bytes": 3249,
+        "payload_median_bytes": 3249.0
+      },
+      "samples": [
+        {
+          "sample": 1,
+          "status": 200,
+          "elapsed_ms": 4.622,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 2,
+          "status": 200,
+          "elapsed_ms": 3.611,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 3,
+          "status": 200,
+          "elapsed_ms": 3.691,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 4,
+          "status": 200,
+          "elapsed_ms": 3.565,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 5,
+          "status": 200,
+          "elapsed_ms": 3.539,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 6,
+          "status": 200,
+          "elapsed_ms": 3.671,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 7,
+          "status": 200,
+          "elapsed_ms": 3.847,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 8,
+          "status": 200,
+          "elapsed_ms": 4.031,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 9,
+          "status": 200,
+          "elapsed_ms": 3.615,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        },
+        {
+          "sample": 10,
+          "status": 200,
+          "elapsed_ms": 4.885,
+          "response_bytes": 3249,
+          "environment_status": "cached",
+          "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+        }
+      ]
+    },
+    "create_analysis_post": {
+      "summary": {
+        "samples": 10,
+        "successes": 10,
+        "median_ms": 14.236,
+        "p95_nearest_rank_ms": 18.883,
+        "min_ms": 13.789,
+        "max_ms": 18.883,
+        "payload_min_bytes": 24538,
+        "payload_max_bytes": 24538,
+        "payload_median_bytes": 24538.0
+      },
+      "samples": [
+        {
+          "sample": 1,
+          "status": 201,
+          "elapsed_ms": 18.883,
+          "response_bytes": 24538,
+          "analysis_id": "27d2541e-7773-4f70-b034-4548bbcafc58",
+          "engine_elapsed_ms": 6.05,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 2,
+          "status": 201,
+          "elapsed_ms": 14.689,
+          "response_bytes": 24538,
+          "analysis_id": "aaa38aeb-3057-4e9f-ae44-d866b01ce0ca",
+          "engine_elapsed_ms": 5.66,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 3,
+          "status": 201,
+          "elapsed_ms": 15.535,
+          "response_bytes": 24538,
+          "analysis_id": "6c558eff-787b-405e-9ea2-de859e6d4c8d",
+          "engine_elapsed_ms": 5.67,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 4,
+          "status": 201,
+          "elapsed_ms": 13.822,
+          "response_bytes": 24538,
+          "analysis_id": "b96fc219-dc92-42ae-823c-4cbfeb35bd0b",
+          "engine_elapsed_ms": 5.67,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 5,
+          "status": 201,
+          "elapsed_ms": 14.225,
+          "response_bytes": 24538,
+          "analysis_id": "3d014e72-30a9-46ab-8167-76bcb745f385",
+          "engine_elapsed_ms": 5.74,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 6,
+          "status": 201,
+          "elapsed_ms": 13.789,
+          "response_bytes": 24538,
+          "analysis_id": "14ffa2d8-4bea-4424-aaf1-3edf834c56b1",
+          "engine_elapsed_ms": 5.59,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 7,
+          "status": 201,
+          "elapsed_ms": 13.978,
+          "response_bytes": 24538,
+          "analysis_id": "bd58b056-f45b-4056-ab3a-d1ede49b9272",
+          "engine_elapsed_ms": 5.61,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 8,
+          "status": 201,
+          "elapsed_ms": 14.035,
+          "response_bytes": 24538,
+          "analysis_id": "9ac9f3d3-e3ff-41f7-adea-d97415c06424",
+          "engine_elapsed_ms": 5.57,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 9,
+          "status": 201,
+          "elapsed_ms": 14.246,
+          "response_bytes": 24538,
+          "analysis_id": "9ca4f3f4-4685-4fde-bd0b-7494c06d2f43",
+          "engine_elapsed_ms": 5.68,
+          "feasible_count": 48,
+          "rejected_count": 168
+        },
+        {
+          "sample": 10,
+          "status": 201,
+          "elapsed_ms": 15.319,
+          "response_bytes": 24538,
+          "analysis_id": "2d720e53-1061-4809-a6cf-161cca293491",
+          "engine_elapsed_ms": 5.88,
+          "feasible_count": 48,
+          "rejected_count": 168
+        }
+      ]
+    }
+  },
+  "mutations": {
+    "created_analysis_count": 10,
+    "modified_existing_fields": false,
+    "modified_existing_plans": false,
+    "restarted_services": false
+  }
+}
