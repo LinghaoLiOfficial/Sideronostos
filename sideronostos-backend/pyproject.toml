@@ -16,7 +16,7 @@ workflow = ["cryptography>=45,<47", "temporalio>=1.18,<2"]
 ai = ["langchain-core>=1.6,<2", "langchain-openai>=1.0,<2", "langgraph>=1.2,<2", "gradio>=5.49,<7", "langgraph-cli[inmem]>=0.4,<1"]
 identity = ["aiosmtplib>=4,<6", "cryptography>=45,<47", "email-validator>=2.2,<3", "pwdlib[argon2]>=0.3,<1", "pyjwt>=2.10,<3", "temporalio>=1.18,<2"]
 saas = ["aiosmtplib>=4,<6", "boto3>=1.40,<2", "cryptography>=45,<47", "email-validator>=2.2,<3", "httpx>=0.28,<1", "pillow>=11,<13", "pwdlib[argon2]>=0.3,<1", "pyjwt>=2.10,<3", "temporalio>=1.18,<2"]
-full = ["sideronostos-backend[knowledge,science,optimizer]", "aiosmtplib>=4,<6", "boto3>=1.40,<2", "cryptography>=45,<47", "email-validator>=2.2,<3", "httpx>=0.28,<1", "pillow>=11,<13", "langchain-core>=1.6,<2", "langchain-openai>=1.0,<2", "langgraph>=1.2,<2", "gradio>=5.49,<7", "langgraph-cli[inmem]>=0.4,<1", "opentelemetry-api>=1.29,<2", "opentelemetry-sdk>=1.29,<2", "opentelemetry-exporter-otlp-proto-http>=1.29,<2", "pwdlib[argon2]>=0.3,<1", "pyjwt>=2.10,<3", "temporalio>=1.18,<2"]
+full = ["sideronostos-backend[assistant]", "aiosmtplib>=4,<6", "boto3>=1.40,<2", "cryptography>=45,<47", "email-validator>=2.2,<3", "httpx>=0.28,<1", "pillow>=11,<13", "langchain-core>=1.6,<2", "langchain-openai>=1.0,<2", "langgraph>=1.2,<2", "gradio>=5.49,<7", "langgraph-cli[inmem]>=0.4,<1", "opentelemetry-api>=1.29,<2", "opentelemetry-sdk>=1.29,<2", "opentelemetry-exporter-otlp-proto-http>=1.29,<2", "pwdlib[argon2]>=0.3,<1", "pyjwt>=2.10,<3", "temporalio>=1.18,<2"]
 observability = [
   "opentelemetry-api>=1.29,<2",
   "opentelemetry-sdk>=1.29,<2",
@@ -25,6 +25,7 @@ observability = [
 knowledge = ["jieba>=0.42,<1", "pgvector>=0.4,<0.5", "pymupdf>=1.26,<2"]
 science = ["numpy>=2.2,<3", "h5py>=3.14,<4", "pyproj>=3.7,<4", "shapely>=2.1,<3"]
 optimizer = ["gurobipy>=13,<14"]
+assistant = ["sideronostos-backend[knowledge,science,optimizer]"]
 [project.scripts]
 sideronostos_backend = "sideronostos_backend.app:app"
 [build-system]

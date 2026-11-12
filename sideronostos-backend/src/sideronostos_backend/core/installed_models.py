@@ -3,6 +3,7 @@ from ..modules.agri_data import models as _models_11  # noqa: F401
 from ..modules.auth import models as _models_0  # noqa: F401
 from ..modules.collaboration import models as _models_7  # noqa: F401
 from ..modules.database.audit import AuditEvent as _models_1  # noqa: F401
+from ..modules.farm_assistant import models as _models_13  # noqa: F401
 from ..modules.field_shift import models as _models_9  # noqa: F401
 from ..modules.jobs import models as _models_2  # noqa: F401
 from ..modules.knowledge import models as _models_10  # noqa: F401
@@ -27,4 +28,5 @@ REGISTERED_MODEL_MODULES = (
     "modules.knowledge.models",
     "modules.agri_data.models",
     "modules.rotation_optimizer.models",
+    "modules.farm_assistant.models",
 )

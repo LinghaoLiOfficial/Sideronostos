@@ -1849,6 +1849,16 @@ ai = [
     { name = "langgraph" },
     { name = "langgraph-cli", extra = ["inmem"] },
 ]
+assistant = [
+    { name = "gurobipy" },
+    { name = "h5py" },
+    { name = "jieba" },
+    { name = "numpy" },
+    { name = "pgvector" },
+    { name = "pymupdf" },
+    { name = "pyproj" },
+    { name = "shapely" },
+]
 full = [
     { name = "aiosmtplib" },
     { name = "boto3" },
@@ -1980,7 +1990,8 @@ requires-dist = [
     { name = "pymupdf", marker = "extra == 'knowledge'", specifier = ">=1.26,<2" },
     { name = "pyproj", marker = "extra == 'science'", specifier = ">=3.7,<4" },
     { name = "shapely", marker = "extra == 'science'", specifier = ">=2.1,<3" },
-    { name = "sideronostos-backend", extras = ["knowledge", "science", "optimizer"], marker = "extra == 'full'" },
+    { name = "sideronostos-backend", extras = ["assistant"], marker = "extra == 'full'" },
+    { name = "sideronostos-backend", extras = ["knowledge", "science", "optimizer"], marker = "extra == 'assistant'" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.36,<3" },
     { name = "temporalio", marker = "extra == 'full'", specifier = ">=1.18,<2" },
     { name = "temporalio", marker = "extra == 'identity'", specifier = ">=1.18,<2" },
@@ -1988,7 +1999,7 @@ requires-dist = [
     { name = "temporalio", marker = "extra == 'workflow'", specifier = ">=1.18,<2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.35,<1" },
 ]
-provides-extras = ["workflow", "ai", "identity", "saas", "full", "observability", "knowledge", "science", "optimizer"]
+provides-extras = ["workflow", "ai", "identity", "saas", "full", "observability", "knowledge", "science", "optimizer", "assistant"]
 
 [package.metadata.requires-dev]
 dev = [

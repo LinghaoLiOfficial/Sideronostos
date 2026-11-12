@@ -15,4 +15,5 @@ INSTALLED_MODULES = (
     "knowledge",
     "agri_data",
     "rotation_optimizer",
+    "farm_assistant",
 )
