@@ -1,5 +1,5 @@
 /** Framework-independent presentation contracts; no farm or model-provider imports. */
-export type BotMode = "collapsed" | "chat" | "data";
+export type BotMode = "collapsed" | "chat";
 export type BotIdentity = {
   id: string;
   name: string;

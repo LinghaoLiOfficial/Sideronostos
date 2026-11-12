@@ -401,52 +401,6 @@
   padding: 4px 7px;
   cursor: pointer;
 }
-.composer {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  margin: 8px 14px 0;
-  padding: 11px 12px;
-  background: #f7f8f5;
-  border: 1px solid var(--border);
-  border-radius: 17px;
-  flex-shrink: 0;
-}
-.composer:focus-within {
-  border-color: #9e8dc9;
-  box-shadow: 0 0 0 2px #8e78c20a;
-}
-.composer textarea {
-  flex: 1;
-  min-width: 0;
-  resize: none;
-  border: 0;
-  outline: none;
-  background: none;
-  font-size: 16px;
-  line-height: 1.7;
-  max-height: 100px;
-  color: inherit;
-}
-.composer textarea::placeholder {
-  color: #7d8678;
-}
-.composer > button {
-  border: 0;
-  flex-shrink: 0;
-  background: #282d25;
-  color: #fff;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-.composer > button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
 .chatFootnote {
   margin: 8px 17px 13px;
   font-size: 10px;
@@ -702,8 +656,7 @@
 }
 
 /* Compact icon controls must not inherit the workspace form-button padding. */
-.iconButton,
-.composer > button {
+.iconButton {
   padding: 0;
 }
 .chatPanel svg {
@@ -763,16 +716,6 @@
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
-}
-.composer textarea,
-.composer textarea:focus {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  outline: none;
-  box-shadow: none;
-  background: transparent;
-  min-height: 0;
 }
 .chatContext > span:nth-child(2) {
   flex: 1;

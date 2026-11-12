@@ -27,7 +27,6 @@ import type {
 } from "@/lib/api/rotation-types";
 import { observationWindow, scienceSourceName } from "./workspace-state";
 import { AssistantDock } from "./assistant-dock";
-import { RegionDataView } from "./region-data-view";
 import {
   labels,
   dataStatus,
@@ -931,30 +930,6 @@ function OwnerWorkspace({
             context={context}
             contextLabel={contextLabel}
             openRequest={openRequest}
-            dataView={
-              selection.data && selection.data.id === selectionId
-                ? {
-                    label: "所选区域的数据",
-                    content: (
-                      <RegionDataView
-                        selection={selection.data}
-                        data={facts.data}
-                        dates={dates}
-                        loading={facts.isFetching}
-                        error={facts.error}
-                        onRetry={() => void facts.refetch()}
-                        sourceName={(id) =>
-                          scienceSourceName(
-                            id,
-                            layers.data?.items ?? [],
-                            profiles.data?.items ?? [],
-                          )
-                        }
-                      />
-                    ),
-                  }
-                : undefined
-            }
             onAction={(action) => {
               if (action === "open_planner" || action === "edit_conditions") {
                 navigate({ plan: null }, "rotation");

@@ -9,7 +9,7 @@ import {
   type FormEvent,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Bot, type BotDataView } from "@/components/bot/Bot";
+import { Bot } from "@/components/bot/Bot";
 import type { BotMode } from "@/lib/bot";
 import {
   ArrowUp,
@@ -33,9 +33,9 @@ import type {
 import { errorMessage } from "../field-shift/model";
 import styles from "./rotation.module.css";
 import { BotAnswer } from "@/components/bot/BotAnswer";
+import { BotComposer } from "@/components/bot/BotComposer";
 
 export type AssistantDockProps = {
-  dataView?: BotDataView;
   ownerId: string;
   context: AssistantContext;
   contextLabel: string;
@@ -110,7 +110,6 @@ export function AssistantDock(props: AssistantDockProps) {
 }
 function AssistantSession({
   ownerId,
-  dataView,
   context,
   contextLabel,
   onAction,
@@ -413,7 +412,6 @@ function AssistantSession({
           setAnnouncement("");
         }
       }}
-      dataView={dataView}
       headerActions={
         <>
           <button
@@ -766,38 +764,21 @@ function AssistantSession({
           </button>
         </div>
       )}
-      <form className={styles.composer} onSubmit={(e) => void send(e)}>
-        <textarea
-          ref={textarea}
-          aria-label="给轮作助手留言"
-          value={text}
-          maxLength={2000}
-          rows={2}
-          placeholder={
-            preferences.language === "zh"
-              ? "说说你想了解什么…"
-              : "Ask about your next crop…"
-          }
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (
-              e.key === "Enter" &&
-              !e.shiftKey &&
-              !e.nativeEvent.isComposing
-            ) {
-              e.preventDefault();
-              void send();
-            }
-          }}
-        />
-        <button
-          type="submit"
-          disabled={pending || !text.trim()}
-          aria-label="发送消息"
-        >
-          {pending ? <LoaderCircle size={18} /> : <ArrowUp size={20} />}
-        </button>
-      </form>
+      <BotComposer
+        inputRef={textarea}
+        label="给轮作助手留言"
+        active={open}
+        value={text}
+        onChange={setText}
+        onSend={() => void send()}
+        pending={pending}
+        language={preferences.language === "zh" ? "zh-CN" : "en-US"}
+        placeholder={
+          preferences.language === "zh"
+            ? "说说你想了解什么…"
+            : "Ask about your next crop…"
+        }
+      />
       <p className={styles.chatFootnote}>
         结合地里实际情况判断，依据可以展开查看。
       </p>

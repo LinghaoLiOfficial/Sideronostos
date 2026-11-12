@@ -1,4 +1,3 @@
-import "../bot/dialog-test-setup";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it, vi } from "vitest";
 import {
@@ -613,7 +612,7 @@ it("reopens a received reply in full instead of replaying the animation", async 
   ).not.toBeInTheDocument();
 });
 
-it("opens selected data full screen, returns to chat, and preserves an unsent draft when collapsed", async () => {
+it("preserves an unsent draft when collapsed without exposing a full-screen action", async () => {
   api.getPreferences.mockResolvedValue({ language: "zh", detail: "brief" });
   const user = userEvent.setup();
   render(
@@ -627,7 +626,6 @@ it("opens selected data full screen, returns to chat, and preserves an unsent dr
         context={context}
         contextLabel="北田"
         onAction={vi.fn()}
-        dataView={{ label: "选区数据", content: <p>已选区域的真实资料</p> }}
       />
     </QueryClientProvider>,
   );
@@ -636,16 +634,9 @@ it("opens selected data full screen, returns to chat, and preserves an unsent dr
     screen.getByRole("textbox", { name: "给轮作助手留言" }),
     "这片地适合种什么？",
   );
-  await user.click(screen.getByRole("button", { name: "全屏查看选区数据" }));
-  expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
-  expect(screen.getByText("已选区域的真实资料")).toBeVisible();
   expect(
-    screen.queryByRole("textbox", { name: "给轮作助手留言" }),
+    screen.queryByRole("button", { name: /全屏/ }),
   ).not.toBeInTheDocument();
-  await user.keyboard("{Escape}");
-  expect(screen.getByRole("textbox", { name: "给轮作助手留言" })).toHaveValue(
-    "这片地适合种什么？",
-  );
   await user.click(screen.getByRole("button", { name: "收起轮作助手" }));
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "打开轮作助手" }));
