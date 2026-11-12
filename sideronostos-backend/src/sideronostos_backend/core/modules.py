@@ -173,6 +173,10 @@ def load_modules(settings: Settings) -> tuple[ModuleSpec, ...]:
         from ..modules.field_shift.module import module as field_shift
 
         registry[field_shift.name] = field_shift
+    if "knowledge" in INSTALLED_MODULES:
+        from ..modules.knowledge.module import module as knowledge
+
+        registry[knowledge.name] = knowledge
     modules = resolve_modules(INSTALLED_MODULES, registry)
     validate_module_registrations(modules)
     return modules

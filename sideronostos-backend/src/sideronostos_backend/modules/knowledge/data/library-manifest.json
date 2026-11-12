@@ -1,0 +1,1650 @@
+{
+  "schema_version": "knowledge-manifest-v1",
+  "source_review_date": "2026-11-12",
+  "sources": [
+    {
+      "id": "S01",
+      "title": "FAO-56, Chapter 1: Introduction to evapotranspiration",
+      "url": "https://www.fao.org/4/x0490e/x0490e04.htm",
+      "doi": null,
+      "reader_file": "Sources/S01 - Web Snapshot.pdf",
+      "sha256": "e9cab23abc687387ec49ecdbdbe451a51b55cc9c7fee168a365da044822c08cb",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 1998,
+      "limitations": [
+        "FAO-56 is a reference framework. Crop coefficients and soil parameters need local application.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S02",
+      "title": "Managing Cover Crops Profitably, Third Edition",
+      "url": "https://www.sare.org/resources/managing-cover-crops-profitably-3rd-edition/",
+      "doi": null,
+      "reader_file": "Sources/S02.pdf",
+      "sha256": "2c800409e03d0ebd9a03b4a51001d8fef144eb443987ec78598d8abf2af40b74",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "United States"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2007,
+      "limitations": [
+        "A US-oriented 2007 extension manual, not a universal crop calendar or current price source.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S03",
+      "title": "Crop Rotation on Organic Farms: A Planning Manual",
+      "url": "https://www.sare.org/resources/crop-rotation-on-organic-farms/",
+      "doi": null,
+      "reader_file": "Sources/S03.pdf",
+      "sha256": "1f4ae323023eb4024676dd2748897eb9ab008b99ece8354d6553b05d54dac267",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "Northeastern United States"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2009,
+      "limitations": [
+        "Practical guidance is weighted towards organic systems in the northeastern US. A botanical-family screen is not a pathogen diagnosis.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S04",
+      "title": "Crop rotations synergize yield, nutrition, and revenue: a meta-analysis",
+      "url": "https://www.nature.com/articles/s41467-025-64567-9",
+      "doi": "10.1038/s41467-025-64567-9",
+      "reader_file": "Sources/S04.pdf",
+      "sha256": "ea01329fd843d9972fd6b39c831eea2d33c6495b055346f17d948faf07380cc0",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2025,
+      "limitations": [
+        "The average is not an estimated benefit of adding one crop to an already diversified local rotation. Revenue is not profit.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S05",
+      "title": "Global systematic review with meta-analysis reveals yield advantage of legume-based rotations and its drivers",
+      "url": "https://www.nature.com/articles/s41467-022-32464-0",
+      "doi": "10.1038/s41467-022-32464-0",
+      "reader_file": "Sources/S05.pdf",
+      "sha256": "43f4e328e431f7f7f42c784d0ae71cd156bec061c2cecc5f1dbfe999a0cdeddc",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2022,
+      "limitations": [
+        "Do not transfer the pooled mean to every species pair. N fertilization, existing diversity, and environment moderate the response.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S06",
+      "title": "Cover crop legacy impacts on soil water and nitrogen dynamics, and on subsequent crop yields in drylands: a meta-analysis",
+      "url": "https://link.springer.com/article/10.1007/s13593-022-00760-0",
+      "doi": "10.1007/s13593-022-00760-0",
+      "reader_file": "Sources/S06.pdf",
+      "sha256": "4372753e158cdd06e95fcc1b7463205245b0ad3ed2e11ce0de021f060355adbb",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2022,
+      "limitations": [
+        "The control is fallow. The approximate annual-rainfall break-even result is not a universally valid decision threshold.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S07",
+      "title": "Increasing Cropping System Diversity Balances Productivity, Profitability and Environmental Health",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0047149",
+      "doi": "10.1371/journal.pone.0047149",
+      "reader_file": "Sources/S07.pdf",
+      "sha256": "2bd0b6bf20669b1d5143c9776634b4662077375d0e7218db6022b1f0e29deca7",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "Iowa, United States"
+      ],
+      "crops": [
+        "maize",
+        "soybean",
+        "small_grain",
+        "alfalfa",
+        "clover"
+      ],
+      "product": null,
+      "product_version": null,
+      "year": 2012,
+      "limitations": [
+        "One Iowa experiment; treatments bundle crops, manure, and other management. Returns exclude land costs, management time, and federal subsidies in the study definition.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S08",
+      "title": "Agricultural diversification promotes multiple ecosystem services without compromising yield",
+      "url": "https://www.science.org/doi/10.1126/sciadv.aba1715",
+      "doi": "10.1126/sciadv.aba1715",
+      "reader_file": "Sources/S08 - Web Snapshot.pdf",
+      "sha256": "f20ea0ddda85de8bca5f90b62e06fffb1bf099b946559e686d8cd541d5aa22b1",
+      "access_scope": "abstract_only",
+      "allowed_pages": [
+        1
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2020,
+      "limitations": [
+        "Only the author-institution abstract/record was obtained. The synthesis includes practices beyond crop rotation; detailed subgroup claims were not extracted.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S09",
+      "title": "SMAP Level 2 and 3 Soil Moisture Passive Algorithm Theoretical Basis Document, Revision F",
+      "url": "https://smap.jpl.nasa.gov/system/internal_resources/details/original/484_L2_SM_P_ATBD_rev_F_final_Aug2020.pdf",
+      "doi": null,
+      "reader_file": "Sources/S09.pdf",
+      "sha256": "2beb036dcba068e21ba1824e0fa6faa390f828c306c644fa86c8a92f09aec4e6",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "SMAP_L2_L3",
+      "product_version": "ATBD_Rev_F",
+      "year": 2020,
+      "limitations": [
+        "The original radar failed early in the mission. A fine posting grid is not independent fine-scale radiometer information.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations.",
+        "Generic SMAP algorithm background; use SMAP006 for the current SPL3SMP_E/006 flag and resolution contract."
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "IMERG V07 Technical Documentation",
+      "url": "https://gpm.nasa.gov/sites/default/files/2023-07/IMERG_TechnicalDocumentation_final_230713.pdf",
+      "doi": null,
+      "reader_file": "Sources/S10.pdf",
+      "sha256": "2216edb07929f3163cf64b0425245d7e037dd67f4eeacb81b6bd7ab5474f99d7",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "IMERG",
+      "product_version": "V07",
+      "year": 2023,
+      "limitations": [
+        "Use the selected run/version consistently. The Final run's delayed observations cannot be treated as available in a real-time hindcast.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S11",
+      "title": "NASA POWER Data Services",
+      "url": "https://power.larc.nasa.gov/docs/services/",
+      "doi": null,
+      "reader_file": "Sources/S11 - Web Snapshot.pdf",
+      "sha256": "7fd223c74c8eda3372d960a4d1efaf5c281a3f4b8f14bb5afa141f1dded06b1e",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "POWER",
+      "product_version": null,
+      "year": 2026,
+      "limitations": [
+        "The quoted service documentation also describes a 1 x 1 degree solar grid. Parameter-specific product revisions and near-real-time replacement matter.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S12",
+      "title": "ECOSTRESS Tiled Evapotranspiration Instantaneous and Daytime L3 Global 70 m V002",
+      "url": "https://www.earthdata.nasa.gov/data/catalog/lpcloud-eco-l3t-jet-002",
+      "doi": null,
+      "reader_file": "Sources/S12 - Web Snapshot.pdf",
+      "sha256": "bd39cc081999a28970d559093652ea7dc4c3c1428202258083fa9c3602f0a9ba",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "ECOSTRESS",
+      "product_version": "V002",
+      "year": 2026,
+      "limitations": [
+        "An ET retrieval/model product with cloud, water, sampling, and ancillary-data limitations; not a direct yield observation.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S13",
+      "title": "Harmonized Landsat and Sentinel-2 Product Overview",
+      "url": "https://hls.gsfc.nasa.gov/products-description/",
+      "doi": null,
+      "reader_file": "Sources/S13 - Web Snapshot.pdf",
+      "sha256": "8aa1efb2e9653aa6dfffbfc5b825b58b5a872b5ae1be564275033c00167a02de",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "HLS",
+      "product_version": null,
+      "year": 2026,
+      "limitations": [
+        "HLS includes NASA/USGS Landsat and ESA/Copernicus Sentinel-2. Effective clear-sky availability varies.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S14",
+      "title": "MODIS Terra Vegetation Indices 16-Day L3 Global 250 m SIN Grid V061",
+      "url": "https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod13q1-061",
+      "doi": null,
+      "reader_file": "Sources/S14 - Web Snapshot.pdf",
+      "sha256": "074b9564c56223b62706abed3b2764b83b9a286871d9c15e7844acb16188cb90",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "MOD13Q1",
+      "product_version": "061",
+      "year": 2026,
+      "limitations": [
+        "MOD13Q1 specifications do not describe all MODIS products. A composite is not an instantaneous image or field-specific diagnosis.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S15",
+      "title": "Monthly Mass Grids - Global mascons (JPL RL06.3_v04)",
+      "url": "https://grace.jpl.nasa.gov/data/get-data/jpl_global_mascons/",
+      "doi": null,
+      "reader_file": "Sources/S15 - Web Snapshot.pdf",
+      "sha256": "fdd0f7d73a14ccf0e59f0f5c34e32f4c7f00860dabfe677ae1b6fc42aaea0a6a",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "GRACE_MASCON",
+      "product_version": "RL06.3_v04",
+      "year": 2026,
+      "limitations": [
+        "The official page was retained through web-tool text retrieval because direct HTML requests returned 404. It describes total-water anomalies and approximately 3 degree JPL mascons, not farm-well observations.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S16",
+      "title": "Shuttle Radar Topography Mission Collection User Guide",
+      "url": "https://lpdaac.usgs.gov/documents/179/SRTM_User_Guide_V3.pdf",
+      "doi": null,
+      "reader_file": "Sources/S16.pdf",
+      "sha256": "422d91fef5195706a596fe5fa759d638ad3b509f5f36d77b0382004b3b0aaac9",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "SRTM",
+      "product_version": null,
+      "year": 2015,
+      "limitations": [
+        "Nominal elevation sampling and derived terrain indicators do not establish field soil hydraulic conditions.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S17",
+      "title": "Algorithm theoretical basis document for GEDI footprint aboveground biomass density",
+      "url": "https://daac.ornl.gov/GEDI/guides/GEDI_L4A_AGB_Density_V2_1.html",
+      "doi": null,
+      "reader_file": "Sources/S17.pdf",
+      "sha256": "d59e3d335249c0a2e02016482ceedda12d7ce2e16ed40bcf1d946d0546844816",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "GEDI",
+      "product_version": null,
+      "year": null,
+      "limitations": [
+        "The downloaded file is the GEDI biomass algorithm document, not the originally requested product landing page. Its cover labels it a non-peer-reviewed preprint/technical document; no publication year is asserted here. Do not treat forest biomass as crop yield.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "disposition": "excluded",
+      "exclusion_reason": "GEDI forest biomass is outside the first agricultural Rotation release; not used as a crop or soil indicator."
+    },
+    {
+      "id": "S18",
+      "title": "Comparing infiltration rates in soils managed with conventional and alternative farming methods: A meta-analysis",
+      "url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0215702&type=printable",
+      "doi": "10.1371/journal.pone.0215702",
+      "reader_file": "Sources/S18.pdf",
+      "sha256": "6a77b7d292761f0e3e4e6e0afb19c0413b87a99543ef7da02e4f5d2e01f1d2d3",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2019,
+      "limitations": [
+        "The paper found no statistically significant overall infiltration effect for the crop-rotation category; do not assign every rotation a fixed infiltration improvement.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S19",
+      "title": "Temperature extremes: Effect on plant growth and development",
+      "url": "https://core.ac.uk/download/pdf/81139827.pdf",
+      "doi": "10.1016/j.wace.2015.08.001",
+      "reader_file": "Sources/S19 - Web Snapshot.pdf",
+      "sha256": "22d9ee110be4fbab8402ada04a3bce3914cbb8adb7e9e3c4af9052706dc1adfe",
+      "access_scope": "abstract_only",
+      "allowed_pages": [
+        1,
+        2
+      ],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2015,
+      "limitations": [
+        "Only the USDA author's interpretive and technical abstracts were obtained, not the full paper. Do not derive crop-specific numeric temperature thresholds from this source.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S20",
+      "title": "Plant responses to rising vapor pressure deficit",
+      "url": "https://sperry.biology.utah.edu/publications/Grossiord_et_al_2020.pdf",
+      "doi": "10.1111/nph.16485",
+      "reader_file": "Sources/S20.pdf",
+      "sha256": "b29176a6bcae5e9b50a952ee8dd2367fba1574cc7c012330aa3fa3e4d8b84999",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2020,
+      "limitations": [
+        "An accepted manuscript of a peer-reviewed review; not a universal crop response curve. The review notes remaining uncertainties in VPD sensing.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S21",
+      "title": "Challenges and opportunities in remote sensing-based crop monitoring: a review",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10029851/",
+      "doi": "10.1093/nsr/nwac290",
+      "reader_file": "Sources/S21 - Web Snapshot.pdf",
+      "sha256": "9eea0f334b1204c42bf1dbaec4e5ff061afb728d7444068a4fd31d3b43c74cac",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2023,
+      "limitations": [
+        "The evidence is weighted towards major staple-crop monitoring. It does not validate every vegetable, quality trait, or intervention model.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S22",
+      "title": "Current Progress in Nitrogen Fixing Plants and Microbiome Research",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7020401/",
+      "doi": "10.3390/plants9010097",
+      "reader_file": "Sources/S22 - Web Snapshot.pdf",
+      "sha256": "f8ed92da6b4db9b052f61bdeaa83bc60c074dc8d7af1d931635f28e97786082b",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2020,
+      "limitations": [
+        "Fixation biology alone does not quantify a fertilizer credit after seed or forage harvest.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S23",
+      "title": "Frost protection: fundamentals, practice, and economics, Volume 1, Chapter 1",
+      "url": "https://www.fao.org/4/y7223e/y7223e07.htm",
+      "doi": null,
+      "reader_file": "Sources/S23 - Web Snapshot.pdf",
+      "sha256": "e262db6a92c08231c75b40069444caf121a72fcacc8dd567fc861d65f7d6f5e6",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2005,
+      "limitations": [
+        "Critical damage temperatures depend on tissues, cultivar, duration, and growth stage. Coarse air or surface temperature is not a direct flower-temperature measurement.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S24",
+      "title": "Landsat 8",
+      "url": "https://landsat.gsfc.nasa.gov/satellites/landsat-8/",
+      "doi": null,
+      "reader_file": "Sources/S24 - Web Snapshot.pdf",
+      "sha256": "41801c93a8ad1697a633873d987f3930eb01f76adcb01e9dd5b53640ec2371e8",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "LANDSAT_8",
+      "product_version": null,
+      "year": 2026,
+      "limitations": [
+        "The NASA mission page is the downloaded source. Resampled delivery does not improve original thermal measurement detail.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S25",
+      "title": "Version 8 of the NASA SMAP Level 4 Soil Moisture Product",
+      "url": "https://nsidc.org/sites/default/files/documents/technical-reference/igarss2026_reichle_et_al_v3_for_nsidc.pdf",
+      "doi": null,
+      "reader_file": "Sources/S25.pdf",
+      "sha256": "e0bc6b9c8f545035e3fe032b6e0a39a89f1fa2c13ae7c2f5a79efc62095ba999",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "SPL4SMGP",
+      "product_version": "008",
+      "year": 2026,
+      "limitations": [
+        "A Version-8 mission conference/technical paper, not a direct agricultural-yield validation study. Preserve the distinction between observed brightness temperature and modelled water at depth.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S26",
+      "title": "FAO-56, Chapter 8: ETc under soil water stress conditions",
+      "url": "https://www.fao.org/4/x0490e/x0490e0e.htm",
+      "doi": null,
+      "reader_file": "Sources/S26 - Web Snapshot.pdf",
+      "sha256": "f69feb072cbfef5d98f09e7716a92850f263af4fdb3ae9788d88d71cb89cd92b",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 1998,
+      "limitations": [
+        "FAO relationships require correct crop coefficients and soil parameters; climatic rainfall-minus-demand is not actual field storage.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S27",
+      "title": "Cover Crops Reduce Nitrate Leaching in Agroecosystems: A Global Meta-Analysis",
+      "url": "https://www.ars.usda.gov/research/publications/publication/?seqNo115=352581",
+      "doi": "10.2134/jeq2018.03.0107",
+      "reader_file": "Sources/S27 - Web Snapshot.pdf",
+      "sha256": "62766649bd830282165edacfa7ca81066fce203c282eec9ba7595028af122b17",
+      "access_scope": "abstract_only",
+      "allowed_pages": [
+        1,
+        2
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2018,
+      "limitations": [
+        "Only the USDA abstract/research summary was downloaded. Leaching reduction is not evidence for a specific yield or irrigation response.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S28",
+      "title": "Principles for High Functioning Soils",
+      "url": "https://www.nrcs.usda.gov/sites/default/files/2023-07/NRCS-Principles-for-High-Functioning-Soils-Factsheet.pdf",
+      "doi": null,
+      "reader_file": "Sources/S28.pdf",
+      "sha256": "070a7c9d471e4d18845678189ab84a115cbddc710d2da743d9b041db69974d98",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": null,
+      "limitations": [
+        "Undated official guidance. It is not an empirical effect size or a remotely sensed soil-health score.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S29",
+      "title": "NASA POWER Methodology",
+      "url": "https://power.larc.nasa.gov/docs/methodology/",
+      "doi": null,
+      "reader_file": "Sources/S29 - Web Snapshot.pdf",
+      "sha256": "4455850349bd2bab707979b5fd17e91b5293416021996b6d5f1f38c93e0f2b87",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "POWER",
+      "product_version": null,
+      "year": 2026,
+      "limitations": [
+        "A methodology overview with release history; details depend on parameter and data vintage. An historical archive is not automatically a forecast.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S30",
+      "title": "ECOSTRESS Collection 2 Tiled and Gridded Product User Guide",
+      "url": "https://lpdaac.usgs.gov/documents/1655/ECO_L1C-4_Grid_Tile_User_Guide_V2.pdf",
+      "doi": null,
+      "reader_file": "Sources/S30.pdf",
+      "sha256": "ac14bfaa99e512f74af9914720b9b5be58d83aa9e6193e3fa87c6e57646abb21",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "ECOSTRESS",
+      "product_version": "V002",
+      "year": 2023,
+      "limitations": [
+        "The April 2023 guide is a living product guide. Its ETdaily definition is daytime integration; inspect current file metadata and units rather than assuming full-day ET. The model-specific ESI is not interchangeable with every other index named ESI.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S31",
+      "title": "A comprehensive assessment of in situ and remote sensing soil moisture data assimilation in the APSIM model for improving agricultural forecasting across the US Midwest",
+      "url": "https://hess.copernicus.org/articles/27/1173/2023/hess-27-1173-2023.pdf",
+      "doi": "10.5194/hess-27-1173-2023",
+      "reader_file": "Sources/S31 - Web Snapshot.pdf",
+      "sha256": "95ecc95034039c454c91cf28976f5d282cb8d548c1de4f7ebb863dcf43073fb8",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "Midwestern United States"
+      ],
+      "crops": [
+        "maize",
+        "soybean"
+      ],
+      "product": null,
+      "product_version": null,
+      "year": 2023,
+      "limitations": [
+        "The 17.2% refers to prediction error, not a yield increase. The same assimilation did not reliably constrain drainage or nitrate losses; transfer requires new validation.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S32",
+      "title": "A scalable satellite-based crop yield mapper",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0034425715001637",
+      "doi": "10.1016/j.rse.2015.04.021",
+      "reader_file": "Sources/S32 - Web Snapshot.pdf",
+      "sha256": "5bff805845373f7b78872fc6fb9500af8b297eca3a14b98b25a7c6a83061abc8",
+      "access_scope": "bibliographic_only",
+      "allowed_pages": [
+        1
+      ],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2015,
+      "limitations": [
+        "Only an institutional bibliographic record and highlights were downloaded. Full-paper methods and numeric accuracy are not claimed in the review.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S34",
+      "title": "ECOSTRESS: NASAs Next Generation Mission to Measure Evapotranspiration From the International Space Station",
+      "url": "https://www.ars.usda.gov/arsuserfiles/20361500/pdf_pubs/P2674.pdf",
+      "doi": "10.1029/2019WR026058",
+      "reader_file": "Sources/S34.pdf",
+      "sha256": "620a73ed30216142531c0b777ef53a65c3ae3f90bb53687cbdc4ebb1f77bb75d",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "ECOSTRESS",
+      "product_version": "mission_early_validation",
+      "year": 2020,
+      "limitations": [
+        "The r-squared, bias and normalized RMSE are specific to that product, sample, and protocol. They do not establish crop-yield accuracy or validate all later products.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S35",
+      "title": "Optimizing cover cropping application for sustainable crop production",
+      "url": "https://www.nature.com/articles/s44264-025-00050-8.pdf",
+      "doi": "10.1038/s44264-025-00050-8",
+      "reader_file": "Sources/S35.pdf",
+      "sha256": "4431407a4a4282e7c59fd0a900616a51723d8dfbfbc9d9f49bed628025b5e77a",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2025,
+      "limitations": [
+        "A pooled percentage is not a field-specific emission factor, whole-farm climate balance, or prediction interval.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S36",
+      "title": "FAO-56, Chapter 4: Determination of reference evapotranspiration",
+      "url": "https://www.fao.org/4/x0490e/x0490e08.htm",
+      "doi": null,
+      "reader_file": "Sources/S36 - Web Snapshot.pdf",
+      "sha256": "6ad80cbea7cea482a5df40affb21314db5a3dd09e7c83e1d623c49566c23c7f5",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 1998,
+      "limitations": [
+        "The saved chapter includes calculation examples; equations represented as images may not survive text conversion. Consult original HTML when needed.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S38",
+      "title": "Soil microbial biomass and function are altered by 12 years of crop rotation",
+      "url": "https://soil.copernicus.org/articles/2/583/2016/soil-2-583-2016.pdf",
+      "doi": "10.5194/soil-2-583-2016",
+      "reader_file": "Sources/S38.pdf",
+      "sha256": "c712ba2aa3e60db949897be97c17c7ab8fc5b01b0ea4833668f73149b47dba22",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "study-site-specific"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2016,
+      "limitations": [
+        "Potential laboratory mineralization and microbial biomass are not direct next-season nitrogen delivery or yield gains.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S39",
+      "title": "A review of soil waterlogging impacts, mechanisms, and adaptive strategies",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11866847/",
+      "doi": "10.3389/fpls.2025.1545912",
+      "reader_file": "Sources/S39 - Web Snapshot.pdf",
+      "sha256": "6a72187d7c339d55de6ace7d2edb36d55b989409e120509c8978705d1ddd3015",
+      "access_scope": "web_snapshot",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2025,
+      "limitations": [
+        "Different flood types, durations, developmental stages and cultivars have different responses; tolerance is not immunity.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S40",
+      "title": "Root-rhizosphere-soil interactions in biopores",
+      "url": "https://link.springer.com/article/10.1007/s11104-022-05406-4",
+      "doi": "10.1007/s11104-022-05406-4",
+      "reader_file": "Sources/S40.pdf",
+      "sha256": "57687ea9cb4f77f76c97830dd8a5c52843ca58e66139313d5436ca893348c321",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2022,
+      "limitations": [
+        "The review identifies unresolved context dependence; deep roots and biopores should not receive an unconditional yield bonus.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S43",
+      "title": "Building Soils for Better Crops, Fourth Edition",
+      "url": "https://www.sare.org/resources/building-soils-for-better-crops/",
+      "doi": null,
+      "reader_file": "Sources/S43.pdf",
+      "sha256": "5c5b002f9d08198fdaea5107d3b6003cf9849b019f2186d2051d1b757bf117f3",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": null,
+      "product_version": null,
+      "year": 2021,
+      "limitations": [
+        "A comprehensive management manual with context-dependent practices, not a substitute for a local soil test or nutrient budget.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S44",
+      "title": "MODIS Vegetation Index User Guide, Collection 6.1, Version 3.10",
+      "url": "https://modis-land.gsfc.nasa.gov/pdf/MOD13_User_Guide_V61.pdf",
+      "doi": null,
+      "reader_file": "Sources/S44.pdf",
+      "sha256": "7440d485fef25e85c19752c553989d7af33698f2f606cc0b50cf298012f85a0a",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global_background"
+      ],
+      "crops": [],
+      "product": "MOD13Q1",
+      "product_version": "061",
+      "year": 2019,
+      "limitations": [
+        "Collection 6.1 guide, version 3.10, September 2019. Processing details and data flags must match the collection being used.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S45",
+      "title": "Winter Wheat Yield Assessment from Landsat 8 and Sentinel-2 Data: Incorporating Surface Reflectance, Through Phenological Fitting, into Regression Yield Models",
+      "url": "https://www.mdpi.com/2072-4292/11/15/1768",
+      "doi": "10.3390/rs11151768",
+      "reader_file": "Sources/S45.pdf",
+      "sha256": "b2baf4c88a672696575c7b63995ef954d23d317797bb851a3c9abcb84513d44a",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "Ukraine"
+      ],
+      "crops": [
+        "winter_wheat"
+      ],
+      "product": null,
+      "product_version": null,
+      "year": 2019,
+      "limitations": [
+        "The reported cross-validation result is for the studied region and period, not independently established field-level or future-region accuracy.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "S46",
+      "title": "Spatial Rice Yield Estimation Based on MODIS and Sentinel-1 SAR Data and ORYZA Crop Growth Model",
+      "url": "https://www.mdpi.com/2072-4292/10/2/293",
+      "doi": "10.3390/rs10020293",
+      "reader_file": "Sources/S46.pdf",
+      "sha256": "0e14cb63b68b8160c46da3d7258262d0a4afa3200f14af25bc21202c64d87a93",
+      "access_scope": "full_text",
+      "allowed_pages": [],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "Red River Delta, Vietnam"
+      ],
+      "crops": [
+        "rice"
+      ],
+      "product": null,
+      "product_version": null,
+      "year": 2018,
+      "limitations": [
+        "Validation was aggregated to districts for two 2016 seasons in the Red River Delta. District agreement does not verify every mapped field, and Sentinel-1 is not a NASA mission.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ]
+    },
+    {
+      "id": "SMAP006",
+      "title": "SMAP SPL3SMP_E Version 6 official user guide",
+      "url": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf",
+      "reader_file": "spl3smp_e-v006-userguide.pdf",
+      "asset_group": "prepared",
+      "locator_type": "pdf_page",
+      "sha256": "637af53499f8cfeefcb3ed54820a04a918517488cdee2dfe4d14326dfc9a5ffd",
+      "access_scope": "full_text",
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "regions": [
+        "global"
+      ],
+      "product": "SPL3SMP_E",
+      "product_version": "006",
+      "limitations": [
+        "Regional surface soil moisture; not field-level irrigation or root-zone storage.",
+        "Citations use PDF page numbers, which are one greater than printed page labels."
+      ]
+    },
+    {
+      "id": "HELPV2",
+      "title": "Field Shift v2 farmer workflow and metric dictionary / 农场主操作与指标说明",
+      "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/grok_bot/sideronostos-backend/src/sideronostos_backend/modules/knowledge/data/readers/product-help-v2.md",
+      "reader_file": "product-help-v2-20261113-v4.md",
+      "asset_group": "prepared",
+      "locator_type": "section",
+      "sha256": "7b76e9edce0bc1c75208981044c4ec48606d6df632031e5b2689e4a0baacb213",
+      "access_scope": "product_help",
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "regions": [
+        "global"
+      ],
+      "product": null,
+      "product_version": null,
+      "year": 2026,
+      "limitations": [
+        "Local versioned product documentation; remote branch may not yet contain this working-copy file.",
+        "Describes product semantics, not independent agronomic validation; actual availability is checked by current capability state."
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "C-S01",
+      "source_id": "S01",
+      "statement": "参考蒸散 ET0 表示天气的蒸发需求，不包含作物特征和土壤因素；不能把它直接当作农田实测耗水或灌溉量。",
+      "anchors": [
+        {
+          "page": 5,
+          "contains": "does not consider the crop characteristics"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "FAO-56 is a reference framework. Crop coefficients and soil parameters need local application.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "definition"
+    },
+    {
+      "id": "C-S03",
+      "source_id": "S03",
+      "statement": "轮作需要考虑近期同科作物和土传病害历史；间隔应结合具体病害和当地条件确定，不能把所有同科作物统一判为相同风险。",
+      "anchors": [
+        {
+          "page": 86,
+          "contains": "Be careful not to repeat crops"
+        }
+      ],
+      "applicability": [
+        "Northeastern United States"
+      ],
+      "limitations": [
+        "Practical guidance is weighted towards organic systems in the northeastern US. A botanical-family screen is not a pathogen diagnosis.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "C-S04",
+      "source_id": "S04",
+      "statement": "轮作研究中的 gross revenue 是总收入。缺少投入成本数据时不能把它解释成净利润，更不能承诺某块地会获得同样的增益。",
+      "anchors": [
+        {
+          "page": 2,
+          "contains": "lack of input cost data"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "The average is not an estimated benefit of adding one crop to an already diversified local rotation. Revenue is not profit.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "C-S05",
+      "source_id": "S05",
+      "statement": "豆科前茬的作用与施氮水平和作物多样性等条件有关，不能只凭“种过豆科”就固定增加下一季产量或扣减施肥量。",
+      "anchors": [
+        {
+          "page": 3,
+          "contains": "Nitrogen fertilization"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "Do not transfer the pooled mean to every species pair. N fertilization, existing diversity, and environment moderate the response.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "C-S06",
+      "source_id": "S06",
+      "statement": "旱作区用覆盖作物替代休耕可能消耗土壤水分并影响下一季作物；应比较当地降雨、土壤与管理条件，不能保证覆盖越多越好。",
+      "anchors": [
+        {
+          "page": 1,
+          "contains": "cover cropping reduced cash crop"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "The control is fallow. The approximate annual-rainfall break-even result is not a universally valid decision threshold.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "counterevidence"
+    },
+    {
+      "id": "C-S07",
+      "source_id": "S07",
+      "statement": "Iowa 的多样化轮作试验同时改变了作物序列、化学投入和粪肥管理，不能把组合管理的结果全部归因于轮作顺序。",
+      "anchors": [
+        {
+          "page": 2,
+          "contains": "use of manure"
+        }
+      ],
+      "applicability": [
+        "Iowa, United States"
+      ],
+      "limitations": [
+        "One Iowa experiment; treatments bundle crops, manure, and other management. Returns exclude land costs, management time, and federal subsidies in the study definition.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "C-S09",
+      "source_id": "S09",
+      "statement": "SMAP 被动微波表层土壤水分描述浅表层的区域背景；网格间距与实际观测支持范围不同，不能把一个网格读数当作每块小田的根区含水量。",
+      "anchors": [
+        {
+          "page": 13,
+          "contains": "surface soil moisture"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "The original radar failed early in the mission. A fine posting grid is not independent fine-scale radiometer information.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "stance": "definition"
+    },
+    {
+      "id": "C-S18",
+      "source_id": "S18",
+      "statement": "这项综述分别分析覆盖作物和轮作等管理类别，不能把覆盖作物的入渗改善幅度直接赋给所有轮作方案。",
+      "anchors": [
+        {
+          "page": 1,
+          "contains": "cover crops led to the largest"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "The paper found no statistically significant overall infiltration effect for the crop-rotation category; do not assign every rotation a fixed infiltration improvement.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "counterevidence"
+    },
+    {
+      "id": "C-S26",
+      "source_id": "S26",
+      "statement": "估算水分胁迫需要根区水量平衡和可利用水信息；仅用降雨减去蒸散，不能代表完整的土壤储水过程。",
+      "anchors": [
+        {
+          "page": 17,
+          "contains": "requires a daily water balance calculation"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "FAO relationships require correct crop coefficients and soil parameters; climatic rainfall-minus-demand is not actual field storage.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "stance": "definition"
+    },
+    {
+      "id": "C-S28",
+      "source_id": "S28",
+      "statement": "土壤健康涉及水分、养分和生物等多种功能，不能凭单个遥感数值直接生成已验证的综合土壤健康评分。",
+      "anchors": [
+        {
+          "page": 2,
+          "contains": "additional"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "Undated official guidance. It is not an empirical effect size or a remotely sensed soil-health score.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "definition"
+    },
+    {
+      "id": "C-S36",
+      "source_id": "S36",
+      "statement": "FAO Penman–Monteith 方法用气象数据估算参考蒸散 ET0；缺少输入时应说明缺项和采用的方法，不能悄悄更换公式后当作同一结果。",
+      "anchors": [
+        {
+          "page": 1,
+          "contains": "meteorological data"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "The saved chapter includes calculation examples; equations represented as images may not survive text conversion. Consult original HTML when needed.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "soil_water",
+        "rotation"
+      ],
+      "stance": "definition"
+    },
+    {
+      "id": "C-S32",
+      "source_id": "S32",
+      "statement": "本地仅有作物产量制图方法的书目信息与概要；这不能支持复制完整算法，也不能证明当前系统已经能够预测农户地块产量。",
+      "anchors": [
+        {
+          "page": 1,
+          "contains": "A new approach to mapping crop yields"
+        }
+      ],
+      "applicability": [
+        "global_background"
+      ],
+      "limitations": [
+        "Only an institutional bibliographic record and highlights were downloaded. Full-paper methods and numeric accuracy are not claimed in the review.",
+        "PDF page numbers refer to this exact reader copy; snapshots may flatten tables or omit image equations."
+      ],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "SMAP006_QA",
+      "source_id": "SMAP006",
+      "statement": "SPL3SMP_E 第 6 版建议使用 retrieval_qual_flag 为 0 或 8 的土壤水分反演；其余标记需要核查，不可默认为可靠农田观测。",
+      "anchors": [
+        {
+          "page": 14,
+          "contains": "A retrieval_qual_flag value of either 0 or 8 indicates high-quality retrievals"
+        }
+      ],
+      "applicability": [
+        "Current product version or Field Shift v2 declared method"
+      ],
+      "limitations": [
+        "Does not establish a field-specific agronomic prescription."
+      ],
+      "topics": [
+        "soil_water"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "SMAP006_GRID",
+      "source_id": "SMAP006",
+      "statement": "SMAP 辐射计原生足迹约 36 km，增强产品插值至约 9 km 网格；网格间距不能解释为田块尺度的独立测量。",
+      "anchors": [
+        {
+          "page": 7,
+          "contains": "The native spatial resolution of the radiometer footprint is approximately 36 km."
+        }
+      ],
+      "applicability": [
+        "Current product version or Field Shift v2 declared method"
+      ],
+      "limitations": [
+        "Does not establish a field-specific agronomic prescription."
+      ],
+      "topics": [
+        "soil_water"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_DRAFT",
+      "source_id": "HELPV2",
+      "statement": "修改输入后旧结果仍属于旧条件，需要明确提交重算，不能用聊天推测新的资源用量或排序。",
+      "anchors": [
+        {
+          "page": 4,
+          "contains": "Drafts need explicit recomputation."
+        }
+      ],
+      "applicability": [
+        "Current product version or Field Shift v2 declared method"
+      ],
+      "limitations": [
+        "Does not establish a field-specific agronomic prescription."
+      ],
+      "topics": [
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_WATER",
+      "source_id": "HELPV2",
+      "statement": "估算补水缺口来自简化水量配方，不是实测灌溉量，也没有包括土壤蓄水和灌溉效率。",
+      "anchors": [
+        {
+          "page": 5,
+          "contains": "Estimated supplemental water is not measured irrigation."
+        }
+      ],
+      "applicability": [
+        "Current product version or Field Shift v2 declared method"
+      ],
+      "limitations": [
+        "Does not establish a field-specific agronomic prescription."
+      ],
+      "topics": [
+        "soil_water",
+        "crop",
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_HISTORY",
+      "source_id": "HELPV2",
+      "statement": "仅知年份的前茬按年末、仅知月份的按月末保守核验间隔；此边界不是实测收获日。",
+      "anchors": [
+        {
+          "page": 2,
+          "contains": "以该年年末作为保守的计算结束日"
+        }
+      ],
+      "applicability": [
+        "Current Field Shift v2 implementation"
+      ],
+      "limitations": [
+        "Product semantics; not independent agronomic validation."
+      ],
+      "topics": [
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_UNITS",
+      "source_id": "HELPV2",
+      "statement": "年度资源上限按所选全部地块合计填写，水用立方米、投入用美元、劳力用人日，不是每公顷额度。",
+      "anchors": [
+        {
+          "page": 2,
+          "contains": "资源上限按公历年度填写"
+        }
+      ],
+      "applicability": [
+        "Current Field Shift v2 implementation"
+      ],
+      "limitations": [
+        "Product semantics; not independent agronomic validation."
+      ],
+      "topics": [
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_GDD",
+      "source_id": "HELPV2",
+      "statement": "积温累计描述模型生长进度；候选生长期缺必要天气时排除候选，不插值或按零补齐。",
+      "anchors": [
+        {
+          "page": 9,
+          "contains": "本产品排除这个候选"
+        }
+      ],
+      "applicability": [
+        "Current Field Shift v2 implementation"
+      ],
+      "limitations": [
+        "Product semantics; not independent agronomic validation."
+      ],
+      "topics": [
+        "crop",
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_LIMITS",
+      "source_id": "HELPV2",
+      "statement": "系统不预测产量或利润，选择方案或重新计算也不会启用这些能力；助手不能执行业务写入。",
+      "anchors": [
+        {
+          "page": 10,
+          "contains": "当前模型不预测产量"
+        }
+      ],
+      "applicability": [
+        "Current Field Shift v2 implementation"
+      ],
+      "limitations": [
+        "Product semantics; not independent agronomic validation."
+      ],
+      "topics": [
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_SAVE",
+      "source_id": "HELPV2",
+      "statement": "保存计划在结果区选中具体方案后操作，已存计划由页面顶部入口恢复其完整计算快照。",
+      "anchors": [
+        {
+          "page": 11,
+          "contains": "保存的是当时的完整计算和选项快照"
+        }
+      ],
+      "applicability": [
+        "Current Field Shift v2 implementation"
+      ],
+      "limitations": [
+        "Product semantics; not independent agronomic validation."
+      ],
+      "topics": [
+        "rotation"
+      ],
+      "stance": "qualifies"
+    },
+    {
+      "id": "HELPV2_INFEASIBLE",
+      "source_id": "HELPV2",
+      "statement": "基准违反约束只解释该基准，不能据此推断全部候选无解的具体原因。",
+      "anchors": [
+        {
+          "page": 12,
+          "contains": "这些仅诊断该基准"
+        }
+      ],
+      "applicability": [
+        "Current Field Shift v2 implementation"
+      ],
+      "limitations": [
+        "Product semantics; not independent agronomic validation."
+      ],
+      "topics": [
+        "rotation"
+      ],
+      "stance": "qualifies"
+    }
+  ]
+}

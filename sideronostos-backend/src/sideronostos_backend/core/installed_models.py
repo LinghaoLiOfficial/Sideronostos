@@ -4,6 +4,7 @@ from ..modules.collaboration import models as _models_7  # noqa: F401
 from ..modules.database.audit import AuditEvent as _models_1  # noqa: F401
 from ..modules.field_shift import models as _models_9  # noqa: F401
 from ..modules.jobs import models as _models_2  # noqa: F401
+from ..modules.knowledge import models as _models_10  # noqa: F401
 from ..modules.personal_schedule import models as _models_8  # noqa: F401
 from ..modules.rbac import models as _models_3  # noqa: F401
 from ..modules.storage import models as _models_4  # noqa: F401
@@ -21,4 +22,5 @@ REGISTERED_MODEL_MODULES = (
     "modules.collaboration.models",
     "modules.personal_schedule.models",
     "modules.field_shift.models",
+    "modules.knowledge.models",
 )

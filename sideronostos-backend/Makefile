@@ -46,3 +46,8 @@ check:
 	uv run python -m pytest
 smoke:
 	uv run python -m sideronostos_backend.dev smoke
+
+# Explicit preparation and verification commands; ARGS pass through to the CLI.
+.PHONY: prepare-knowledge
+prepare-knowledge:
+	uv run python -m sideronostos_backend.modules.knowledge.cli $(ARGS)

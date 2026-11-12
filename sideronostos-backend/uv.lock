@@ -8,146 +8,6 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "sideronostos-backend"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "alembic" },
-    { name = "asyncpg" },
-    { name = "fastapi" },
-    { name = "pydantic-settings" },
-    { name = "sqlalchemy", extra = ["asyncio"] },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.optional-dependencies]
-ai = [
-    { name = "gradio" },
-    { name = "langchain-core" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
-    { name = "langgraph-cli", extra = ["inmem"] },
-]
-full = [
-    { name = "aiosmtplib" },
-    { name = "boto3" },
-    { name = "cryptography" },
-    { name = "email-validator" },
-    { name = "gradio" },
-    { name = "httpx" },
-    { name = "langchain-core" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
-    { name = "langgraph-cli", extra = ["inmem"] },
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-exporter-otlp-proto-http" },
-    { name = "opentelemetry-sdk" },
-    { name = "pillow" },
-    { name = "pwdlib", extra = ["argon2"] },
-    { name = "pyjwt" },
-    { name = "temporalio" },
-]
-identity = [
-    { name = "aiosmtplib" },
-    { name = "cryptography" },
-    { name = "email-validator" },
-    { name = "pwdlib", extra = ["argon2"] },
-    { name = "pyjwt" },
-    { name = "temporalio" },
-]
-observability = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-exporter-otlp-proto-http" },
-    { name = "opentelemetry-sdk" },
-]
-saas = [
-    { name = "aiosmtplib" },
-    { name = "boto3" },
-    { name = "cryptography" },
-    { name = "email-validator" },
-    { name = "httpx" },
-    { name = "pillow" },
-    { name = "pwdlib", extra = ["argon2"] },
-    { name = "pyjwt" },
-    { name = "temporalio" },
-]
-workflow = [
-    { name = "cryptography" },
-    { name = "temporalio" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "httpx" },
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiosmtplib", marker = "extra == 'full'", specifier = ">=4,<6" },
-    { name = "aiosmtplib", marker = "extra == 'identity'", specifier = ">=4,<6" },
-    { name = "aiosmtplib", marker = "extra == 'saas'", specifier = ">=4,<6" },
-    { name = "alembic", specifier = ">=1.16,<2" },
-    { name = "asyncpg", specifier = ">=0.30,<1" },
-    { name = "boto3", marker = "extra == 'full'", specifier = ">=1.40,<2" },
-    { name = "boto3", marker = "extra == 'saas'", specifier = ">=1.40,<2" },
-    { name = "cryptography", marker = "extra == 'full'", specifier = ">=45,<47" },
-    { name = "cryptography", marker = "extra == 'identity'", specifier = ">=45,<47" },
-    { name = "cryptography", marker = "extra == 'saas'", specifier = ">=45,<47" },
-    { name = "cryptography", marker = "extra == 'workflow'", specifier = ">=45,<47" },
-    { name = "email-validator", marker = "extra == 'full'", specifier = ">=2.2,<3" },
-    { name = "email-validator", marker = "extra == 'identity'", specifier = ">=2.2,<3" },
-    { name = "email-validator", marker = "extra == 'saas'", specifier = ">=2.2,<3" },
-    { name = "fastapi", specifier = ">=0.115,<1" },
-    { name = "gradio", marker = "extra == 'ai'", specifier = ">=5.49,<7" },
-    { name = "gradio", marker = "extra == 'full'", specifier = ">=5.49,<7" },
-    { name = "httpx", marker = "extra == 'full'", specifier = ">=0.28,<1" },
-    { name = "httpx", marker = "extra == 'saas'", specifier = ">=0.28,<1" },
-    { name = "langchain-core", marker = "extra == 'ai'", specifier = ">=1.6,<2" },
-    { name = "langchain-core", marker = "extra == 'full'", specifier = ">=1.6,<2" },
-    { name = "langchain-openai", marker = "extra == 'ai'", specifier = ">=1.0,<2" },
-    { name = "langchain-openai", marker = "extra == 'full'", specifier = ">=1.0,<2" },
-    { name = "langgraph", marker = "extra == 'ai'", specifier = ">=1.2,<2" },
-    { name = "langgraph", marker = "extra == 'full'", specifier = ">=1.2,<2" },
-    { name = "langgraph-cli", extras = ["inmem"], marker = "extra == 'ai'", specifier = ">=0.4,<1" },
-    { name = "langgraph-cli", extras = ["inmem"], marker = "extra == 'full'", specifier = ">=0.4,<1" },
-    { name = "opentelemetry-api", marker = "extra == 'full'", specifier = ">=1.29,<2" },
-    { name = "opentelemetry-api", marker = "extra == 'observability'", specifier = ">=1.29,<2" },
-    { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'full'", specifier = ">=1.29,<2" },
-    { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'observability'", specifier = ">=1.29,<2" },
-    { name = "opentelemetry-sdk", marker = "extra == 'full'", specifier = ">=1.29,<2" },
-    { name = "opentelemetry-sdk", marker = "extra == 'observability'", specifier = ">=1.29,<2" },
-    { name = "pillow", marker = "extra == 'full'", specifier = ">=11,<13" },
-    { name = "pillow", marker = "extra == 'saas'", specifier = ">=11,<13" },
-    { name = "pwdlib", extras = ["argon2"], marker = "extra == 'full'", specifier = ">=0.3,<1" },
-    { name = "pwdlib", extras = ["argon2"], marker = "extra == 'identity'", specifier = ">=0.3,<1" },
-    { name = "pwdlib", extras = ["argon2"], marker = "extra == 'saas'", specifier = ">=0.3,<1" },
-    { name = "pydantic-settings", specifier = ">=2.10,<3" },
-    { name = "pyjwt", marker = "extra == 'full'", specifier = ">=2.10,<3" },
-    { name = "pyjwt", marker = "extra == 'identity'", specifier = ">=2.10,<3" },
-    { name = "pyjwt", marker = "extra == 'saas'", specifier = ">=2.10,<3" },
-    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.36,<3" },
-    { name = "temporalio", marker = "extra == 'full'", specifier = ">=1.18,<2" },
-    { name = "temporalio", marker = "extra == 'identity'", specifier = ">=1.18,<2" },
-    { name = "temporalio", marker = "extra == 'saas'", specifier = ">=1.18,<2" },
-    { name = "temporalio", marker = "extra == 'workflow'", specifier = ">=1.18,<2" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.35,<1" },
-]
-provides-extras = ["workflow", "ai", "identity", "saas", "full", "observability"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "httpx", specifier = ">=0.28,<1" },
-    { name = "mypy", specifier = ">=1.17,<2" },
-    { name = "pytest", specifier = ">=8.4,<9" },
-    { name = "pytest-asyncio", specifier = ">=1.1,<2" },
-    { name = "ruff", specifier = ">=0.12,<1" },
-]
-
-[[package]]
 name = "aiosmtplib"
 version = "5.1.3"
 source = { registry = "https://pypi.org/simple" }
@@ -840,6 +700,12 @@ wheels = [
 ]
 
 [[package]]
+name = "jieba"
+version = "0.42.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c6/cb/18eeb235f833b726522d7ebed54f2278ce28ba9438e3135ab0278d9792a2/jieba-0.42.1.tar.gz", hash = "sha256:055ca12f62674fafed09427f176506079bc135638a14e23e25be909131928db2", size = 19214172, upload-time = "2020-01-20T14:27:23.5Z" }
+
+[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1488,6 +1354,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pgvector"
+version = "0.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/25/6c/6d8b4b03b958c02fa8687ec6063c49d952a189f8c91ebbe51e877dfab8f7/pgvector-0.4.2.tar.gz", hash = "sha256:322cac0c1dc5d41c9ecf782bd9991b7966685dee3a00bc873631391ed949513a", size = 31354, upload-time = "2025-12-05T01:07:17.87Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5a/26/6cee8a1ce8c43625ec561aff19df07f9776b7525d9002c86bceb3e0ac970/pgvector-0.4.2-py3-none-any.whl", hash = "sha256:549d45f7a18593783d5eec609ea1684a724ba8405c4cb182a0b2b08aeff04e08", size = 27441, upload-time = "2025-12-05T01:07:16.536Z" },
+]
+
+[[package]]
 name = "pillow"
 version = "12.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1635,6 +1513,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/43/ea/5194e52748b0da83d71e082d75496eaec6e58f419f5e184786ded517e6a9/pyjwt-2.15.1.tar.gz", hash = "sha256:4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8", size = 121252, upload-time = "2026-09-28T18:40:42.598Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/50/ca/44de4e75f8aadc457f0634be3b542815078ded46dca30efb960edeecad6e/pyjwt-2.15.1-py3-none-any.whl", hash = "sha256:42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193", size = 33860, upload-time = "2026-09-28T18:40:41.429Z" },
+]
+
+[[package]]
+name = "pymupdf"
+version = "1.28.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a3/fb/b6761fa2d5266f2cdb24c3b91f4023070ab7848381417678e7a289a1d52a/pymupdf-1.28.2.tar.gz", hash = "sha256:5e0be7908a715aa20333caddd73f1d6f01e4cd0c26e869fa2dd0b7f344da2249", size = 87903557, upload-time = "2026-08-06T21:43:23.321Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b4/51/550c9a75c4ff3245cb4ecb7bb95cbe2ab7374230b8e2b7a1f7259444150b/pymupdf-1.28.2-cp310-abi3-macosx_10_15_x86_64.whl", hash = "sha256:5fc315b425ff1f7afdd1ea2f348205cb19b806767daae7ce4d64115799c2bae1", size = 24645079, upload-time = "2026-08-06T21:37:25.001Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/01/3591f781b417b382a8487a2356e927acfe858b1043bab0ec47f6805bb109/pymupdf-1.28.2-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:7113846b35dbf0a033f088e4f4fb543dabeb4b0b12c112966a1ca1ee2d5eacae", size = 23875605, upload-time = "2026-08-06T21:37:40.369Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/86/4a68f080b71b46802178346af46486e1697508e760855ff5f3b218a6dff7/pymupdf-1.28.2-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:3050a233dde1211efe89ada74e2add6238436434159f46097a1423aad2842545", size = 25095554, upload-time = "2026-08-06T21:37:58.485Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/06/dace3e27af26690cb20bead80dbac42941b0841eb689b8aabbd67dde16f0/pymupdf-1.28.2-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:397d6715c1f0df7548a92d0afd8ce370fc48fa47aeefac16be2bc04a16a8227f", size = 25762500, upload-time = "2026-08-06T21:38:17.438Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/61/4146dfa1d8172a1ce8d59f0eed94896ddefb8deb2274534d0522fbb8abf5/pymupdf-1.28.2-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:f89fb2d86d07d643a269f17a093105057e20c79c1d06c103b53600067b6d2b01", size = 25986309, upload-time = "2026-08-06T21:38:35.472Z" },
+    { url = "https://files.pythonhosted.org/packages/52/60/1fb6e64676f7500ebe89054b9e5bbbe14d3101c92d5f1a40ac9a35227673/pymupdf-1.28.2-cp310-abi3-win32.whl", hash = "sha256:530ef543a3885b3b81cb72a854e7c5a625a9233201221132bb6c31698c6a2bdb", size = 18525353, upload-time = "2026-08-06T21:38:47.697Z" },
+    { url = "https://files.pythonhosted.org/packages/4a/61/d563bbccba262f9dd6d2d35ccb72593648184d886188efb12d9ce8f34dd6/pymupdf-1.28.2-cp310-abi3-win_amd64.whl", hash = "sha256:ebd244918798502d7b4504c90410d1711a4d7675a32584ca30f1bab419ecbffe", size = 19826532, upload-time = "2026-08-06T21:39:00.213Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/93/08f404a1f0155fe24137cf2d3aabd3e2b4b08c62053ed89c60f2611be3e9/pymupdf-1.28.2-cp310-abi3-win_arm64.whl", hash = "sha256:ffe91a24edc75c80da2a4b62f50fc0f54632d34fc8fe4cbc48e5c7ff07cf8fb4", size = 19759252, upload-time = "2026-08-06T21:39:12.937Z" },
+    { url = "https://files.pythonhosted.org/packages/58/8c/d897dcd32a25b58186c968b15ce4324ca029e9d96460de12325314e390be/pymupdf-1.28.2-cp313-abi3-pyemscripten_2025_0_wasm32.whl", hash = "sha256:2e1b574c0fd2cb238021033fd3c0f9c4388816638df064e4bfb56d9d81736dc8", size = 18399403, upload-time = "2026-08-06T21:39:25.008Z" },
 ]
 
 [[package]]
@@ -1861,6 +1756,158 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/58/15/8b3609fd3830ef7b27b655beb4b4e9c62313a4e8da8c676e142cc210d58e/shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de", size = 10310, upload-time = "2023-10-24T04:13:40.426Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e0/f9/0595336914c5619e5f28a1fb793285925a8cd4b432c9da0a987836c7f822/shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686", size = 9755, upload-time = "2023-10-24T04:13:38.866Z" },
+]
+
+[[package]]
+name = "sideronostos-backend"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "alembic" },
+    { name = "asyncpg" },
+    { name = "fastapi" },
+    { name = "pydantic-settings" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.optional-dependencies]
+ai = [
+    { name = "gradio" },
+    { name = "langchain-core" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
+    { name = "langgraph-cli", extra = ["inmem"] },
+]
+full = [
+    { name = "aiosmtplib" },
+    { name = "boto3" },
+    { name = "cryptography" },
+    { name = "email-validator" },
+    { name = "gradio" },
+    { name = "httpx" },
+    { name = "jieba" },
+    { name = "langchain-core" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
+    { name = "langgraph-cli", extra = ["inmem"] },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-sdk" },
+    { name = "pgvector" },
+    { name = "pillow" },
+    { name = "pwdlib", extra = ["argon2"] },
+    { name = "pyjwt" },
+    { name = "pymupdf" },
+    { name = "temporalio" },
+]
+identity = [
+    { name = "aiosmtplib" },
+    { name = "cryptography" },
+    { name = "email-validator" },
+    { name = "pwdlib", extra = ["argon2"] },
+    { name = "pyjwt" },
+    { name = "temporalio" },
+]
+knowledge = [
+    { name = "jieba" },
+    { name = "pgvector" },
+    { name = "pymupdf" },
+]
+observability = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-sdk" },
+]
+saas = [
+    { name = "aiosmtplib" },
+    { name = "boto3" },
+    { name = "cryptography" },
+    { name = "email-validator" },
+    { name = "httpx" },
+    { name = "pillow" },
+    { name = "pwdlib", extra = ["argon2"] },
+    { name = "pyjwt" },
+    { name = "temporalio" },
+]
+workflow = [
+    { name = "cryptography" },
+    { name = "temporalio" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiosmtplib", marker = "extra == 'full'", specifier = ">=4,<6" },
+    { name = "aiosmtplib", marker = "extra == 'identity'", specifier = ">=4,<6" },
+    { name = "aiosmtplib", marker = "extra == 'saas'", specifier = ">=4,<6" },
+    { name = "alembic", specifier = ">=1.16,<2" },
+    { name = "asyncpg", specifier = ">=0.30,<1" },
+    { name = "boto3", marker = "extra == 'full'", specifier = ">=1.40,<2" },
+    { name = "boto3", marker = "extra == 'saas'", specifier = ">=1.40,<2" },
+    { name = "cryptography", marker = "extra == 'full'", specifier = ">=45,<47" },
+    { name = "cryptography", marker = "extra == 'identity'", specifier = ">=45,<47" },
+    { name = "cryptography", marker = "extra == 'saas'", specifier = ">=45,<47" },
+    { name = "cryptography", marker = "extra == 'workflow'", specifier = ">=45,<47" },
+    { name = "email-validator", marker = "extra == 'full'", specifier = ">=2.2,<3" },
+    { name = "email-validator", marker = "extra == 'identity'", specifier = ">=2.2,<3" },
+    { name = "email-validator", marker = "extra == 'saas'", specifier = ">=2.2,<3" },
+    { name = "fastapi", specifier = ">=0.115,<1" },
+    { name = "gradio", marker = "extra == 'ai'", specifier = ">=5.49,<7" },
+    { name = "gradio", marker = "extra == 'full'", specifier = ">=5.49,<7" },
+    { name = "httpx", marker = "extra == 'full'", specifier = ">=0.28,<1" },
+    { name = "httpx", marker = "extra == 'saas'", specifier = ">=0.28,<1" },
+    { name = "jieba", marker = "extra == 'knowledge'", specifier = ">=0.42,<1" },
+    { name = "langchain-core", marker = "extra == 'ai'", specifier = ">=1.6,<2" },
+    { name = "langchain-core", marker = "extra == 'full'", specifier = ">=1.6,<2" },
+    { name = "langchain-openai", marker = "extra == 'ai'", specifier = ">=1.0,<2" },
+    { name = "langchain-openai", marker = "extra == 'full'", specifier = ">=1.0,<2" },
+    { name = "langgraph", marker = "extra == 'ai'", specifier = ">=1.2,<2" },
+    { name = "langgraph", marker = "extra == 'full'", specifier = ">=1.2,<2" },
+    { name = "langgraph-cli", extras = ["inmem"], marker = "extra == 'ai'", specifier = ">=0.4,<1" },
+    { name = "langgraph-cli", extras = ["inmem"], marker = "extra == 'full'", specifier = ">=0.4,<1" },
+    { name = "opentelemetry-api", marker = "extra == 'full'", specifier = ">=1.29,<2" },
+    { name = "opentelemetry-api", marker = "extra == 'observability'", specifier = ">=1.29,<2" },
+    { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'full'", specifier = ">=1.29,<2" },
+    { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'observability'", specifier = ">=1.29,<2" },
+    { name = "opentelemetry-sdk", marker = "extra == 'full'", specifier = ">=1.29,<2" },
+    { name = "opentelemetry-sdk", marker = "extra == 'observability'", specifier = ">=1.29,<2" },
+    { name = "pgvector", marker = "extra == 'knowledge'", specifier = ">=0.4,<0.5" },
+    { name = "pillow", marker = "extra == 'full'", specifier = ">=11,<13" },
+    { name = "pillow", marker = "extra == 'saas'", specifier = ">=11,<13" },
+    { name = "pwdlib", extras = ["argon2"], marker = "extra == 'full'", specifier = ">=0.3,<1" },
+    { name = "pwdlib", extras = ["argon2"], marker = "extra == 'identity'", specifier = ">=0.3,<1" },
+    { name = "pwdlib", extras = ["argon2"], marker = "extra == 'saas'", specifier = ">=0.3,<1" },
+    { name = "pydantic-settings", specifier = ">=2.10,<3" },
+    { name = "pyjwt", marker = "extra == 'full'", specifier = ">=2.10,<3" },
+    { name = "pyjwt", marker = "extra == 'identity'", specifier = ">=2.10,<3" },
+    { name = "pyjwt", marker = "extra == 'saas'", specifier = ">=2.10,<3" },
+    { name = "pymupdf", marker = "extra == 'knowledge'", specifier = ">=1.26,<2" },
+    { name = "sideronostos-backend", extras = ["knowledge"], marker = "extra == 'full'" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.36,<3" },
+    { name = "temporalio", marker = "extra == 'full'", specifier = ">=1.18,<2" },
+    { name = "temporalio", marker = "extra == 'identity'", specifier = ">=1.18,<2" },
+    { name = "temporalio", marker = "extra == 'saas'", specifier = ">=1.18,<2" },
+    { name = "temporalio", marker = "extra == 'workflow'", specifier = ">=1.18,<2" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.35,<1" },
+]
+provides-extras = ["workflow", "ai", "identity", "saas", "full", "observability", "knowledge"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "httpx", specifier = ">=0.28,<1" },
+    { name = "mypy", specifier = ">=1.17,<2" },
+    { name = "pytest", specifier = ">=8.4,<9" },
+    { name = "pytest-asyncio", specifier = ">=1.1,<2" },
+    { name = "ruff", specifier = ">=0.12,<1" },
 ]
 
 [[package]]

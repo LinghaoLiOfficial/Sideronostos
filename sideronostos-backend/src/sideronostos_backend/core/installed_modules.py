@@ -12,4 +12,5 @@ INSTALLED_MODULES = (
     "collaboration",
     "ai",
     "field_shift",
+    "knowledge",
 )
