@@ -51,3 +51,6 @@ smoke:
 .PHONY: prepare-knowledge
 prepare-knowledge:
 	uv run python -m sideronostos_backend.modules.knowledge.cli $(ARGS)
+.PHONY: prepare-data
+prepare-data:
+	uv run python -m sideronostos_backend.modules.agri_data.cli $(ARGS)

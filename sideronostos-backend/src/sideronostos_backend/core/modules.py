@@ -177,6 +177,10 @@ def load_modules(settings: Settings) -> tuple[ModuleSpec, ...]:
         from ..modules.knowledge.module import module as knowledge
 
         registry[knowledge.name] = knowledge
+    if "agri_data" in INSTALLED_MODULES:
+        from ..modules.agri_data.module import module as agri_data
+
+        registry[agri_data.name] = agri_data
     modules = resolve_modules(INSTALLED_MODULES, registry)
     validate_module_registrations(modules)
     return modules

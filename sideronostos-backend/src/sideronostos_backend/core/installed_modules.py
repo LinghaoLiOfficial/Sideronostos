@@ -13,4 +13,5 @@ INSTALLED_MODULES = (
     "ai",
     "field_shift",
     "knowledge",
+    "agri_data",
 )
