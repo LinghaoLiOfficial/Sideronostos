@@ -54,3 +54,6 @@ prepare-knowledge:
 .PHONY: prepare-data
 prepare-data:
 	uv run python -m sideronostos_backend.modules.agri_data.cli $(ARGS)
+.PHONY: check-optimizer
+check-optimizer:
+	uv run pytest -q tests/test_rotation_candidates.py tests/test_rotation_milp.py tests/test_rotation_profiles.py tests/test_rotation_requests.py

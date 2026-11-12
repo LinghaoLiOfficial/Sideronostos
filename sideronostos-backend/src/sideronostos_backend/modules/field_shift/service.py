@@ -42,6 +42,16 @@ def _validate_field(body: FieldInput) -> None:
             status_code=422, detail=f"Unknown crop identifiers: {', '.join(sorted(unknown))}"
         )
 
+    from ..rotation_optimizer.profiles import get_profile as rotation_profile
+
+    for event in body.history_events:
+        try:
+            catalogue = rotation_profile(event.profile_id).history_catalogue
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        if event.crop_id not in catalogue:
+            raise HTTPException(422, "Unknown crop in precise history catalogue")
+
 
 def _field(record: FieldRecord) -> Field:
     return Field(
@@ -100,7 +110,11 @@ class FieldShiftService:
         body: FieldInput,
         expected_version: int,
     ) -> Field:
-        await self._field_record(session, user_id, field_id)
+        original = await self._field_record(session, user_id, field_id)
+        # Old clients omit extension fields. Only explicit values may clear them.
+        body = FieldInput.model_validate(
+            {**original.data, **body.model_dump(mode="json", exclude_unset=True)}
+        )
         _validate_field(body)
         record = await session.scalar(
             update(FieldRecord)

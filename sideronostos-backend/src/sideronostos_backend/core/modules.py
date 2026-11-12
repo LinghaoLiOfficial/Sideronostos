@@ -181,6 +181,10 @@ def load_modules(settings: Settings) -> tuple[ModuleSpec, ...]:
         from ..modules.agri_data.module import module as agri_data
 
         registry[agri_data.name] = agri_data
+    if "rotation_optimizer" in INSTALLED_MODULES:
+        from ..modules.rotation_optimizer.module import module as rotation_optimizer
+
+        registry[rotation_optimizer.name] = rotation_optimizer
     modules = resolve_modules(INSTALLED_MODULES, registry)
     validate_module_registrations(modules)
     return modules

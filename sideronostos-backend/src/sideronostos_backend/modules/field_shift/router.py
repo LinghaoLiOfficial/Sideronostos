@@ -65,7 +65,9 @@ async def get_field(field_id: str, user: User, session: Session) -> Field:
 
 @router.patch("/fields/{field_id}", response_model=Field)
 async def update_field(field_id: str, body: FieldPatch, user: User, session: Session) -> Field:
-    field_input = FieldInput.model_validate(body.model_dump(exclude={"expected_version"}))
+    field_input = FieldInput.model_validate(
+        body.model_dump(exclude={"expected_version"}, exclude_unset=True)
+    )
     return await FieldShiftService().update_field(
         session, user.id, field_id, field_input, body.expected_version
     )

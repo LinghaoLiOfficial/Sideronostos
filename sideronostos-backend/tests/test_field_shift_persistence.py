@@ -408,3 +408,40 @@ async def test_invalid_or_infeasible_options_cannot_be_saved(api, weather):
         )
         assert response.status_code == 422
     assert (await client.get("/field-shift/plans")).json() == {"items": []}
+
+
+async def test_v1_edits_preserve_v2_geometry_and_history_until_explicit_clear(api):
+    client, _ = api
+    geometry = {
+        "type": "Polygon",
+        "coordinates": [[[-93.5, 42], [-93.499, 42], [-93.499, 42.001], [-93.5, 42]]],
+    }
+    event = {
+        "id": "history-2025",
+        "crop_id": "wheat",
+        "profile_id": "iowa-benchmark-20261112-v1",
+        "end_year": 2025,
+        "precision": "year",
+        "linked_legacy_year": 2025,
+    }
+    created = await client.post(
+        "/field-shift/fields", json=field_input(geometry=geometry, history_events=[event])
+    )
+    assert created.status_code == 201, created.text
+    item = created.json()
+    path = f"/field-shift/fields/{item['id']}"
+    edited = await client.patch(
+        path, json={**field_input(name="Old form edit"), "expected_version": 1}
+    )
+    assert edited.status_code == 200
+    assert edited.json()["geometry"] == geometry
+    assert edited.json()["history_events"][0]["id"] == event["id"]
+    cleared = await client.patch(
+        path, json={**field_input(), "geometry": None, "history_events": [], "expected_version": 2}
+    )
+    assert cleared.status_code == 200
+    assert cleared.json()["geometry"] is None and cleared.json()["history_events"] == []
+    bad = await client.post(
+        "/field-shift/fields", json=field_input(history_events=[{**event, "crop_id": "unknown"}])
+    )
+    assert bad.status_code == 422

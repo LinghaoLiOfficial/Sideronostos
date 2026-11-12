@@ -1,5 +1,6 @@
 """Validated, serializable Field Shift contracts shared by API and decision engine."""
 
+import calendar
 from datetime import date, datetime
 from typing import Annotated, Any, Literal
 
@@ -75,6 +76,36 @@ class HistoryEntry(Contract):
     crop_id: Identifier
 
 
+class HistoryEvent(Contract):
+    id: Identifier
+    crop_id: Identifier
+    profile_id: Identifier
+    precision: Literal["day", "month", "year"]
+    end_year: Year
+    end_month: int | None = PydField(default=None, strict=True, ge=1, le=12)
+    end_day: int | None = PydField(default=None, strict=True, ge=1, le=31)
+    linked_legacy_year: Year | None = None
+
+    @model_validator(mode="after")
+    def declared_precision(self) -> "HistoryEvent":
+        if self.precision == "year" and (self.end_month is not None or self.end_day is not None):
+            raise ValueError("Year precision cannot imply a month or day")
+        if self.precision == "month" and (self.end_month is None or self.end_day is not None):
+            raise ValueError("Month precision needs a month and no day")
+        if self.precision == "day" and (self.end_month is None or self.end_day is None):
+            raise ValueError("Day precision needs an exact date")
+        self.latest_end()
+        if self.linked_legacy_year is not None and self.linked_legacy_year != self.end_year:
+            raise ValueError("Linked legacy year must match this history year")
+        return self
+
+    def latest_end(self) -> date:
+        month = self.end_month or 12
+        return date(
+            self.end_year, month, self.end_day or calendar.monthrange(self.end_year, month)[1]
+        )
+
+
 class FieldInput(Contract):
     name: Name
     area_ha: float = PydField(gt=0, le=100000)
@@ -84,12 +115,38 @@ class FieldInput(Contract):
     irrigation_available: bool
     profile_id: Identifier
     history: list[HistoryEntry] = PydField(max_length=100)
+    geometry: dict[str, Any] | None = None
+    history_events: list[HistoryEvent] = PydField(default_factory=list, max_length=100)
 
     @model_validator(mode="after")
     def unique_history_years(self) -> "FieldInput":
         years = [entry.year for entry in self.history]
         if len(years) != len(set(years)):
             raise ValueError("Planting history must have unique years")
+        ids = [event.id for event in self.history_events]
+        links = [
+            event.linked_legacy_year
+            for event in self.history_events
+            if event.linked_legacy_year is not None
+        ]
+        if len(ids) != len(set(ids)) or len(links) != len(set(links)):
+            raise ValueError("Historical events and legacy links must be unique")
+        legacy = {entry.year: entry.crop_id for entry in self.history}
+        for event in self.history_events:
+            if (
+                event.linked_legacy_year is not None
+                and legacy.get(event.linked_legacy_year) != event.crop_id
+            ):
+                raise ValueError("Linked history must refer to the same legacy crop")
+        if self.geometry is not None:
+            from ..agri_data.schemas import validate_geometry
+
+            normalized = validate_geometry(self.geometry)
+            if normalized["geometry"]["type"] != "Polygon":
+                raise ValueError("A field boundary must be a polygon")
+            if normalized["area_ha"] > 100000:
+                raise ValueError("Field boundary exceeds the supported farm extent")
+            self.geometry = normalized["geometry"]
         return self
 
 

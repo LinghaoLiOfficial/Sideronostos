@@ -542,6 +542,17 @@ wheels = [
 ]
 
 [[package]]
+name = "gurobipy"
+version = "13.0.3"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8c/87/ada84ac49ccc8478ad50b4938ef61122719d64f224a2c5312ad4bccbdb20/gurobipy-13.0.3-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:ee439774ed56dca173cddf0017f1cb854d7f79dfcc12abc4fe5d83a7f22bb9b3", size = 15987021, upload-time = "2026-08-25T06:33:48.381Z" },
+    { url = "https://files.pythonhosted.org/packages/62/8b/df51ea9593c9434ae736bd528586777d6978ae3842e8252c053ec88e3656/gurobipy-13.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:34f0b9528edfbf29e96a74e0b69b8cc832375d43342d6376754fd436c570bb2a", size = 14865983, upload-time = "2026-08-25T06:34:19.194Z" },
+    { url = "https://files.pythonhosted.org/packages/98/cf/b94bcddb78e3fc7cb9eb26251db33da1e45772ab0e6df2d5cf5b8df00d1e/gurobipy-13.0.3-cp312-cp312-manylinux_2_26_aarch64.whl", hash = "sha256:3d4611c247850379e416daafd9a7ad624d94e7b2b416746c382a3a54c1ef89d7", size = 87206647, upload-time = "2026-08-25T06:36:38.821Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/ca/e2f677a1f7b91e3f1dfda3043c9810cff38ea8901007a4abea6a53c904fb/gurobipy-13.0.3-cp312-cp312-win_amd64.whl", hash = "sha256:11ae3f75a17265e095695229a3ccbf14a8fe6fa9a4bc17a11e2698bedc16b28a", size = 10983444, upload-time = "2026-08-25T06:36:51.628Z" },
+]
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1844,6 +1855,7 @@ full = [
     { name = "cryptography" },
     { name = "email-validator" },
     { name = "gradio" },
+    { name = "gurobipy" },
     { name = "h5py" },
     { name = "httpx" },
     { name = "jieba" },
@@ -1881,6 +1893,9 @@ observability = [
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp-proto-http" },
     { name = "opentelemetry-sdk" },
+]
+optimizer = [
+    { name = "gurobipy" },
 ]
 saas = [
     { name = "aiosmtplib" },
@@ -1932,6 +1947,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115,<1" },
     { name = "gradio", marker = "extra == 'ai'", specifier = ">=5.49,<7" },
     { name = "gradio", marker = "extra == 'full'", specifier = ">=5.49,<7" },
+    { name = "gurobipy", marker = "extra == 'optimizer'", specifier = ">=13,<14" },
     { name = "h5py", marker = "extra == 'science'", specifier = ">=3.14,<4" },
     { name = "httpx", marker = "extra == 'full'", specifier = ">=0.28,<1" },
     { name = "httpx", marker = "extra == 'saas'", specifier = ">=0.28,<1" },
@@ -1964,7 +1980,7 @@ requires-dist = [
     { name = "pymupdf", marker = "extra == 'knowledge'", specifier = ">=1.26,<2" },
     { name = "pyproj", marker = "extra == 'science'", specifier = ">=3.7,<4" },
     { name = "shapely", marker = "extra == 'science'", specifier = ">=2.1,<3" },
-    { name = "sideronostos-backend", extras = ["knowledge", "science"], marker = "extra == 'full'" },
+    { name = "sideronostos-backend", extras = ["knowledge", "science", "optimizer"], marker = "extra == 'full'" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.36,<3" },
     { name = "temporalio", marker = "extra == 'full'", specifier = ">=1.18,<2" },
     { name = "temporalio", marker = "extra == 'identity'", specifier = ">=1.18,<2" },
@@ -1972,7 +1988,7 @@ requires-dist = [
     { name = "temporalio", marker = "extra == 'workflow'", specifier = ">=1.18,<2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.35,<1" },
 ]
-provides-extras = ["workflow", "ai", "identity", "saas", "full", "observability", "knowledge", "science"]
+provides-extras = ["workflow", "ai", "identity", "saas", "full", "observability", "knowledge", "science", "optimizer"]
 
 [package.metadata.requires-dev]
 dev = [
