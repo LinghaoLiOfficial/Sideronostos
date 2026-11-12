@@ -30,7 +30,7 @@ git diff feature/nasa-data..feature/rotation-optimizer
 git diff feature/rotation-optimizer..feature/bot-rag
 
 # UI integration commit, excluding its already combined backend and bot parents
-git diff feature/field-shift-ui^..feature/field-shift-ui
+git diff 0af94663..feature/field-shift-ui
 ```
 
 Build the frontend after switching branches; `.next` is ignored local build output and is not a branch snapshot. Do not downgrade the integration database to run an earlier stack branch: use a separate database for migration checks. Read `ROTATION_V2.md` for the full local setup; read `sideronostos-frontend/src/components/bot/README.md` for component-only use. Future topic changes can be merged upward through the stack and then into `integrated`.
@@ -43,3 +43,7 @@ Build the frontend after switching branches; `.next` is ignored local build outp
 - Real browser: collapse/open, full-screen point/area data, Escape, keyboard focus confinement/return, draft preservation, missing/zero/stale handling and mobile layout reviewed.
 - `.env.local`, downloaded scientific files, prepared literature/releases, evaluation output and screenshots remain local and ignored. Source manifests, recipes, authored help, schemas and tests are committed.
 - Source prompt v15 is still an unvalidated candidate; AI semantic acceptance remains HOLD and the default remains Nano. No paid model/embedding calls, pushes or deployment were made during the branch split.
+
+## Selection navigation follow-up
+
+A production-browser regression exposed a saved selection whose API response and requested navigation contained the new ID, while the router applied the previous URL. Same-page query updates now use native `history.replaceState`; map/rotation page changes still use `router.replace`. This keeps the URL, query cache and bot selection context synchronized without revisiting the prefetched page route. Next documents this integration with `useSearchParams` in [Native History API](https://nextjs.org/docs/app/getting-started/linking-and-navigating#native-history-api). The fix is confined to `feature/field-shift-ui` and `integrated`.

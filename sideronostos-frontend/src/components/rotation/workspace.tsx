@@ -297,10 +297,11 @@ function OwnerWorkspace({
       else params.delete(key);
     }
     latestSearch.current = params.toString();
-    router.replace(
-      `/field-shift/${nextMode}${params.size ? "?" + params : ""}`,
-      { scroll: false },
-    );
+    const url = `/field-shift/${nextMode}${params.size ? "?" + params : ""}`;
+    // These query values belong to this client workspace. Next integrates native
+    // history with useSearchParams, without reusing a prefetched page's old URL.
+    if (nextMode === mode) globalThis.history.replaceState(null, "", url);
+    else router.replace(url, { scroll: false });
   }
   async function selectRegion(
     kind: RegionSelection["kind"],
