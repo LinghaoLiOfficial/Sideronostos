@@ -1,5 +1,9 @@
 # Field Shift implementation and evidence
 
+## Current Rotation v2 entry point
+
+The map/RAG/MILP implementation on `grok_bot` is documented in [ROTATION_V2.md](ROTATION_V2.md), based on `0271351`. The remaining content below is the preserved v1 implementation record and its original authority; it does not describe the v2 architecture or current workspace.
+
 ## Authority and scope
 
 Authority: the user goal at `/Users/fanysmacpro/.codex/attachments/10adc810-353c-426d-9774-ba15f92de629/goal-objective.md`, the conversation's farmer-centered rotation plan, and the research in the parent NASAappChallenge directory. Baseline: `6c6edcc`. Worktree: `codex/field-shift`.
