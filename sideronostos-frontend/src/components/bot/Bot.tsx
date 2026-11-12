@@ -7,18 +7,16 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { Maximize2, Minimize2, Minus } from "lucide-react";
+import { Minus } from "lucide-react";
 import type { BotIdentity, BotMode } from "@/lib/bot";
 import styles from "./bot.module.css";
 
-export type BotDataView = { label: string; content: ReactNode };
 export type BotProps = {
   identity: BotIdentity;
   mode: BotMode;
   onModeChange: (mode: BotMode) => void;
   children: ReactNode;
   headerActions?: ReactNode;
-  dataView?: BotDataView;
 };
 
 export function BotAvatar({ small = false }: { small?: boolean }) {
@@ -27,71 +25,125 @@ export function BotAvatar({ small = false }: { small?: boolean }) {
       aria-hidden="true"
       className={`${styles.avatar} ${small ? styles.smallAvatar : ""}`}
     >
-      <i />
-      <i />
+      <span className={styles.eyes}>
+        <i />
+        <i />
+      </span>
     </span>
   );
 }
 
-/** A reusable, controlled bot surface. Transport, evidence and domain state belong to the caller. */
+/** Persistent, non-modal companion. Domain state and transport belong to the caller. */
 export function Bot({
   identity,
   mode,
   onModeChange,
   children,
   headerActions,
-  dataView,
 }: BotProps) {
   const id = useId();
-  const dialog = useRef<HTMLDialogElement>(null);
+  const panel = useRef<HTMLElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
-  const expand = useRef<HTMLButtonElement>(null);
-  const previous = useRef<BotMode>("collapsed");
+  const preview = useRef(false);
+  const suppressed = useRef(false);
+  const enterTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const change = useRef(onModeChange);
+  const previous = useRef(mode);
+  const open = mode === "chat";
   useEffect(() => {
     change.current = onModeChange;
   }, [onModeChange]);
-  const effective = mode === "data" && !dataView ? "chat" : mode;
   useEffect(() => {
-    if (mode === "data" && !dataView) change.current("chat");
-  }, [mode, dataView]);
-  useEffect(() => {
-    const panel = dialog.current;
-    if (!panel) return;
-    const was = previous.current;
-    previous.current = effective;
-    if (panel.open) panel.close();
-    if (effective === "collapsed") {
-      if (was !== "collapsed") launcher.current?.focus();
-      return;
+    if (mode === "chat" && !preview.current) {
+      // Hover previews must never steal keyboard focus from the map.
+      panel.current
+        ?.querySelector<HTMLTextAreaElement>("textarea")
+        ?.focus({ preventScroll: true });
+    } else if (
+      mode === "collapsed" &&
+      previous.current !== mode &&
+      panel.current?.contains(document.activeElement)
+    ) {
+      launcher.current?.focus({ preventScroll: true });
     }
-    if (effective === "data") panel.showModal();
-    else panel.show();
-    if (effective === "data") expand.current?.focus();
-    else panel.querySelector<HTMLTextAreaElement>("textarea")?.focus();
-    const overflow = document.body.style.overflow;
-    if (effective === "data") document.body.style.overflow = "hidden";
-    return () => {
-      if (effective === "data") document.body.style.overflow = overflow;
-    };
-  }, [effective]);
+    previous.current = mode;
+  }, [mode]);
+  useEffect(
+    () => () => {
+      clearTimeout(enterTimer.current);
+      clearTimeout(leaveTimer.current);
+    },
+    [],
+  );
   useEffect(() => {
-    if (effective !== "chat") return;
-    const onEscape = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || event.defaultPrevented) return;
-      const activePanel =
-        event.target instanceof Element
-          ? event.target.closest("[data-bot-panel]")
-          : null;
-      if (activePanel && activePanel !== dialog.current) return;
-      event.preventDefault();
-      change.current("collapsed");
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const update = () => {
+      const inset = Math.max(
+        0,
+        window.innerHeight - viewport.height - viewport.offsetTop,
+      );
+      const keyboard = inset > 80;
+      panel.current?.style.setProperty(
+        "--bot-visible-height",
+        `${viewport.height}px`,
+      );
+      panel.current?.style.setProperty(
+        "--bot-mobile-bottom",
+        keyboard
+          ? `${inset + 12}px`
+          : "calc(110px + env(safe-area-inset-bottom))",
+      );
+      panel.current?.setAttribute("data-keyboard", String(keyboard));
     };
-    document.addEventListener("keydown", onEscape);
-    return () => document.removeEventListener("keydown", onEscape);
-  }, [effective]);
-  function escape() {
-    onModeChange(effective === "data" ? "chat" : "collapsed");
+    update();
+    viewport.addEventListener("resize", update);
+    viewport.addEventListener("scroll", update);
+    return () => {
+      viewport.removeEventListener("resize", update);
+      viewport.removeEventListener("scroll", update);
+    };
+  }, []);
+  function pin() {
+    preview.current = false;
+    clearTimeout(leaveTimer.current);
+  }
+  function collapse() {
+    pin();
+    suppressed.current = true;
+    clearTimeout(enterTimer.current);
+    onModeChange("collapsed");
+    launcher.current?.focus({ preventScroll: true });
+  }
+  function enter() {
+    clearTimeout(leaveTimer.current);
+    if (
+      open ||
+      suppressed.current ||
+      !window.matchMedia?.("(hover: hover) and (pointer: fine)").matches
+    )
+      return;
+    clearTimeout(enterTimer.current);
+    enterTimer.current = setTimeout(() => {
+      preview.current = true;
+      change.current("chat");
+    }, 350);
+  }
+  function leave() {
+    clearTimeout(enterTimer.current);
+    suppressed.current = false;
+    if (preview.current)
+      leaveTimer.current = setTimeout(() => {
+        if (preview.current) {
+          preview.current = false;
+          change.current("collapsed");
+        }
+      }, 400);
   }
   const color = {
     "--bot-accent": identity.color ?? "#7962ce",
@@ -103,35 +155,75 @@ export function Bot({
         type="button"
         className={styles.launcher}
         style={color}
-        aria-label={`打开${identity.name}`}
-        aria-expanded={effective !== "collapsed"}
+        aria-label={
+          open ? `${identity.name}，对话已展开` : `打开${identity.name}`
+        }
+        aria-expanded={open}
         aria-controls={id}
-        hidden={effective !== "collapsed"}
-        onClick={() => onModeChange("chat")}
+        data-open={open}
+        onPointerEnter={enter}
+        onPointerLeave={(e) => {
+          leave();
+          e.currentTarget.style.removeProperty("--gaze-x");
+          e.currentTarget.style.removeProperty("--gaze-y");
+        }}
+        onPointerMove={(e) => {
+          if (
+            e.pointerType !== "mouse" ||
+            window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+          )
+            return;
+          const bounds = e.currentTarget.getBoundingClientRect();
+          e.currentTarget.style.setProperty(
+            "--gaze-x",
+            `${Math.max(-3, Math.min(3, (e.clientX - bounds.left - bounds.width / 2) / 12))}px`,
+          );
+          e.currentTarget.style.setProperty(
+            "--gaze-y",
+            `${Math.max(-2, Math.min(2, (e.clientY - bounds.top - bounds.height / 2) / 12))}px`,
+          );
+        }}
+        onClick={() => {
+          clearTimeout(enterTimer.current);
+          if (open && !preview.current) collapse();
+          else {
+            pin();
+            onModeChange("chat");
+            panel.current
+              ?.querySelector("textarea")
+              ?.focus({ preventScroll: true });
+          }
+        }}
       >
+        <span className={styles.petShadow} aria-hidden="true" />
         <BotAvatar />
-        <span>{identity.name}</span>
+        <span className={styles.petLabel}>
+          {identity.name}
+          <span>点我聊聊</span>
+        </span>
       </button>
-      <dialog
-        ref={dialog}
+      <section
+        ref={panel}
         id={id}
-        hidden={effective === "collapsed"}
+        role="dialog"
+        aria-modal="false"
+        aria-hidden={!open}
+        inert={!open}
         data-bot-panel
-        data-mode={effective}
+        data-mode={mode}
         className={styles.panel}
         style={color}
         aria-labelledby={`${id}-title`}
         aria-describedby={`${id}-description`}
-        aria-modal={effective === "data"}
-        onCancel={(event) => {
-          event.preventDefault();
-          escape();
-        }}
+        onPointerEnter={enter}
+        onPointerLeave={leave}
+        onPointerDownCapture={pin}
+        onFocusCapture={pin}
         onKeyDown={(event) => {
           if (event.key === "Escape" && !event.defaultPrevented) {
             event.preventDefault();
             event.stopPropagation();
-            escape();
+            collapse();
           }
         }}
       >
@@ -139,44 +231,20 @@ export function Bot({
           <BotAvatar small />
           <div className={styles.heading}>
             <h2 id={`${id}-title`}>{identity.name}</h2>
-            <p id={`${id}-description`}>
-              {effective === "data" ? dataView?.label : identity.description}
-            </p>
+            <p id={`${id}-description`}>{identity.description}</p>
           </div>
-          <div hidden={effective === "data"} className={styles.headerActions}>
-            {headerActions}
-          </div>
-          <button
-            ref={expand}
-            type="button"
-            className={styles.iconButton}
-            disabled={!dataView}
-            aria-label={effective === "data" ? "返回聊天" : "全屏查看选区数据"}
-            title={!dataView ? "先在地图选择位置或范围" : undefined}
-            onClick={() => onModeChange(effective === "data" ? "chat" : "data")}
-          >
-            {effective === "data" ? (
-              <Minimize2 size={18} />
-            ) : (
-              <Maximize2 size={18} />
-            )}
-          </button>
+          <div className={styles.headerActions}>{headerActions}</div>
           <button
             type="button"
             className={styles.iconButton}
             aria-label={`收起${identity.name}`}
-            onClick={() => onModeChange("collapsed")}
+            onClick={collapse}
           >
             <Minus size={19} />
           </button>
         </header>
-        <div className={styles.chat} hidden={effective !== "chat"}>
-          {children}
-        </div>
-        <div className={styles.data} hidden={effective !== "data"}>
-          {dataView?.content}
-        </div>
-      </dialog>
+        <div className={styles.chat}>{children}</div>
+      </section>
     </>
   );
 }
