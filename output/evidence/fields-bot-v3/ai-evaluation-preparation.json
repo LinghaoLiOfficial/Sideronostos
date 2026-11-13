@@ -1,0 +1,49 @@
+{
+  "recorded_at": "2026-11-13T23:28:14.755024+00:00",
+  "status": "HOLD: external embedding access denied; no semantic model evaluation performed",
+  "provider_error": {
+    "host": "openrouter.ai",
+    "model": "openai/text-embedding-3-small",
+    "http_status": 403,
+    "type": "PermissionDeniedError",
+    "attempts": 2,
+    "reported_cost_usd": null,
+    "raw_error_or_credentials_stored": false
+  },
+  "staged_release": {
+    "id": "field-shift-knowledge-20261114-v5-daily",
+    "status": "staging",
+    "manifest_sha256": "ec6630f4cdb0df798e80ea115eab0dcef1be2970721704f4beb6688b3d4b559d",
+    "chunks": 4911,
+    "embedded_chunks": 0,
+    "active_releases": []
+  },
+  "case_set": {
+    "file": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/evaluation/cases-v4-daily.json",
+    "sha256": "913f3fe3ac7868b9314a3ce1ac1befc383291f77593bbaf7ff9b9168289ada53",
+    "development": 13,
+    "protected": 13,
+    "candidate_outputs_seen": 0,
+    "previous_protected_v3_unchanged": true
+  },
+  "fixture": {
+    "archive": "eval-fixtures-v4-daily.json.gz",
+    "uncompressed_sha256": "2d0e39511afde7324736cd7199d523c2db836ddacee16173930957e7202c9bb3",
+    "archive_sha256": "297ff891b6dc802ed1a68e412e618bbaaba7b730db0a81c3bec483f50a098bb4",
+    "contexts": 26,
+    "all_owner_and_version_gates_passed": true,
+    "compaction_preserves_all_case_model_projections": true,
+    "controlled_fixture": "timeout_without_incumbent only; other run states are real owned queued results"
+  },
+  "next": [
+    "Restore embedding provider access through local configuration; do not put keys in reports.",
+    "Resume embedding same immutable staging identity, verify counts, then activate only the isolated release.",
+    "Run development plus exposed regression and review unchanged rubric before any protected generation."
+  ],
+  "not_verified": [
+    "new daily embeddings",
+    "real v16 semantic quality",
+    "protected acceptance",
+    "real farmer calibration"
+  ]
+}

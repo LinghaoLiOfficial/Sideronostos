@@ -411,3 +411,41 @@ cross-run/plan-only owner context. This is a checkpoint, not full-goal completio
 | Real-region use | Explicit sourcing/readiness and uncalibrated-engineering labels | Pilot, crop/soil/operations calibration and farmer/agronomist review |
 
 Goal remains ACTIVE. No push, remote merge or deployment was performed.
+
+## Checkpoint 8a — frozen daily AI cases; provider access HOLD
+
+Created `cases-v4-daily.json`: 26 bilingual cases, 13 development and 13 protected,
+SHA256 `913f3fe3ac7868b9314a3ce1ac1befc383291f77593bbaf7ff9b9168289ada53`.
+No candidate chat outputs have been seen. Prior v1/v2/v3 cases, expectations and scores
+remain unchanged. The 90% recall/clarity targets and zero wrong-field/number/source gate
+are retained. New cases cover six metrics, null versus zero, actual diagnostic gaps,
+hard failure, independent soil-water initialization, changed drafts, comparison,
+GIBS boundaries, guarantees, unsupported writes and timeout without an incumbent.
+
+`evaluation/prepare_daily.py` reads owned actual API/Temporal/Gurobi runs without changing
+them. It verifies foreign-owner rejection and version conflict, and compacts redundant
+solver proofs only after proving identical model-visible projections for every question.
+The controlled timeout is explicitly labelled. All seven owner/version gates passed.
+The frozen fixture is archived as `eval-fixtures-v4-daily.json.gz`; its uncompressed SHA256
+is `2d0e39511afde7324736cd7199d523c2db836ddacee16173930957e7202c9bb3`.
+This is input preparation, not semantic acceptance.
+
+A real queued diagnostic fixture (`c10b3fa4-fa9b-4074-b623-d7f86041713d`) has a positive
+verified water-resource gap, one distinct option and null profit (explicitly disabled).
+No resource booking was made. It uses the same frozen field/version/profile/weather as
+the successful browser run, so cross-run comparison has a real compatible input basis.
+
+The isolated knowledge release `field-shift-knowledge-20261114-v5-daily` is STAGING,
+not active. Exact public-source embedding input hashes and provider identity allowed
+reuse of 4,877 unique vectors from the immutable prior published release. New material
+requires 33 embeddings (9 HELPV3, 17 MODELV3, 7 DATAV3). The original database and all
+conversations remain untouched. A normal incremental embedding request and one minimal
+public-text diagnostic both returned OpenRouter HTTP 403 / PermissionDeniedError.
+No further provider retry is justified until configuration/access changes. Failure costs
+are unreported, not assumed zero. The incomplete release was not activated.
+
+Evidence: `knowledge-cache-reuse.json`, `ai-evaluation-preparation.json` and the frozen
+fixture archive in `output/evidence/fields-bot-v3/`. The reusable freezer passes Ruff/mypy
+and was executed successfully against real owned records. Live retrieval/generation,
+semantic review and held-out acceptance remain **NOT VERIFIED**. The external-access
+question is pending; remaining product verification can proceed independently.

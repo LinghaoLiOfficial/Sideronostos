@@ -1,0 +1,12 @@
+{
+  "source_release": "field-shift-knowledge-20261113-v4",
+  "source_release_sha256": "dcdf044abd636198239a1a8793de2a5301a513548ed640a3e58750741f906757",
+  "namespace": "7446a7464b3bd9afe531285d",
+  "exact_input_vectors_reused": 4877,
+  "new_chunks_requiring_embedding": {
+    "HELPV3": 9,
+    "MODELV3": 17,
+    "DATAV3": 7
+  },
+  "scope": "public source embeddings only; original database unchanged; no conversations copied"
+}

@@ -49,3 +49,26 @@ The 47-source v3 manifest has been validated and prepared offline; vector activa
 semantic acceptance remain pending. See `docs/integration/model-v3-assistant-contract.md`.
 The protected v3 case set above is unchanged and unrun. New daily cases must have a distinct
 version and frozen hash; existing protected cases must not be silently rewritten for v3.
+
+## Frozen daily inputs and current external blocker
+
+`cases-v4-daily.json` has 13 dev + 13 protected cases; SHA256
+`913f3fe3ac7868b9314a3ce1ac1befc383291f77593bbaf7ff9b9168289ada53`.
+It preserves the previous 90% rubric and hard gates. No daily candidate output has been
+seen. `prepare_daily.py` can freeze real owned run/diagnostic/failure/map contexts using
+its `--help` arguments against an explicitly selected isolated database. It performs no
+provider call or business write; the timeout is a labelled control.
+
+The frozen input artifact is `output/evidence/fields-bot-v3/eval-fixtures-v4-daily.json.gz`
+(relative to the repository root). Decompress to a new local JSON path before using
+`run.py --cases .../cases-v4-daily.json --fixtures <decompressed.json> --split dev`.
+Verify uncompressed SHA256
+`2d0e39511afde7324736cd7199d523c2db836ddacee16173930957e7202c9bb3`.
+Do not regenerate or overwrite frozen inputs merely to make a candidate pass.
+
+The isolated new knowledge release remains STAGING: OpenRouter returned HTTP 403 for
+new public-document embeddings, including a minimal diagnostic request. Original public
+vectors were reused only for exact input hashes and the same embedding namespace/model.
+Wait for access/configuration correction, resume the same staging identity, verify full
+embedding coverage, then activate only that isolated release. No model-quality or
+protected-test pass can be claimed from fixture preparation or cache reuse.
