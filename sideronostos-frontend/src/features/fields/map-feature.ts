@@ -30,4 +30,3 @@ export function toFieldFeature(feature: Feature, index: number, previousFields: 
   }
   return validatePolygon(candidate).valid ? candidate : null
 }
-

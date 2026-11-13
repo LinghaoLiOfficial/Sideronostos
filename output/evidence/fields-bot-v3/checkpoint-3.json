@@ -1,0 +1,32 @@
+{
+  "checkpoint": 3,
+  "status": "kernel-implemented-application-integration-pending",
+  "backend_tests": {
+    "passed": 426,
+    "skipped": 0,
+    "warnings": 5,
+    "database": "sideronostos_fields_v3_test"
+  },
+  "v3_tests": 71,
+  "ruff": "passed",
+  "mypy": {
+    "passed": true,
+    "scoped_files": 9
+  },
+  "solver": "real Gurobi; version in kernel-smoke.json",
+  "oracle": "independent two-field cross-product enumeration",
+  "versions": [
+    "rotation-milp-v3.0",
+    "daily-root-zone-v3.0",
+    "rotation-readiness-v3.0"
+  ],
+  "public_api_dispatch": "v2 unchanged",
+  "pending": [
+    "versioned sourced profile and full scientific/economic/suitability preparation",
+    "complete server readiness policy",
+    "farm/resource snapshot and job dispatch",
+    "v3 frontend and assistant",
+    "full farmer journey and live AI evaluation"
+  ],
+  "remote_changes": false
+}

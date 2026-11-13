@@ -1,0 +1,1229 @@
+{
+  "scope": "synthetic kernel verification, not farmer application acceptance",
+  "cases": {
+    "gap_priority": {
+      "input": {
+        "version": "rotation-milp-v3.0",
+        "start": "2027-01-01",
+        "end": "2027-01-06",
+        "fields": [
+          {
+            "id": "f",
+            "farm_id": "farm",
+            "area_ha": 2.0,
+            "irrigation_available": true,
+            "water_system_id": "w",
+            "history": []
+          }
+        ],
+        "candidates": [
+          {
+            "id": "large-profit",
+            "field_id": "f",
+            "crop_id": "large-profit",
+            "species_id": "large-profit",
+            "family": "large-profit",
+            "sow_date": "2027-01-01",
+            "harvest_date": "2027-01-02",
+            "turnaround_days": 1,
+            "water_mm": [
+              2.0,
+              0.0
+            ],
+            "cover_mask": [
+              true,
+              true,
+              false
+            ],
+            "seed_kg_ha": 1.0,
+            "yield_kg_ha": 10.0,
+            "profit_usd_ha": 1000000.0,
+            "soil_score": 0.3,
+            "risk_score": 0.1,
+            "machine_hours_ha": {
+              "m": {
+                "2027-01-01": 1.0
+              }
+            },
+            "suitability": {
+              "sow": true,
+              "soil": true,
+              "terrain": true,
+              "climate": true,
+              "management": true
+            },
+            "baseline_confirmed": true
+          },
+          {
+            "id": "no-gap",
+            "field_id": "f",
+            "crop_id": "no-gap",
+            "species_id": "no-gap",
+            "family": "no-gap",
+            "sow_date": "2027-01-01",
+            "harvest_date": "2027-01-02",
+            "turnaround_days": 1,
+            "water_mm": [
+              0.0,
+              0.0
+            ],
+            "cover_mask": [
+              true,
+              true,
+              false
+            ],
+            "seed_kg_ha": 1.0,
+            "yield_kg_ha": 10.0,
+            "profit_usd_ha": 1.0,
+            "soil_score": 0.3,
+            "risk_score": 0.1,
+            "machine_hours_ha": {
+              "m": {
+                "2027-01-01": 1.0
+              }
+            },
+            "suitability": {
+              "sow": true,
+              "soil": true,
+              "terrain": true,
+              "climate": true,
+              "management": true
+            },
+            "baseline_confirmed": true
+          }
+        ],
+        "family_gaps": {
+          "large-profit": 0,
+          "no-gap": 0
+        },
+        "periods": [
+          {
+            "id": "p",
+            "start": "2027-01-01",
+            "end": "2027-01-06"
+          }
+        ],
+        "daily_resources": [
+          {
+            "id": "w",
+            "farm_id": "farm",
+            "kind": "water",
+            "field_ids": [
+              "f"
+            ],
+            "days": {
+              "2027-01-01": {
+                "capacity": 0.0,
+                "remediable": true,
+                "gap_unit_cost": 2.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-02": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-03": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-04": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-05": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-06": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              }
+            }
+          },
+          {
+            "id": "m",
+            "farm_id": "farm",
+            "kind": "machine",
+            "field_ids": [
+              "f"
+            ],
+            "days": {
+              "2027-01-01": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-02": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-03": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-04": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-05": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-06": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              }
+            }
+          }
+        ],
+        "period_resources": [
+          {
+            "id": "seed-large-profit",
+            "farm_id": "farm",
+            "kind": "seed",
+            "crop_id": "large-profit",
+            "period_id": "p",
+            "limit": {
+              "capacity": 1000.0,
+              "remediable": true,
+              "gap_unit_cost": 1.0,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          },
+          {
+            "id": "market-large-profit",
+            "farm_id": "farm",
+            "kind": "market",
+            "crop_id": "large-profit",
+            "period_id": "p",
+            "limit": {
+              "capacity": 1000.0,
+              "remediable": true,
+              "gap_unit_cost": 1.0,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          },
+          {
+            "id": "seed-no-gap",
+            "farm_id": "farm",
+            "kind": "seed",
+            "crop_id": "no-gap",
+            "period_id": "p",
+            "limit": {
+              "capacity": 1000.0,
+              "remediable": true,
+              "gap_unit_cost": 1.0,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          },
+          {
+            "id": "market-no-gap",
+            "farm_id": "farm",
+            "kind": "market",
+            "crop_id": "no-gap",
+            "period_id": "p",
+            "limit": {
+              "capacity": 1000.0,
+              "remediable": true,
+              "gap_unit_cost": 1.0,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          }
+        ],
+        "bare_limits": {
+          "f": {
+            "capacity": 6.0,
+            "remediable": true,
+            "gap_unit_cost": 1.0,
+            "remedy": "Synthetic fixture supplementation",
+            "evidence_ids": [
+              "fixture"
+            ]
+          }
+        },
+        "bare_limit_disabled": {},
+        "weights": {
+          "profit": 0.3,
+          "water": 0.2,
+          "rotation": 0.0,
+          "soil": 0.1,
+          "risk": 0.1,
+          "bare": 0.3
+        },
+        "scales": {
+          "profit": 100.0,
+          "water": 100.0,
+          "soil": 10.0,
+          "risk": 10.0,
+          "bare": 12.0
+        },
+        "disabled_metrics": {
+          "rotation": "No reliable transition score in this synthetic fixture"
+        },
+        "rotation_benefits": []
+      },
+      "result": {
+        "status": "optimal",
+        "selected_ids": [
+          "no-gap"
+        ],
+        "solution_count": 1,
+        "solver": "gurobi",
+        "solver_version": [
+          13,
+          0,
+          3
+        ],
+        "model_version": "rotation-milp-v3.0",
+        "optimality_scope": "generated_candidate_set",
+        "time_limit_seconds": 10,
+        "gap_optimality_proven": true,
+        "score_optimality_proven": true,
+        "hierarchy": [
+          "minimize_resource_gap_cost",
+          "maximize_normalized_six_metric_score"
+        ],
+        "objective_degradation_tolerance": 0,
+        "excluded_combination": null,
+        "raw_status": 2,
+        "runtime_seconds": 0.00037384033203125,
+        "variable_count": 14,
+        "constraint_count": 18,
+        "verification": {
+          "valid": true,
+          "violations": [],
+          "paths": [
+            {
+              "field_id": "f",
+              "candidate_ids": [
+                "no-gap"
+              ]
+            }
+          ],
+          "metrics": {
+            "profit": 2.0,
+            "water": 0.0,
+            "rotation": null,
+            "soil": 0.6,
+            "risk": 0.2,
+            "bare": 8.0
+          },
+          "normalized": {
+            "profit": 0.02,
+            "water": 0.0,
+            "soil": 0.06,
+            "risk": 0.02,
+            "bare": 0.6666666666666666
+          },
+          "score": -0.18999999999999997,
+          "gap_cost": 0.0,
+          "resources": [
+            {
+              "id": "water:w:2027-01-01",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 0.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 2.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-02",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-03",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-04",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-05",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-06",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-01",
+              "kind": "machine",
+              "used": 2.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-02",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-03",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-04",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-05",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-06",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "seed:seed-large-profit",
+              "kind": "seed",
+              "used": 0.0,
+              "capacity": 1000.0,
+              "gap": 0.0,
+              "unit": "kg",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "market:market-large-profit",
+              "kind": "market",
+              "used": 0.0,
+              "capacity": 1000.0,
+              "gap": 0.0,
+              "unit": "kg",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "seed:seed-no-gap",
+              "kind": "seed",
+              "used": 2.0,
+              "capacity": 1000.0,
+              "gap": 0.0,
+              "unit": "kg",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "market:market-no-gap",
+              "kind": "market",
+              "used": 20.0,
+              "capacity": 1000.0,
+              "gap": 0.0,
+              "unit": "kg",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "bare:f",
+              "kind": "bare",
+              "used": 4,
+              "capacity": 6.0,
+              "gap": 0.0,
+              "unit": "days",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          ],
+          "diagnostic": false,
+          "resource_feasible": true,
+          "water_mm": {
+            "f": {
+              "2027-01-01": 0.0,
+              "2027-01-02": 0.0,
+              "2027-01-03": 0.0,
+              "2027-01-04": 0.0,
+              "2027-01-05": 0.0,
+              "2027-01-06": 0.0
+            }
+          },
+          "recipe": "independent-daily-calendar-resource-verifier-v3.0",
+          "scope": "frozen coefficients; scientific preprocessing and local calibration are separate checks"
+        },
+        "gap_cost": 0.0,
+        "score": -0.18999999999999997,
+        "gap_reporting": "minimum required gaps for the selected schedule; unneeded incumbent slack removed"
+      }
+    },
+    "five_resource_diagnostic": {
+      "input": {
+        "version": "rotation-milp-v3.0",
+        "start": "2027-01-01",
+        "end": "2027-01-06",
+        "fields": [
+          {
+            "id": "f",
+            "farm_id": "farm",
+            "area_ha": 2.0,
+            "irrigation_available": true,
+            "water_system_id": "w",
+            "history": []
+          }
+        ],
+        "candidates": [
+          {
+            "id": "diagnostic",
+            "field_id": "f",
+            "crop_id": "diagnostic",
+            "species_id": "diagnostic",
+            "family": "diagnostic",
+            "sow_date": "2027-01-01",
+            "harvest_date": "2027-01-02",
+            "turnaround_days": 1,
+            "water_mm": [
+              2.0,
+              0.0
+            ],
+            "cover_mask": [
+              true,
+              true,
+              false
+            ],
+            "seed_kg_ha": 3.0,
+            "yield_kg_ha": 10.0,
+            "profit_usd_ha": 10.0,
+            "soil_score": 0.3,
+            "risk_score": 0.1,
+            "machine_hours_ha": {
+              "m": {
+                "2027-01-01": 2.0
+              }
+            },
+            "suitability": {
+              "sow": true,
+              "soil": true,
+              "terrain": true,
+              "climate": true,
+              "management": true
+            },
+            "baseline_confirmed": true
+          }
+        ],
+        "family_gaps": {
+          "diagnostic": 0
+        },
+        "periods": [
+          {
+            "id": "p",
+            "start": "2027-01-01",
+            "end": "2027-01-06"
+          }
+        ],
+        "daily_resources": [
+          {
+            "id": "w",
+            "farm_id": "farm",
+            "kind": "water",
+            "field_ids": [
+              "f"
+            ],
+            "days": {
+              "2027-01-01": {
+                "capacity": 10.0,
+                "remediable": true,
+                "gap_unit_cost": 2.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-02": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-03": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-04": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-05": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-06": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              }
+            }
+          },
+          {
+            "id": "m",
+            "farm_id": "farm",
+            "kind": "machine",
+            "field_ids": [
+              "f"
+            ],
+            "days": {
+              "2027-01-01": {
+                "capacity": 1.0,
+                "remediable": true,
+                "gap_unit_cost": 3.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-02": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-03": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-04": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-05": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              },
+              "2027-01-06": {
+                "capacity": 100.0,
+                "remediable": true,
+                "gap_unit_cost": 1.0,
+                "remedy": "Synthetic fixture supplementation",
+                "evidence_ids": [
+                  "fixture"
+                ]
+              }
+            }
+          }
+        ],
+        "period_resources": [
+          {
+            "id": "seed-diagnostic",
+            "farm_id": "farm",
+            "kind": "seed",
+            "crop_id": "diagnostic",
+            "period_id": "p",
+            "limit": {
+              "capacity": 4.0,
+              "remediable": true,
+              "gap_unit_cost": 5.0,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          },
+          {
+            "id": "market-diagnostic",
+            "farm_id": "farm",
+            "kind": "market",
+            "crop_id": "diagnostic",
+            "period_id": "p",
+            "limit": {
+              "capacity": 15.0,
+              "remediable": true,
+              "gap_unit_cost": 7.0,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          }
+        ],
+        "bare_limits": {
+          "f": {
+            "capacity": 3.0,
+            "remediable": true,
+            "gap_unit_cost": 11.0,
+            "remedy": "Synthetic fixture supplementation",
+            "evidence_ids": [
+              "fixture"
+            ]
+          }
+        },
+        "bare_limit_disabled": {},
+        "weights": {
+          "profit": 0.3,
+          "water": 0.2,
+          "rotation": 0.0,
+          "soil": 0.1,
+          "risk": 0.1,
+          "bare": 0.3
+        },
+        "scales": {
+          "profit": 100.0,
+          "water": 100.0,
+          "soil": 10.0,
+          "risk": 10.0,
+          "bare": 12.0
+        },
+        "disabled_metrics": {
+          "rotation": "No reliable transition score in this synthetic fixture"
+        },
+        "rotation_benefits": []
+      },
+      "result": {
+        "status": "optimal",
+        "selected_ids": [
+          "diagnostic"
+        ],
+        "solution_count": 1,
+        "solver": "gurobi",
+        "solver_version": [
+          13,
+          0,
+          3
+        ],
+        "model_version": "rotation-milp-v3.0",
+        "optimality_scope": "generated_candidate_set",
+        "time_limit_seconds": 10,
+        "gap_optimality_proven": true,
+        "score_optimality_proven": true,
+        "hierarchy": [
+          "minimize_resource_gap_cost",
+          "maximize_normalized_six_metric_score"
+        ],
+        "objective_degradation_tolerance": 0,
+        "excluded_combination": null,
+        "raw_status": 2,
+        "runtime_seconds": 0.00011992454528808594,
+        "variable_count": 9,
+        "constraint_count": 13,
+        "verification": {
+          "valid": true,
+          "violations": [],
+          "paths": [
+            {
+              "field_id": "f",
+              "candidate_ids": [
+                "diagnostic"
+              ]
+            }
+          ],
+          "metrics": {
+            "profit": 20.0,
+            "water": 40.0,
+            "rotation": null,
+            "soil": 0.6,
+            "risk": 0.2,
+            "bare": 8.0
+          },
+          "normalized": {
+            "profit": 0.2,
+            "water": 0.4,
+            "soil": 0.06,
+            "risk": 0.02,
+            "bare": 0.6666666666666666
+          },
+          "score": -0.216,
+          "gap_cost": 125.0,
+          "resources": [
+            {
+              "id": "water:w:2027-01-01",
+              "kind": "water",
+              "used": 40.0,
+              "capacity": 10.0,
+              "gap": 30.0,
+              "unit": "m3",
+              "gap_unit_cost": 2.0,
+              "gap_cost": 60.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-02",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-03",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-04",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-05",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "water:w:2027-01-06",
+              "kind": "water",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "m3",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-01",
+              "kind": "machine",
+              "used": 4.0,
+              "capacity": 1.0,
+              "gap": 3.0,
+              "unit": "hours",
+              "gap_unit_cost": 3.0,
+              "gap_cost": 9.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-02",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-03",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-04",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-05",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "machine:m:2027-01-06",
+              "kind": "machine",
+              "used": 0.0,
+              "capacity": 100.0,
+              "gap": 0.0,
+              "unit": "hours",
+              "gap_unit_cost": 1.0,
+              "gap_cost": 0.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "seed:seed-diagnostic",
+              "kind": "seed",
+              "used": 6.0,
+              "capacity": 4.0,
+              "gap": 2.0,
+              "unit": "kg",
+              "gap_unit_cost": 5.0,
+              "gap_cost": 10.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "market:market-diagnostic",
+              "kind": "market",
+              "used": 20.0,
+              "capacity": 15.0,
+              "gap": 5.0,
+              "unit": "kg",
+              "gap_unit_cost": 7.0,
+              "gap_cost": 35.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            },
+            {
+              "id": "bare:f",
+              "kind": "bare",
+              "used": 4,
+              "capacity": 3.0,
+              "gap": 1.0,
+              "unit": "days",
+              "gap_unit_cost": 11.0,
+              "gap_cost": 11.0,
+              "remediable": true,
+              "remedy": "Synthetic fixture supplementation",
+              "evidence_ids": [
+                "fixture"
+              ]
+            }
+          ],
+          "diagnostic": true,
+          "resource_feasible": false,
+          "water_mm": {
+            "f": {
+              "2027-01-01": 2.0,
+              "2027-01-02": 0.0,
+              "2027-01-03": 0.0,
+              "2027-01-04": 0.0,
+              "2027-01-05": 0.0,
+              "2027-01-06": 0.0
+            }
+          },
+          "recipe": "independent-daily-calendar-resource-verifier-v3.0",
+          "scope": "frozen coefficients; scientific preprocessing and local calibration are separate checks"
+        },
+        "gap_cost": 125.0,
+        "score": -0.216,
+        "gap_reporting": "minimum required gaps for the selected schedule; unneeded incumbent slack removed"
+      }
+    }
+  }
+}

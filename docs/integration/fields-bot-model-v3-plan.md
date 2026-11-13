@@ -185,3 +185,35 @@ Still required:
    final documentation and real-region data/calibration checklist.
 
 Overall goal remains ACTIVE. No push, remote merge or deployment.
+
+
+## Checkpoint 3 — daily mathematical kernel (2026-11-14)
+
+Implemented within `rotation_optimizer/v3/`, without changing live v2 dispatch:
+- Strict versioned scientific/model contracts; sourced readiness reports distinguish
+  missing values from confirmed zero, and retain QA, region/time and assumption state.
+- Recipe-paired GDD, first maturity date, explicit turnaround and cover; staged Kc/root
+  depth, FC/WP, effective rain, TAW/RAW, minimum NIR and per-day audit trace. The conservative
+  dry initial/root-expansion policy is explicit; no continuous multiseason claim.
+- Real daily Gurobi model with one path per field, species adjacency, all-pair family
+  gaps/history, hard suitability/infrastructure/capacities, and five resource-gap types.
+- Six raw metrics/positive scales and priority-ordered gap minimization then normalized
+  score maximization. Unavailable optional metrics remain null with reasons.
+- Independent calendar/resource verifier and independent GDD/Kc/root/NIR/cover/trace
+  verifier. Corrupt metadata and trace values are rejected, not only wrong final totals.
+- Real cancellation/deadline/license failure behavior. Model limits are explicit errors,
+  never silent truncation. Gurobi results remain limited to the generated candidate set.
+
+Design contract and scientific limitations: `docs/integration/model-v3-core.md`.
+Kernel artifacts: `output/evidence/fields-bot-v3/kernel-smoke.json` contains complete
+synthetic inputs and actual Gurobi results for zero-gap priority and a five-resource
+125-unit gap-cost diagnostic. These are engineering fixtures, not farm recommendations.
+
+Fresh proof: full dedicated-DB backend suite 426 passed / 0 skipped (5 pre-existing
+PDF/SWIG warnings); 71 v3 cases; scoped Ruff passed and mypy passed 9 modules.
+See `output/evidence/fields-bot-v3/checkpoint-3.json`. All original application
+integration work is still required: v3 profile/data preparation and suitability/economic/
+risk/soil coefficients; server-owned readiness policy; farm/current partition/resource
+snapshots; task dispatcher, immutable result compatibility; planner/results/bot/knowledge;
+full end-to-end and AI evaluation. The v3 functions are currently a tested library, not
+an exposed replacement backend. Overall goal remains ACTIVE.
