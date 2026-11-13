@@ -1,5 +1,16 @@
 # Rotation v2 — local review and reproduction
 
+> Current v3 integration (2026-11-14): this document retains the historical v2 model
+> and evaluation record below. New planning uses the daily v3 model; see
+> [integration plan](docs/integration/fields-bot-model-v3-plan.md) and
+> [data contract](docs/integration/model-v3-data-contract.md). `/fields` is the unified
+> MapLibre farm/science map; `/field-shift/map` now redirects there with query parameters
+> preserved. `/field-shift/rotation` keeps the assistant but no longer renders a second
+> map. Historical v1/v2 results remain readable. The active local implementation branch
+> is `codex/fields-bot-model-v3`; no remote publication is authorized by the current goal.
+
+## Historical v2 checkpoint
+
 Current integration branch: `integrated`; implementation baseline: `0271351`. See `BRANCHES.md` for the topic branches and their dependencies. This record supersedes the v1 worktree/location statements in `FIELD_SHIFT.md` for the new map, RAG and MILP routes. The original `/field-shift` and its saved analyses remain available. No deployment is part of this work. The user requested publishing the integrated branch after the companion update.
 
 **Review status:** core implementation and real runtime evidence exist. The AI semantic quality gate is HOLD. Both first protected evaluations scored 16/20 against the frozen 90% target; exposed-case regressions do not replace those scores. The last real v13 evaluation was interrupted by the OpenRouter key limit. Source candidate v15 adds source-faithful paraphrasing and conversational wording, but has no new generation results. Further paid calls have stopped pending available allowance. Do not describe this as production-ready agronomic advice or an independently validated model release. The configured default remains Nano; Mini is an evaluated candidate, not a silent default change.

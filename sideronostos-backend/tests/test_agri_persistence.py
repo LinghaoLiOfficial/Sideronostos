@@ -105,3 +105,35 @@ async def test_future_dates_and_private_releases_cannot_leak_historical_values(s
     rain = next(f for f in actual["facts"] if f["metric"] == "rainfall_total")
     assert rain["value"] is None and rain["coverage"]["valid_days"] == 1
     assert rain["coverage"]["expected_days"] == 2
+
+
+async def test_layer_manifest_preserves_catalog_identity_and_owner_scope(session):
+    service = AgriDataService()
+    session.add(
+        ScienceRelease(
+            id="owned-smap",
+            owner_user_id="owner-a",
+            product="SPL3SMP_E",
+            status="published",
+            manifest_sha256="c" * 64,
+            data={
+                "passes": {"AM": {}, "PM": {}},
+                "start": "2026-11-07",
+                "end": "2026-11-07",
+                "bounds": [-180, -85, 180, 85],
+                "grid_spacing_label": "9 km grid",
+                "limitations": ["Surface moisture only"],
+                "recipe": "test-only",
+            },
+        )
+    )
+    await session.commit()
+    catalog = await service.layers(session, "owner-a")
+    for item in catalog:
+        manifest = await service.layer_manifest(session, "owner-a", item["id"])
+        for key in ("id", "release_id", "title", "pass", "start", "end", "unit", "source"):
+            assert manifest.get(key) == item[key], key
+    assert await service.layers(session, "owner-b") == []
+    with pytest.raises(HTTPException) as error:
+        await service.layer_manifest(session, "owner-b", "owned-smap:am")
+    assert error.value.status_code == 404

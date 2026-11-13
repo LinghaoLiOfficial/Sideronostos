@@ -174,3 +174,20 @@ it("does not carry edited daily conditions into a different legacy run", async (
     expect(state.assistant?.context.draft?.dirty).toBe(false),
   );
 });
+
+it("keeps the planner and assistant together without mounting a second map", async () => {
+  state.search = new URLSearchParams(
+    "field=field-a&selection=aoi-a&obsStart=2026-11-07&obsEnd=2026-11-07&layer=release%3Aam",
+  );
+  open();
+  await screen.findByRole("region", { name: "逐日轮作规划" });
+  expect(screen.queryByText("Map")).not.toBeInTheDocument();
+  expect(screen.getByText("Assistant")).toBeInTheDocument();
+  const back = new URL(
+    screen.getByRole("link", { name: "返回地图" }).getAttribute("href")!,
+    "https://local.example",
+  );
+  expect(back.pathname).toBe("/fields");
+  expect(back.searchParams.get("selection")).toBe("aoi-a");
+  expect(back.searchParams.get("obsStart")).toBe("2026-11-07");
+});

@@ -1,10 +1,15 @@
-import { Suspense } from "react";
-import { RotationWorkspace } from "@/components/rotation/workspace";
-export const metadata = { title: "Field Shift · 地图与轮作助手" };
-export default function MapPage() {
-  return (
-    <Suspense fallback={<main role="status">正在打开地图…</main>}>
-      <RotationWorkspace mode="map" />
-    </Suspense>
-  );
+import { redirect } from "next/navigation";
+
+/** Preserve old saved/shared map URLs after verified MapLibre science migration. */
+export default async function MapPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(await searchParams)) {
+    if (Array.isArray(value)) value.forEach((item) => query.append(key, item));
+    else if (value !== undefined) query.append(key, value);
+  }
+  redirect(`/fields${query.size ? `?${query}` : ""}`);
 }

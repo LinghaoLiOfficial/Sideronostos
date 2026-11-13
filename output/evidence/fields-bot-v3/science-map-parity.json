@@ -1,0 +1,544 @@
+{
+  "verified_at": "2026-11-13T23:44:46.959192+00:00",
+  "environment": "dedicated local journey DB, actual prepared SMAP HDF5-derived arrays; no intercepted requests in API checks",
+  "release": "smap-20261107-journey-v1",
+  "manifests": {
+    "am": {
+      "id": "smap-20261107-journey-v1:am",
+      "release_id": "smap-20261107-journey-v1",
+      "title": "SMAP surface soil moisture · AM",
+      "type": "raster",
+      "tile_size": 256,
+      "minzoom": 0,
+      "maxzoom": 12,
+      "tiles": [
+        "/agri-data/layers/smap-20261107-journey-v1:am/tiles/{z}/{x}/{y}"
+      ],
+      "bounds": [
+        -180,
+        -85.04450225830078,
+        180,
+        85.04450225830078
+      ],
+      "start": "2026-11-07T00:00:00.000Z",
+      "end": "2026-11-07T23:59:59.999Z",
+      "pass": "AM",
+      "unit": "m3/m3",
+      "legend": {
+        "min": 0.02,
+        "max": 0.5,
+        "colors": [
+          "#a86837",
+          "#dac480",
+          "#5daa9f",
+          "#245e97"
+        ],
+        "missing": "transparent"
+      },
+      "resampling": "nearest_native_cell",
+      "spatial_support": "9 km grid; radiometer footprint approximately 36 km",
+      "limitations": [
+        "Single day: trends, anomalies and persistence are unavailable.",
+        "Surface moisture is not root-zone storage or an irrigation prescription.",
+        "AM and PM are separate passes; overlapping grids are not independent fields.",
+        "No field-scale downscaling or polygon mean is inferred from these pixels."
+      ],
+      "source": {
+        "release_id": "smap-20261107-journey-v1",
+        "product": "SPL3SMP_E",
+        "product_version": "006",
+        "sha256": "8ef5bc421eac15cf5d714b1c497d809ae8fa9c8318bcf9e3b3116fb9680e2767",
+        "recipe": "spl3smpe006-native-grid-qa0or8-v1",
+        "raw_sha256": "c9a3fc165ec31e45c3f82e6c8a8cc38c8455817f1bede17cac2982fc5d79d402",
+        "url": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+      }
+    },
+    "pm": {
+      "id": "smap-20261107-journey-v1:pm",
+      "release_id": "smap-20261107-journey-v1",
+      "title": "SMAP surface soil moisture · PM",
+      "type": "raster",
+      "tile_size": 256,
+      "minzoom": 0,
+      "maxzoom": 12,
+      "tiles": [
+        "/agri-data/layers/smap-20261107-journey-v1:pm/tiles/{z}/{x}/{y}"
+      ],
+      "bounds": [
+        -180,
+        -85.04450225830078,
+        180,
+        85.04450225830078
+      ],
+      "start": "2026-11-07T00:00:00.000Z",
+      "end": "2026-11-07T23:59:59.999Z",
+      "pass": "PM",
+      "unit": "m3/m3",
+      "legend": {
+        "min": 0.02,
+        "max": 0.5,
+        "colors": [
+          "#a86837",
+          "#dac480",
+          "#5daa9f",
+          "#245e97"
+        ],
+        "missing": "transparent"
+      },
+      "resampling": "nearest_native_cell",
+      "spatial_support": "9 km grid; radiometer footprint approximately 36 km",
+      "limitations": [
+        "Single day: trends, anomalies and persistence are unavailable.",
+        "Surface moisture is not root-zone storage or an irrigation prescription.",
+        "AM and PM are separate passes; overlapping grids are not independent fields.",
+        "No field-scale downscaling or polygon mean is inferred from these pixels."
+      ],
+      "source": {
+        "release_id": "smap-20261107-journey-v1",
+        "product": "SPL3SMP_E",
+        "product_version": "006",
+        "sha256": "8ef5bc421eac15cf5d714b1c497d809ae8fa9c8318bcf9e3b3116fb9680e2767",
+        "recipe": "spl3smpe006-native-grid-qa0or8-v1",
+        "raw_sha256": "c9a3fc165ec31e45c3f82e6c8a8cc38c8455817f1bede17cac2982fc5d79d402",
+        "url": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+      }
+    }
+  },
+  "point_facts": {
+    "iowa_missing": {
+      "selection": {
+        "id": "57d88311-b776-4517-8c63-57f6ca11960e",
+        "revision": 2,
+        "kind": "point",
+        "center": [
+          -93.5,
+          42.0
+        ],
+        "area_ha": null,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -93.5,
+            42.0
+          ]
+        },
+        "created_at": "2026-11-13T23:39:23.665004+00:00"
+      },
+      "facts": [
+        {
+          "id": "power-iowa-2025-v1:rainfall_total:2025-01-01:2025-12-31",
+          "metric": "rainfall_total",
+          "value": 914.1,
+          "status": "available",
+          "unit": "mm",
+          "coverage": {
+            "valid_days": 365,
+            "expected_days": 365
+          },
+          "period": {
+            "start": "2025-01-01",
+            "end": "2025-12-31",
+            "time_standard": "UTC"
+          },
+          "data_kind": "derived_historical",
+          "spatial_support": "regional_background",
+          "source": {
+            "release_id": "power-iowa-2025-v1",
+            "product": "NASA_POWER_DAILY",
+            "product_version": "v2.10.3",
+            "sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+            "recipe": "fao56-daily-dewpoint-v1",
+            "raw_sha256": "73246b3db80643e83f7150f47a1a68a11cf68d117c80845c7a2e809f85135d32",
+            "url": "https://power.larc.nasa.gov/docs/services/api/temporal/daily/"
+          },
+          "source_kind": "reanalysis_and_satellite_inputs",
+          "limitations": [
+            "Historical regional data, not future weather or a field sensor.",
+            "Reference ET0 is not measured crop water use or an irrigation prescription."
+          ]
+        },
+        {
+          "id": "power-iowa-2025-v1:reference_et0_total:2025-01-01:2025-12-31",
+          "metric": "reference_et0_total",
+          "value": 1042.3130057379583,
+          "status": "available",
+          "unit": "mm",
+          "coverage": {
+            "valid_days": 365,
+            "expected_days": 365
+          },
+          "period": {
+            "start": "2025-01-01",
+            "end": "2025-12-31",
+            "time_standard": "UTC"
+          },
+          "data_kind": "derived_historical",
+          "spatial_support": "regional_background",
+          "source": {
+            "release_id": "power-iowa-2025-v1",
+            "product": "NASA_POWER_DAILY",
+            "product_version": "v2.10.3",
+            "sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+            "recipe": "fao56-daily-dewpoint-v1",
+            "raw_sha256": "73246b3db80643e83f7150f47a1a68a11cf68d117c80845c7a2e809f85135d32",
+            "url": "https://power.larc.nasa.gov/docs/services/api/temporal/daily/"
+          },
+          "source_kind": "reanalysis_and_satellite_inputs",
+          "limitations": [
+            "Historical regional data, not future weather or a field sensor.",
+            "Reference ET0 is not measured crop water use or an irrigation prescription."
+          ]
+        },
+        {
+          "id": "smap-20261107-journey-v1:AM:surface_moisture",
+          "metric": "surface_soil_moisture",
+          "status": "no_recommended_retrieval",
+          "value": null,
+          "unit": "m3/m3",
+          "row": 267,
+          "column": 926,
+          "center": [
+            -93.50103732538497,
+            42.043378124104954
+          ],
+          "acquired_at": null,
+          "retrieval_qual_flag": 7,
+          "surface_flag": 2047,
+          "uncertainty": null,
+          "spatial_support": "native_grid_background",
+          "not_field_measurement": true,
+          "pass": "AM",
+          "period": {
+            "start": "2026-11-07T00:00:00.000Z",
+            "end": "2026-11-07T23:59:59.999Z"
+          },
+          "data_kind": "satellite_retrieval",
+          "source": {
+            "release_id": "smap-20261107-journey-v1",
+            "product": "SPL3SMP_E",
+            "product_version": "006",
+            "sha256": "8ef5bc421eac15cf5d714b1c497d809ae8fa9c8318bcf9e3b3116fb9680e2767",
+            "recipe": "spl3smpe006-native-grid-qa0or8-v1",
+            "raw_sha256": "c9a3fc165ec31e45c3f82e6c8a8cc38c8455817f1bede17cac2982fc5d79d402",
+            "url": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+          },
+          "limitations": [
+            "Single day: trends, anomalies and persistence are unavailable.",
+            "Surface moisture is not root-zone storage or an irrigation prescription.",
+            "AM and PM are separate passes; overlapping grids are not independent fields.",
+            "No field-scale downscaling or polygon mean is inferred from these pixels."
+          ]
+        },
+        {
+          "id": "smap-20261107-journey-v1:PM:surface_moisture",
+          "metric": "surface_soil_moisture",
+          "status": "no_recommended_retrieval",
+          "value": null,
+          "unit": "m3/m3",
+          "row": 267,
+          "column": 926,
+          "center": [
+            -93.50103732538497,
+            42.043378124104954
+          ],
+          "acquired_at": null,
+          "retrieval_qual_flag": 7,
+          "surface_flag": 2047,
+          "uncertainty": null,
+          "spatial_support": "native_grid_background",
+          "not_field_measurement": true,
+          "pass": "PM",
+          "period": {
+            "start": "2026-11-07T00:00:00.000Z",
+            "end": "2026-11-07T23:59:59.999Z"
+          },
+          "data_kind": "satellite_retrieval",
+          "source": {
+            "release_id": "smap-20261107-journey-v1",
+            "product": "SPL3SMP_E",
+            "product_version": "006",
+            "sha256": "8ef5bc421eac15cf5d714b1c497d809ae8fa9c8318bcf9e3b3116fb9680e2767",
+            "recipe": "spl3smpe006-native-grid-qa0or8-v1",
+            "raw_sha256": "c9a3fc165ec31e45c3f82e6c8a8cc38c8455817f1bede17cac2982fc5d79d402",
+            "url": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+          },
+          "limitations": [
+            "Single day: trends, anomalies and persistence are unavailable.",
+            "Surface moisture is not root-zone storage or an irrigation prescription.",
+            "AM and PM are separate passes; overlapping grids are not independent fields.",
+            "No field-scale downscaling or polygon mean is inferred from these pixels."
+          ]
+        }
+      ],
+      "unavailable": [],
+      "online_fetch_performed": false
+    },
+    "valid_am_region": {
+      "selection": {
+        "id": "e3bd83a0-17db-4d04-9a5d-67581710f9f3",
+        "revision": 6,
+        "kind": "point",
+        "center": [
+          -96.67531118366067,
+          43.86512880869236
+        ],
+        "area_ha": null,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -96.67531118366067,
+            43.86512880869236
+          ]
+        },
+        "created_at": "2026-11-13T23:42:32.887592+00:00"
+      },
+      "facts": [
+        {
+          "id": "smap-20261107-journey-v1:AM:surface_moisture",
+          "metric": "surface_soil_moisture",
+          "status": "available",
+          "value": 0.27163422107696533,
+          "unit": "m3/m3",
+          "row": 248,
+          "column": 892,
+          "center": [
+            -96.67531118366067,
+            43.86512880869236
+          ],
+          "acquired_at": "2026-11-07T13:24:41.875726+00:00",
+          "retrieval_qual_flag": 0,
+          "surface_flag": 0,
+          "uncertainty": null,
+          "spatial_support": "native_grid_background",
+          "not_field_measurement": true,
+          "pass": "AM",
+          "period": {
+            "start": "2026-11-07T00:00:00.000Z",
+            "end": "2026-11-07T23:59:59.999Z"
+          },
+          "data_kind": "satellite_retrieval",
+          "source": {
+            "release_id": "smap-20261107-journey-v1",
+            "product": "SPL3SMP_E",
+            "product_version": "006",
+            "sha256": "8ef5bc421eac15cf5d714b1c497d809ae8fa9c8318bcf9e3b3116fb9680e2767",
+            "recipe": "spl3smpe006-native-grid-qa0or8-v1",
+            "raw_sha256": "c9a3fc165ec31e45c3f82e6c8a8cc38c8455817f1bede17cac2982fc5d79d402",
+            "url": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+          },
+          "limitations": [
+            "Single day: trends, anomalies and persistence are unavailable.",
+            "Surface moisture is not root-zone storage or an irrigation prescription.",
+            "AM and PM are separate passes; overlapping grids are not independent fields.",
+            "No field-scale downscaling or polygon mean is inferred from these pixels."
+          ]
+        },
+        {
+          "id": "smap-20261107-journey-v1:PM:surface_moisture",
+          "metric": "surface_soil_moisture",
+          "status": "no_recommended_retrieval",
+          "value": null,
+          "unit": "m3/m3",
+          "row": 248,
+          "column": 892,
+          "center": [
+            -96.67531118366067,
+            43.86512880869236
+          ],
+          "acquired_at": null,
+          "retrieval_qual_flag": 7,
+          "surface_flag": 2047,
+          "uncertainty": null,
+          "spatial_support": "native_grid_background",
+          "not_field_measurement": true,
+          "pass": "PM",
+          "period": {
+            "start": "2026-11-07T00:00:00.000Z",
+            "end": "2026-11-07T23:59:59.999Z"
+          },
+          "data_kind": "satellite_retrieval",
+          "source": {
+            "release_id": "smap-20261107-journey-v1",
+            "product": "SPL3SMP_E",
+            "product_version": "006",
+            "sha256": "8ef5bc421eac15cf5d714b1c497d809ae8fa9c8318bcf9e3b3116fb9680e2767",
+            "recipe": "spl3smpe006-native-grid-qa0or8-v1",
+            "raw_sha256": "c9a3fc165ec31e45c3f82e6c8a8cc38c8455817f1bede17cac2982fc5d79d402",
+            "url": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+          },
+          "limitations": [
+            "Single day: trends, anomalies and persistence are unavailable.",
+            "Surface moisture is not root-zone storage or an irrigation prescription.",
+            "AM and PM are separate passes; overlapping grids are not independent fields.",
+            "No field-scale downscaling or polygon mean is inferred from these pixels."
+          ]
+        }
+      ],
+      "unavailable": [
+        {
+          "release_id": "power-iowa-2025-v1",
+          "reason": "no_prepared_weather_for_location"
+        }
+      ],
+      "online_fetch_performed": false
+    },
+    "viewport": {
+      "selection": {
+        "id": "d77b7152-6eda-4122-ab74-97b91a0ad01d",
+        "revision": 8,
+        "kind": "viewport",
+        "center": [
+          -96.67531118366048,
+          43.86381323673457
+        ],
+        "area_ha": 808346.9396351441,
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -97.24660024616054,
+                43.46777118280795
+              ],
+              [
+                -96.10402212116044,
+                43.46777118280795
+              ],
+              [
+                -96.10402212116044,
+                44.25985529066119
+              ],
+              [
+                -97.24660024616054,
+                44.25985529066119
+              ],
+              [
+                -97.24660024616054,
+                43.46777118280795
+              ]
+            ]
+          ]
+        },
+        "created_at": "2026-11-13T23:43:53.617420+00:00"
+      },
+      "facts": [],
+      "unavailable": [
+        {
+          "reason": "no_prepared_area_statistics",
+          "detail": "Native grid layers are available; this polygon has no published area statistics."
+        }
+      ],
+      "online_fetch_performed": false
+    }
+  },
+  "future_window": {
+    "selection": {
+      "id": "57d88311-b776-4517-8c63-57f6ca11960e",
+      "revision": 2,
+      "kind": "point",
+      "center": [
+        -93.5,
+        42.0
+      ],
+      "area_ha": null,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.5,
+          42.0
+        ]
+      },
+      "created_at": "2026-11-13T23:39:23.665004+00:00"
+    },
+    "facts": [],
+    "unavailable": [
+      {
+        "release_id": "power-iowa-2025-v1",
+        "reason": "outside_time_coverage"
+      },
+      {
+        "release_id": "smap-20261107-journey-v1",
+        "reason": "outside_time_coverage"
+      }
+    ],
+    "online_fetch_performed": false
+  },
+  "tile_pixel_checks": [
+    {
+      "selection": "iowa_missing",
+      "tile": [
+        12,
+        984,
+        1520
+      ],
+      "pixel": [
+        45,
+        129
+      ],
+      "rgba": [
+        168,
+        104,
+        55,
+        0
+      ],
+      "expected_rgba": [
+        168,
+        104,
+        55,
+        0
+      ],
+      "fact_value": null,
+      "fact_status": "no_recommended_retrieval",
+      "png_sha256": "4a50a7dfd5d6a783f02a0aeb061d5435b8d8ece6ae0277ffbdde7d588ab74bdc",
+      "content_type": "image/png",
+      "cache_control": "private, max-age=3600"
+    },
+    {
+      "selection": "valid_am_region",
+      "tile": [
+        12,
+        948,
+        1491
+      ],
+      "pixel": [
+        12,
+        132
+      ],
+      "rgba": [
+        146,
+        181,
+        145,
+        180
+      ],
+      "expected_rgba": [
+        146,
+        181,
+        145,
+        180
+      ],
+      "fact_value": 0.27163422107696533,
+      "fact_status": "available",
+      "png_sha256": "8e4f284486fd60111d48c26d9d4f94a0f42e543a9a0b802e030f2f710f191a17",
+      "content_type": "image/png",
+      "cache_control": "private, max-age=3600"
+    }
+  ],
+  "unauthenticated_tile_status": 401,
+  "owned_field_after_queries": {
+    "id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+    "version": 2,
+    "latitude": 41.99925,
+    "longitude": -93.5,
+    "geometry_sha256": "cf893e1cbc55868fd5dea9b07275f85ebf8f667cface47b8a6f34e6117ddb252"
+  },
+  "browser_checks": {
+    "actual": "AM/PM selection, point/AOI/viewport, future dates, native nearest pixels, mobile evidence sheet",
+    "controlled": "one 503 interception, visible warning, interception removed, retry then actual 200",
+    "not_claimed": "MapTiler satellite search without key; field-scale SMAP or polygon means; real AI answer"
+  },
+  "screenshots": [
+    "fields-v3-science-native-grid.png",
+    "fields-v3-science-mobile.png",
+    "fields-v3-science-controlled-failure.png"
+  ]
+}

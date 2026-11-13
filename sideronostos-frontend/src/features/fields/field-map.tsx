@@ -34,6 +34,7 @@ import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter"
 import { toFieldFeature } from "./map-feature"
 import type { Geometry, LayerManifest, RegionSelection } from "@/lib/api/rotation-types"
 import { ScienceRaster } from "./science-raster"
+import { useMapFocus } from "./use-map-focus"
 import { Button } from "@/components/ui/button"
 import { buildGibsTileUrl, GIBS_LAYERS } from "@/data/gibs-layers"
 import { featureBounds, validatePolygon } from "@/features/fields/geometry"
@@ -211,7 +212,6 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
   const mapRef = useRef<MapRef>(null)
   const drawRef = useRef<TerraDraw | null>(null)
   const selectedIdRef = useRef<string | null>(selectedFieldId)
-  const focusedIdRef = useRef<string | null>(null)
   const fieldsRef = useRef(fields)
   const farmsRef = useRef(farms)
   const onFarmCreatedRef = useRef(onFarmCreated)
@@ -252,23 +252,12 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
     : queryVertices.length > 1 ? { type: "LineString", coordinates: queryVertices } : queryVertices.length ? { type: "Point", coordinates: queryVertices[0] } : null
 
 
-  // Restoring a URL selection moves the camera only; it must not dispatch a drawing
-  // selection event that would clear the saved run/AOI context.
-  const focusRestoredField = useCallback(() => {
-    const id = selectedIdRef.current
-    if (!id) { focusedIdRef.current = null; return }
-    const field = fieldsRef.current.find(f => f.properties.id === id)
-    const map = mapRef.current?.getMap()
-    if (!field || !map || focusedIdRef.current === id) return
-    const [west, south, east, north] = featureBounds(field)
-    map.fitBounds([[west, south], [east, north]], { padding: 90, maxZoom: 16, duration: 700 })
-    focusedIdRef.current = id
-  }, [])
+  // Camera restoration never emits drawing-selection events or edits a boundary.
+  const focusRestoredField = useMapFocus(mapRef, fields, selectedFieldId, selection)
   useEffect(() => {
     selectedIdRef.current = selectedFieldId
     fieldsRef.current = fields
-    focusRestoredField()
-  }, [selectedFieldId, fields, focusRestoredField])
+  }, [selectedFieldId, fields])
 
   useEffect(() => {
     farmsRef.current = farms

@@ -49,3 +49,23 @@ Enabled capabilities are recorded in `capabilities.json`. Authentication keeps a
 in memory and restores sessions through the backend refresh cookie. Production frontend and API
 origins must use HTTPS. For browser uploads, configure the production S3 provider's bucket CORS to
 allow the frontend origin and expose `ETag`.
+
+
+## Farmer workspace (v3 integration)
+
+Use `/fields` to draw/import a farm, confirm partitions, complete field/history details
+and explicitly synchronize them to the signed-in account. Anonymous drafts remain local
+until explicitly imported. Confirmation and synchronization do not imply calculation readiness.
+Use the Data panel for separate point/polygon/viewport science queries. GIBS display dates,
+scientific observation dates and planning dates are independent. Prepared SMAP pixels retain
+native support; missing observations are transparent and load failures offer a retry.
+
+Open `/field-shift/rotation` for sourced daily conditions, readiness, calculation, comparison,
+save/export/print and the companion. Return to the map with the same field/run/option/AOI.
+Old `/field-shift/map?...` links redirect to `/fields?...`. Saved plans use frozen inputs;
+editing current fields cannot change them. Iowa is an explicitly uncalibrated engineering
+benchmark. Real farms require a locally sourced parameter pack and operating conditions.
+
+See `../docs/integration/fields-bot-model-v3-plan.md` for current validation and open gates.
+Live AI semantic acceptance is pending provider access; a visible chat panel is not proof
+of validated answers.

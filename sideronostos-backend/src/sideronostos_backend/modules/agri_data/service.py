@@ -158,6 +158,8 @@ class AgriDataService:
             raise HTTPException(404, "Layer not found")
         return {
             "id": layer_id,
+            "release_id": row.id,
+            "title": f"SMAP surface soil moisture · {orbit.upper()}",
             "type": "raster",
             "tile_size": 256,
             "minzoom": 0,

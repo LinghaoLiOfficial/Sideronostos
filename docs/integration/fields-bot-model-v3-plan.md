@@ -407,7 +407,7 @@ cross-run/plan-only owner context. This is a checkpoint, not full-goal completio
 | Daily form/readiness/results/save | 305 frontend regressions; real incomplete, hard-failure, successful compare/save/reopen paths | Multi-field UI, diagnostic remedy UI, print/export and remaining responsive paths |
 | Bot numeric/evidence boundaries | Deterministic and owned DB tests; saved context on mobile | Frozen daily cases, real retrieval/generation, semantic rubric and held-out gate |
 | Knowledge v3 | Manifest/readers validated, 4,911 chunks prepared offline | Versioned vector publication and retrieval/generation evaluation |
-| Unified map | MapLibre temporary AOI and saved field restoration | Prepared scientific-raster parity; remove duplicate planning map and redirect old map afterward |
+| Unified map | Actual prepared SMAP parity, AOI camera restoration, error/retry, mobile evidence sheet, old URL redirect and planner without duplicate map | Broader account/race/restart journey remains |
 | Real-region use | Explicit sourcing/readiness and uncalibrated-engineering labels | Pilot, crop/soil/operations calibration and farmer/agronomist review |
 
 Goal remains ACTIVE. No push, remote merge or deployment was performed.
@@ -449,3 +449,39 @@ fixture archive in `output/evidence/fields-bot-v3/`. The reusable freezer passes
 and was executed successfully against real owned records. Live retrieval/generation,
 semantic review and held-out acceptance remain **NOT VERIFIED**. The external-access
 question is pending; remaining product verification can proceed independently.
+
+
+## Checkpoint 9 — unified map and actual plan artifacts (2026-11-14)
+
+Published an isolated journey SMAP release from the existing actual 2026-11-07 HDF5.
+AM/PM derivative hashes exactly match the previously prepared public source. No private
+source records or production releases were modified. MapLibre native raster requests
+returned actual PNGs; API pixel checks match the source value's color/alpha exactly.
+The Iowa point has QA-rejected observations (null, transparent), while a separately named
+regional AOI has AM 0.27163422107696533 m³/m³. The regional query never substitutes for the
+operating field: its ID, version 2 and geometry stay unchanged. Future observation windows
+return no historical values; polygon/viewport queries explicitly lack prepared area statistics.
+
+Fixed the manifest's missing title/release identity, request cancellation on removal,
+late tile decoding and a missing visible failure/retry state. A browser-controlled 503
+verified the warning; after removing the interception, retry returned an actual 200.
+`use-map-focus.ts` restores an AOI independently of delayed field loading and returns to
+the field when cleared. These behaviors have focused regression coverage.
+
+Only after this parity check, `/field-shift/map` became a server redirect to `/fields`,
+preserving all query values. The planning route now displays conditions/results at full
+width and retains a fixed companion; it mounts no Leaflet or MapLibre canvas. Legacy map
+component code is retained but no current page URL renders it. Desktop 1440 px and mobile
+390 px views were inspected. The saved run/option/field and independent AOI remain bound.
+
+A real browser download of the saved v3 plan equals the authenticated server plan exactly,
+including the entire frozen snapshot. Chromium print output initially touched paper edges;
+14 mm page margins, compact print spacing and unbroken evidence panels corrected it.
+The inspected one-page PDF retains six metrics, dates and engineering/scientific limits.
+This verifies browser print rendering, not a physical printer or user operating-system dialog.
+
+Evidence: `science-map-parity.json`, `map-migration-and-plan-export.json`, and the named
+screenshots/PDF in `output/playwright/`. Fresh frontend suite: 312 passed / 55 files;
+TypeScript and focused ESLint pass. Backend agri persistence: 3 passed; Ruff/mypy pass.
+No live AI calls were retried. Provider access and semantic acceptance remain HOLD;
+other product checks continue. The overall goal remains ACTIVE.

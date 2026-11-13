@@ -1,0 +1,52 @@
+{
+  "verified_at": "2026-11-13T23:51:51.765777+00:00",
+  "saved_plan": "f6c7bf75-4d0a-47d5-b586-8c132466a65e",
+  "run_id": "1d241a5f-96b1-47d0-951c-726a7f6b55f4",
+  "schema": "rotation-saved-v3.0",
+  "actual_browser_download": true,
+  "download_exactly_equals_authenticated_server_plan": true,
+  "download_sha256": "de22686d6caba19f49679ee9035bda79de5a7291e4b1f194c288d4db5c11b566",
+  "input_snapshot_sha256": "7fdd819eeaf46ed0a7c5e885d9e472a0cd8d664c5c44c4a7f12dfaaab7804fea",
+  "print": {
+    "method": "Chromium page.pdf using actual product print CSS; no physical printer claimed",
+    "pages": 1,
+    "minimum_text_x_pt": 39.75,
+    "minimum_text_y_pt": 39.89555358886719,
+    "sha256": "b139cc6e6f1791bf71b8fdb83855e9ec27f1526adff1ebeb941f7fef8e4b9617",
+    "visual_review": "PASS, single page, complete six metrics/calendar/source limitations, 14 mm page margins"
+  },
+  "route_migration": {
+    "actual_legacy_url_redirected_to_fields": true,
+    "preserved_keys": [
+      "plan",
+      "run",
+      "option",
+      "field",
+      "layer",
+      "selection"
+    ],
+    "unit_checks_also_preserve": [
+      "compare",
+      "compareOption",
+      "obsStart",
+      "obsEnd",
+      "repeated_query_values"
+    ],
+    "planner_map_canvases": 0,
+    "desktop_width": 1440,
+    "desktop_document_width": 1440,
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "assistant_visible_and_usable_in_both_sizes": true
+  },
+  "verification": {
+    "frontend": "312 tests / 55 files PASS",
+    "typescript": "PASS",
+    "scoped_eslint": "PASS",
+    "backend_agri_persistence": "3 PASS",
+    "ruff_and_mypy": "PASS"
+  },
+  "remaining": "Diagnostic/multi-field UI, broader account/race/restart checks, production build, real AI semantic evaluation"
+}

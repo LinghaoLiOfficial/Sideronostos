@@ -858,7 +858,7 @@ function OwnerWorkspace({
     <Surface tone="light" className={styles.app}>
       <Header mode={mode} user={owner} search={mapSearch.toString()} />
       <div
-        className={mode === "map" ? styles.mapLayout : styles.planningLayout}
+        className={mode === "map" ? styles.mapLayout : styles.unifiedPlanning}
       >
         <main
           className={
@@ -949,29 +949,29 @@ function OwnerWorkspace({
             </>
           )}
         </main>
-        <section className={styles.mapStage} aria-label="地图与轮作助手">
-          <MapCanvas
-            fields={fields.data?.items ?? []}
-            selectedField={selectedField}
-            selection={selection.data ?? null}
-            layer={manifest.data ?? null}
-            onSelect={selectRegion}
-            onField={selectField}
-          />
-          {manifest.error && (
-            <div className={styles.mapError}>
-              <QueryError
-                error={manifest.error}
-                retry={() => void manifest.refetch()}
+        <section
+          className={mode === "map" ? styles.mapStage : styles.plannerAssistant}
+          aria-label={mode === "map" ? "地图与轮作助手" : "轮作助手"}
+        >
+          {mode === "map" && (
+            <>
+              <MapCanvas
+                fields={fields.data?.items ?? []}
+                selectedField={selectedField}
+                selection={selection.data ?? null}
+                layer={manifest.data ?? null}
+                onSelect={selectRegion}
+                onField={selectField}
               />
-            </div>
-          )}
-          {mode === "rotation" && (
-            <div className={styles.mapSummary}>
-              正在规划{" "}
-              {run.data ? run.data.field_snapshots.length : draftFields.length}{" "}
-              个经营地块 · 地图选区用于查询背景
-            </div>
+              {manifest.error && (
+                <div className={styles.mapError}>
+                  <QueryError
+                    error={manifest.error}
+                    retry={() => void manifest.refetch()}
+                  />
+                </div>
+              )}
+            </>
           )}
           <AssistantDock
             ownerId={owner.id}
