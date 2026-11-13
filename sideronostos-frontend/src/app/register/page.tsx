@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { PasswordField } from "@/components/auth/password-field";
-import { authErrorMessage } from "@/components/auth/utils";
+import { authErrorMessage, safeNextPath, registrationNextPath, authHref, isFieldShiftDestination } from "@/components/auth/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,8 +17,11 @@ import { getCurrentUser, signUp } from "@/lib/api/client";
 
 const MIN_PASSWORD_LENGTH = 8;
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedNext = searchParams.get("next");
+  const next = requestedNext ? registrationNextPath(requestedNext) : null;
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +29,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => { getCurrentUser().then(() => router.replace("/workspace/files")).catch(() => undefined); }, [router]);
+  useEffect(() => { getCurrentUser().then(() => router.replace(safeNextPath(next))).catch(() => undefined); }, [router, next]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -35,8 +38,9 @@ export default function RegisterPage() {
     setError("");
     setSubmitting(true);
     try {
-      await signUp(email, password, displayName);
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      if (next) await signUp(email, password, displayName, next);
+      else await signUp(email, password, displayName);
+      router.push(authHref("/verify-email", next, { email }));
     } catch (caught) {
       setError(authErrorMessage(caught));
     } finally {
@@ -45,7 +49,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell agriculture={isFieldShiftDestination(next)}>
       <Card className="min-w-0 w-full py-6">
         <CardHeader className="px-6"><CardTitle className="text-2xl">创建账户</CardTitle></CardHeader>
         <CardContent className="px-6">
@@ -57,9 +61,13 @@ export default function RegisterPage() {
             <div className="grid gap-2"><Label htmlFor="confirm-password">确认密码</Label><PasswordField id="confirm-password" autoComplete="new-password" required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="再次输入密码" /></div>
             <Button type="submit" size="lg" className="mt-1 h-10" disabled={submitting}>{submitting ? <LoaderCircle className="animate-spin" /> : <ArrowRight />}{submitting ? "正在创建" : "创建账户"}</Button>
           </form>
-          <p className="mt-6 text-center text-sm text-muted-foreground">已有账户？ <Link className="text-pink-200 hover:text-pink-100" href="/login">返回登录</Link></p>
+          <p className="mt-6 text-center text-sm text-muted-foreground">已有账户？ <Link className="text-pink-200 hover:text-pink-100" href={authHref("/login", next)}>返回登录</Link></p>
         </CardContent>
       </Card>
     </AuthShell>
   );
+}
+
+export default function RegisterPage() {
+  return <Suspense fallback={<div className="p-8 text-sm text-muted-foreground">正在加载…</div>}><RegisterForm /></Suspense>;
 }

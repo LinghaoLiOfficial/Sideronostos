@@ -12,7 +12,7 @@ function Harness({ initial = { version: 1, entries: [] } }: { initial?: Vocabula
 }
 function submit(label: string, text: string) {
   fireEvent.change(screen.getByLabelText(label), { target: { value: text } });
-  fireEvent.click(screen.getByRole("button", { name: "确认", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "确认" }));
 }
 function document() { return JSON.parse(screen.getByTestId("document").textContent!) as VocabularyDocument; }
 
@@ -20,17 +20,17 @@ describe("vocabulary editor", () => {
   it("adds, selects, edits and deletes words, senses and plain-text examples", () => {
     render(<Harness />);
     expect(screen.getByText("暂无词汇")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "添加词汇", exact: true }));
-    expect(screen.getByRole("button", { name: "确认", exact: true }).hasAttribute("disabled")).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "添加词汇" }));
+    expect(screen.getByRole("button", { name: "确认" }).hasAttribute("disabled")).toBe(true);
     submit("词汇", "  run  ");
     const wordId = document().entries[0].id;
-    expect(screen.getByRole("button", { name: "run", exact: true }).getAttribute("aria-pressed")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "添加释义", exact: true }));
+    expect(screen.getByRole("button", { name: "run" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "添加释义" }));
     expect(within(screen.getByLabelText("词性")).getAllByRole("option").map((option) => option.textContent)).toEqual([...PARTS_OF_SPEECH]);
     fireEvent.change(screen.getByLabelText("词性"), { target: { value: "动词" } });
     submit("释义", "跑步");
     const senseId = document().entries[0].senses[0].id;
-    fireEvent.click(screen.getByRole("button", { name: "添加例句", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "添加例句" }));
     submit("例句正文", "I run every day.");
     const exampleId = document().entries[0].senses[0].examples[0].id;
     fireEvent.click(screen.getByRole("button", { name: "修改例句：I run every day." }));
@@ -46,14 +46,14 @@ describe("vocabulary editor", () => {
     expect(screen.getByText("暂无例句")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "删除释义：奔跑" }));
     expect(screen.getByText(/所有例句会一并删除/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "取消", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "取消" }));
     expect(document().entries[0].senses).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "删除释义：奔跑" }));
     fireEvent.click(screen.getByRole("button", { name: "确认删除" }));
     expect(document().entries[0].senses).toHaveLength(0);
-    fireEvent.click(screen.getByRole("button", { name: "添加词汇", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "添加词汇" }));
     submit("词汇", "walk");
-    fireEvent.click(screen.getByRole("button", { name: "running", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "running" }));
     fireEvent.click(screen.getByRole("button", { name: "删除词汇" }));
     expect(screen.getByText(/所有释义和例句会一并删除/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "确认删除" }));
@@ -69,7 +69,7 @@ describe("vocabulary editor", () => {
     expect(screen.getByRole("button", { name: initial.entries[0].word }).getAttribute("title")).toBe(initial.entries[0].word);
     expect(screen.getByText("They run.").closest("article")?.textContent).toContain("奔跑");
     expect(screen.getByText("A test run.").closest("article")?.textContent).toContain("一次运行");
-    fireEvent.click(screen.getByRole("button", { name: "添加词汇", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "添加词汇" }));
     submit("词汇", initial.entries[0].word);
     expect(document().entries).toHaveLength(2);
     expect(new Set(document().entries.map((entry) => entry.id)).size).toBe(2);

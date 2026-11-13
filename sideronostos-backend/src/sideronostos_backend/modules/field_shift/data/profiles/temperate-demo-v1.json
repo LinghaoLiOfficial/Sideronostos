@@ -1,0 +1,203 @@
+{
+  "id": "temperate-demo",
+  "name": "温带一年生作物 · 演示配置",
+  "version": "1.0.0",
+  "is_demo": true,
+  "description": "三年、每年一季主作物的可配置演示。试点地区与品种尚未确认，结果只说明已配置规则下的可行性。",
+  "assumptions": [
+    "所有播种日历、固定作物系数 Kc、投入成本与劳动量均为演示假设，未经当地校准，不是田间测量或具体种植建议。",
+    "每年安排一季春播主作物；暂未模拟冬作、间作、覆盖作物或年内多季接茬。",
+    "演示规则：同一作物再次种植前需间隔两年，同一植物科需间隔一年。这些保守示例规则必须经当地农艺人员核查。",
+    "参考蒸散量采用月尺度 Hargreaves 估计，作物需水量使用固定 Kc；生长窗口内降雨的 80% 被假设为有效降雨。",
+    "灌溉缺口为每月“需水量减有效降雨”的正值之和；未模拟土壤储水、径流、渗漏、灌溉效率或不同生育阶段的响应。",
+    "生长期天数仅代表计划覆盖天数，不等于实测冠层覆盖率，也不是土壤健康、土壤碳、产量或利润的估计。",
+    "资源上限逐年检查；比较指标汇总同一三年周期，成本按 USD/ha、劳动按天/ha 表示。美元仅为演示货币。",
+    "各规划年重复使用同一历史参考年的气候；降雨和温度调整是假设情景，不是天气预报。",
+    "尚未验证当地作物适宜性，也未模拟霜冻、作物温度阈值、具体病虫害或产量。“可行”仅指通过已有数据支持的配置规则，不能替代当地判断。"
+  ],
+  "crops": [
+    {
+      "id": "maize",
+      "name": "玉米 Maize",
+      "family": "Poaceae",
+      "sow_month": 4,
+      "sow_day": 20,
+      "duration_days": 150,
+      "kc": 1.05,
+      "estimated_cost_usd_ha": 850,
+      "estimated_labor_days_ha": 7,
+      "allowed_soils": [
+        "sand",
+        "loam",
+        "clay"
+      ],
+      "source_ids": [
+        "demo-parameters",
+        "fao56"
+      ]
+    },
+    {
+      "id": "soybean",
+      "name": "大豆 Soybean",
+      "family": "Fabaceae",
+      "sow_month": 5,
+      "sow_day": 10,
+      "duration_days": 140,
+      "kc": 0.9,
+      "estimated_cost_usd_ha": 550,
+      "estimated_labor_days_ha": 6,
+      "allowed_soils": [
+        "loam",
+        "clay"
+      ],
+      "source_ids": [
+        "demo-parameters",
+        "fao56"
+      ]
+    },
+    {
+      "id": "wheat",
+      "name": "春小麦 Spring wheat",
+      "family": "Poaceae",
+      "sow_month": 3,
+      "sow_day": 15,
+      "duration_days": 110,
+      "kc": 0.8,
+      "estimated_cost_usd_ha": 400,
+      "estimated_labor_days_ha": 5,
+      "allowed_soils": [
+        "sand",
+        "loam",
+        "clay"
+      ],
+      "source_ids": [
+        "demo-parameters",
+        "fao56"
+      ]
+    },
+    {
+      "id": "sunflower",
+      "name": "向日葵 Sunflower",
+      "family": "Asteraceae",
+      "sow_month": 5,
+      "sow_day": 1,
+      "duration_days": 130,
+      "kc": 0.85,
+      "estimated_cost_usd_ha": 450,
+      "estimated_labor_days_ha": 5,
+      "allowed_soils": [
+        "sand",
+        "loam",
+        "clay"
+      ],
+      "source_ids": [
+        "demo-parameters",
+        "fao56"
+      ]
+    },
+    {
+      "id": "pea",
+      "name": "田豌豆 Field pea",
+      "family": "Fabaceae",
+      "sow_month": 3,
+      "sow_day": 20,
+      "duration_days": 90,
+      "kc": 0.75,
+      "estimated_cost_usd_ha": 320,
+      "estimated_labor_days_ha": 5,
+      "allowed_soils": [
+        "loam",
+        "clay"
+      ],
+      "source_ids": [
+        "demo-parameters",
+        "fao56"
+      ]
+    },
+    {
+      "id": "potato",
+      "name": "马铃薯 Potato",
+      "family": "Solanaceae",
+      "sow_month": 4,
+      "sow_day": 15,
+      "duration_days": 120,
+      "kc": 1.0,
+      "estimated_cost_usd_ha": 1500,
+      "estimated_labor_days_ha": 18,
+      "allowed_soils": [
+        "sand",
+        "loam"
+      ],
+      "source_ids": [
+        "demo-parameters",
+        "fao56"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "crop_gap",
+      "name": "作物轮作间隔",
+      "description": "演示规则：同一作物再次种植前需有两个完整间隔年。",
+      "kind": "crop_gap",
+      "parameters": {
+        "intervening_years": 2
+      }
+    },
+    {
+      "id": "family_gap",
+      "name": "同科作物间隔",
+      "description": "演示规则：同一植物科再次种植前需有一个完整间隔年。",
+      "kind": "family_gap",
+      "parameters": {
+        "intervening_years": 1
+      }
+    },
+    {
+      "id": "annual_calendar",
+      "name": "每年一季主作物",
+      "description": "播种至收获的完整生长窗口必须落在同一规划年内。",
+      "kind": "annual_calendar",
+      "parameters": {}
+    },
+    {
+      "id": "soil_compatibility",
+      "name": "配置中的土壤适配",
+      "description": "已知土壤质地按作物允许列表核查；未知质地单独列为信息缺口。",
+      "kind": "soil_compatibility",
+      "parameters": {}
+    },
+    {
+      "id": "water_model",
+      "name": "有效降雨假设",
+      "description": "演示：80% 的生长季降雨视为有效，每月正的需水缺口相加形成灌溉缺口估计。",
+      "kind": "water_model",
+      "parameters": {
+        "effective_rainfall_fraction": 0.8
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "demo-parameters",
+      "title": "Agrisata 演示假设 v1.0.0",
+      "url": null,
+      "kind": "demonstration",
+      "detail": "本配置的日历、Kc、轮作间隔、土壤适配、有效降雨、成本和劳动量都是明确披露的示例输入，尚未按确认的地区、品种或农场校准。"
+    },
+    {
+      "id": "fao56",
+      "title": "FAO 56 — crop evapotranspiration methods",
+      "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+      "kind": "rule",
+      "detail": "参考蒸散量与 ETc = Kc × ETo 的方法依据。本配置的具体作物参数为演示假设，并非 FAO 针对本地校准的建议。"
+    },
+    {
+      "id": "rotat",
+      "title": "ROTAT — rule-based crop rotation generation",
+      "url": "https://research.wur.nl/en/publications/rotat-a-tool-for-systematically-generating-crop-rotations/",
+      "kind": "rule",
+      "detail": "支持系统生成并筛选作物序列的方法思路，不代表本文献验证了演示配置中的作物或科属间隔。"
+    }
+  ]
+}

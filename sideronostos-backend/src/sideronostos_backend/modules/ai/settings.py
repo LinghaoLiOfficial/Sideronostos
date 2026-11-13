@@ -14,6 +14,7 @@ class LLMConfig(BaseModel):
     read_timeout_seconds: float = Field(default=300, gt=0, le=600)
     max_retries: int = Field(default=2, ge=0, le=10)
     temperature: float = Field(default=0, ge=0, le=2)
+    omit_temperature: bool = False
     max_tokens: int = Field(default=2048, ge=1)
     top_p: float | None = Field(default=None, ge=0, le=1)
     frequency_penalty: float | None = Field(default=None, ge=-2, le=2)
@@ -40,6 +41,7 @@ class LLMTaskConfig(BaseModel):
     read_timeout_seconds: float | None = Field(default=None, gt=0, le=600)
     max_retries: int | None = Field(default=None, ge=0, le=10)
     temperature: float | None = Field(default=None, ge=0, le=2)
+    omit_temperature: bool | None = None
     max_tokens: int | None = Field(default=None, ge=1)
     top_p: float | None = Field(default=None, ge=0, le=1)
     frequency_penalty: float | None = Field(default=None, ge=-2, le=2)

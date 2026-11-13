@@ -5,4 +5,4 @@ description = "Generated backend project"
 slug = "sideronostos"
 package = "sideronostos_backend"
 profile = "full"
-modules = ["database", "temporal", "jobs", "users", "rbac", "email", "auth", "storage", "ai"]
+modules = ["database", "temporal", "jobs", "users", "rbac", "email", "auth", "storage", "workspace_files", "personal_schedule", "collaboration", "ai", "field_shift"]

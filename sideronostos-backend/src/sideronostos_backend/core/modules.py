@@ -169,6 +169,26 @@ def load_modules(settings: Settings) -> tuple[ModuleSpec, ...]:
         from ..modules.collaboration.module import module as collaboration
 
         registry[collaboration.name] = collaboration
+    if "field_shift" in INSTALLED_MODULES:
+        from ..modules.field_shift.module import module as field_shift
+
+        registry[field_shift.name] = field_shift
+    if "knowledge" in INSTALLED_MODULES:
+        from ..modules.knowledge.module import module as knowledge
+
+        registry[knowledge.name] = knowledge
+    if "agri_data" in INSTALLED_MODULES:
+        from ..modules.agri_data.module import module as agri_data
+
+        registry[agri_data.name] = agri_data
+    if "rotation_optimizer" in INSTALLED_MODULES:
+        from ..modules.rotation_optimizer.module import module as rotation_optimizer
+
+        registry[rotation_optimizer.name] = rotation_optimizer
+    if "farm_assistant" in INSTALLED_MODULES:
+        from ..modules.farm_assistant.module import module as farm_assistant
+
+        registry[farm_assistant.name] = farm_assistant
     modules = resolve_modules(INSTALLED_MODULES, registry)
     validate_module_registrations(modules)
     return modules

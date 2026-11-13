@@ -1,0 +1,932 @@
+{
+  "id": "ca986abe-ba15-4766-b14c-3cd62b7f091f",
+  "title": "南田三年轮作 · 少雨暖化情景",
+  "notes": "实际播种前核对当地日历、土壤检测与收购渠道。",
+  "created_at": "2026-11-11T16:38:15.634322Z",
+  "field_id": "2722dbd6-48cf-4e2f-a08b-4986c3506edb",
+  "field_name": "南田 · 正式构建验收",
+  "option": {
+    "id": "rotation-a94ce998f0469bf9",
+    "label": "田豌豆 Field pea → 向日葵 Sunflower → 春小麦 Spring wheat",
+    "is_baseline": false,
+    "feasible": true,
+    "seasons": [
+      {
+        "year": 2027,
+        "crop_id": "pea",
+        "crop_name": "田豌豆 Field pea",
+        "family": "Fabaceae",
+        "sow_date": "2027-03-20",
+        "harvest_date": "2027-06-17",
+        "water_demand_mm": 273.83,
+        "irrigation_gap_mm": 69.6,
+        "cover_days": 90,
+        "cost_usd_ha": 320,
+        "labor_days_ha": 5
+      },
+      {
+        "year": 2028,
+        "crop_id": "sunflower",
+        "crop_name": "向日葵 Sunflower",
+        "family": "Asteraceae",
+        "sow_date": "2028-05-01",
+        "harvest_date": "2028-09-07",
+        "water_demand_mm": 521.39,
+        "irrigation_gap_mm": 137.46,
+        "cover_days": 130,
+        "cost_usd_ha": 450,
+        "labor_days_ha": 5
+      },
+      {
+        "year": 2029,
+        "crop_id": "wheat",
+        "crop_name": "春小麦 Spring wheat",
+        "family": "Poaceae",
+        "sow_date": "2029-03-15",
+        "harvest_date": "2029-07-02",
+        "water_demand_mm": 364.07,
+        "irrigation_gap_mm": 85.45,
+        "cover_days": 110,
+        "cost_usd_ha": 400,
+        "labor_days_ha": 5
+      }
+    ],
+    "metrics": {
+      "irrigation_gap_mm": 292.51,
+      "water_demand_mm": 1159.29,
+      "cover_days": 330,
+      "diversity": 3,
+      "cost_usd_ha": 1170,
+      "labor_days_ha": 15
+    },
+    "reasons": [
+      "通过现有数据可核查的配置规则；缺失历史、未知土壤和未确认地区仍需当地复核。",
+      "三年估计：灌溉缺口 292.51 mm；计划覆盖 330 天；3 个植物科；投入成本 1170 USD/ha；劳动量 15 天/ha。",
+      "在可行替代方案中，按您的权重得分最高；这是偏好排序，不是农业效益预测。",
+      "采用您的优先级：节水 4/5、覆盖 3/5、多样性 3/5、成本 2/5。仅在可行方案间按各指标范围归一化：较低灌溉缺口和成本、较高计划覆盖天数与植物科多样性得分更高。同分时使用稳定的序列排序。"
+    ],
+    "violations": [],
+    "evidence": [
+      {
+        "id": "demo-parameters",
+        "title": "Agrisata 演示假设 v1.0.0",
+        "url": null,
+        "kind": "demonstration",
+        "detail": "本配置的日历、Kc、轮作间隔、土壤适配、有效降雨、成本和劳动量都是明确披露的示例输入，尚未按确认的地区、品种或农场校准。"
+      },
+      {
+        "id": "fao56",
+        "title": "FAO 56 — crop evapotranspiration methods",
+        "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+        "kind": "rule",
+        "detail": "参考蒸散量与 ETc = Kc × ETo 的方法依据。本配置的具体作物参数为演示假设，并非 FAO 针对本地校准的建议。"
+      },
+      {
+        "id": "rotat",
+        "title": "ROTAT — rule-based crop rotation generation",
+        "url": "https://research.wur.nl/en/publications/rotat-a-tool-for-systematically-generating-crop-rotations/",
+        "kind": "rule",
+        "detail": "支持系统生成并筛选作物序列的方法思路，不代表本文献验证了演示配置中的作物或科属间隔。"
+      },
+      {
+        "id": "nasa-power-history",
+        "title": "NASA POWER 2025 年历史日值",
+        "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42.0&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+        "kind": "observation",
+        "detail": "T2M_MIN/T2M_MAX（°C）月平均；PRECTOTCORR（mm/day）按完整 UTC 月求和。来源为区域再分析。"
+      },
+      {
+        "id": "climate-reference-et",
+        "title": "FAO56：参考蒸散估算方法",
+        "url": "https://www.fao.org/4/x0490e/x0490e07.htm",
+        "kind": "estimate",
+        "detail": "月均最低/最高气温与纬度用于 Hargreaves 估算；Ra 按逐日天文辐射计算并乘 0.408。尚未按当地气候校准，不等于 NASA 实测蒸散。方法版本：monthly-hargreaves-v1"
+      },
+      {
+        "id": "farmer-constraints",
+        "title": "农户的地块信息与规划输入",
+        "url": null,
+        "kind": "farmer_input",
+        "detail": "地块 南田 · 正式构建验收；6.2 ha；土壤 壤土；灌溉可用。年度上限：300 mm、1500 USD/ha、30 天/ha。种植历史记录：2 条。"
+      },
+      {
+        "id": "scenario-water-estimate",
+        "title": "情景需水计算",
+        "url": null,
+        "kind": "estimate",
+        "detail": "月尺度 Hargreaves 参考蒸散量乘以配置中的固定 Kc；降雨按生长窗口天数分配，再乘以配置的有效降雨比例。各月正缺口相加，不考虑土壤储水跨月结转或灌溉效率。降雨情景 -10%；温度情景 +1 °C。这是情景估计，不是实测灌溉量或天气预报。"
+      }
+    ]
+  },
+  "analysis": {
+    "baseline": {
+      "id": "baseline",
+      "label": "当前种植安排",
+      "is_baseline": true,
+      "feasible": false,
+      "seasons": [
+        {
+          "year": 2027,
+          "crop_id": "maize",
+          "crop_name": "玉米 Maize",
+          "family": "Poaceae",
+          "sow_date": "2027-04-20",
+          "harvest_date": "2027-09-16",
+          "water_demand_mm": 718.43,
+          "irrigation_gap_mm": 268.76,
+          "cover_days": 150,
+          "cost_usd_ha": 850,
+          "labor_days_ha": 7
+        },
+        {
+          "year": 2028,
+          "crop_id": "maize",
+          "crop_name": "玉米 Maize",
+          "family": "Poaceae",
+          "sow_date": "2028-04-20",
+          "harvest_date": "2028-09-16",
+          "water_demand_mm": 717.54,
+          "irrigation_gap_mm": 268.25,
+          "cover_days": 150,
+          "cost_usd_ha": 850,
+          "labor_days_ha": 7
+        },
+        {
+          "year": 2029,
+          "crop_id": "maize",
+          "crop_name": "玉米 Maize",
+          "family": "Poaceae",
+          "sow_date": "2029-04-20",
+          "harvest_date": "2029-09-16",
+          "water_demand_mm": 718.43,
+          "irrigation_gap_mm": 268.76,
+          "cover_days": 150,
+          "cost_usd_ha": 850,
+          "labor_days_ha": 7
+        }
+      ],
+      "metrics": {
+        "irrigation_gap_mm": 805.77,
+        "water_demand_mm": 2154.4,
+        "cover_days": 450,
+        "diversity": 1,
+        "cost_usd_ha": 2550,
+        "labor_days_ha": 21
+      },
+      "reasons": [
+        "当前种植安排保留用于比较；违反的约束会完整列出。",
+        "三年估计：灌溉缺口 805.77 mm；计划覆盖 450 天；1 个植物科；投入成本 2550 USD/ha；劳动量 21 天/ha。"
+      ],
+      "violations": [
+        {
+          "rule_id": "crop_gap",
+          "message": "2027 年 玉米 Maize：演示规则：同一作物再次种植前需有两个完整间隔年。 此前同作物或同科记录：2026 年 玉米 Maize。"
+        },
+        {
+          "rule_id": "family_gap",
+          "message": "2027 年 玉米 Maize：演示规则：同一植物科再次种植前需有一个完整间隔年。 此前同作物或同科记录：2026 年 玉米 Maize。"
+        },
+        {
+          "rule_id": "crop_gap",
+          "message": "2028 年 玉米 Maize：演示规则：同一作物再次种植前需有两个完整间隔年。 此前同作物或同科记录：2026 年 玉米 Maize。"
+        },
+        {
+          "rule_id": "crop_gap",
+          "message": "2028 年 玉米 Maize：演示规则：同一作物再次种植前需有两个完整间隔年。 此前同作物或同科记录：2027 年 玉米 Maize。"
+        },
+        {
+          "rule_id": "family_gap",
+          "message": "2028 年 玉米 Maize：演示规则：同一植物科再次种植前需有一个完整间隔年。 此前同作物或同科记录：2027 年 玉米 Maize。"
+        },
+        {
+          "rule_id": "crop_gap",
+          "message": "2029 年 玉米 Maize：演示规则：同一作物再次种植前需有两个完整间隔年。 此前同作物或同科记录：2027 年 玉米 Maize。"
+        },
+        {
+          "rule_id": "crop_gap",
+          "message": "2029 年 玉米 Maize：演示规则：同一作物再次种植前需有两个完整间隔年。 此前同作物或同科记录：2028 年 玉米 Maize。"
+        },
+        {
+          "rule_id": "family_gap",
+          "message": "2029 年 玉米 Maize：演示规则：同一植物科再次种植前需有一个完整间隔年。 此前同作物或同科记录：2028 年 玉米 Maize。"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "demo-parameters",
+          "title": "Agrisata 演示假设 v1.0.0",
+          "url": null,
+          "kind": "demonstration",
+          "detail": "本配置的日历、Kc、轮作间隔、土壤适配、有效降雨、成本和劳动量都是明确披露的示例输入，尚未按确认的地区、品种或农场校准。"
+        },
+        {
+          "id": "fao56",
+          "title": "FAO 56 — crop evapotranspiration methods",
+          "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+          "kind": "rule",
+          "detail": "参考蒸散量与 ETc = Kc × ETo 的方法依据。本配置的具体作物参数为演示假设，并非 FAO 针对本地校准的建议。"
+        },
+        {
+          "id": "rotat",
+          "title": "ROTAT — rule-based crop rotation generation",
+          "url": "https://research.wur.nl/en/publications/rotat-a-tool-for-systematically-generating-crop-rotations/",
+          "kind": "rule",
+          "detail": "支持系统生成并筛选作物序列的方法思路，不代表本文献验证了演示配置中的作物或科属间隔。"
+        },
+        {
+          "id": "nasa-power-history",
+          "title": "NASA POWER 2025 年历史日值",
+          "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42.0&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+          "kind": "observation",
+          "detail": "T2M_MIN/T2M_MAX（°C）月平均；PRECTOTCORR（mm/day）按完整 UTC 月求和。来源为区域再分析。"
+        },
+        {
+          "id": "climate-reference-et",
+          "title": "FAO56：参考蒸散估算方法",
+          "url": "https://www.fao.org/4/x0490e/x0490e07.htm",
+          "kind": "estimate",
+          "detail": "月均最低/最高气温与纬度用于 Hargreaves 估算；Ra 按逐日天文辐射计算并乘 0.408。尚未按当地气候校准，不等于 NASA 实测蒸散。方法版本：monthly-hargreaves-v1"
+        },
+        {
+          "id": "farmer-constraints",
+          "title": "农户的地块信息与规划输入",
+          "url": null,
+          "kind": "farmer_input",
+          "detail": "地块 南田 · 正式构建验收；6.2 ha；土壤 壤土；灌溉可用。年度上限：300 mm、1500 USD/ha、30 天/ha。种植历史记录：2 条。"
+        },
+        {
+          "id": "scenario-water-estimate",
+          "title": "情景需水计算",
+          "url": null,
+          "kind": "estimate",
+          "detail": "月尺度 Hargreaves 参考蒸散量乘以配置中的固定 Kc；降雨按生长窗口天数分配，再乘以配置的有效降雨比例。各月正缺口相加，不考虑土壤储水跨月结转或灌溉效率。降雨情景 -10%；温度情景 +1 °C。这是情景估计，不是实测灌溉量或天气预报。"
+        }
+      ]
+    },
+    "alternatives": [
+      {
+        "id": "rotation-a94ce998f0469bf9",
+        "label": "田豌豆 Field pea → 向日葵 Sunflower → 春小麦 Spring wheat",
+        "is_baseline": false,
+        "feasible": true,
+        "seasons": [
+          {
+            "year": 2027,
+            "crop_id": "pea",
+            "crop_name": "田豌豆 Field pea",
+            "family": "Fabaceae",
+            "sow_date": "2027-03-20",
+            "harvest_date": "2027-06-17",
+            "water_demand_mm": 273.83,
+            "irrigation_gap_mm": 69.6,
+            "cover_days": 90,
+            "cost_usd_ha": 320,
+            "labor_days_ha": 5
+          },
+          {
+            "year": 2028,
+            "crop_id": "sunflower",
+            "crop_name": "向日葵 Sunflower",
+            "family": "Asteraceae",
+            "sow_date": "2028-05-01",
+            "harvest_date": "2028-09-07",
+            "water_demand_mm": 521.39,
+            "irrigation_gap_mm": 137.46,
+            "cover_days": 130,
+            "cost_usd_ha": 450,
+            "labor_days_ha": 5
+          },
+          {
+            "year": 2029,
+            "crop_id": "wheat",
+            "crop_name": "春小麦 Spring wheat",
+            "family": "Poaceae",
+            "sow_date": "2029-03-15",
+            "harvest_date": "2029-07-02",
+            "water_demand_mm": 364.07,
+            "irrigation_gap_mm": 85.45,
+            "cover_days": 110,
+            "cost_usd_ha": 400,
+            "labor_days_ha": 5
+          }
+        ],
+        "metrics": {
+          "irrigation_gap_mm": 292.51,
+          "water_demand_mm": 1159.29,
+          "cover_days": 330,
+          "diversity": 3,
+          "cost_usd_ha": 1170,
+          "labor_days_ha": 15
+        },
+        "reasons": [
+          "通过现有数据可核查的配置规则；缺失历史、未知土壤和未确认地区仍需当地复核。",
+          "三年估计：灌溉缺口 292.51 mm；计划覆盖 330 天；3 个植物科；投入成本 1170 USD/ha；劳动量 15 天/ha。",
+          "在可行替代方案中，按您的权重得分最高；这是偏好排序，不是农业效益预测。",
+          "采用您的优先级：节水 4/5、覆盖 3/5、多样性 3/5、成本 2/5。仅在可行方案间按各指标范围归一化：较低灌溉缺口和成本、较高计划覆盖天数与植物科多样性得分更高。同分时使用稳定的序列排序。"
+        ],
+        "violations": [],
+        "evidence": [
+          {
+            "id": "demo-parameters",
+            "title": "Agrisata 演示假设 v1.0.0",
+            "url": null,
+            "kind": "demonstration",
+            "detail": "本配置的日历、Kc、轮作间隔、土壤适配、有效降雨、成本和劳动量都是明确披露的示例输入，尚未按确认的地区、品种或农场校准。"
+          },
+          {
+            "id": "fao56",
+            "title": "FAO 56 — crop evapotranspiration methods",
+            "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+            "kind": "rule",
+            "detail": "参考蒸散量与 ETc = Kc × ETo 的方法依据。本配置的具体作物参数为演示假设，并非 FAO 针对本地校准的建议。"
+          },
+          {
+            "id": "rotat",
+            "title": "ROTAT — rule-based crop rotation generation",
+            "url": "https://research.wur.nl/en/publications/rotat-a-tool-for-systematically-generating-crop-rotations/",
+            "kind": "rule",
+            "detail": "支持系统生成并筛选作物序列的方法思路，不代表本文献验证了演示配置中的作物或科属间隔。"
+          },
+          {
+            "id": "nasa-power-history",
+            "title": "NASA POWER 2025 年历史日值",
+            "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42.0&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+            "kind": "observation",
+            "detail": "T2M_MIN/T2M_MAX（°C）月平均；PRECTOTCORR（mm/day）按完整 UTC 月求和。来源为区域再分析。"
+          },
+          {
+            "id": "climate-reference-et",
+            "title": "FAO56：参考蒸散估算方法",
+            "url": "https://www.fao.org/4/x0490e/x0490e07.htm",
+            "kind": "estimate",
+            "detail": "月均最低/最高气温与纬度用于 Hargreaves 估算；Ra 按逐日天文辐射计算并乘 0.408。尚未按当地气候校准，不等于 NASA 实测蒸散。方法版本：monthly-hargreaves-v1"
+          },
+          {
+            "id": "farmer-constraints",
+            "title": "农户的地块信息与规划输入",
+            "url": null,
+            "kind": "farmer_input",
+            "detail": "地块 南田 · 正式构建验收；6.2 ha；土壤 壤土；灌溉可用。年度上限：300 mm、1500 USD/ha、30 天/ha。种植历史记录：2 条。"
+          },
+          {
+            "id": "scenario-water-estimate",
+            "title": "情景需水计算",
+            "url": null,
+            "kind": "estimate",
+            "detail": "月尺度 Hargreaves 参考蒸散量乘以配置中的固定 Kc；降雨按生长窗口天数分配，再乘以配置的有效降雨比例。各月正缺口相加，不考虑土壤储水跨月结转或灌溉效率。降雨情景 -10%；温度情景 +1 °C。这是情景估计，不是实测灌溉量或天气预报。"
+          }
+        ]
+      },
+      {
+        "id": "rotation-386b1d155df1bc08",
+        "label": "向日葵 Sunflower → 大豆 Soybean → 春小麦 Spring wheat",
+        "is_baseline": false,
+        "feasible": true,
+        "seasons": [
+          {
+            "year": 2027,
+            "crop_id": "sunflower",
+            "crop_name": "向日葵 Sunflower",
+            "family": "Asteraceae",
+            "sow_date": "2027-05-01",
+            "harvest_date": "2027-09-07",
+            "water_demand_mm": 522.07,
+            "irrigation_gap_mm": 137.88,
+            "cover_days": 130,
+            "cost_usd_ha": 450,
+            "labor_days_ha": 5
+          },
+          {
+            "year": 2028,
+            "crop_id": "soybean",
+            "crop_name": "大豆 Soybean",
+            "family": "Fabaceae",
+            "sow_date": "2028-05-10",
+            "harvest_date": "2028-09-26",
+            "water_demand_mm": 575.28,
+            "irrigation_gap_mm": 178.66,
+            "cover_days": 140,
+            "cost_usd_ha": 550,
+            "labor_days_ha": 6
+          },
+          {
+            "year": 2029,
+            "crop_id": "wheat",
+            "crop_name": "春小麦 Spring wheat",
+            "family": "Poaceae",
+            "sow_date": "2029-03-15",
+            "harvest_date": "2029-07-02",
+            "water_demand_mm": 364.07,
+            "irrigation_gap_mm": 85.45,
+            "cover_days": 110,
+            "cost_usd_ha": 400,
+            "labor_days_ha": 5
+          }
+        ],
+        "metrics": {
+          "irrigation_gap_mm": 401.99,
+          "water_demand_mm": 1461.42,
+          "cover_days": 380,
+          "diversity": 3,
+          "cost_usd_ha": 1400,
+          "labor_days_ha": 16
+        },
+        "reasons": [
+          "通过现有数据可核查的配置规则；缺失历史、未知土壤和未确认地区仍需当地复核。",
+          "三年估计：灌溉缺口 401.99 mm；计划覆盖 380 天；3 个植物科；投入成本 1400 USD/ha；劳动量 16 天/ha。",
+          "为展示不同取舍，选择了作物组合及汇总指标均不同的最高分可行方案；因此展示的是两种代表性选择，而非简单取总分前两名。",
+          "采用您的优先级：节水 4/5、覆盖 3/5、多样性 3/5、成本 2/5。仅在可行方案间按各指标范围归一化：较低灌溉缺口和成本、较高计划覆盖天数与植物科多样性得分更高。同分时使用稳定的序列排序。"
+        ],
+        "violations": [],
+        "evidence": [
+          {
+            "id": "demo-parameters",
+            "title": "Agrisata 演示假设 v1.0.0",
+            "url": null,
+            "kind": "demonstration",
+            "detail": "本配置的日历、Kc、轮作间隔、土壤适配、有效降雨、成本和劳动量都是明确披露的示例输入，尚未按确认的地区、品种或农场校准。"
+          },
+          {
+            "id": "fao56",
+            "title": "FAO 56 — crop evapotranspiration methods",
+            "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+            "kind": "rule",
+            "detail": "参考蒸散量与 ETc = Kc × ETo 的方法依据。本配置的具体作物参数为演示假设，并非 FAO 针对本地校准的建议。"
+          },
+          {
+            "id": "rotat",
+            "title": "ROTAT — rule-based crop rotation generation",
+            "url": "https://research.wur.nl/en/publications/rotat-a-tool-for-systematically-generating-crop-rotations/",
+            "kind": "rule",
+            "detail": "支持系统生成并筛选作物序列的方法思路，不代表本文献验证了演示配置中的作物或科属间隔。"
+          },
+          {
+            "id": "nasa-power-history",
+            "title": "NASA POWER 2025 年历史日值",
+            "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42.0&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+            "kind": "observation",
+            "detail": "T2M_MIN/T2M_MAX（°C）月平均；PRECTOTCORR（mm/day）按完整 UTC 月求和。来源为区域再分析。"
+          },
+          {
+            "id": "climate-reference-et",
+            "title": "FAO56：参考蒸散估算方法",
+            "url": "https://www.fao.org/4/x0490e/x0490e07.htm",
+            "kind": "estimate",
+            "detail": "月均最低/最高气温与纬度用于 Hargreaves 估算；Ra 按逐日天文辐射计算并乘 0.408。尚未按当地气候校准，不等于 NASA 实测蒸散。方法版本：monthly-hargreaves-v1"
+          },
+          {
+            "id": "farmer-constraints",
+            "title": "农户的地块信息与规划输入",
+            "url": null,
+            "kind": "farmer_input",
+            "detail": "地块 南田 · 正式构建验收；6.2 ha；土壤 壤土；灌溉可用。年度上限：300 mm、1500 USD/ha、30 天/ha。种植历史记录：2 条。"
+          },
+          {
+            "id": "scenario-water-estimate",
+            "title": "情景需水计算",
+            "url": null,
+            "kind": "estimate",
+            "detail": "月尺度 Hargreaves 参考蒸散量乘以配置中的固定 Kc；降雨按生长窗口天数分配，再乘以配置的有效降雨比例。各月正缺口相加，不考虑土壤储水跨月结转或灌溉效率。降雨情景 -10%；温度情景 +1 °C。这是情景估计，不是实测灌溉量或天气预报。"
+          }
+        ]
+      }
+    ],
+    "feasible_count": 37,
+    "rejected_count": 179,
+    "rejection_summary": [
+      {
+        "rule_id": "crop_gap",
+        "message": "演示规则：同一作物再次种植前需有两个完整间隔年。",
+        "count": 152
+      },
+      {
+        "rule_id": "family_gap",
+        "message": "演示规则：同一植物科再次种植前需有一个完整间隔年。",
+        "count": 138
+      }
+    ],
+    "limitations": [
+      "2025 年历史参考数据，只代表该年；不是未来天气预报，也不是多年气候常值。",
+      "NASA POWER 气象数据来自区域再分析，约 0.5° × 0.625°，不能代表田块内的土壤或微气候实测。",
+      "参考蒸散由月均温度近似估算，尚未当地校准；不包含土壤蓄水、径流、灌溉效率或作物逐阶段系数。",
+      "未接入田块土壤检测、卫星植被时序或实际产量记录。",
+      "所有播种日历、固定作物系数 Kc、投入成本与劳动量均为演示假设，未经当地校准，不是田间测量或具体种植建议。",
+      "每年安排一季春播主作物；暂未模拟冬作、间作、覆盖作物或年内多季接茬。",
+      "演示规则：同一作物再次种植前需间隔两年，同一植物科需间隔一年。这些保守示例规则必须经当地农艺人员核查。",
+      "参考蒸散量采用月尺度 Hargreaves 估计，作物需水量使用固定 Kc；生长窗口内降雨的 80% 被假设为有效降雨。",
+      "灌溉缺口为每月“需水量减有效降雨”的正值之和；未模拟土壤储水、径流、渗漏、灌溉效率或不同生育阶段的响应。",
+      "生长期天数仅代表计划覆盖天数，不等于实测冠层覆盖率，也不是土壤健康、土壤碳、产量或利润的估计。",
+      "资源上限逐年检查；比较指标汇总同一三年周期，成本按 USD/ha、劳动按天/ha 表示。美元仅为演示货币。",
+      "各规划年重复使用同一历史参考年的气候；降雨和温度调整是假设情景，不是天气预报。",
+      "尚未验证当地作物适宜性，也未模拟霜冻、作物温度阈值、具体病虫害或产量。“可行”仅指通过已有数据支持的配置规则，不能替代当地判断。"
+    ],
+    "elapsed_ms": 6.29,
+    "id": "50a3fea9-3b8a-41f1-a206-f7732b755962",
+    "field_id": "2722dbd6-48cf-4e2f-a08b-4986c3506edb",
+    "field_version": 1,
+    "created_at": "2026-11-11T16:36:19.904649Z",
+    "profile": {
+      "id": "temperate-demo",
+      "name": "温带一年生作物 · 演示配置",
+      "version": "1.0.0",
+      "is_demo": true
+    },
+    "profile_snapshot": {
+      "id": "temperate-demo",
+      "name": "温带一年生作物 · 演示配置",
+      "version": "1.0.0",
+      "is_demo": true,
+      "description": "三年、每年一季主作物的可配置演示。试点地区与品种尚未确认，结果只说明已配置规则下的可行性。",
+      "assumptions": [
+        "所有播种日历、固定作物系数 Kc、投入成本与劳动量均为演示假设，未经当地校准，不是田间测量或具体种植建议。",
+        "每年安排一季春播主作物；暂未模拟冬作、间作、覆盖作物或年内多季接茬。",
+        "演示规则：同一作物再次种植前需间隔两年，同一植物科需间隔一年。这些保守示例规则必须经当地农艺人员核查。",
+        "参考蒸散量采用月尺度 Hargreaves 估计，作物需水量使用固定 Kc；生长窗口内降雨的 80% 被假设为有效降雨。",
+        "灌溉缺口为每月“需水量减有效降雨”的正值之和；未模拟土壤储水、径流、渗漏、灌溉效率或不同生育阶段的响应。",
+        "生长期天数仅代表计划覆盖天数，不等于实测冠层覆盖率，也不是土壤健康、土壤碳、产量或利润的估计。",
+        "资源上限逐年检查；比较指标汇总同一三年周期，成本按 USD/ha、劳动按天/ha 表示。美元仅为演示货币。",
+        "各规划年重复使用同一历史参考年的气候；降雨和温度调整是假设情景，不是天气预报。",
+        "尚未验证当地作物适宜性，也未模拟霜冻、作物温度阈值、具体病虫害或产量。“可行”仅指通过已有数据支持的配置规则，不能替代当地判断。"
+      ],
+      "crops": [
+        {
+          "id": "maize",
+          "name": "玉米 Maize",
+          "family": "Poaceae",
+          "sow_month": 4,
+          "sow_day": 20,
+          "duration_days": 150,
+          "kc": 1.05,
+          "estimated_cost_usd_ha": 850,
+          "estimated_labor_days_ha": 7,
+          "allowed_soils": [
+            "sand",
+            "loam",
+            "clay"
+          ],
+          "source_ids": [
+            "demo-parameters",
+            "fao56"
+          ]
+        },
+        {
+          "id": "soybean",
+          "name": "大豆 Soybean",
+          "family": "Fabaceae",
+          "sow_month": 5,
+          "sow_day": 10,
+          "duration_days": 140,
+          "kc": 0.9,
+          "estimated_cost_usd_ha": 550,
+          "estimated_labor_days_ha": 6,
+          "allowed_soils": [
+            "loam",
+            "clay"
+          ],
+          "source_ids": [
+            "demo-parameters",
+            "fao56"
+          ]
+        },
+        {
+          "id": "wheat",
+          "name": "春小麦 Spring wheat",
+          "family": "Poaceae",
+          "sow_month": 3,
+          "sow_day": 15,
+          "duration_days": 110,
+          "kc": 0.8,
+          "estimated_cost_usd_ha": 400,
+          "estimated_labor_days_ha": 5,
+          "allowed_soils": [
+            "sand",
+            "loam",
+            "clay"
+          ],
+          "source_ids": [
+            "demo-parameters",
+            "fao56"
+          ]
+        },
+        {
+          "id": "sunflower",
+          "name": "向日葵 Sunflower",
+          "family": "Asteraceae",
+          "sow_month": 5,
+          "sow_day": 1,
+          "duration_days": 130,
+          "kc": 0.85,
+          "estimated_cost_usd_ha": 450,
+          "estimated_labor_days_ha": 5,
+          "allowed_soils": [
+            "sand",
+            "loam",
+            "clay"
+          ],
+          "source_ids": [
+            "demo-parameters",
+            "fao56"
+          ]
+        },
+        {
+          "id": "pea",
+          "name": "田豌豆 Field pea",
+          "family": "Fabaceae",
+          "sow_month": 3,
+          "sow_day": 20,
+          "duration_days": 90,
+          "kc": 0.75,
+          "estimated_cost_usd_ha": 320,
+          "estimated_labor_days_ha": 5,
+          "allowed_soils": [
+            "loam",
+            "clay"
+          ],
+          "source_ids": [
+            "demo-parameters",
+            "fao56"
+          ]
+        },
+        {
+          "id": "potato",
+          "name": "马铃薯 Potato",
+          "family": "Solanaceae",
+          "sow_month": 4,
+          "sow_day": 15,
+          "duration_days": 120,
+          "kc": 1,
+          "estimated_cost_usd_ha": 1500,
+          "estimated_labor_days_ha": 18,
+          "allowed_soils": [
+            "sand",
+            "loam"
+          ],
+          "source_ids": [
+            "demo-parameters",
+            "fao56"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "crop_gap",
+          "name": "作物轮作间隔",
+          "description": "演示规则：同一作物再次种植前需有两个完整间隔年。",
+          "kind": "crop_gap",
+          "parameters": {
+            "intervening_years": 2
+          }
+        },
+        {
+          "id": "family_gap",
+          "name": "同科作物间隔",
+          "description": "演示规则：同一植物科再次种植前需有一个完整间隔年。",
+          "kind": "family_gap",
+          "parameters": {
+            "intervening_years": 1
+          }
+        },
+        {
+          "id": "annual_calendar",
+          "name": "每年一季主作物",
+          "description": "播种至收获的完整生长窗口必须落在同一规划年内。",
+          "kind": "annual_calendar",
+          "parameters": {}
+        },
+        {
+          "id": "soil_compatibility",
+          "name": "配置中的土壤适配",
+          "description": "已知土壤质地按作物允许列表核查；未知质地单独列为信息缺口。",
+          "kind": "soil_compatibility",
+          "parameters": {}
+        },
+        {
+          "id": "water_model",
+          "name": "有效降雨假设",
+          "description": "演示：80% 的生长季降雨视为有效，每月正的需水缺口相加形成灌溉缺口估计。",
+          "kind": "water_model",
+          "parameters": {
+            "effective_rainfall_fraction": 0.8
+          }
+        }
+      ],
+      "sources": [
+        {
+          "id": "demo-parameters",
+          "title": "Agrisata 演示假设 v1.0.0",
+          "url": null,
+          "kind": "demonstration",
+          "detail": "本配置的日历、Kc、轮作间隔、土壤适配、有效降雨、成本和劳动量都是明确披露的示例输入，尚未按确认的地区、品种或农场校准。"
+        },
+        {
+          "id": "fao56",
+          "title": "FAO 56 — crop evapotranspiration methods",
+          "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+          "kind": "rule",
+          "detail": "参考蒸散量与 ETc = Kc × ETo 的方法依据。本配置的具体作物参数为演示假设，并非 FAO 针对本地校准的建议。"
+        },
+        {
+          "id": "rotat",
+          "title": "ROTAT — rule-based crop rotation generation",
+          "url": "https://research.wur.nl/en/publications/rotat-a-tool-for-systematically-generating-crop-rotations/",
+          "kind": "rule",
+          "detail": "支持系统生成并筛选作物序列的方法思路，不代表本文献验证了演示配置中的作物或科属间隔。"
+        }
+      ]
+    },
+    "inputs": {
+      "start_year": 2027,
+      "baseline_crop_ids": [
+        "maize",
+        "maize",
+        "maize"
+      ],
+      "allowed_crop_ids": [
+        "maize",
+        "soybean",
+        "wheat",
+        "sunflower",
+        "pea",
+        "potato"
+      ],
+      "max_irrigation_mm": 300,
+      "max_cost_usd_ha": 1500,
+      "max_labor_days_ha": 30,
+      "weights": {
+        "water": 4,
+        "cover": 3,
+        "diversity": 3,
+        "cost": 2
+      },
+      "scenario": {
+        "rainfall_change_pct": -10,
+        "temperature_change_c": 1
+      },
+      "accept_demo_assumptions": true
+    },
+    "environment": {
+      "status": "cached",
+      "source_name": "NASA POWER · 历史气象",
+      "source_url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42.0&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+      "reference_year": 2025,
+      "fetched_at": "2026-11-11T16:34:37.180797Z",
+      "spatial_resolution": "气象再分析约 0.5° × 0.625°（非田块分辨率）",
+      "months": [
+        {
+          "month": 1,
+          "rainfall_mm": 6.97,
+          "tmin_c": -11.817,
+          "tmax_c": -1.533,
+          "reference_et_mm": 14.598,
+          "valid_days": 31,
+          "expected_days": 31
+        },
+        {
+          "month": 2,
+          "rainfall_mm": 10.05,
+          "tmin_c": -9.334,
+          "tmax_c": 0.874,
+          "reference_et_mm": 21.866,
+          "valid_days": 28,
+          "expected_days": 28
+        },
+        {
+          "month": 3,
+          "rainfall_mm": 66.68,
+          "tmin_c": 0.132,
+          "tmax_c": 14.302,
+          "reference_et_mm": 72.786,
+          "valid_days": 31,
+          "expected_days": 31
+        },
+        {
+          "month": 4,
+          "rainfall_mm": 89.73,
+          "tmin_c": 4.551,
+          "tmax_c": 17.371,
+          "reference_et_mm": 98.963,
+          "valid_days": 30,
+          "expected_days": 30
+        },
+        {
+          "month": 5,
+          "rainfall_mm": 75.73,
+          "tmin_c": 9.824,
+          "tmax_c": 22.707,
+          "reference_et_mm": 140.591,
+          "valid_days": 31,
+          "expected_days": 31
+        },
+        {
+          "month": 6,
+          "rainfall_mm": 187.43,
+          "tmin_c": 18.033,
+          "tmax_c": 28.142,
+          "reference_et_mm": 152.756,
+          "valid_days": 30,
+          "expected_days": 30
+        },
+        {
+          "month": 7,
+          "rainfall_mm": 236.09,
+          "tmin_c": 20.257,
+          "tmax_c": 29.307,
+          "reference_et_mm": 150.955,
+          "valid_days": 31,
+          "expected_days": 31
+        },
+        {
+          "month": 8,
+          "rainfall_mm": 81.04,
+          "tmin_c": 17.286,
+          "tmax_c": 26.973,
+          "reference_et_mm": 129.981,
+          "valid_days": 31,
+          "expected_days": 31
+        },
+        {
+          "month": 9,
+          "rainfall_mm": 41.51,
+          "tmin_c": 14.585,
+          "tmax_c": 26.09,
+          "reference_et_mm": 105.473,
+          "valid_days": 30,
+          "expected_days": 30
+        },
+        {
+          "month": 10,
+          "rainfall_mm": 59.09,
+          "tmin_c": 8.868,
+          "tmax_c": 20.458,
+          "reference_et_mm": 68.2,
+          "valid_days": 31,
+          "expected_days": 31
+        },
+        {
+          "month": 11,
+          "rainfall_mm": 39,
+          "tmin_c": 0.463,
+          "tmax_c": 10.244,
+          "reference_et_mm": 30.801,
+          "valid_days": 30,
+          "expected_days": 30
+        },
+        {
+          "month": 12,
+          "rainfall_mm": 20.78,
+          "tmin_c": -8.722,
+          "tmax_c": 0.854,
+          "reference_et_mm": 15.606,
+          "valid_days": 31,
+          "expected_days": 31
+        }
+      ],
+      "limitations": [
+        "2025 年历史参考数据，只代表该年；不是未来天气预报，也不是多年气候常值。",
+        "NASA POWER 气象数据来自区域再分析，约 0.5° × 0.625°，不能代表田块内的土壤或微气候实测。",
+        "参考蒸散由月均温度近似估算，尚未当地校准；不包含土壤蓄水、径流、灌溉效率或作物逐阶段系数。",
+        "未接入田块土壤检测、卫星植被时序或实际产量记录。"
+      ],
+      "evidence": [
+        {
+          "id": "nasa-power-history",
+          "title": "NASA POWER 2025 年历史日值",
+          "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42.0&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+          "kind": "observation",
+          "detail": "T2M_MIN/T2M_MAX（°C）月平均；PRECTOTCORR（mm/day）按完整 UTC 月求和。来源为区域再分析。"
+        },
+        {
+          "id": "climate-reference-et",
+          "title": "FAO56：参考蒸散估算方法",
+          "url": "https://www.fao.org/4/x0490e/x0490e07.htm",
+          "kind": "estimate",
+          "detail": "月均最低/最高气温与纬度用于 Hargreaves 估算；Ra 按逐日天文辐射计算并乘 0.408。尚未按当地气候校准，不等于 NASA 实测蒸散。方法版本：monthly-hargreaves-v1"
+        }
+      ],
+      "fingerprint": "d38771ca1af74742abb49acb52e5e4392097e009f1bc00794279d100f0035a12"
+    }
+  },
+  "field_snapshot": {
+    "name": "南田 · 正式构建验收",
+    "area_ha": 6.2,
+    "latitude": 42,
+    "longitude": -93.5,
+    "soil_texture": "loam",
+    "irrigation_available": true,
+    "profile_id": "temperate-demo",
+    "history": [
+      {
+        "year": 2025,
+        "crop_id": "soybean"
+      },
+      {
+        "year": 2026,
+        "crop_id": "maize"
+      }
+    ],
+    "id": "2722dbd6-48cf-4e2f-a08b-4986c3506edb",
+    "version": 1,
+    "created_at": "2026-11-11T16:34:36.074565Z",
+    "updated_at": "2026-11-11T16:34:36.074566Z"
+  }
+}

@@ -1,3 +1,34 @@
 .DS_Store
 .idea/
-docs/
+docs/*
+!docs/NASA-datasets-and-APIs.md
+!docs/Problem.md
+!docs/data-source-selection.md
+!docs/reference/
+docs/reference/*
+!docs/reference/farmhawk-system-analysis.md
+
+# NASA sample source files remain local; rendered previews and scripts are tracked.
+data/sample/*/raw/
+
+.playwright-cli/
+
+# Local scientific raw files and immutable generated releases.
+/data/*
+/output/evidence/rotation-v2/eval-*.json
+!/output/evidence/rotation-v2/eval-*-review.json
+/output/evidence/rotation-v2/rag-smoke*.json
+/output/playwright/rotation-*.webm
+/output/evidence/rotation-v2/
+/output/playwright/rotation-*
+/output/playwright/coordinate-submit-debug.png
+/output/pdf/rotation-*
+
+# Keep selected local NASA previews and visualization sources tracked.
+!/data/overall/
+!/data/overall/**
+!/data/sample/
+!/data/sample/**/
+!/data/sample/**/visualization/
+!/data/sample/**/visualization/**
+/data/sample/*/raw/

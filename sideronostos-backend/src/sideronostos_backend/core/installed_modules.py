@@ -11,4 +11,9 @@ INSTALLED_MODULES = (
     "personal_schedule",
     "collaboration",
     "ai",
+    "field_shift",
+    "knowledge",
+    "agri_data",
+    "rotation_optimizer",
+    "farm_assistant",
 )

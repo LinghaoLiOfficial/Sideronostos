@@ -46,3 +46,24 @@ check:
 	uv run python -m pytest
 smoke:
 	uv run python -m sideronostos_backend.dev smoke
+
+# Rotation v2: explicit offline preparation and read-only verification.
+# See ../ROTATION_V2.md. ARGS are the underlying CLI arguments.
+.PHONY: prepare-knowledge prepare-data eval-assistant check-optimizer check-rotation
+prepare-knowledge:
+	uv run python -m sideronostos_backend.modules.knowledge.cli $(ARGS)
+prepare-data:
+	uv run python -m sideronostos_backend.modules.agri_data.cli $(ARGS)
+eval-assistant:
+	uv run python -m sideronostos_backend.modules.farm_assistant.evaluation.run $(ARGS)
+check-optimizer:
+	uv run pytest -q tests/test_rotation_candidates.py tests/test_rotation_milp.py tests/test_rotation_profiles.py tests/test_rotation_requests.py
+check-rotation:
+	uv run ruff check src/sideronostos_backend/modules/knowledge src/sideronostos_backend/modules/agri_data src/sideronostos_backend/modules/rotation_optimizer src/sideronostos_backend/modules/farm_assistant
+	uv run mypy src/sideronostos_backend/modules/knowledge src/sideronostos_backend/modules/agri_data src/sideronostos_backend/modules/rotation_optimizer src/sideronostos_backend/modules/farm_assistant
+	uv run pytest -q
+
+# Reads archived files only; never calls a model, embeddings or the database.
+.PHONY: replay-assistant
+replay-assistant:
+	.venv/bin/python -m sideronostos_backend.modules.farm_assistant.evaluation.replay $(ARGS)
