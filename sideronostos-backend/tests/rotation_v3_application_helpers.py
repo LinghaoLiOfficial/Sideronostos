@@ -73,6 +73,8 @@ def draft():
                     "salinity_ds_m": record(0.5, "dS/m"),
                     "drainage": record("well", "category"),
                     "slope_deg": record(2.0, "degree"),
+                    "aspect": record("flat", "category"),
+                    "terrain_position": record("level", "category"),
                     "mechanical_access": record(True),
                     "effective_rain_fraction": record(0.8),
                     "history_reviewed": record(True),

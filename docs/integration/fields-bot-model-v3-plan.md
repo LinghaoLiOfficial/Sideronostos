@@ -252,3 +252,33 @@ Remaining: candidate compilation and independent coefficient verification, v3 jo
 submission/execution/publication, planner/results/bot/knowledge integration, immutable
 saved-plan journey, raster parity, full UI/AI evaluation and final requirement audit.
 The available readiness API does not itself generate a v3 solution. Overall goal ACTIVE.
+
+
+## Checkpoint 5 — complete frozen v3 backend path (2026-11-14)
+
+Implemented candidate/site/history filtering, sourced growth/economic/soil/risk coefficients,
+actual-day machine operations and farm resource expansion. Baseline dates are retained even
+off the regular sample grid. Limits fail explicitly. A separate source-to-coefficient audit
+checks traces, provenance identity, resource conversions and coefficients before Gurobi.
+
+`POST /rotation-optimizer/v3/runs` now uses the existing idempotent task service, frozen
+inputs, cancellation, retry and publication controls. The worker dispatches by snapshot
+version. Baselines and distinct alternatives are independently checked; all enabled metric
+preferences are explored within a shared budget and primary gap ceiling. Diagnostics retain
+remedies; optional unknown metrics stay null. Saved v3 plans and comparisons preserve actual
+weights and immutable evidence; v2 remains supported. No database migration was needed.
+
+Fresh verification: **530 backend tests passed, 0 skipped**, dedicated disposable test DB;
+5 pre-existing PDF/SWIG warnings. Scoped Ruff passed and mypy passed 22 source files. Real
+PostgreSQL tests include concurrent idempotency, frozen-field mutation isolation, actual job
+execution, save/reopen, six-metric comparison, account guards and null optional deltas.
+
+`output/evidence/fields-bot-v3/v3-real-weather-execution.json` contains the complete frozen
+engineering input and actual Gurobi result using the public 365-day NASA POWER release:
+6 candidates, 2 distinct zero-gap alternatives (requested priorities and soil emphasis),
+verified coefficients and schedules. All operating values are explicit engineering
+assumptions; this is an offline proof, not an actual farm recommendation or a UI journey.
+
+Remaining: frontend v3 contracts/forms/readiness/results/history, bot/knowledge/evaluation,
+prepared-raster parity, active Temporal/browser farmer journey, account/race/retry/restart
+acceptance, final audit and real-region calibration checklist. Overall goal remains ACTIVE.

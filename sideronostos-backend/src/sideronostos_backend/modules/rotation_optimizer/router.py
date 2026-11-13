@@ -11,6 +11,7 @@ from .requests import RunRequest
 from .schemas import Contract
 from .service import RotationService
 from .v3.inputs import PlanningDraft
+from .v3.inputs import RunRequest as DailyRunRequest
 from .v3.profiles import list_profiles as list_v3_profiles
 from .v3.service import readiness as v3_readiness
 
@@ -53,6 +54,18 @@ async def daily_readiness(
     if workspace_owner is not None and workspace_owner != user.id:
         raise HTTPException(409, "Workspace account changed; reload the current account")
     return await v3_readiness(session, user.id, body)
+
+
+@router.post("/v3/runs", status_code=202)
+async def create_daily(
+    body: DailyRunRequest,
+    user: User,
+    session: Session,
+    workspace_owner: Annotated[str | None, Header(alias="X-Workspace-Owner")] = None,
+) -> dict[str, Any]:
+    if workspace_owner is not None and workspace_owner != user.id:
+        raise HTTPException(409, "Workspace account changed; reload the current account")
+    return await RotationService().create_run(session, user.id, body)
 
 
 @router.post("/runs", status_code=202)
@@ -106,6 +119,10 @@ async def plan(plan_id: str, user: User, session: Session) -> dict[str, Any]:
 async def compare(body: CompareRequest, user: User, session: Session) -> dict[str, Any]:
     a = await RotationService().get_run(session, user.id, body.first_run_id)
     b = await RotationService().get_run(session, user.id, body.second_run_id)
+    version_a = a["request"].get("model_version", "rotation-milp-v2.0")
+    version_b = b["request"].get("model_version", "rotation-milp-v2.0")
+    if version_a != version_b:
+        raise HTTPException(422, "Compare results from the same model version")
     if a["id"] == b["id"]:
         raise HTTPException(422, "Select two different completed runs")
 
@@ -116,6 +133,7 @@ async def compare(body: CompareRequest, user: User, session: Session) -> dict[st
         field_identity(a) != field_identity(b)
         or any(a["request"][k] != b["request"][k] for k in ("start", "end", "profile_id"))
         or a["provenance"]["weather_sha256"] != b["provenance"]["weather_sha256"]
+        or a["provenance"].get("profile_sha256") != b["provenance"].get("profile_sha256")
     ):
         raise HTTPException(
             422, "Runs need matching field versions, horizon, profile and weather release"
@@ -132,19 +150,36 @@ async def compare(body: CompareRequest, user: User, session: Session) -> dict[st
         if option is None or not option.get("complete", True):
             raise HTTPException(422, "Select a complete calculated option in each run")
         choices.append(option)
-    before, after = [o["verification"]["totals"] for o in choices]
+    daily = version_a == "rotation-milp-v3.0"
+    before, after = [o["verification"]["metrics" if daily else "totals"] for o in choices]
+    definitions = [
+        o.get("objective_definition", run["result"].get("objective_definition", {}))
+        for o, run in zip(choices, (a, b), strict=True)
+    ]
+    weights = [
+        definition.get("weights", run["request"]["weights"])
+        for definition, run in zip(definitions, (a, b), strict=True)
+    ]
+    scale_key = "scales" if daily else "references"
+
     return {
         "first_run_id": a["id"],
         "second_run_id": b["id"],
         "first_option_id": body.first_option_id,
         "second_option_id": body.second_option_id,
-        "delta": {k: after[k] - before[k] for k in before},
+        "delta": {
+            k: after[k] - before[k] if before[k] is not None and after[k] is not None else None
+            for k in before
+        },
+        "unavailable_metrics": [k for k in before if before[k] is None or after[k] is None],
+        "model_version": version_a,
         "input_changes": {
             k: {"before": a["request"][k], "after": b["request"][k]}
             for k in a["request"]
             if k != "idempotency_key" and a["request"][k] != b["request"][k]
         },
-        "score_comparable": a["request"]["weights"] == b["request"]["weights"],
+        "score_comparable": weights[0] == weights[1]
+        and definitions[0].get(scale_key) == definitions[1].get(scale_key),
         "interpretation": (
             "second minus first; estimates under their respective scenarios, not measured outcomes"
         ),

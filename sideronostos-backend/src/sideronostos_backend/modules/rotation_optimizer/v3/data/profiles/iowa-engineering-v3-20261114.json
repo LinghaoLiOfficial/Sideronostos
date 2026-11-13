@@ -62,7 +62,23 @@
           "moderate",
           "well"
         ],
-        "max_slope_deg": 12.0
+        "max_slope_deg": 12.0,
+        "allowed_textures": [
+          "sand",
+          "loam",
+          "clay"
+        ],
+        "allowed_aspects": [
+          "flat",
+          "north",
+          "east",
+          "south",
+          "west"
+        ],
+        "allowed_terrain_positions": [
+          "level",
+          "slope"
+        ]
       },
       "climate": {
         "heat_c": 35.0,
@@ -163,7 +179,23 @@
           "moderate",
           "well"
         ],
-        "max_slope_deg": 12.0
+        "max_slope_deg": 12.0,
+        "allowed_textures": [
+          "sand",
+          "loam",
+          "clay"
+        ],
+        "allowed_aspects": [
+          "flat",
+          "north",
+          "east",
+          "south",
+          "west"
+        ],
+        "allowed_terrain_positions": [
+          "level",
+          "slope"
+        ]
       },
       "climate": {
         "heat_c": 35.0,
@@ -264,7 +296,23 @@
           "moderate",
           "well"
         ],
-        "max_slope_deg": 12.0
+        "max_slope_deg": 12.0,
+        "allowed_textures": [
+          "sand",
+          "loam",
+          "clay"
+        ],
+        "allowed_aspects": [
+          "flat",
+          "north",
+          "east",
+          "south",
+          "west"
+        ],
+        "allowed_terrain_positions": [
+          "level",
+          "slope"
+        ]
       },
       "climate": {
         "heat_c": 35.0,
@@ -467,7 +515,8 @@
     "Soil scores describe assumed crop contributions, not measured carbon, nitrogen or soil health.",
     "Capacities, farm soil measurements, history, baseline and permission to use engineering assumptions must be supplied explicitly.",
     "Fixed positive scales are declared management reference values for engineering comparison, not computed single-objective optima.",
-    "UTC daily weather aggregates are explicitly used as local-date proxies in this engineering benchmark; accurate local agricultural days require hourly reaggregation or a validated local-day release."
+    "UTC daily weather aggregates are explicitly used as local-date proxies in this engineering benchmark; accurate local agricultural days require hourly reaggregation or a validated local-day release.",
+    "Terrain screening uses declared slope/aspect/position and mechanical access. Depressions are excluded by this uncalibrated benchmark rule; no DEM or drainage observation is inferred."
   ],
   "weather_day_policy": "utc_daily_proxy_v1"
 }

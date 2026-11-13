@@ -1,12 +1,12 @@
 # Daily v3 data preparation contract
 
-Status at checkpoint 4: **profile and data-preflight API implemented**. Candidate
-preparation, task dispatch, planner/results and bot integration are still pending.
+Status at checkpoint 5: **profile, preflight, candidate compilation and frozen v3 jobs
+implemented**. Frontend planner/results and bot integration are still pending.
 `POST /rotation-optimizer/runs` remains v2. This is not a completed v3 farmer journey.
 
 ## Available API
 
-Both endpoints use the existing verified-user dependency:
+The endpoints use the existing verified-user dependency:
 
 - `GET /rotation-optimizer/v3/profiles`: server-owned regional releases, content hash,
   structured crop parameters, source records and flattened value/unit/source audit.
@@ -15,6 +15,12 @@ Both endpoints use the existing verified-user dependency:
   `X-Workspace-Owner` rejects a request whose captured account differs from authentication.
   The response includes blocked features, per-value issues, field/farm versions, weather
   provenance and a fingerprint of the exact input snapshot.
+
+- `POST /rotation-optimizer/v3/runs`: repeat readiness under farm/field locks, capture the
+  exact source-bearing snapshot, then submit through the existing idempotent job service.
+  Incomplete inputs return 422 with `planning_data_not_ready` and create no job.
+- Shared run, cancel, retry, export, comparison and plan endpoints dispatch by frozen
+  model version. New saved snapshots use `rotation-saved-v3.0`; v2 remains readable.
 
 A foreign field returns 404; a field in an archived partition returns 409. An old expected
 field version is reported as a blocking readiness issue. Missing operating values and
@@ -51,7 +57,7 @@ inputs remain required even if their associated optional objective is disabled.
 ## Farmer operating inputs
 
 `field_conditions[field_id]` contains evidence-bearing scalar records for FC/WP, depth,
-pH, salinity, drainage, slope, mechanical access, effective rainfall, initial-water policy,
+pH, salinity, drainage, slope, aspect, terrain position, mechanical access, effective rainfall, initial-water policy,
 history/management review and baseline confirmation. A record has `value`, `unit`,
 `source_ids`, and `missing_reason` when null. Values remain null when unknown; zero is
 usable only when explicitly supplied and sourced. Malformed/nonfinite public scalar
@@ -75,8 +81,8 @@ One field has at most its one declared water system. Shared equipment membership
 within the farm, with exactly one resource per required machine type for each selected
 field. Unknown/unselected/foreign resource links are blocked. Periods partition every
 planning day. All source applicability checks for capacities, gap costs and remedies span
-the planning horizon. Daily defaults and exceptions will be expanded into immutable daily
-coefficients by the next preparation stage; the API currently does not perform this solve.
+the planning horizon. Daily defaults and exceptions are expanded into immutable daily coefficients. Gross
+water becomes net capacity once; stated gap costs are explicitly per net cubic metre.
 
 ## Weather and dates
 
@@ -106,14 +112,44 @@ missing-data response with no operating values automatically filled.
 | File in `rotation_optimizer/v3/` | Implemented responsibility |
 |---|---|
 | `profiles.py`, `data/profiles/*.json` | Typed releases, compatibility, parameter audit and hash |
-| `inputs.py` | Incomplete bounded farmer drafts and future v3 run envelope |
+| `inputs.py` | Incomplete bounded farmer drafts and v3 run envelope |
 | `preflight.py` | Server requirements, history, geometry coverage and resource membership |
 | `weather.py` | Complete raw-variable QA, explicit calendar policy and FAO-56 replay |
 | `service.py` | Owned current fields/farms, snapshot fingerprint and read-only readiness |
-| Parent `router.py` | Separate v3 profile/readiness endpoints; v2 contracts retained |
+| `resources.py` | Daily expansion, net/gross conversion and period/bare resource contracts |
+| `coefficients.py`, `prepare.py` | Site suitability, actual-day operations, six coefficients and bounded sampling |
+| `preparation_verify.py` | Source-to-coefficient audit, independent growth and resource checks |
+| `execution.py` | Frozen preparation, lexicographic solves and independently verified options |
+| Parent `service.py`, `execution.py`, `router.py` | v3 submission, jobs, immutable saves and version-aware comparison |
 
-Next: compile validated inputs into candidate suitability, staged growth/water, actual-day
-operations, six metrics, resource calendars and direct-transition scores; independently
-verify those coefficients; freeze the preparation in the existing job service; connect
-v3 planner/results, saved snapshots and evidence-bound bot responses. No current UI or
-job is represented as already running the v3 model.
+## Candidate preparation and execution
+
+The compiler includes all confirmed baseline dates, including dates off the normal sampling
+step. It filters site, climate, management, history and individually impossible hard resource
+conditions. Shared constraints remain in the MILP. Candidate, edge and sample limits fail
+explicitly; the compiler never silently truncates a field or candidate list. Each field
+needs a surviving confirmed baseline and a candidate before solving. A jointly invalid
+baseline remains visible with violations and cannot be saved as a feasible plan.
+
+Profit is profile yield × price − cost; soil is the declared weighted contribution score.
+Risk combines historical heat/frost/excess-rain exposure and irrigation dependence. These
+are estimates and proxies, not loss probabilities or measured soil changes. The full export
+retains growth/water traces, operating evidence and profile hashes; normal run responses
+omit the large problem/trace payload. The independent audit checks accepted coefficients,
+metadata, calendars and resources, not completeness of the sampled search space.
+
+The primary solve uses the user's six metric weights after minimizing resource gap cost.
+Available metrics also receive declared 95% emphasis in bounded alternative searches,
+with the primary gap cost as a ceiling. Duplicate schedules are removed. If needed, one
+excluded-primary search looks for another schedule. No full Pareto frontier is claimed;
+non-dominance is only among generated options. All solves together receive at most twice
+the configured per-solve budget (preparation is separate and subject to the job deadline).
+A time-limited incumbent never claims proven minimal gap or globally optimal score.
+
+Independent verification distinguishes hard validity, zero resource gaps and diagnostics
+requiring remedies. Saved plans include that label, the frozen inputs/profile/weather,
+actual selected weights and all source evidence. Missing optional metrics remain null,
+including comparison deltas. Different model releases cannot be directly compared.
+
+Next: connect v3 forms/readiness/results, saved snapshots and evidence-bound bot responses.
+No current UI is represented as already using the v3 planner.
