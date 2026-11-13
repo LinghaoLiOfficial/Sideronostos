@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mocks.push, replace: mocks.replace }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("@/lib/api/client", () => ({

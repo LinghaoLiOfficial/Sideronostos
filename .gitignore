@@ -1,3 +1,20 @@
 .DS_Store
 .idea/
 docs/
+.playwright-cli/
+
+# Local scientific raw files and immutable generated releases
+/data/
+
+# Local RAG runs contain copyrighted retrieved passages; retain compact reviews.
+/output/evidence/rotation-v2/eval-*.json
+!/output/evidence/rotation-v2/eval-*-review.json
+/output/evidence/rotation-v2/rag-smoke*.json
+# Actual browser recordings remain local review artifacts.
+/output/playwright/rotation-*.webm
+
+# Local Rotation review artifacts; source tests and authored docs are committed.
+/output/evidence/rotation-v2/
+/output/playwright/rotation-*
+/output/playwright/coordinate-submit-debug.png
+/output/pdf/rotation-*

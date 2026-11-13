@@ -1,0 +1,317 @@
+/* Companion tokens are local: this surface stays legible over light/dark map tiles. */
+.launcher,
+.panel {
+  --bot-ink: #24222d;
+  --bot-muted: #696571;
+  --bot-line: #e6e3ec;
+  --bot-surface: #fff;
+  --bot-focus: #6b54bc;
+  --bot-spring: cubic-bezier(0.22, 1.18, 0.36, 1);
+  --bot-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
+  color-scheme: light;
+  font-family: inherit;
+}
+.launcher {
+  position: absolute;
+  z-index: 801;
+  bottom: 33px;
+  right: 26px;
+  width: 72px;
+  height: 72px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--bot-ink);
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 24px;
+}
+.petLabel {
+  position: absolute;
+  right: 82px;
+  bottom: 15px;
+  white-space: nowrap;
+  background: #fffffff2;
+  border: 1px solid #ffffff;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 14px;
+  box-shadow: 0 3px 18px #29203c10;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  backdrop-filter: blur(10px);
+  transition:
+    opacity 160ms,
+    transform 240ms var(--bot-settle);
+}
+.petLabel > span {
+  display: block;
+  color: var(--bot-muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+.launcher[data-open="true"] .petLabel {
+  opacity: 0;
+  transform: translateX(6px);
+  pointer-events: none;
+}
+.petShadow {
+  position: absolute;
+  width: 40px;
+  height: 7px;
+  bottom: 0;
+  left: 16px;
+  border-radius: 50%;
+  background: #42306322;
+  filter: blur(4px);
+}
+.avatar {
+  width: 62px;
+  height: 60px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 45% 55% 48% 52% / 53% 49% 51% 47%;
+  background:
+    radial-gradient(ellipse at 28% 18%, #ffffff48, transparent 62%),
+    var(--bot-accent, #7962ce);
+  transform: rotate(-9deg);
+  box-shadow:
+    inset 0 1px 1px #ffffff60,
+    inset -3px -5px 9px #35236618,
+    0 7px 18px #45327d25;
+  flex-shrink: 0;
+  transition:
+    transform 380ms var(--bot-spring),
+    border-radius 380ms var(--bot-spring);
+}
+.eyes {
+  display: flex;
+  gap: 9px;
+  transform: translate(var(--gaze-x, 0px), var(--gaze-y, 0px));
+  transition: transform 140ms ease-out;
+}
+.eyes i {
+  width: 7px;
+  height: 16px;
+  background: #fff;
+  border-radius: 6px;
+  transform: rotate(-9deg);
+  animation: blink 8s ease-in-out infinite;
+}
+.launcher:hover .avatar,
+.launcher:focus-visible .avatar {
+  transform: translateY(-3px) rotate(4deg) scale(1.05);
+  border-radius: 53% 47% 54% 46% / 47% 54% 46% 53%;
+}
+.launcher:active .avatar {
+  transform: translateY(1px) scale(0.94);
+}
+.smallAvatar {
+  width: 34px;
+  height: 34px;
+  box-shadow: none;
+}
+.smallAvatar .eyes {
+  gap: 5px;
+}
+.smallAvatar .eyes i {
+  width: 4px;
+  height: 10px;
+  animation: none;
+}
+@keyframes blink {
+  0%,
+  43%,
+  47%,
+  100% {
+    scale: 1 1;
+  }
+  45% {
+    scale: 1 0.12;
+  }
+}
+.panel {
+  --background: #faf9fc;
+  --foreground: var(--bot-ink);
+  --popover: var(--bot-surface);
+  --border: var(--bot-line);
+  --muted-foreground: var(--bot-muted);
+  --field: #fff;
+  --ring: var(--bot-focus);
+  position: absolute;
+  z-index: 800;
+  inset: auto 26px 116px auto;
+  width: 448px;
+  max-width: calc(100% - 32px);
+  height: min(630px, calc(100% - 136px));
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--bot-ink);
+  background: var(--bot-surface);
+  border: 1px solid var(--bot-line);
+  border-radius: 26px;
+  box-shadow:
+    0 24px 70px #24203624,
+    0 3px 12px #2420360a;
+  outline: none;
+  transform-origin: calc(100% - 35px) calc(100% + 48px);
+  transition:
+    transform 340ms var(--bot-spring),
+    opacity 180ms ease-out,
+    visibility 0s;
+}
+.panel[data-mode="collapsed"] {
+  transform: translateY(18px) scale(0.94);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 180ms var(--bot-settle),
+    opacity 140ms,
+    visibility 0s 180ms;
+}
+.panel *,
+.launcher * {
+  box-sizing: border-box;
+}
+.header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 17px 15px 15px;
+  flex-shrink: 0;
+  background: linear-gradient(120deg, #f7f5fb, #fff);
+}
+.heading {
+  flex: 1;
+  min-width: 0;
+}
+.heading h2 {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0 0 3px;
+}
+.heading p {
+  color: var(--bot-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+.headerActions {
+  display: flex;
+  gap: 2px;
+}
+.headerActions button {
+  min-width: 36px;
+  min-height: 40px;
+}
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.iconButton:hover {
+  background: #edeaf3;
+}
+.iconButton:focus-visible,
+.launcher:focus-visible {
+  outline: 2px solid var(--bot-focus);
+  outline-offset: 3px;
+}
+.panel svg {
+  flex-shrink: 0;
+}
+.chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+@media (max-width: 700px) {
+  .launcher {
+    right: 16px;
+    bottom: 32px;
+  }
+  .panel {
+    position: fixed;
+    inset: auto 12px
+      var(--bot-mobile-bottom, calc(110px + env(safe-area-inset-bottom))) 12px;
+    width: auto;
+    max-width: none;
+    height: min(68dvh, 620px);
+    max-height: calc(100dvh - 170px);
+    border-radius: 24px;
+    z-index: 1000;
+  }
+  .panel[data-keyboard="true"] {
+    height: calc(var(--bot-visible-height, 100dvh) - 24px);
+    max-height: calc(var(--bot-visible-height, 100dvh) - 24px);
+  }
+  .panel[data-keyboard="true"] .chat {
+    overflow-y: auto;
+  }
+  .header {
+    gap: 7px;
+    padding: 14px 12px 12px;
+  }
+  .headerActions {
+    gap: 0;
+  }
+  .iconButton,
+  .headerActions button {
+    min-width: 40px;
+    min-height: 44px;
+  }
+  .heading p {
+    font-size: 11px;
+  }
+  .petLabel {
+    right: 78px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .launcher *,
+  .avatar,
+  .eyes {
+    transition: none !important;
+    animation: none !important;
+  }
+  .launcher:hover .avatar,
+  .launcher:focus-visible .avatar,
+  .launcher:active .avatar {
+    transform: rotate(-9deg);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .petLabel {
+    background: #fff;
+    backdrop-filter: none;
+  }
+}
+@media (forced-colors: active) {
+  .avatar {
+    background: ButtonText;
+  }
+  .eyes i {
+    background: ButtonFace;
+  }
+  .panel,
+  .petLabel {
+    border: 1px solid CanvasText;
+  }
+}

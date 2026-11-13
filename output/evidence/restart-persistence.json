@@ -1,0 +1,12 @@
+{
+  "export_unchanged_after_api_restart_and_field_edit": true,
+  "saved_area_ha": 8.5,
+  "saved_field_version": 1,
+  "title": "西田三年计划 · 少雨情景",
+  "scenario": {
+    "rainfall_change_pct": -20,
+    "temperature_change_c": 2
+  },
+  "profile_crop_count": 6,
+  "canonical_sha256": "1023d40be0c1a8107b18869f72865b15c600a6e7cd58c6305152d1a41c0958a5"
+}

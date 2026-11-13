@@ -5,7 +5,7 @@ import hashlib
 import json
 import time
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ def create_chat_model(settings: AISettings | None = None, *, task: str | None = 
         timeout=(configured.connect_timeout_seconds, configured.read_timeout_seconds),
         # Retries are explicit in invoke_structured_model so each attempt is observable.
         max_retries=0,
-        temperature=configured.temperature,
+        temperature=None if configured.omit_temperature else configured.temperature,
         max_completion_tokens=configured.max_tokens,
         **optional_parameters,
     )
@@ -58,11 +58,15 @@ async def invoke_structured_model(
     messages: list[Any],
     *,
     max_retries: int,
+    method: Literal["json_mode", "json_schema"] = "json_mode",
 ) -> dict[str, Any]:
-    """Invoke a JSON-mode model while retaining every real request attempt."""
+    """Retain every real request attempt; strict schemas are opt-in per caller."""
     attempts: list[dict[str, Any]] = []
     structured = model.with_structured_output(
-        output_schema, method="json_mode", include_raw=True
+        output_schema,
+        method=method,
+        include_raw=True,
+        **({"strict": True} if method == "json_schema" else {}),
     )
     for attempt_number in range(1, max_retries + 2):
         started = time.perf_counter()
@@ -81,9 +85,11 @@ async def invoke_structured_model(
         try:
             response = await structured.ainvoke(messages)
             raw = response["raw"] if isinstance(response, dict) and "raw" in response else response
-            record["raw_output"] = raw.model_dump(
-                mode="json", include={"content", "tool_calls", "invalid_tool_calls"}
-            ) if hasattr(raw, "model_dump") else str(raw)
+            record["raw_output"] = (
+                raw.model_dump(mode="json", include={"content", "tool_calls", "invalid_tool_calls"})
+                if hasattr(raw, "model_dump")
+                else str(raw)
+            )
             parsing_error = response.get("parsing_error") if isinstance(response, dict) else None
             if parsing_error:
                 raise parsing_error

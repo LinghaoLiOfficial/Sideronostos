@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { PasswordField } from "@/components/auth/password-field";
-import { authErrorMessage, safeNextPath } from "@/components/auth/utils";
+import { authErrorMessage, safeNextPath, authHref, isFieldShiftDestination } from "@/components/auth/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +26,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (searchParams.get("authRequired") === "1") {
-      toast.warning("请先登录", { id: "auth-required", description: "登录后即可访问你的工作空间" });
+      toast.warning("请先登录", { id: "auth-required", description: isFieldShiftDestination(searchParams.get("next")) ? "登录后继续你的轮作规划" : "登录后即可访问你的工作空间" });
     }
     getCurrentUser().then(() => router.replace(safeNextPath(searchParams.get("next")))).catch(() => undefined);
   }, [router, searchParams]);
@@ -38,7 +38,7 @@ function LoginForm() {
     try {
       await signIn(email, password);
       await getCurrentUser();
-      toast.success("登录成功", { description: "正在进入你的工作空间" });
+      toast.success("登录成功", { description: isFieldShiftDestination(searchParams.get("next")) ? "正在返回轮作规划" : "正在进入你的工作空间" });
       router.replace(safeNextPath(searchParams.get("next")));
     } catch (caught) {
       setError(authErrorMessage(caught));
@@ -48,7 +48,7 @@ function LoginForm() {
   }
 
   return (
-    <Card className="min-w-0 w-full py-6">
+    <AuthShell agriculture={isFieldShiftDestination(searchParams.get("next"))}><Card className="min-w-0 w-full py-6">
       <CardHeader className="px-6">
         <CardTitle className="text-2xl">欢迎回来</CardTitle>
       </CardHeader>
@@ -67,12 +67,12 @@ function LoginForm() {
             {submitting ? <LoaderCircle className="animate-spin" /> : <ArrowRight />}{submitting ? "正在登录" : "登录"}
           </Button>
         </form>
-        <p className="mt-6 text-center text-sm text-muted-foreground">还没有账户？ <Link className="text-pink-200 hover:text-pink-100" href="/register">立即注册</Link></p>
+        <p className="mt-6 text-center text-sm text-muted-foreground">还没有账户？ <Link className="text-pink-200 hover:text-pink-100" href={authHref("/register", searchParams.get("next"))}>立即注册</Link></p>
       </CardContent>
-    </Card>
+    </Card></AuthShell>
   );
 }
 
 export default function LoginPage() {
-  return <AuthShell><Suspense fallback={<div className="text-sm text-muted-foreground">正在加载…</div>}><LoginForm /></Suspense></AuthShell>;
+  return <Suspense fallback={<div className="text-sm text-muted-foreground">正在加载…</div>}><LoginForm /></Suspense>;
 }

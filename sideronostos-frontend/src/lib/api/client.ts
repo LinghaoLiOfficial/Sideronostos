@@ -105,21 +105,35 @@ async function refreshAccessToken() {
   return refreshPromise;
 }
 
-export async function apiRequest<T>(path: string, options: Options = {}): Promise<T> {
+async function apiResponse(path: string, options: Options = {}): Promise<Response> {
+  // API credentials must never be forwarded to a basemap or another external host.
+  const url = new URL(path, env.NEXT_PUBLIC_API_BASE_URL);
+  if (!path.startsWith("/") || path.startsWith("//") || url.origin !== new URL(env.NEXT_PUBLIC_API_BASE_URL).origin) {
+    throw new Error("API requests require a relative path on the configured origin");
+  }
   const { body, authenticate = true, retryAuth = true, headers, ...init } = options;
   const requestHeaders = new Headers(headers);
   if (body && !(body instanceof FormData)) requestHeaders.set("Content-Type", "application/json");
   if (authenticate && accessToken) requestHeaders.set("Authorization", `Bearer ${accessToken}`);
-  const response = await fetch(new URL(path, env.NEXT_PUBLIC_API_BASE_URL), {
+  const response = await fetch(url, {
     ...init,
     credentials: "include",
     headers: requestHeaders,
     body: body && typeof body === "object" && !(body instanceof FormData) ? JSON.stringify(body) : body,
   });
   if (response.status === 401 && authenticate && retryAuth && await refreshAccessToken()) {
-    return apiRequest<T>(path, { ...options, retryAuth: false });
+    return apiResponse(path, { ...options, retryAuth: false });
   }
   if (!response.ok) throw await parseError(response);
+  return response;
+}
+
+export async function apiBlob(path: string, options: Options = {}): Promise<Blob> {
+  return (await apiResponse(path, options)).blob();
+}
+
+export async function apiRequest<T>(path: string, options: Options = {}): Promise<T> {
+  const response = await apiResponse(path, options);
   if (response.status === 204) return null as T;
   return await response.json() as T;
 }
@@ -132,10 +146,10 @@ export async function signIn(email: string, password: string) {
   return result;
 }
 
-export async function signUp(email: string, password: string, displayName: string) {
+export async function signUp(email: string, password: string, displayName: string, next?: string) {
   return apiRequest<MessageResponse>("/auth/register", {
     method: "POST",
-    body: { email, password, display_name: displayName },
+    body: { email, password, display_name: displayName, ...(next ? { next } : {}) },
     authenticate: false,
   });
 }
@@ -146,9 +160,9 @@ export async function verifyEmail(token: string) {
   });
 }
 
-export async function resendVerification(email: string) {
+export async function resendVerification(email: string, next?: string) {
   return apiRequest<MessageResponse>("/auth/resend-verification", {
-    method: "POST", body: { email }, authenticate: false,
+    method: "POST", body: { email, ...(next ? { next } : {}) }, authenticate: false,
   });
 }
 

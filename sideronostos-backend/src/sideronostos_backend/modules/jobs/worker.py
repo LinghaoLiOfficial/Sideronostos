@@ -87,6 +87,30 @@ async def _update_batch(session: AsyncSession, job: Job) -> None:
         )
 
 
+async def renew_job_lease(
+    factory: async_sessionmaker[AsyncSession], job_id: str, attempt: int, generation: int
+) -> bool:
+    """An old activity must never keep a replacement workflow's lease alive."""
+    async with factory() as session:
+        current = await session.get(Job, job_id, with_for_update=True)
+        if (
+            current is None
+            or current.attempt != attempt
+            or current.generation != generation
+            or current.status != JobStatus.RUNNING
+        ):
+            return False
+        lease = await session.get(JobExecutionLease, job_id, with_for_update=True)
+        if lease is not None:
+            if lease.owner != f"job/{job_id}/{attempt}":
+                return False
+            now = datetime.now(UTC)
+            lease.heartbeat_at = now
+            lease.expires_at = now + timedelta(seconds=get_jobs_settings().lease_seconds)
+            await session.commit()
+        return True
+
+
 def build_job_activity(
     factory: async_sessionmaker[AsyncSession], handlers: tuple[JobHandlerSpec, ...]
 ) -> Any:
@@ -106,6 +130,14 @@ def build_job_activity(
             job = await session.scalar(select(Job).where(Job.id == job_id).with_for_update())
             if job is None:
                 raise RuntimeError(f"Job not found: {job_id}")
+            if job.attempt != generation_attempt or job.status in (
+                JobStatus.SUCCEEDED,
+                JobStatus.CANCELLED,
+                JobStatus.DEAD_LETTERED,
+                JobStatus.ABANDONED,
+            ):
+                return job.result if job.status == JobStatus.SUCCEEDED else None
+            generation_id = job.generation
             if job.status == JobStatus.CANCELLING:
                 job.status = JobStatus.CANCELLED
                 await session.commit()
@@ -125,17 +157,14 @@ def build_job_activity(
             attempt = await session.scalar(
                 select(JobAttempt).where(
                     JobAttempt.job_id == job.id,
-                    JobAttempt.attempt
-                    == (generation_attempt - 1) * 1000 + temporal_attempt,
+                    JobAttempt.attempt == (generation_attempt - 1) * 1000 + temporal_attempt,
                 )
             )
             if attempt is None:
                 attempt = JobAttempt(
                     job_id=job.id,
                     attempt=(generation_attempt - 1) * 1000 + temporal_attempt,
-                    workflow_id=(
-                        f"job/{job.id}/{generation_attempt}/attempt/{temporal_attempt}"
-                    ),
+                    workflow_id=(f"job/{job.id}/{generation_attempt}/attempt/{temporal_attempt}"),
                 )
                 session.add(attempt)
             attempt.started_at = attempt.started_at or datetime.now(UTC)
@@ -144,15 +173,8 @@ def build_job_activity(
         async def heartbeat() -> None:
             while True:
                 activity.heartbeat(job_id)
-                async with factory() as heartbeat_session:
-                    lease = await heartbeat_session.get(JobExecutionLease, job_id)
-                    if lease is not None:
-                        now = datetime.now(UTC)
-                        lease.heartbeat_at = now
-                        lease.expires_at = now + timedelta(
-                            seconds=get_jobs_settings().lease_seconds
-                        )
-                        await heartbeat_session.commit()
+                if not await renew_job_lease(factory, job_id, generation_attempt, generation_id):
+                    return
                 await asyncio.sleep(5)
 
         heartbeat_task = asyncio.create_task(heartbeat()) if in_activity_context else None
@@ -160,12 +182,17 @@ def build_job_activity(
             result = await handler(job.id, dict(job.payload))
         except asyncio.CancelledError:
             async with factory() as session:
-                current = await session.get(Job, job_id)
+                current = await session.get(Job, job_id, with_for_update=True)
+                if (
+                    current is None
+                    or current.attempt != generation_attempt
+                    or current.generation != generation_id
+                ):
+                    return None
                 attempt = await session.scalar(
                     select(JobAttempt).where(
                         JobAttempt.job_id == job_id,
-                        JobAttempt.attempt
-                        == (generation_attempt - 1) * 1000 + temporal_attempt,
+                        JobAttempt.attempt == (generation_attempt - 1) * 1000 + temporal_attempt,
                     )
                 )
                 if current is not None:
@@ -188,15 +215,28 @@ def build_job_activity(
             exhausted = temporal_attempt >= (job.maximum_attempts or 5)
             error_code = getattr(error, "code", type(error).__name__)
             async with factory() as session:
-                current = await session.get(Job, job_id)
+                current = await session.get(Job, job_id, with_for_update=True)
+                if (
+                    current is None
+                    or current.attempt != generation_attempt
+                    or current.generation != generation_id
+                ):
+                    return None
                 attempt = await session.scalar(
                     select(JobAttempt).where(
                         JobAttempt.job_id == job_id,
-                        JobAttempt.attempt
-                        == (generation_attempt - 1) * 1000 + temporal_attempt,
+                        JobAttempt.attempt == (generation_attempt - 1) * 1000 + temporal_attempt,
                     )
                 )
                 if current is not None:
+                    if current.status in (JobStatus.CANCELLING, JobStatus.CANCELLED):
+                        current.status = JobStatus.CANCELLED
+                        current.updated_at = datetime.now(UTC)
+                        lease = await session.get(JobExecutionLease, job_id)
+                        if lease is not None:
+                            await session.delete(lease)
+                        await session.commit()
+                        return None
                     current.status = (
                         JobStatus.DEAD_LETTERED
                         if in_activity_context and (permanent or exhausted)
@@ -246,23 +286,36 @@ def build_job_activity(
                 with suppress(asyncio.CancelledError):
                     await heartbeat_task
         async with factory() as session:
-            current = await session.get(Job, job_id)
+            current = await session.get(Job, job_id, with_for_update=True)
+            if (
+                current is None
+                or current.attempt != generation_attempt
+                or current.generation != generation_id
+            ):
+                return None
             attempt = await session.scalar(
                 select(JobAttempt).where(
                     JobAttempt.job_id == job_id,
-                    JobAttempt.attempt
-                    == (generation_attempt - 1) * 1000 + temporal_attempt,
+                    JobAttempt.attempt == (generation_attempt - 1) * 1000 + temporal_attempt,
                 )
             )
             if current is not None:
-                current.status = JobStatus.SUCCEEDED
+                cancelled = current.status in (JobStatus.CANCELLING, JobStatus.CANCELLED)
+                current.status = JobStatus.CANCELLED if cancelled else JobStatus.SUCCEEDED
+                if cancelled:
+                    result = None
                 current.result = result
                 current.error = None
                 current.error_code = None
                 current.error_class = None
                 current.updated_at = datetime.now(UTC)
                 if in_activity_context:
-                    await emit_job_event(session, current, "job.succeeded", {"result": result})
+                    await emit_job_event(
+                        session,
+                        current,
+                        "job.cancelled" if cancelled else "job.succeeded",
+                        {"result": result},
+                    )
                     await _update_batch(session, current)
                 lease = await session.get(JobExecutionLease, job_id)
                 if isinstance(lease, JobExecutionLease):

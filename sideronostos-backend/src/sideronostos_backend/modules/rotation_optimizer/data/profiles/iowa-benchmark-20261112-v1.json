@@ -1,0 +1,276 @@
+{
+  "id": "iowa-benchmark-20261112-v1",
+  "name": "Iowa engineering benchmark / 工程验收参数包",
+  "scope": "benchmark_not_locally_calibrated",
+  "region": "Reference weather near 42 N, 93.5 W; not the chosen business pilot",
+  "weather_release_id": "power-iowa-2025-v1",
+  "weather_center": [
+    -93.5,
+    42
+  ],
+  "weather_radius_km": 25,
+  "crops": [
+    {
+      "id": "maize",
+      "name": "Maize / 玉米（110-day hybrid example）",
+      "family": "Poaceae",
+      "base_c": 10,
+      "upper_c": 30,
+      "gdd_required": 1483.3333333333333,
+      "gdd_recipe": "draft_one_sided_v1",
+      "max_growing_days": 200,
+      "turnaround_days": 14,
+      "sow_start_mmdd": "04-20",
+      "sow_end_mmdd": "05-18",
+      "kc": [
+        0.3,
+        1.2,
+        0.6
+      ],
+      "stage_fractions": [
+        0.2,
+        0.3,
+        0.3,
+        0.2
+      ],
+      "cost_usd_ha": 900,
+      "labor_days_ha": 4,
+      "parameter_origins": {
+        "family": "SARE_FAMILY",
+        "base_c": "KSTATE_CORN",
+        "upper_c": "KSTATE_CORN",
+        "gdd_required": "KSTATE_CORN",
+        "gdd_recipe": "KSTATE_CORN",
+        "max_growing_days": "B_PHENOLOGY",
+        "turnaround_days": "B_CALENDAR",
+        "sow_start_mmdd": "B_CALENDAR",
+        "sow_end_mmdd": "B_CALENDAR",
+        "kc": "FAO56_KC",
+        "stage_fractions": "B_STAGES",
+        "cost_usd_ha": "B_RESOURCES",
+        "labor_days_ha": "B_RESOURCES"
+      }
+    },
+    {
+      "id": "oat",
+      "name": "Spring oat / 春燕麦（benchmark）",
+      "family": "Poaceae",
+      "base_c": 0,
+      "upper_c": 30,
+      "gdd_required": 1200,
+      "gdd_recipe": "bounded_both_v1",
+      "max_growing_days": 150,
+      "turnaround_days": 14,
+      "sow_start_mmdd": "04-01",
+      "sow_end_mmdd": "04-29",
+      "kc": [
+        0.3,
+        1.15,
+        0.25
+      ],
+      "stage_fractions": [
+        0.2,
+        0.3,
+        0.3,
+        0.2
+      ],
+      "cost_usd_ha": 450,
+      "labor_days_ha": 2.5,
+      "parameter_origins": {
+        "family": "SARE_FAMILY",
+        "base_c": "B_PHENOLOGY",
+        "upper_c": "B_PHENOLOGY",
+        "gdd_required": "B_PHENOLOGY",
+        "gdd_recipe": "B_PHENOLOGY",
+        "max_growing_days": "B_PHENOLOGY",
+        "turnaround_days": "B_CALENDAR",
+        "sow_start_mmdd": "B_CALENDAR",
+        "sow_end_mmdd": "B_CALENDAR",
+        "kc": "FAO56_KC",
+        "stage_fractions": "B_STAGES",
+        "cost_usd_ha": "B_RESOURCES",
+        "labor_days_ha": "B_RESOURCES"
+      }
+    },
+    {
+      "id": "pea",
+      "name": "Dry field pea / 干籽豌豆（benchmark）",
+      "family": "Fabaceae",
+      "base_c": 0,
+      "upper_c": 30,
+      "gdd_required": 1000,
+      "gdd_recipe": "bounded_both_v1",
+      "max_growing_days": 140,
+      "turnaround_days": 14,
+      "sow_start_mmdd": "04-05",
+      "sow_end_mmdd": "05-03",
+      "kc": [
+        0.5,
+        1.15,
+        0.3
+      ],
+      "stage_fractions": [
+        0.2,
+        0.3,
+        0.3,
+        0.2
+      ],
+      "cost_usd_ha": 550,
+      "labor_days_ha": 3,
+      "parameter_origins": {
+        "family": "SARE_FAMILY",
+        "base_c": "B_PHENOLOGY",
+        "upper_c": "B_PHENOLOGY",
+        "gdd_required": "B_PHENOLOGY",
+        "gdd_recipe": "B_PHENOLOGY",
+        "max_growing_days": "B_PHENOLOGY",
+        "turnaround_days": "B_CALENDAR",
+        "sow_start_mmdd": "B_CALENDAR",
+        "sow_end_mmdd": "B_CALENDAR",
+        "kc": "FAO56_KC",
+        "stage_fractions": "B_STAGES",
+        "cost_usd_ha": "B_RESOURCES",
+        "labor_days_ha": "B_RESOURCES"
+      }
+    }
+  ],
+  "history_catalogue": {
+    "maize": "Poaceae",
+    "oat": "Poaceae",
+    "pea": "Fabaceae",
+    "wheat": "Poaceae",
+    "soybean": "Fabaceae",
+    "sorghum": "Poaceae",
+    "barley": "Poaceae",
+    "clover": "Fabaceae",
+    "alfalfa": "Fabaceae"
+  },
+  "family_gaps": {
+    "Poaceae": 365,
+    "Fabaceae": 365
+  },
+  "sowing_step_days": 14,
+  "effective_rain_fraction": 0.8,
+  "default_weights": {
+    "cover": 2,
+    "diversity": 1,
+    "water": 1,
+    "cost": 0.5
+  },
+  "references": {
+    "cover": 1000,
+    "diversity": 10,
+    "water": 10000,
+    "cost": 10000
+  },
+  "parameter_origins": {
+    "family_gaps": "B_GAPS",
+    "sowing_step_days": "B_OBJECTIVE",
+    "effective_rain_fraction": "B_RAIN",
+    "references": "B_OBJECTIVE",
+    "default_weights": "B_OBJECTIVE",
+    "weather_radius_km": "B_OBJECTIVE",
+    "history_catalogue": "SARE_FAMILY",
+    "history_turnaround_days": "B_CALENDAR"
+  },
+  "sources": {
+    "KSTATE_CORN": {
+      "kind": "reference",
+      "title": "K-State: Corn Maturity",
+      "url": "https://www.sunflower.k-state.edu/agronomy/corn/corn_maturity.html",
+      "applicability": "Example 110-day hybrid; 2670 Fahrenheit degree-days / 1.8 = Celsius degree-days.",
+      "limitations": [
+        "Kansas extension example; not an Iowa cultivar calibration. Physiological maturity is not a validated harvest/drying schedule."
+      ]
+    },
+    "FAO56_KC": {
+      "kind": "reference",
+      "title": "FAO-56 Chapter 6, Table 12",
+      "url": "https://www.fao.org/4/x0490e/x0490e0b.htm",
+      "applicability": "Standard non-stressed crop coefficients; field maize high-moisture harvest, oats, dry peas.",
+      "limitations": [
+        "General standard coefficients need climate/wetting and local crop adjustment; stage timing is a separate benchmark assumption."
+      ]
+    },
+    "SARE_FAMILY": {
+      "kind": "reference",
+      "title": "Crop Rotation on Organic Farms, crop-family diagrams (local reader pp.56–58)",
+      "url": "https://www.sare.org/resources/crop-rotation-on-organic-farms/",
+      "applicability": "Grass family Poaceae and legume family Fabaceae; server-owned crop mapping.",
+      "limitations": [
+        "Botanical family is not a pathogen diagnosis or a universal required interval."
+      ]
+    },
+    "B_PHENOLOGY": {
+      "kind": "benchmark_assumption",
+      "title": "Engineering benchmark phenology settings",
+      "url": null,
+      "applicability": "Illustrative oat/pea thermal thresholds and temperature bounds; crop duration caps.",
+      "limitations": [
+        "No cultivar validation; no frost damage, photoperiod or vernalization model. Do not use as a planting recommendation."
+      ]
+    },
+    "B_CALENDAR": {
+      "kind": "benchmark_assumption",
+      "title": "Engineering benchmark sowing and turnaround calendar",
+      "url": null,
+      "applicability": "Narrow spring windows; a 14-day post-harvest occupancy allowance.",
+      "limitations": [
+        "Not a locally verified sowing calendar or machinery schedule."
+      ]
+    },
+    "B_STAGES": {
+      "kind": "benchmark_assumption",
+      "title": "Engineering benchmark stage fractions",
+      "url": null,
+      "applicability": "Initial/development/mid/late fractions 0.2/0.3/0.3/0.2 over computed growing duration.",
+      "limitations": [
+        "Not observed crop phenology; FAO coefficient values do not validate these stage timings."
+      ]
+    },
+    "B_RESOURCES": {
+      "kind": "benchmark_assumption",
+      "title": "Engineering benchmark cost and labour",
+      "url": null,
+      "applicability": "Illustrative USD/ha and labour-days/ha, allocated uniformly across growing days.",
+      "limitations": [
+        "Not current market prices or a farm budget; excludes yield/revenue, drying, and machinery constraints."
+      ]
+    },
+    "B_RAIN": {
+      "kind": "benchmark_assumption",
+      "title": "Engineering benchmark effective rainfall",
+      "url": null,
+      "applicability": "80% of daily rain is credited; positive daily Kc*ET0 minus credited rain is the supplemental gap.",
+      "limitations": [
+        "No root-zone storage, runoff, drainage, carry-over or irrigation-efficiency model. Not an irrigation prescription."
+      ]
+    },
+    "B_GAPS": {
+      "kind": "benchmark_assumption",
+      "title": "Engineering benchmark family interval",
+      "url": null,
+      "applicability": "365-day gap for Poaceae and Fabaceae, plus no identical adjacent crops.",
+      "limitations": [
+        "Not a universal disease break period; local crop/pathogen advice may require different rules."
+      ]
+    },
+    "B_OBJECTIVE": {
+      "kind": "benchmark_assumption",
+      "title": "Engineering benchmark objective and sampling",
+      "url": null,
+      "applicability": "Fixed positive metric reference scales, user preference defaults, 14-day sowing sampling, and 25 km benchmark locality guard.",
+      "limitations": [
+        "Only optimal for this candidate set and objective; neither profit maximization nor locally calibrated farming advice."
+      ]
+    }
+  },
+  "limitations": [
+    "Engineering benchmark, not locally calibrated agricultural advice.",
+    "Historical 2025 weather is replayed with source dates; it is not a forecast.",
+    "No yield, profit, nutrient balance, frost damage or soil-storage prediction.",
+    "No-irrigation constraints use a conservative simplified gap; infeasibility does not establish that rainfed farming is impossible.",
+    "Crop maturity is thermal and capped; local cultivar, soil and management validation is required."
+  ],
+  "history_turnaround_days": 14
+}

@@ -1,0 +1,141 @@
+{
+  "status": "live",
+  "source_name": "NASA POWER · 历史气象",
+  "source_url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+  "reference_year": 2025,
+  "fetched_at": "2026-11-11T15:49:48.938904Z",
+  "spatial_resolution": "气象再分析约 0.5° × 0.625°（非田块分辨率）",
+  "months": [
+    {
+      "month": 1,
+      "rainfall_mm": 6.97,
+      "tmin_c": -11.817,
+      "tmax_c": -1.533,
+      "reference_et_mm": 14.598,
+      "valid_days": 31,
+      "expected_days": 31
+    },
+    {
+      "month": 2,
+      "rainfall_mm": 10.05,
+      "tmin_c": -9.334,
+      "tmax_c": 0.874,
+      "reference_et_mm": 21.866,
+      "valid_days": 28,
+      "expected_days": 28
+    },
+    {
+      "month": 3,
+      "rainfall_mm": 66.68,
+      "tmin_c": 0.132,
+      "tmax_c": 14.302,
+      "reference_et_mm": 72.786,
+      "valid_days": 31,
+      "expected_days": 31
+    },
+    {
+      "month": 4,
+      "rainfall_mm": 89.73,
+      "tmin_c": 4.551,
+      "tmax_c": 17.371,
+      "reference_et_mm": 98.963,
+      "valid_days": 30,
+      "expected_days": 30
+    },
+    {
+      "month": 5,
+      "rainfall_mm": 75.73,
+      "tmin_c": 9.824,
+      "tmax_c": 22.707,
+      "reference_et_mm": 140.591,
+      "valid_days": 31,
+      "expected_days": 31
+    },
+    {
+      "month": 6,
+      "rainfall_mm": 187.43,
+      "tmin_c": 18.033,
+      "tmax_c": 28.142,
+      "reference_et_mm": 152.756,
+      "valid_days": 30,
+      "expected_days": 30
+    },
+    {
+      "month": 7,
+      "rainfall_mm": 236.09,
+      "tmin_c": 20.257,
+      "tmax_c": 29.307,
+      "reference_et_mm": 150.955,
+      "valid_days": 31,
+      "expected_days": 31
+    },
+    {
+      "month": 8,
+      "rainfall_mm": 81.04,
+      "tmin_c": 17.286,
+      "tmax_c": 26.973,
+      "reference_et_mm": 129.981,
+      "valid_days": 31,
+      "expected_days": 31
+    },
+    {
+      "month": 9,
+      "rainfall_mm": 41.51,
+      "tmin_c": 14.585,
+      "tmax_c": 26.09,
+      "reference_et_mm": 105.473,
+      "valid_days": 30,
+      "expected_days": 30
+    },
+    {
+      "month": 10,
+      "rainfall_mm": 59.09,
+      "tmin_c": 8.868,
+      "tmax_c": 20.458,
+      "reference_et_mm": 68.2,
+      "valid_days": 31,
+      "expected_days": 31
+    },
+    {
+      "month": 11,
+      "rainfall_mm": 39.0,
+      "tmin_c": 0.463,
+      "tmax_c": 10.244,
+      "reference_et_mm": 30.801,
+      "valid_days": 30,
+      "expected_days": 30
+    },
+    {
+      "month": 12,
+      "rainfall_mm": 20.78,
+      "tmin_c": -8.722,
+      "tmax_c": 0.854,
+      "reference_et_mm": 15.606,
+      "valid_days": 31,
+      "expected_days": 31
+    }
+  ],
+  "limitations": [
+    "2025 年历史参考数据，只代表该年；不是未来天气预报，也不是多年气候常值。",
+    "NASA POWER 气象数据来自区域再分析，约 0.5° × 0.625°，不能代表田块内的土壤或微气候实测。",
+    "参考蒸散由月均温度近似估算，尚未当地校准；不包含土壤蓄水、径流、灌溉效率或作物逐阶段系数。",
+    "未接入田块土壤检测、卫星植被时序或实际产量记录。"
+  ],
+  "evidence": [
+    {
+      "id": "nasa-power-history",
+      "title": "NASA POWER 2025 年历史日值",
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-93.5&latitude=42&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+      "kind": "observation",
+      "detail": "T2M_MIN/T2M_MAX（°C）月平均；PRECTOTCORR（mm/day）按完整 UTC 月求和。来源为区域再分析。"
+    },
+    {
+      "id": "climate-reference-et",
+      "title": "FAO56：参考蒸散估算方法",
+      "url": "https://www.fao.org/4/x0490e/x0490e07.htm",
+      "kind": "estimate",
+      "detail": "月均最低/最高气温与纬度用于 Hargreaves 估算；Ra 按逐日天文辐射计算并乘 0.408。尚未按当地气候校准，不等于 NASA 实测蒸散。方法版本：monthly-hargreaves-v1"
+    }
+  ],
+  "fingerprint": "07fe6aa14dbbc839c69ccb4f98ba4742f4b513905a1a8c264b6261b310f5be00"
+}

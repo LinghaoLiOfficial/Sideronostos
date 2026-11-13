@@ -4,6 +4,7 @@ import hashlib
 import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from urllib.parse import unquote, urlencode, urlsplit
 from uuid import uuid4
 
 import jwt
@@ -19,6 +20,34 @@ from .settings import AuthSettings, get_auth_settings
 
 password_hash = PasswordHash.recommended()
 MIN_PASSWORD_LENGTH = 8
+
+
+def safe_return_path(value: str | None) -> str | None:
+    """Permit only canonical known in-app destinations; invalid values are rejected."""
+    if value is None:
+        return None
+    decoded = unquote(value)
+    if (
+        not value.startswith("/")
+        or value.startswith("//")
+        or len(value) > 2048
+        or any(ord(char) < 32 or ord(char) == 127 for char in decoded)
+        or "\\" in decoded
+    ):
+        raise ValueError("next must be a safe in-app destination")
+    parts = urlsplit(value)
+    if (
+        parts.scheme
+        or parts.netloc
+        or "%" in parts.path
+        or any(segment in {".", ".."} for segment in parts.path.split("/"))
+        or not any(
+            parts.path == root or parts.path.startswith(root + "/")
+            for root in ("/field-shift", "/workspace", "/personal")
+        )
+    ):
+        raise ValueError("next must be a Field Shift, workspace, or personal destination")
+    return value
 
 
 class AuthenticationError(ValueError):
@@ -55,8 +84,15 @@ class AuthService:
         self.organizations = organizations or OrganizationService()
 
     async def register(
-        self, session: AsyncSession, *, email: str, password: str, display_name: str
+        self,
+        session: AsyncSession,
+        *,
+        email: str,
+        password: str,
+        display_name: str,
+        next_path: str | None = None,
     ) -> UserAccount:
+        next_path = safe_return_path(next_path)
         if len(password) < MIN_PASSWORD_LENGTH:
             raise AuthenticationError(
                 f"Password must contain at least {MIN_PASSWORD_LENGTH} characters"
@@ -78,11 +114,38 @@ class AuthService:
             session,
             to=user.email,
             template="verify_email",
-            context={"url": f"{self.email_url}/verify-email?token={token}"},
+            context={"url": self._verification_url(token, next_path)},
             idempotency_key=f"verify:{user.id}:{digest(token)}",
             organization_id=organization_id,
         )
         return user
+
+    def _verification_url(self, token: str, next_path: str | None = None) -> str:
+        parameters = {"token": token}
+        destination = safe_return_path(next_path)
+        if destination is not None:
+            parameters["next"] = destination
+        return f"{self.email_url}/verify-email?{urlencode(parameters)}"
+
+    async def resend_verification(
+        self,
+        session: AsyncSession,
+        email: str,
+        *,
+        next_path: str | None = None,
+    ) -> None:
+        next_path = safe_return_path(next_path)
+        user = await self.users.by_email(session, email)
+        if user is None or user.email_verified_at is not None:
+            return
+        token = await self._issue_one_time_token(session, user, AuthTokenType.VERIFY_EMAIL)
+        await self.email.enqueue(
+            session,
+            to=user.email,
+            template="verify_email",
+            context={"url": self._verification_url(token, next_path)},
+            idempotency_key=f"verify:{user.id}:{digest(token)}",
+        )
 
     @property
     def email_url(self) -> str:
