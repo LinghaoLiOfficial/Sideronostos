@@ -1,0 +1,49 @@
+{
+  "ready": true,
+  "issues": [],
+  "warnings": [
+    "not_future_forecast",
+    "regional_background_not_field_station",
+    "utc_aggregate_not_local_day"
+  ],
+  "invalid_dates": [],
+  "calendar_policy": "utc_daily_proxy_v1",
+  "agricultural_timezone": "America/Chicago",
+  "source_time_standard": "UTC",
+  "release_id": "power-iowa-2025-v1",
+  "manifest_sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+  "source_kind": "reanalysis_and_satellite_inputs",
+  "source_start": "2025-01-01",
+  "source_end": "2025-12-31",
+  "basis": "historical_replay",
+  "retrieved_at": "2026-11-13T21:13:05.217584+00:00",
+  "source_url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MIN%2CT2M_MAX%2CT2MDEW%2CWS2M%2CPS%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN&community=AG&longitude=-93.5&latitude=42&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+  "raw_sha256": "73246b3db80643e83f7150f47a1a68a11cf68d117c80845c7a2e809f85135d32",
+  "content_sha256": "40adf081c6787919914baa792984f66bb8e3eea99f1edd0b76f5f2535691b693",
+  "expected_days": 365,
+  "complete_days": 365,
+  "replay_days": 365,
+  "sample_replay_day": {
+    "date": "2027-04-20",
+    "missing": [],
+    "tmin_c": 3.76,
+    "tmax_c": 11.18,
+    "tdew_c": 2.89,
+    "wind_2m_ms": 3.46,
+    "pressure_kpa": 98.22,
+    "rain_mm": 18.98,
+    "shortwave": 5.43,
+    "et0_mm": 1.580647837063697,
+    "et0_missing_reason": null,
+    "source_date": "2025-04-20",
+    "synthetic_calendar_day": false,
+    "weather_basis": "historical_replay",
+    "replay_recipe": "month-day-repeat-feb28-v1"
+  },
+  "database_publication": {
+    "database": "sideronostos_fields_v3_journey_test",
+    "id": "power-iowa-2025-v1",
+    "status": "published",
+    "sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735"
+  }
+}

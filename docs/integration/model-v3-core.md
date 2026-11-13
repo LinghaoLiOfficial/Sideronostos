@@ -1,7 +1,7 @@
 # Daily v3 computation contract and progress
 
-Status: **kernel implemented, application integration pending**. This document does not
-claim a working v3 farmer journey. Existing API/job dispatch still uses v2 as of this
+Status: **kernel and profile/data-preflight API implemented; solver application integration pending**. This document does not
+claim a working v3 farmer journey. Existing run/job dispatch still uses v2 as of this
 checkpoint; old results have not been reinterpreted.
 
 ## Authority and versioning
@@ -16,14 +16,17 @@ new scientific and mathematical contracts from existing v2 snapshots:
 | `science.py` | First GDD maturity day, stage interpolation, effective rain, root water and trace |
 | `scientific_verify.py` | Independently reconstruct maturity, Kc, roots, NIR and cover from frozen inputs |
 | `readiness.py` | Values, units, sources, quality, confirmation, region/time and blocked features |
+| `profiles.py`, `inputs.py` | Sourced regional releases and bounded incomplete farmer drafts |
+| `preflight.py`, `weather.py` | Server-owned operating requirements, raw weather QA and calendar policy |
+| `service.py` | Owned current fields/farms and read-only data-preflight snapshots |
 | `model.py` | Validated frozen fields/candidates, periods, capacities and objective scales |
 | `milp.py` | Single-path daily Gurobi model and two explicit priorities |
 | `verify.py` | Independent chronology, all-pair gaps, resource totals, raw metrics and score |
 | `solver.py` | Real Gurobi execution, cancellation/deadline/failure and verified publication candidate |
 
 Versions: `rotation-milp-v3.0`, `daily-root-zone-v3.0`. Readiness output is
-`rotation-readiness-v3.0`. Requests, profiles, immutable service snapshots and published
-results still need their v3 dispatcher and version labels.
+`rotation-readiness-v3.0`. The v3 profile and input snapshots now have their own contracts. See
+`model-v3-data-contract.md`; published results still need their v3 dispatcher.
 
 ## Daily conventions
 
@@ -74,7 +77,8 @@ those definitions support the water-state bookkeeping. The dry expansion policy 
 our disclosed engineering choice, not a claim that FAO prescribes dry soil:
 [FAO-56 chapter 8](https://www.fao.org/4/X0490E/x0490e0e.htm).
 Existing FAO-56 ET0 calculation remains in `agri_data/recipes.py`; weather ingestion and
-its raw unit/QA/provenance verification must be wired into the v3 preparation snapshot.
+its raw unit/QA/provenance verification now feeds v3 data preflight and still needs
+to be connected to candidate generation and the queued job snapshot.
 
 ## Objectives, capacities and diagnosis
 
@@ -121,7 +125,8 @@ Engineering assumptions require explicit acceptance and stay labelled as uncalib
 
 `assess_readiness` is a reusable engine. Its requirements and enabled features must be
 constructed by the server-owned profile/preparation policy, never chosen arbitrarily by
-an API client. That policy and farmer-facing input flow are still pending.
+an API client. That server policy is now exposed through the v3 data-preflight API;
+the farmer-facing v3 input flow and candidate-level checks remain pending.
 
 ## Verification so far
 
@@ -131,7 +136,7 @@ intervening-species family conflicts, historical adjacency, actual Gurobi cancel
 license failure and tiny deadline behavior. A two-field cross-product enumerator computes
 its own objective/resource oracle and agrees with the actual Gurobi optimum.
 
-Remaining: sourced profile and suitability/economic/risk coefficient preparation, complete
-readiness matrix, service/job/version dispatch, active farm partition/resource snapshots,
+Remaining: suitability/economic/risk coefficient preparation and candidate-level checks,
+service/job/version dispatch with frozen active farm partition/resource snapshots,
 frontend planning/results, assistant/knowledge extension, frozen/live AI evaluation and
 the full real-browser saved-plan journey. A kernel test passing is not completion.

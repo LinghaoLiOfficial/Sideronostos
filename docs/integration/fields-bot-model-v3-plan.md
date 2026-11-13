@@ -217,3 +217,38 @@ risk/soil coefficients; server-owned readiness policy; farm/current partition/re
 snapshots; task dispatcher, immutable result compatibility; planner/results/bot/knowledge;
 full end-to-end and AI evaluation. The v3 functions are currently a tested library, not
 an exposed replacement backend. Overall goal remains ACTIVE.
+
+## Checkpoint 4 — sourced profiles and data-preflight API (2026-11-14)
+
+Implemented:
+- Separate server-owned v3 regional profile catalog with value/unit/source audit and hash.
+  The Iowa profile is an explicitly acknowledged engineering benchmark; all new agronomic,
+  operating-estimate and objective-reference values remain labelled assumptions.
+- Bounded farmer-input drafts and server-owned readiness requirements for soil, history,
+  baseline, daily water/equipment, period seed/market, bare caps and gap remedies. Unknown
+  is never zero; hard zero is not softened; malformed/nonfinite scalar inputs are rejected.
+- `GET /rotation-optimizer/v3/profiles` and `POST /rotation-optimizer/v3/readiness` use real
+  ownership, current farm partition and version checks, plus the captured-owner header.
+  Read-only reports fingerprint actual snapshots. Existing v2 routes and jobs are retained.
+- Raw weather unit/QA/calendar/location/provenance checks and FAO-56 historical replay.
+  UTC versus local-date approximation is explicitly versioned and acknowledged. Calibrated
+  profiles cannot inherit that engineering proxy silently.
+- Exact water-system membership is enforced in both the input policy and frozen model.
+
+Fresh verification: full dedicated-DB backend suite **491 passed, 0 skipped** (5 existing
+PDF/SWIG warnings); scoped Ruff passed; mypy passed all **14 v3 modules**. Tests include
+actual PostgreSQL API ownership/partition/version checks, unavailable weather, malformed
+inputs, source applicability, zero versus unknown, and metadata fingerprint changes.
+No frontend code changed in this checkpoint; no new browser journey claim is made.
+
+Real data evidence: downloaded the seven required public NASA POWER variables for the
+Iowa 2025 reference point. The old repository sample had only three. All **365/365** days
+passed adapter checks and a full 2027 historical replay. Stored raw/prepared files and
+`power-v3-validation.json`; published only into the isolated journey database. An actual
+saved field's read-only preflight still blocks missing farmer data and unaccepted
+assumptions. See `journey-data-readiness.json` and `model-v3-data-contract.md`.
+
+Remaining: candidate compilation and independent coefficient verification, v3 job
+submission/execution/publication, planner/results/bot/knowledge integration, immutable
+saved-plan journey, raster parity, full UI/AI evaluation and final requirement audit.
+The available readiness API does not itself generate a v3 solution. Overall goal ACTIVE.

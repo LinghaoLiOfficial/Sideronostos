@@ -1,0 +1,40 @@
+{
+  "checkpoint": 4,
+  "scope": "v3 regional profiles, operating input preflight and owned readiness API",
+  "overall_goal": "active; not complete",
+  "backend_full_suite": {
+    "passed": 491,
+    "skipped": 0,
+    "warnings": 5,
+    "database": "sideronostos_fields_v3_test"
+  },
+  "static_checks": {
+    "ruff": "passed: v3, rotation router and v3 tests",
+    "mypy": "passed: 14 v3 modules"
+  },
+  "new_api": [
+    "GET /rotation-optimizer/v3/profiles",
+    "POST /rotation-optimizer/v3/readiness"
+  ],
+  "real_data_evidence": "power-v3-validation.json",
+  "saved_field_preflight": "journey-data-readiness.json",
+  "actual_weather": {
+    "source": "NASA POWER Daily API",
+    "reference_year": 2025,
+    "complete_days": 365,
+    "expected_days": 365,
+    "planning_replay_year": 2027,
+    "not_forecast": true,
+    "calendar_policy": "utc_daily_proxy_v1",
+    "published_only_to": "sideronostos_fields_v3_journey_test"
+  },
+  "frontend_changes": false,
+  "new_browser_journey": false,
+  "v3_job_dispatch": "not yet implemented",
+  "remaining": [
+    "candidate compilation and independent coefficient verification",
+    "existing task service v3 dispatch and result publication",
+    "frontend planner/results and assistant/knowledge integration",
+    "full saved-plan journey, raster parity and AI evaluation"
+  ]
+}
