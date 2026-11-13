@@ -1,0 +1,44 @@
+.fields-app {
+  --fields-map-control: #f8f9f4;
+  --fields-map-control-text: #151711;
+}
+
+.fields-app .maplibregl-map {
+  font-family: var(--font-sans), sans-serif;
+}
+
+.fields-app .maplibregl-ctrl-group {
+  overflow: hidden;
+  border: 1px solid #15171122;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px #0003;
+}
+
+.fields-app .maplibregl-ctrl-group button {
+  background-color: var(--fields-map-control);
+}
+
+.fields-app .maplibregl-ctrl-group button span {
+  filter: none;
+}
+
+.fields-app .maplibregl-ctrl-attrib {
+  color: var(--fields-map-control-text);
+  font-size: 10px;
+}
+
+.fields-app .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+
+.fields-app .maplibregl-ctrl-top-right {
+  top: 52px;
+}
+
+.fields-app input[type="range"] {
+  accent-color: var(--primary);
+}
+
+.fields-app .bg-white {
+  color: var(--fields-map-control-text);
+}

@@ -5,5 +5,9 @@ import nextTs from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
-  globalIgnores([".next/**", "coverage/**", "next-env.d.ts"]),
+  {
+    files: ["src/features/fields/fields-workspace.tsx"],
+    rules: { "@next/next/no-img-element": "off" },
+  },
+  globalIgnores([".next/**", "coverage/**", "next-env.d.ts", "public/vendor/**"]),
 ]);

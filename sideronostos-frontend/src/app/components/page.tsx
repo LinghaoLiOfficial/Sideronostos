@@ -156,7 +156,7 @@ function Examples({ sectionId, tone, material }: { sectionId: string; tone: Surf
 
 export default function ComponentsPage() {
   return <div className="design-system gallery-surface">
-    <header className="ds-header"><Link href="/landing" aria-label="Agrisata" className="ds-wordmark"><BrandLogo className="w-44" /></Link><span className="ds-header-label">Design system / 01</span><Button asChild variant="outline" size="sm"><Link href="/landing">探索平台 <ArrowRight /></Link></Button></header>
+    <header className="ds-header"><Link href="/refer-1" aria-label="Agrisata" className="ds-wordmark"><BrandLogo className="w-44" /></Link><span className="ds-header-label">Design system / 01</span><Button asChild variant="outline" size="sm"><Link href="/refer-1">探索平台 <ArrowRight /></Link></Button></header>
     <div className="ds-layout">
       <aside className="ds-sidebar"><p className="ds-index-label">THE LIBRARY</p><nav aria-label="组件分类">{sections.map(item => <a key={item.id} href={`#${item.id}`}><span>{item.number}</span>{item.label}</a>)}</nav><div className="ds-sidebar-note"><span className="ds-status-dot" /> One system.<br />Every surface.<p>黑灰为底，荧光绿点亮行动。<br />米白表面为重点信息留白。</p></div></aside>
       <main className="ds-main">
@@ -167,7 +167,7 @@ export default function ComponentsPage() {
           <div className="ds-photo-stage"><MetricPanel material="glass" title="Field intelligence." eyebrow="NORTH FIELD / CONNECTED" metrics={[{label:"覆盖面积",value:"128",detail:"公顷 / 已连接"},{label:"健康指数",value:"86",detail:"状态良好"},{label:"节省投入",value:"24%",detail:"相比上一季"}]} /><FloatingToolbar aria-label="浮动操作示例"><Button variant="ghost" size="icon" aria-label="查找地块"><Search /></Button><Button variant="ghost" size="icon" aria-label="地块通知"><Bell /></Button><Button size="action" asChild><a href="#knowledge">进入工作空间 <ArrowRight /></a></Button></FloatingToolbar></div>
         </section>
         {sections.map(section => <section key={section.id} id={section.id} className="gallery-section ds-section"><div className="ds-section-heading"><div><span className="ds-eyebrow">{section.number} / COMPONENTS</span><h2>{section.label}</h2></div><span className="ds-section-caption">同一数据 · 独立交互 · 局部表面</span></div><div className={`ds-preview-pair ${["activity","gantt"].includes(section.id) ? "ds-preview-pair-wide" : ""}`}>{([{tone:"dark",material:"solid",label:"深灰表面"},{tone:"light",material:"solid",label:"米白表面"},{tone:"dark",material:"glass",label:"烟灰玻璃"}] as const).map(({tone,material,label})=><div key={label} className={`ds-preview-stage ${material === "glass" ? "ds-preview-stage-glass" : ""}`}><Surface tone={tone} material={material} className="ds-preview @container" aria-label={`${section.label} · ${label}示例`}><div className="ds-preview-label"><span><i />{label}</span><code>{material === "glass" ? 'material="glass"' : `tone="${tone}"`}</code></div><div className="ds-preview-content"><Examples sectionId={section.id} tone={tone} material={material} /></div></Surface></div>)}</div></section>)}
-        <footer className="ds-footer"><span>AGRISATA. / BUILT FOR CLARITY.</span><Link href="/landing">探索 Agrisata <ArrowRight className="size-3" /></Link></footer>
+        <footer className="ds-footer"><span>AGRISATA. / BUILT FOR CLARITY.</span><Link href="/refer-1">探索 Agrisata <ArrowRight className="size-3" /></Link></footer>
       </main>
     </div>
   </div>;
