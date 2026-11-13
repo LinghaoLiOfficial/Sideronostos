@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth.dependencies import AuthPrincipal, require_verified_user
 from ..database.session import get_session
+from .farm_schemas import FarmSyncInput
 from .schemas import (
     Analysis,
     Contract,
@@ -115,3 +116,24 @@ async def save_plan(body: PlanCreate, user: User, session: Session) -> SavedPlan
 @router.get("/plans/{plan_id}", response_model=SavedPlan)
 async def get_plan(plan_id: str, user: User, session: Session) -> SavedPlan:
     return await FieldShiftService().get_plan(session, user.id, plan_id)
+
+
+@router.get("/farms")
+async def list_farms(user: User, session: Session) -> dict[str, object]:
+    from .farm_service import FarmService
+
+    return {"items": await FarmService().list_farms(session, user.id)}
+
+
+@router.get("/farms/{farm_id}")
+async def get_farm(farm_id: str, user: User, session: Session) -> dict[str, object]:
+    from .farm_service import FarmService
+
+    return await FarmService().get_farm(session, user.id, farm_id)
+
+
+@router.post("/farms/sync")
+async def sync_farm(body: FarmSyncInput, user: User, session: Session) -> dict[str, object]:
+    from .farm_service import FarmService
+
+    return await FarmService().sync(session, user.id, body)

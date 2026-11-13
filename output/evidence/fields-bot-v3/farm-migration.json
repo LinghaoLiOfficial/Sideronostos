@@ -1,0 +1,8 @@
+{
+  "database": "fields_v3_migration_1d7d8bd1_test",
+  "from": "foundation_0016_assistant",
+  "to": "foundation_0017_farms",
+  "legacy_record_preserved": true,
+  "upgrade_downgrade_upgrade": true,
+  "application_database_modified": false
+}

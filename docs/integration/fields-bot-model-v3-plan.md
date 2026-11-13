@@ -1,0 +1,127 @@
+# Fields, assistant and model v3 integration
+
+Status: IN PROGRESS. No completion or production-readiness claim.
+Base: main / 8c498cf. Branch: codex/fields-bot-model-v3.
+Authoritative objective: all eight sections of the user's goal-objective.md (2026-11-14).
+No push, remote merge or deployment is authorized.
+
+## Outcome and preserved behavior
+
+One farmer journey: local drawing or login → draw/import farm → review partition →
+complete agronomic information → synchronize owned fields → inspect readiness →
+calculate/compare → save → return to the same field and ask an evidence-bound assistant.
+Keep MapLibre/TerraDraw, partition modes, imports/exports, GIBS, bot companion/dictation,
+legacy records, ownership checks, frozen snapshots, cancellation and honest failure states.
+
+## Authority and decisions
+
+NASA-modeling.md is the v3 mathematical specification; external-data-requirements and
+model-data-assessment define readiness. Adjacent-planting and net-irrigation specify
+supporting calculations. Earlier MILP/notation documents are explanatory where consistent.
+
+- Calendar: local agricultural dates, daily inclusive sow/harvest; occupied through the
+  explicit turnaround end. Next sow must be strictly after that end. Count fallow and
+  family-gap days explicitly, with tests at both boundaries. Unknown history retains its
+  precision; never invent exact harvest dates.
+- GDD: version the recipe with cultivar parameters. Do not change a recipe without its
+  associated maturity threshold. Historical weather replay is a scenario, never a forecast.
+- Water: ha × mm × 10 = m³. Net root-zone irrigation and gross diversion are separate.
+  Candidate precomputation requires explicit initial depletion assumptions; it does not
+  constitute a continuously linked multi-season soil-water simulation.
+- Objectives: six raw metrics with explicit positive scales; weighted gap minimization
+  has higher priority than the agronomic/economic score. Hard prohibitions cannot soften.
+  Missing mandatory inputs block calculation. Only explicitly optional objectives can
+  be disabled; missing metrics are unavailable rather than zero.
+- Readiness: engineering benchmark and locally prepared farm are separate modes. The
+  Iowa parameter/weather package is not the selected pilot, and geographic guards remain.
+- State: GIBS date, observation window and planning horizon are independent. Server field
+  IDs/versions, selection revisions and immutable run snapshots govern assistant context.
+- Farm persistence: minimum owned farm identity + partition revision + field links +
+  resource grouping now; full partition history and collaboration are deferred.
+- Compatibility: legacy v1/v2 analyses and runs stay readable. Add version-dispatched v3
+  contracts and calculations within rotation_optimizer rather than silently relabeling v2.
+
+## Requirement → implementation → proof
+
+FE = sideronostos-frontend/src. BE = sideronostos-backend/src/sideronostos_backend/modules.
+Every row starts NOT VERIFIED; record actual evidence as work completes.
+
+| Requirement / current gap | Files and implementation | Required proof | Status |
+|---|---|---|---|
+| Owned farms and stable local/server field identity; currently browser-only | BE/field_shift/{models,schemas,service,router}.py; new farm schemas/service; additive Alembic migration and installed model registration. Owner-derived farm key, partition revision, per-field idempotency, optimistic updates; preserve existing endpoints | Real DB parallel retry, changed-payload conflict, unauthorized access, partial retry, changed partition, reopen | NOT VERIFIED |
+| Polygon/area/center consistency | BE/field_shift synchronization validation; existing agri_data geometry validation. Recompute geodesic geometry area and validate declared values within documented tolerance | Invalid/self-intersecting polygon, mismatched area/coordinates, valid holes, no silent ring loss | NOT VERIFIED |
+| Anonymous and per-account drafts; non-destructive upgrade | FE/features/fields/storage.ts; FE/types/workspace.ts; add scoped storage tests. Preserve original stores, explicit legacy import, owner-bound write queues | Fake IndexedDB migration plus real browser refresh/account-switch and delayed-write checks | NOT VERIFIED |
+| Field completion and sync UX | FE/features/fields/fields-workspace.tsx, new completion/sync panel and hook; reuse field-form.tsx and history-editor.tsx; FE/lib/api/field-shift*.ts | Confirm boundary ≠ synchronized ≠ ready; duplicate/partial submissions; reload server mapping | NOT VERIFIED |
+| Temporary AOI and scientific evidence | FE/features/fields/field-map.tsx; shared rotation selection/date controller; existing rotation.ts API | Point/polygon/viewport querying without changing farms; date/revision race and missing-data evidence | NOT VERIFIED |
+| Shared navigation/context and bot | FE/components/rotation/{workspace,workspace-state,assistant-dock}.tsx/ts; FE/features/fields/fields-shell.tsx; existing bot components | Same owned field/version across pages; run snapshots; stale actions; login return; desktop/mobile companion and dictation controls | NOT VERIFIED |
+| Planner migration and old URL compatibility | FE/components/rotation/{planner-form,planning-model,results}.tsx/ts; /field-shift/map/page.tsx only after capabilities migrate; auth-shell and old workspace links | Existing plan/history reopen; no duplicate map; preserve deep-link query; static /agriculture assets intact | NOT VERIFIED |
+| Versioned v3 input and source/readiness metadata | BE/rotation_optimizer/{requests,schemas,profiles,service}.py and focused v3 contract/readiness modules; FE API types and conditional form sections | Missing != zero; source/units/time/region/confirmation traced; unknown region blocked; engineering fixtures labelled | NOT VERIFIED |
+| Scientific candidate generation incl root water | BE/rotation_optimizer/{prepare,candidates,coefficients,scientific_verify}.py and focused v3 science module | Hand-calculated GDD, ET0/Kc, storage/TAW/RAW/NIR, daily balance, initial-state limitations and historical date precision | NOT VERIFIED |
+| Full v3 MILP and independent verification | BE/rotation_optimizer/{milp,solver,verify,execution}.py and version-specific model builder/verifier | Enumerated oracle, all-pair spacing, hard suitability, daily water/equipment, seed/market periods, cover/bare, six metrics and lexicographic slack priority | NOT VERIFIED |
+| Durable jobs, bounded capacity and saved results | Existing optimizer service/jobs/models; version-dispatched snapshots and exports | Cancellation, stale generation, timeout with/without solution, no license, partial baseline, no silent field/candidate truncation, saved reopen | NOT VERIFIED |
+| Evidence-bound assistant v3 explanation | BE/farm_assistant/{context,schemas,model_view,prompts,validation}.py; knowledge manifest/readers and evaluation cases | Ownership and numeric binding; diagnostic gaps never actionable claim; new metrics/versions; frozen deterministic and live semantic evaluation distinguished | NOT VERIFIED |
+| Full journey and handoff | FE e2e; backend integration suites; docs/integration plus updated ROTATION_V2 compatibility notes | Actual API/worker/DB/browser path, restart, desktop/mobile screenshots, check/build; requirement audit and unresolved calibration list | NOT VERIFIED |
+
+## Execution stages
+
+1. Establish baseline and owned farm/field synchronization API (tests before behavior).
+2. Scope local storage, field completion and shared map/assistant context; integrate API.
+3. Introduce v3 data/readiness contract, precomputation, model, verifier and job dispatch.
+4. Connect planner/results and assistant to new contracts; version knowledge/help.
+5. Exercise the complete stack, failures and responsive states; retain artifacts and audit.
+
+## Baseline evidence (2026-11-14)
+
+- Clean main at 8c498cf; new branch created, no remote changes.
+- Backend `.venv/bin/python -m pytest -q`: 305 passed, 33 skipped (dedicated DB not set),
+  five existing PDF/SWIG deprecation warnings. This does not prove DB persistence.
+- Global pnpm invocation failed before tests due to package-manager mismatch and automatic
+  install requiring TTY. Retry using repository-pinned corepack pnpm@10.15.0.
+- Existing ROTATION_V2.md documents an AI semantic HOLD and historical provider quota failure.
+  Do not inherit old passing test counts as current proof or erase that limitation.
+
+## Completion ledger
+
+Implementation, DB migration/runtime evidence, frontend journey and v3 model are pending.
+Update this ledger only from inspected files and fresh verification output.
+
+## Checkpoint 1 — 2026-11-14
+
+Implemented (not full-goal completion):
+- Owned farm/partition identity, per-field validation, idempotent batch receipts,
+  partial retry and optimistic conflict behavior; additive migration 0017.
+- Managed Polygon/area/reference-point/containment/overlap validation, including holes;
+  old PATCH cannot bypass it. Old partition records remain readable and immutable.
+- Browser storage v3 preserves legacy stores and adds per-owner workspaces/observations,
+  explicit local-draft copying and owner-mismatch protection.
+
+Fresh proof:
+- New farm API cases failed first with missing-route 404; old edit bypass cases failed
+  with erroneous 200 before the shared validation was added.
+- Full backend suite against dedicated `sideronostos_fields_v3_test`: 351 passed,
+  no skipped tests, five pre-existing SWIG/PDF deprecation warnings.
+- New storage cases failed on owner leakage/overwrite before the implementation.
+- Full frontend: 248 passed across 39 files. Scoped ESLint and TypeScript passed.
+- Ruff passed for changed backend modules/migration/tests; mypy passed for 12 field_shift
+  and geometry files. Whole-repository mypy is not asserted.
+- Fresh isolated Alembic 0016 → 0017 → 0016 → 0017 preserved a seeded legacy record.
+  Evidence: output/evidence/fields-bot-v3/farm-migration.json.
+- Environment setup: installed only locked missing frontend packages with pnpm 10.15.0;
+  Node 26 jsdom uses --no-experimental-webstorage. Removed an obsolete generated Next dev
+  validator (archived in /private/tmp) after typegen; it referenced renamed old routes.
+
+Next work (all still required):
+1. Wire owner-scoped storage/import into the actual /fields page. Current UI still calls
+   anonymous storage methods, so application-level account isolation is NOT VERIFIED.
+   The legacy archive is intact but its import/export controls are not yet displayed.
+2. Implement typed sync API adapter and field completion panel using existing FieldForm;
+   preserve backend IDs/details through FieldMap's toFieldFeature conversion (currently
+   reconstructs properties), choose an interior representative point for concave shapes,
+   persist retry keys, and restore active farms from backend across devices.
+3. Extract shared session/query/context/navigation from RotationWorkspace, add AOI without
+   editing farm boundaries, attach AssistantDock, preserve date/run/deep-link distinctions.
+4. Complete every v3 mathematical/data/readiness requirement, then planner/results/bot
+   integration, end-to-end runtime and responsive QA. No model v3 code exists yet.
+
+No application DB migration, runtime server restart, paid model call, push or deployment
+has occurred. The overall goal remains ACTIVE, with the original eight-section scope.

@@ -57,6 +57,9 @@ def _field(record: FieldRecord) -> Field:
     return Field(
         **record.data,
         id=record.id,
+        farm_id=record.farm_id,
+        partition_revision=record.partition_revision,
+        local_id=record.local_id,
         version=record.version,
         created_at=record.created_at,
         updated_at=record.updated_at,
@@ -116,6 +119,10 @@ class FieldShiftService:
             {**original.data, **body.model_dump(mode="json", exclude_unset=True)}
         )
         _validate_field(body)
+        if original.farm_id is not None:
+            from .farm_service import validate_managed_edit
+
+            body = await validate_managed_edit(session, user_id, original, body)
         record = await session.scalar(
             update(FieldRecord)
             .where(

@@ -4,6 +4,7 @@ from typing import Any, Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pyproj import Geod
 from shapely.geometry import Polygon  # type: ignore[import-untyped]
+from shapely.geometry.polygon import orient  # type: ignore[import-untyped]
 
 GEOD = Geod(ellps="WGS84")
 MAX_AREA_HA = 50_000_000
@@ -23,7 +24,7 @@ def _position(value: Any) -> list[float]:
     return [longitude, latitude]
 
 
-def validate_geometry(value: Any) -> dict[str, Any]:
+def validate_geometry(value: Any, *, allow_holes: bool = False) -> dict[str, Any]:
     if not isinstance(value, dict) or set(value) != {"type", "coordinates"}:
         raise ValueError("Provide a GeoJSON Point or single-ring Polygon")
     if value["type"] == "Point":
@@ -36,28 +37,29 @@ def validate_geometry(value: Any) -> dict[str, Any]:
     if value["type"] != "Polygon":
         raise ValueError("Only Point and Polygon are supported")
     rings = value["coordinates"]
-    if (
-        not isinstance(rings, list)
-        or len(rings) != 1
-        or not isinstance(rings[0], list)
-        or not 4 <= len(rings[0]) <= 201
-    ):
-        raise ValueError("Use one closed ring with at most 200 vertices")
-    ring = [_position(point) for point in rings[0]]
-    if ring[0] != ring[-1]:
+    max_rings, max_vertices = (20, 2000) if allow_holes else (1, 201)
+    if not isinstance(rings, list) or not 1 <= len(rings) <= max_rings:
+        raise ValueError(f"Use between one and {max_rings} polygon rings")
+    if any(not isinstance(ring, list) or len(ring) < 4 for ring in rings):
+        raise ValueError("Each polygon ring needs at least three vertices and closure")
+    if sum(len(ring) for ring in rings) > max_vertices:
+        raise ValueError(f"Polygon exceeds {max_vertices} coordinate positions")
+    normalized = [[_position(point) for point in ring] for ring in rings]
+    if any(ring[0] != ring[-1] for ring in normalized):
         raise ValueError("Polygon ring must be explicitly closed")
-    if max(p[0] for p in ring) - min(p[0] for p in ring) > 180:
+    longitudes = [point[0] for ring in normalized for point in ring]
+    if max(longitudes) - min(longitudes) > 180:
         raise ValueError("Split selections that cross the antimeridian")
-    polygon = Polygon(ring)
+    polygon = Polygon(normalized[0], normalized[1:])
     if not polygon.is_valid or polygon.is_empty or polygon.area == 0:
         raise ValueError("Polygon must have a valid non-intersecting area")
-    area, _ = GEOD.geometry_area_perimeter(polygon)
+    area, _ = GEOD.geometry_area_perimeter(orient(polygon, sign=1.0))
     hectares = abs(area) / 10000
     if not 0 < hectares <= MAX_AREA_HA:
         raise ValueError("Selected area exceeds the supported regional extent")
     center = polygon.representative_point()
     return {
-        "geometry": {"type": "Polygon", "coordinates": [ring]},
+        "geometry": {"type": "Polygon", "coordinates": normalized},
         "center": [center.x, center.y],
         "area_ha": hectares,
     }

@@ -8,6 +8,10 @@ export type EvidenceKind = "observed" | "precomputed" | "synthetic"
 export type SpatialSupport = "field" | "regional-background"
 
 export interface FarmProperties {
+  ownerUserId?: string | null
+  backendFarmId?: string
+  backendVersion?: number
+  partitionRevision?: string
   id: string
   name: string
   boundarySource: FarmBoundarySource
@@ -24,6 +28,12 @@ export interface FarmProperties {
 export type FarmFeature = Feature<Polygon, FarmProperties>
 
 export interface FieldProperties {
+  ownerUserId?: string | null
+  backendFieldId?: string
+  backendVersion?: number
+  syncStatus?: "needs-details" | "pending" | "synced" | "conflict" | "error"
+  syncError?: string | null
+  details?: import("@/lib/api/field-shift-types").FieldInput
   id: string
   farmId: string
   name: string
