@@ -1,12 +1,5 @@
 .DS_Store
 .idea/
-docs/*
-!docs/NASA-datasets-and-APIs.md
-!docs/Problem.md
-!docs/data-source-selection.md
-!docs/reference/
-docs/reference/*
-!docs/reference/farmhawk-system-analysis.md
 
 # NASA sample source files remain local; rendered previews and scripts are tracked.
 data/sample/*/raw/
