@@ -146,6 +146,15 @@ def bind_answer(
             remainder,
         ):
             raise ValueError("Unsupported agricultural guarantee")
+        if any(
+            f.get("source", {}).get("model_version") == "rotation-milp-v3.0"
+            and f["source"].get("implementation_ready") is False
+            for f in facts
+        ) and affirmed(
+            r"已具备实施条件|可直接实施|可以直接实施|ready to implement|ready for implementation",
+            remainder,
+        ):
+            raise ValueError("Unsupported farm implementation readiness claim")
         if not can_claim_optimal and affirmed(r"最优|\boptimal\b", remainder):
             raise ValueError("Unsupported optimality claim")
         rendered = PLACEHOLDER.sub(lambda m: str(values[m.group(1)]["display"]), raw)

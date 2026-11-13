@@ -47,6 +47,10 @@ def replay(report_path: Path, fixtures_path: Path) -> dict[str, Any]:
         view = model_view(recorded["question"], context, evidence)
         visible_ids = {fact["id"] for fact in view["facts"]}
         visible_facts = [fact for fact in evidence["facts"] if fact["id"] in visible_ids]
+        visible_knowledge_ids = {item["id"] for item in view["knowledge"]}
+        visible_knowledge = [
+            item for item in evidence["knowledge"] if item["id"] in visible_knowledge_ids
+        ]
         schema = generation_schema(
             [fact["id"] for fact in view["facts"] if fact["render_reference"]]
         )
@@ -67,7 +71,7 @@ def replay(report_path: Path, fixtures_path: Path) -> dict[str, Any]:
             bound = bind_answer(
                 answer,
                 visible_facts,
-                evidence["knowledge"],
+                visible_knowledge,
                 allowed_actions=view["context"]["allowed_actions"],
                 can_claim_optimal=context["can_claim_optimal"],
             )

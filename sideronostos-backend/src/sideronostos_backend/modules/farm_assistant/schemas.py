@@ -69,7 +69,7 @@ class ContextRef(Contract):
     @model_validator(mode="after")
     def relations(self) -> Self:
         if self.run_id and self.analysis_id:
-            raise ValueError("Choose v1 analysis or v2 run")
+            raise ValueError("Choose a v1 analysis or a versioned optimization run")
         if self.option_id and not (self.run_id or self.analysis_id):
             raise ValueError("Option requires its run or analysis")
         if self.compare_run_id and (

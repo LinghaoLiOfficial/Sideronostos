@@ -9,8 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..agri_data.service import AgriDataService
 from ..field_shift.models import AnalysisRecord, FieldRecord
+from ..rotation_optimizer.comparison import compare_run_views
 from ..rotation_optimizer.models import OptimizationRun
 from ..rotation_optimizer.service import ACTIVE, run_view
+from .daily_evidence import DAILY_METRICS, append_daily_options, daily_verified, is_daily_run
+from .facts import add_fact
 from .schemas import ContextRef
 
 METRICS = {
@@ -20,37 +23,6 @@ METRICS = {
     "cover_ha_days": ("面积加权生长期覆盖 / growing coverage", "ha-days"),
     "diversity_ha_families": ("面积加权科数 / family diversity", "ha-families"),
 }
-
-
-def add_fact(
-    facts: list[dict[str, Any]],
-    key: str,
-    label: str,
-    value: Any,
-    unit: str,
-    source: dict[str, Any],
-    *,
-    language: str = "zh",
-    limitations: list[str] | None = None,
-) -> None:
-    if value is None:
-        display = "缺测 / unavailable" if language == "zh" else "unavailable"
-    elif isinstance(value, (float, int)) and not isinstance(value, bool):
-        display = f"{value:,.2f} {unit}".strip()
-    else:
-        display = f"{value} {unit}".strip()
-    facts.append(
-        {
-            "id": f"F{len(facts) + 1}",
-            "key": key,
-            "label": label,
-            "value": value,
-            "unit": unit,
-            "display": display,
-            "source": source,
-            "limitations": limitations or [],
-        }
-    )
 
 
 async def owned_run(session: AsyncSession, owner: str, identifier: str) -> OptimizationRun:
@@ -93,6 +65,9 @@ def append_run_facts(
             source,
             language=language,
         )
+    if is_daily_run(run):
+        append_daily_options(facts, run, prefix, language, source)
+        return
     result = run["result"] or {}
     for option in [*result.get("options", []), result.get("baseline")]:
         if not option:
@@ -263,6 +238,16 @@ async def freeze_context(
             selected
             and (selected.get("solver") or {}).get("status") == "optimal"
             and run_record.status not in (*ACTIVE, "cancelled", "failed")
+            and (
+                not is_daily_run(run)
+                or (
+                    daily_verified(run, selected)
+                    and selected.get("feasible")
+                    and selected.get("verification", {}).get("valid")
+                    and selected["solver"].get("gap_optimality_proven")
+                    and selected["solver"].get("score_optimality_proven")
+                )
+            )
         )
         context["run"] = run
         if not fields:
@@ -293,44 +278,14 @@ async def freeze_context(
             context["warnings"].append("field_changed_since_run")
         if reference.compare_run_id:
             other = run_view(await owned_run(session, owner, reference.compare_run_id))
-            if other["id"] == run["id"]:
-                raise HTTPException(422, "Comparison needs two different runs")
-            old_fields = sorted((f["id"], f["version"]) for f in run["field_snapshots"])
-            new_fields = sorted((f["id"], f["version"]) for f in other["field_snapshots"])
-            if (
-                old_fields != new_fields
-                or any(
-                    run["request"][k] != other["request"][k] for k in ("start", "end", "profile_id")
-                )
-                or run["provenance"]["weather_sha256"] != other["provenance"]["weather_sha256"]
-            ):
-                raise HTTPException(422, "Run snapshots are not comparable")
-            other["selected_option_id"] = reference.compare_option_id
-            other_options = [
-                *(other["result"] or {}).get("options", []),
-                (other["result"] or {}).get("baseline"),
-            ]
-            second = next(
-                (o for o in other_options if o and o["id"] == reference.compare_option_id), None
+            comparison = compare_run_views(
+                run, other, reference.option_id or "", reference.compare_option_id or ""
             )
-            if selected is None or second is None:
-                raise HTTPException(404, "Comparison option does not belong to the selected run")
-            if (
-                not selected.get("complete", True)
-                or not second.get("complete", True)
-                or any(
-                    r["status"] in (*ACTIVE, "failed", "cancelled", "timeout_no_solution")
-                    for r in (run, other)
-                )
-            ):
-                raise HTTPException(422, "Comparison requires two complete calculated options")
+            other["selected_option_id"] = reference.compare_option_id
             append_run_facts(facts, other, "comparison", language)
-            delta = {
-                k: second["verification"]["totals"][k] - v
-                for k, v in selected["verification"]["totals"].items()
-            }
+            delta = comparison["delta"]
             for metric, value in delta.items():
-                label, unit = METRICS[metric]
+                label, unit = (DAILY_METRICS if is_daily_run(run) else METRICS)[metric]
                 add_fact(
                     facts,
                     "comparison.delta." + metric,
@@ -341,22 +296,14 @@ async def freeze_context(
                         "kind": "comparison",
                         "first_run_id": run["id"],
                         "second_run_id": other["id"],
-                        "first_option_id": selected["id"],
-                        "second_option_id": second["id"],
+                        "first_option_id": reference.option_id,
+                        "second_option_id": reference.compare_option_id,
+                        "model_version": comparison["model_version"],
+                        "implementation_ready": False,
                     },
                     language=language,
                 )
-            changes = {
-                k: {"before": run["request"][k], "after": other["request"][k]}
-                for k in run["request"]
-                if k != "idempotency_key" and run["request"][k] != other["request"][k]
-            }
-            context["comparison"] = {
-                "run": other,
-                "delta": delta,
-                "input_changes": changes,
-                "score_comparable": run["request"]["weights"] == other["request"]["weights"],
-            }
+            context["comparison"] = {**comparison, "run": other}
     if reference.analysis_id:
         analysis = await session.scalar(
             select(AnalysisRecord).where(

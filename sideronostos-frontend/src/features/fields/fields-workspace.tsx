@@ -138,7 +138,7 @@ function OwnedFieldsWorkspace({ owner, unverified }: { owner: AuthUser | null; u
   const selectedField = fields.find((field) => field.properties.id === selectedFieldId) ?? null
   const selectedFarmFields = selectedFarm ? fields.filter((field) => field.properties.farmId === selectedFarm.properties.id) : []
   const context = useFieldsContext(ownerId, selectedField, formDirty)
-  const requestedField = context.navigation.search.get("field")
+  const requestedField = context.navigation.search.get("field") ?? (context.navigation.search.get("plan") ? context.run.data?.field_snapshots[0]?.id : null)
   useEffect(() => {
     if (!requestedField || !local.workspace) return
     const found = local.workspace.fields.find(f => f.properties.backendFieldId === requestedField)

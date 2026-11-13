@@ -30,8 +30,22 @@ Prompt v15 is a candidate prepared from a confirmed failure: paraphrases must pr
 
 ## Resuming real evaluation later
 
-Real evaluation, embedding preparation and sending a new assistant message use provider allowance. The current user instruction is to perform offline work only. Do not run the commands below until real calls are authorized again and usable allowance exists.
+Real evaluation, embedding preparation and new assistant messages use provider allowance.
+The subsequent 2026-11-14 integration goal explicitly requires real AI/end-to-end evaluation
+and supersedes the earlier offline-only stage. No v16 real generation result is recorded yet.
+Preserve the historical reports above; freeze daily cases and fixtures before candidate
+outputs and use an isolated evaluation database/release.
 
-After that: restart the backend with the intended candidate, record the model/reasoning configuration and source hash, and run development plus exposed-case regression into new report files. Review the unchanged 90% rubric and numeric/source/owner hard gates. Source entailment includes preserving the type of outcome; a citation ID match alone is insufficient. Only a completed `promote_to_held_out` review permits the prospective v3 run. Neither partial medium batches nor replay results qualify.
+Next: restart the backend with the intended candidate, record the model/reasoning configuration and source hash, and run development plus exposed-case regression into new report files. Review the unchanged 90% rubric and numeric/source/owner hard gates. Source entailment includes preserving the type of outcome; a citation ID match alone is insufficient. Only a completed `promote_to_held_out` review permits the prospective v3 run. Neither partial medium batches nor replay results qualify.
 
 The existing real runner accepts `--split dev|test|regression`, `--cases`, `--fixtures`, `--output`, and `--dev-review`. Consult its `--help` for syntax, then use a unique output path. Reviewers must preserve all original scores and report paid costs, provider failures and source limitations separately. The current comparison is not independently validated by an agronomist or farmer.
+
+
+## Daily v3 candidate (2026-11-14)
+
+Current prompt is `farmer-evidence-bound-20261114-v16-daily`. Daily metric/gap projection,
+shared nullable comparisons and compatible versioned help retrieval have deterministic tests.
+The 47-source v3 manifest has been validated and prepared offline; vector activation and
+semantic acceptance remain pending. See `docs/integration/model-v3-assistant-contract.md`.
+The protected v3 case set above is unchanged and unrun. New daily cases must have a distinct
+version and frozen hash; existing protected cases must not be silently rewritten for v3.

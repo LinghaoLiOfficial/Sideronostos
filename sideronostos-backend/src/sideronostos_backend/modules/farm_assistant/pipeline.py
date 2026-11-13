@@ -12,7 +12,7 @@ from ..ai.settings import get_ai_settings
 from ..knowledge.embeddings import EmbeddingProvider, EmbeddingUnavailable
 from ..knowledge.models import KBRelease
 from ..knowledge.store import search_release
-from .intents import classify, retrieval_query, retrieval_sources
+from .intents import classify, excluded_product_sources, retrieval_query, retrieval_sources
 from .model_view import model_view
 from .prompts import SYSTEM, VERSION
 from .schemas import ModelAnswer, generation_schema
@@ -50,7 +50,8 @@ async def collect_evidence(
         namespace=release.embedding_namespace,
         product=product,
         product_version="006" if product else None,
-        source_ids=retrieval_sources(question, intent),
+        source_ids=retrieval_sources(question, intent, context),
+        excluded_source_ids=excluded_product_sources(context),
         limit=get_assistant_settings().retrieval_limit,
     )
     knowledge = [{**hit, "chunk_id": hit["id"], "id": f"K{i + 1}"} for i, hit in enumerate(hits)]
@@ -111,6 +112,8 @@ async def generate_answer(
     validation_errors = []
     visible_ids = {v["id"] for v in view["facts"]}
     visible_facts = [f for f in evidence["facts"] if f["id"] in visible_ids]
+    visible_knowledge_ids = {k["id"] for k in view["knowledge"]}
+    visible_knowledge = [k for k in evidence["knowledge"] if k["id"] in visible_knowledge_ids]
     output_schema = generation_schema(
         [fact["id"] for fact in view["facts"] if fact["render_reference"]]
     )
@@ -126,7 +129,7 @@ async def generate_answer(
             bound = bind_answer(
                 parsed,
                 visible_facts,
-                evidence["knowledge"],
+                visible_knowledge,
                 allowed_actions=view["context"]["allowed_actions"],
                 can_claim_optimal=context["can_claim_optimal"],
             )
@@ -181,7 +184,7 @@ async def generate_answer(
         **bound,
         "intent": evidence["intent"],
         "facts": evidence["facts"],
-        "citations": evidence["knowledge"],
+        "citations": visible_knowledge,
         "warnings": context["warnings"],
         "retrieval_mode": evidence["retrieval_mode"],
         "kb_release_id": evidence["kb_release_id"],

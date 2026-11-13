@@ -44,7 +44,8 @@ supporting calculations. Earlier MILP/notation documents are explanatory where c
 ## Requirement → implementation → proof
 
 FE = sideronostos-frontend/src. BE = sideronostos-backend/src/sideronostos_backend/modules.
-Every row starts NOT VERIFIED; record actual evidence as work completes.
+The table records the initial implementation plan. Its NOT VERIFIED entries are baseline
+statuses; the dated checkpoints and current acceptance ledger below record subsequent evidence.
 
 | Requirement / current gap | Files and implementation | Required proof | Status |
 |---|---|---|---|
@@ -82,7 +83,9 @@ Every row starts NOT VERIFIED; record actual evidence as work completes.
 
 ## Completion ledger
 
-Stages 1–2 are implemented with the checkpoint evidence below. Full journey acceptance and the v3 model remain pending.
+Stages 1–3 are implemented. Stage 4 now has v3 planning/results and deterministic bot
+evidence integration, with live knowledge/AI acceptance still pending. Stage 5 has a real
+engineering browser/job/save/reopen checkpoint; full acceptance remains incomplete.
 Update this ledger only from inspected files and fresh verification output.
 
 ## Checkpoint 1 — 2026-11-14
@@ -339,3 +342,72 @@ add v3 results/saved/comparison rendering and version-aware shared history, then
 planning to v3, wire bot/knowledge, and verify the real desktop/mobile journey. Prepared
 raster parity, legacy map redirect, production checks and final AI evaluation also remain.
 Do not report this checkpoint as a completed product integration. Goal remains ACTIVE.
+
+
+## Checkpoint 7 — routed results, daily assistant evidence and actual journey (2026-11-14)
+
+New planning now uses the sourced daily form; `planner-form.tsx` and `results.tsx` dispatch
+explicitly by version. `daily-results.tsx` renders six original metrics, null optional
+metrics, frozen sources/calendar, resource remedies, objective weights and solver proof.
+Alternatives and baseline have a direct raw-metric comparison table; incomparable preference
+scores are not ranked. A scientifically verified but hard-invalid baseline stays labelled
+and cannot be saved. Diagnostic plans have explicit save wording. Historical v2 views remain
+readable; a withdrawn or revised daily profile does not silently replace the run's profile.
+
+Shared `use-rotation-snapshots.ts` loads the saved plan first and obtains its immutable run,
+even for plan-only URLs or conflicting URL run IDs. Draft metadata is scoped by run.
+Draft comparison ignores JSON key order and only documented optional-null defaults, while
+preserving actual numeric/unknown differences. Map return links retain run, option and field.
+MapLibre restores the selected field's camera without dispatching drawing events that would
+clear historical context. Timeline area formatting no longer exposes floating-point noise.
+
+`farm_assistant/daily_evidence.py` projects verified six-metric results, execution limits,
+selected positive gaps/remedies and their input sources. Shared `comparison.py` is used by
+both API and bot. Versioned help retrieval excludes incompatible product documents before
+ranking and before binding. Numeric values remain server-owned; the assistant cannot write
+a farm or plan. Prompt `farmer-evidence-bound-20261114-v16-daily` is an **unevaluated candidate**,
+not a semantic-quality release. See `model-v3-assistant-contract.md`.
+
+The v3 knowledge manifest has 47 sources and 28 reviewed claims. All source hashes verified;
+the offline bundle prepared 4,911 chunks. No v3 vector release was activated and no new real
+chat/embedding evaluation was run in this checkpoint. Existing protected v3 cases remain
+unchanged. The current goal authorizes subsequent real evaluation; the previous offline-only
+restriction belongs to an earlier stage and must not be mistaken for current authorization.
+
+Actual running-system evidence:
+- UI incomplete readiness reported 316 checks. Repetitive checks now appear in four actionable
+  groups while all detailed paths/sources remain inspectable.
+- A real form submission entered the dedicated `fields-v3-journey` Temporal queue. The rainfed
+  test field rejected nine candidates for missing irrigation. A structured-error rendering
+  crash was reproduced, fixed and frozen as a regression; the page now explains field/date
+  and rejection reason without inventing a feasible option.
+- Through the map form, the engineering test field was explicitly changed to irrigated and
+  saved as version 2. The planner required adopting that version and reconfirming conditions.
+- A second UI submission completed a real worker/job attempt with public NASA POWER historical
+  weather: nine candidates, two verified zero-gap alternatives. The UI compared and saved the
+  primary option. The saved input snapshot equals the run's exported snapshot exactly.
+- A new browser session followed the plan-only link, logged in, returned to that plan and
+  recovered the same run/option/field. Mobile map/companion views retain historical context.
+  This does not yet prove a real LLM answer or prepared-raster equivalence.
+
+Fresh automated checkpoint: 305 frontend tests / 52 files passed, TypeScript passed;
+focused ESLint passed after cleanup. Backend checkpoint: 545 passed / 0 skipped, five existing
+PDF/SWIG warnings; scoped Ruff and mypy passed. Evidence and exact IDs are in
+`output/evidence/fields-bot-v3/browser-journey-checkpoint.json`, the two browser-run exports,
+and `output/playwright/fields-v3-*.png`. Tests cover the real structured failure, optional
+metrics, frozen saves, key/default normalization, old-profile fallback prevention and
+cross-run/plan-only owner context. This is a checkpoint, not full-goal completion.
+
+## Current acceptance ledger
+
+| Boundary | Current evidence | Remaining acceptance |
+|---|---|---|
+| Owned field/farm synchronization | Real DB regressions; browser persisted field/version and new-session restoration | Full account switch, conflict, partial retry and restart browser matrix |
+| v3 scientific/math/task execution | Enumerated oracle, independent checks, real Gurobi and real Temporal attempt | Final requirement audit and production configuration checks |
+| Daily form/readiness/results/save | 305 frontend regressions; real incomplete, hard-failure, successful compare/save/reopen paths | Multi-field UI, diagnostic remedy UI, print/export and remaining responsive paths |
+| Bot numeric/evidence boundaries | Deterministic and owned DB tests; saved context on mobile | Frozen daily cases, real retrieval/generation, semantic rubric and held-out gate |
+| Knowledge v3 | Manifest/readers validated, 4,911 chunks prepared offline | Versioned vector publication and retrieval/generation evaluation |
+| Unified map | MapLibre temporary AOI and saved field restoration | Prepared scientific-raster parity; remove duplicate planning map and redirect old map afterward |
+| Real-region use | Explicit sourcing/readiness and uncalibrated-engineering labels | Pilot, crop/soil/operations calibration and farmer/agronomist review |
+
+Goal remains ACTIVE. No push, remote merge or deployment was performed.

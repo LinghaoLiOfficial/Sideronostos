@@ -31,9 +31,28 @@ def classify(question: str, context: dict[str, Any]) -> Intent:
     return "learn"
 
 
-def retrieval_sources(question: str, intent: Intent) -> list[str] | None:
+def help_version(context: dict[str, Any] | None) -> str:
+    if context is None:
+        return "v2"  # Existing offline callers without a context retain their historical contract.
+    run = context.get("run")
+    if run:
+        return "v3" if run.get("request", {}).get("model_version") == "rotation-milp-v3.0" else "v2"
+    return (
+        "v2"
+        if context.get("v1_analysis") or context.get("reference", {}).get("page") == "v1"
+        else "v3"
+    )
+
+
+def excluded_product_sources(context: dict[str, Any]) -> list[str]:
+    return ["HELPV2"] if help_version(context) == "v3" else ["HELPV3", "MODELV3", "DATAV3"]
+
+
+def retrieval_sources(
+    question: str, intent: Intent, context: dict[str, Any] | None = None
+) -> list[str] | None:
     if intent in ("guide", "what_if_request") or re.search(r"积温|\bgdd\b", question, re.I):
-        return ["HELPV2"]
+        return ["HELPV3" if help_version(context) == "v3" else "HELPV2"]
     return None
 
 

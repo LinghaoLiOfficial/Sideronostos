@@ -33,3 +33,11 @@ def test_failed_calculation_questions_retrieve_product_recovery_steps():
         assert intent == "guide"
         assert intents.retrieval_sources(question, intent) == ["HELPV2"]
     assert intents.classify("Why did my crop fail?", {}) == "learn"
+
+
+def test_daily_workflow_retrieves_its_own_versioned_help():
+    daily = {"run": {"request": {"model_version": "rotation-milp-v3.0"}}}
+    legacy = {"run": {"request": {"model_version": "rotation-milp-v2.0"}}}
+    assert intents.retrieval_sources("在哪里检查资料？", "guide", daily) == ["HELPV3"]
+    assert intents.retrieval_sources("在哪里填写旧版预算？", "guide", legacy) == ["HELPV2"]
+    assert intents.retrieval_sources("如何开始规划？", "guide", {"run": None}) == ["HELPV3"]

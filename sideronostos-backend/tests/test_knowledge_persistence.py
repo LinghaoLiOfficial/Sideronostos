@@ -29,7 +29,9 @@ async def session():
     if "test" not in url.rsplit("/", 1)[-1]:
         raise RuntimeError("Tests cannot use the application database")
     engine = create_async_engine(url)
-    tables = [t for t in Base.metadata.sorted_tables if t.name.startswith(("knowledge_", "assistant_"))]
+    tables = [
+        t for t in Base.metadata.sorted_tables if t.name.startswith(("knowledge_", "assistant_"))
+    ]
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         await conn.run_sync(lambda sync: Base.metadata.drop_all(sync, tables=tables))
@@ -131,28 +133,65 @@ async def test_filter_applies_to_both_search_branches_and_rollback_is_explicit(s
     assert (await session.get(KBActivation, "default")).release_id == "test-r1"
 
 
-async def test_lexical_degradation_retrieves_partial_query_terms_instead_of_requiring_every_word(session):
+async def test_lexical_degradation_retrieves_partial_query_terms_instead_of_requiring_every_word(
+    session,
+):
     await stage(session)
     for row in (await session.scalars(select(KnowledgeChunk))).all():
         row.embedding = [0.7, 0.3]
-    await activate_release(session, 'test-r1')
+    await activate_release(session, "test-r1")
     await session.commit()
-    hits = await search_release(session, release_id='test-r1', query='soil unheardtermxyz',
-                                vector=None, namespace='test')
-    assert hits and all('surface water' in h['excerpt'] for h in hits)
+    hits = await search_release(
+        session, release_id="test-r1", query="soil unheardtermxyz", vector=None, namespace="test"
+    )
+    assert hits and all("surface water" in h["excerpt"] for h in hits)
 
 
 async def test_explicit_single_source_help_search_can_retrieve_more_than_two_sections(session):
     sources, _, claims = bundle()
-    parts = chunk_pages(sources[0], [(i, f'Section {i}: surface water guidance.') for i in range(1, 5)])
+    parts = chunk_pages(
+        sources[0], [(i, f"Section {i}: surface water guidance.") for i in range(1, 5)]
+    )
     claims[0].evidence_chunk_ids = [parts[0].id]
-    await stage_release(session, release_id='help-test', sources=[sources[0]], chunks=parts,
-                        claims=[claims[0]], embedding_model='synthetic-test-only', dimensions=2,
-                        namespace='test', report={'scope_reviewed': True})
+    await stage_release(
+        session,
+        release_id="help-test",
+        sources=[sources[0]],
+        chunks=parts,
+        claims=[claims[0]],
+        embedding_model="synthetic-test-only",
+        dimensions=2,
+        namespace="test",
+        report={"scope_reviewed": True},
+    )
     for row in (await session.scalars(select(KnowledgeChunk))).all():
         row.embedding = [0.7, 0.3]
-    await activate_release(session, 'help-test')
+    await activate_release(session, "help-test")
     await session.commit()
-    hits = await search_release(session, release_id='help-test', query='water', vector=[0.7, 0.3],
-                                namespace='test', source_ids=['S0'], limit=8)
+    hits = await search_release(
+        session,
+        release_id="help-test",
+        query="water",
+        vector=[0.7, 0.3],
+        namespace="test",
+        source_ids=["S0"],
+        limit=8,
+    )
     assert len(hits) == 4
+
+
+async def test_source_exclusion_applies_to_both_rankings_before_fusion(session):
+    await stage(session)
+    for row in (await session.scalars(select(KnowledgeChunk))).all():
+        row.embedding = [0.7, 0.3]
+    await activate_release(session, "test-r1")
+    await session.commit()
+    hits = await search_release(
+        session,
+        release_id="test-r1",
+        query="soil",
+        vector=[0.7, 0.3],
+        namespace="test",
+        excluded_source_ids=["S0"],
+    )
+    assert not any(hit["source"]["id"] == "S0" for hit in hits)

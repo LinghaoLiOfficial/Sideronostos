@@ -1,0 +1,61 @@
+{
+  "recorded_at": "2026-11-13T23:12:56.429600+00:00",
+  "environment": "isolated local PostgreSQL/API/Temporal/MapLibre/Next development environment",
+  "task_queue": "fields-v3-journey",
+  "data_kind": "explicit engineering operating assumptions and public historical NASA POWER weather",
+  "failed_run_id": "8649a86b-3755-46c0-9150-b7438f495b1e",
+  "run_id": "1d241a5f-96b1-47d0-951c-726a7f6b55f4",
+  "plan_id": "f6c7bf75-4d0a-47d5-b586-8c132466a65e",
+  "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+  "field_version": 2,
+  "run_status": "optimal",
+  "candidate_count": 9,
+  "distinct_options": 2,
+  "saved_option_id": "option-1",
+  "input_snapshot_sha256": "b577fc7e46384388a03bd8767088dd00c0665dc297d8ad7b822a299a3e275c86",
+  "run_export_snapshot_sha256": "b577fc7e46384388a03bd8767088dd00c0665dc297d8ad7b822a299a3e275c86",
+  "snapshots_match": true,
+  "verified_options": [
+    {
+      "id": "option-1",
+      "feasible": true,
+      "complete": true,
+      "verification_valid": true,
+      "scientific_verification_valid": true,
+      "gap_cost": 0.0
+    },
+    {
+      "id": "option-2",
+      "feasible": true,
+      "complete": true,
+      "verification_valid": true,
+      "scientific_verification_valid": true,
+      "gap_cost": 0.0
+    }
+  ],
+  "browser_observations": [
+    "real form readiness blocks incomplete data",
+    "explicit engineering input and acknowledgment",
+    "rainfed hard failure displayed after renderer correction",
+    "saved irrigation change produces field version 2",
+    "queued optimization finishes with two verified alternatives",
+    "raw alternative comparison and saved plan",
+    "new browser login returns to plan-only deep link",
+    "plan-only link recovers run and canonical map field/option link",
+    "map camera restores persisted field without clearing plan",
+    "mobile companion shows historical calculation context"
+  ],
+  "not_verified": [
+    "real LLM semantic evaluation",
+    "real farmer calibration",
+    "prepared scientific raster parity",
+    "production build and remaining recovery/race acceptance"
+  ],
+  "job": {
+    "id": "3458f018-84ca-439e-b740-b964e0890aad",
+    "status": "succeeded",
+    "attempt": 1,
+    "workflow_id": null,
+    "attempt_records": 1
+  }
+}

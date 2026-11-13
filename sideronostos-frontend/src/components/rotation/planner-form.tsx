@@ -34,6 +34,7 @@ import {
 } from "./planning-model";
 import { HistoryEditor } from "./history-editor";
 import styles from "./workspace.module.css";
+import { DailyPlannerForm, type DailyPlannerProps } from "./daily-planner";
 
 type Props = {
   owner: string;
@@ -79,7 +80,7 @@ export function ResourceInputs({
     </fieldset>
   );
 }
-export function PlannerForm({
+function LegacyPlannerForm({
   owner,
   profile,
   fields,
@@ -802,4 +803,11 @@ export function PlannerForm({
       </form>
     </section>
   );
+}
+
+export function PlannerForm(
+  props: Props | (DailyPlannerProps & { version: "v3" }),
+) {
+  if ("version" in props) return <DailyPlannerForm {...props} />;
+  return <LegacyPlannerForm {...props} />;
 }
