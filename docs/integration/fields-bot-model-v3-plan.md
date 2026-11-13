@@ -82,7 +82,7 @@ Every row starts NOT VERIFIED; record actual evidence as work completes.
 
 ## Completion ledger
 
-Implementation, DB migration/runtime evidence, frontend journey and v3 model are pending.
+Stages 1–2 are implemented with the checkpoint evidence below. Full journey acceptance and the v3 model remain pending.
 Update this ledger only from inspected files and fresh verification output.
 
 ## Checkpoint 1 — 2026-11-14
@@ -110,7 +110,7 @@ Fresh proof:
   Node 26 jsdom uses --no-experimental-webstorage. Removed an obsolete generated Next dev
   validator (archived in /private/tmp) after typegen; it referenced renamed old routes.
 
-Next work (all still required):
+Checkpoint 1 remaining work (superseded by checkpoint 2 below):
 1. Wire owner-scoped storage/import into the actual /fields page. Current UI still calls
    anonymous storage methods, so application-level account isolation is NOT VERIFIED.
    The legacy archive is intact but its import/export controls are not yet displayed.
@@ -125,3 +125,63 @@ Next work (all still required):
 
 No application DB migration, runtime server restart, paid model call, push or deployment
 has occurred. The overall goal remains ACTIVE, with the original eight-section scope.
+
+
+## Checkpoint 2 — owned map, field details and assistant (2026-11-14)
+
+Implemented:
+- `/fields` loads the authenticated owner scope, explicitly imports anonymous/legacy
+  copies and exports the untouched archive. Owner-bound durable queues, exact-request
+  retry receipts and per-item results keep account switches and partial failures safe.
+- New `farms.ts`, `farm-sync.ts`, `owned-workspace.ts`, `local-copy.ts`, completion and
+  sync panels preserve local/server identities, versions and concave polygon geometry.
+  Remote farm adoption keeps a separate unlinked local copy. An incomplete farm on a
+  new device reports missing unsent boundaries rather than inventing them.
+- Farm partition method/orientation/count are persisted. An optional
+  `X-Workspace-Owner` consistency header rejects a delayed farm request after login
+  changes; authenticated identity still exclusively determines ownership.
+- FieldForm and HistoryEditor are reused. Managed geometry is read-only in the details
+  form. Session drafts survive first synchronization. Late completion after panel
+  unmount cannot navigate back, and an older receipt cannot replace a newer query cache.
+- Shared session, navigation, science queries and assistant context are extracted from
+  RotationWorkspace. `/fields` hosts the existing companion/collapse/dictation/chat UI,
+  with field versions, AOI revision, separate observation dates and frozen run context.
+- MapLibre temporary point/polygon/viewport AOI is separate from TerraDraw farm data.
+  Authenticated prepared scientific rasters have an adapter; actual raster publication
+  parity is NOT yet verified. GIBS remains visualization only. No published data is
+  displayed honestly instead of being replaced by demo measurements.
+- Login return paths and both planning return links support `/fields`. Stale page links
+  to `/agriculture` now use `/refer-2`; static assets are unchanged. Mobile panels use
+  the existing focus-trapped Sheet and restore focus on Escape.
+
+Fresh verification:
+- Full frontend: 270 tests / 44 files passed; TypeScript passed.
+- Scoped ESLint: 0 errors, 2 existing cleanup-ref warnings in assistant/workspace.
+- Full backend against dedicated `sideronostos_fields_v3_test`: 355 passed, no skips,
+  5 existing PDF/SWIG deprecation warnings. Ruff passed; scoped mypy passed 13 files.
+- Isolated real journey DB `sideronostos_fields_v3_journey_test` migrated to head.
+  Real login → GeoJSON import → 4 confirmed strips → complete/save first field →
+  point and mobile polygon AOI → planning page → map → refresh was exercised.
+  Mobile Escape restores the Data trigger. No external email or paid model call.
+- Permanent field before/after the mobile polygon: version 1; exact geometry and data
+  unchanged. See `output/evidence/fields-bot-v3/aoi-field-isolation.json`.
+- Screenshots: `output/playwright/fields-v3-saved-desktop.png`,
+  `fields-v3-assistant-desktop.png`, corrected `fields-v3-assistant-mobile.png`,
+  `fields-v3-query-mobile.png`. Iowa is an engineering fixture, not a chosen pilot.
+- Browser console contains expected anonymous/expired-access-token 401s followed by
+  refresh/login; no observed runtime exception. This is not a full production build.
+
+Still required:
+1. Full v3 contracts, readiness, source metadata, scientific preparation, daily MILP,
+   independent verification, frozen job dispatch, and versioned results. No v3 model
+   is implemented at this checkpoint.
+2. Planner/results/bot integration for v3, farm resource groups and active-partition
+   selection; comprehensive account switch, race, conflict, restart and full saved-plan
+   journey verification. Automated tests cover several races; real-browser coverage is
+   currently only the path described above.
+3. Actual prepared-raster parity, then remove the duplicate map from the planner and
+   redirect the legacy map URL with parameters. Legacy routes remain available now.
+4. Fixed-case and live semantic assistant evaluation, full desktop/mobile acceptance,
+   final documentation and real-region data/calibration checklist.
+
+Overall goal remains ACTIVE. No push, remote merge or deployment.

@@ -1,3 +1,4 @@
+import { copyLocalFarm } from "./local-copy"
 import { openDB, type DBSchema } from "idb"
 
 import type { FarmFeature, FieldFeature, FieldObservation } from "@/types/workspace"
@@ -117,20 +118,10 @@ export async function importLocalWorkspace(ownerId: string, source: LocalSource)
   for (const farm of local.farms) {
     const key: [string, LocalSource, string] = [scope, source, farm.properties.id]
     if (await transaction.objectStore("imports").get(key)) continue
-    const farmId = crypto.randomUUID()
-    current.farms.push({
-      ...farm, id: farmId,
-      properties: { ...farm.properties, id: farmId, ownerUserId: ownerId,
-        backendFarmId: undefined, backendVersion: undefined, partitionRevision: crypto.randomUUID() },
-    })
-    for (const field of local.fields.filter(item => item.properties.farmId === farm.properties.id)) {
-      const fieldId = crypto.randomUUID()
-      current.fields.push({
-        ...field, id: fieldId,
-        properties: { ...field.properties, id: fieldId, farmId, ownerUserId: ownerId,
-          backendFieldId: undefined, backendVersion: undefined, syncStatus: "needs-details", syncError: null },
-      })
-    }
+    const copied = copyLocalFarm(farm, local.fields, ownerId)
+    const farmId = copied.farm.properties.id
+    current.farms.push(copied.farm)
+    current.fields.push(...copied.fields)
     await transaction.objectStore("imports").put({ scope, source, originalFarmId: farm.properties.id, targetFarmId: farmId })
   }
   await transaction.objectStore("workspaces").put(current)

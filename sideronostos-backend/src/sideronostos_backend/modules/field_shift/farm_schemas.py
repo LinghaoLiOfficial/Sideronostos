@@ -1,6 +1,6 @@
 """Stable client identities; server ownership is never an input field."""
 
-from typing import Any, Self
+from typing import Any, Literal, Self
 
 from pydantic import Field as PydField
 from pydantic import model_validator
@@ -9,11 +9,22 @@ from ..agri_data.schemas import validate_geometry
 from .schemas import Contract, Identifier, Name
 
 
+class PartitionMetadata(Contract):
+    method: Literal["equal-area-strips", "regular-grid"]
+    orientation: Literal["farm-axis", "cardinal"]
+    requested_count: int = PydField(strict=True, ge=1, le=100)
+    generated_count: int = PydField(strict=True, ge=1, le=100)
+    grid_rows: int | None = PydField(default=None, strict=True, ge=1, le=100)
+    grid_columns: int | None = PydField(default=None, strict=True, ge=1, le=100)
+    boundary_source: Literal["drawn", "imported", "synthetic"]
+
+
 class FarmInput(Contract):
     local_id: Identifier
     name: Name
     geometry: dict[str, Any]
     partition_revision: Identifier
+    partition: PartitionMetadata | None = None
     expected_version: int | None = PydField(default=None, strict=True, ge=1)
 
     @model_validator(mode="after")

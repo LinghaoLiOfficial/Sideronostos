@@ -1,0 +1,51 @@
+{
+  "checkpoint": 2,
+  "status": "partial-goal-in-progress",
+  "backend_tests": {
+    "passed": 355,
+    "skipped": 0,
+    "database": "sideronostos_fields_v3_test"
+  },
+  "frontend_tests": {
+    "passed": 270,
+    "files": 44
+  },
+  "typescript": "passed",
+  "scoped_eslint": {
+    "errors": 0,
+    "existing_warnings": 2
+  },
+  "ruff": "passed",
+  "scoped_mypy_files": 13,
+  "runtime_database": "sideronostos_fields_v3_journey_test",
+  "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+  "field_version": 1,
+  "mobile_viewport": [
+    390,
+    844
+  ],
+  "desktop_viewport": [
+    1440,
+    1000
+  ],
+  "runtime_steps": [
+    "real login",
+    "import Iowa engineering GeoJSON",
+    "confirm four strips",
+    "save first field",
+    "point AOI",
+    "mobile polygon AOI",
+    "planning navigation",
+    "return map",
+    "refresh",
+    "Escape restores Data focus"
+  ],
+  "not_yet_verified": [
+    "actual scientific raster parity",
+    "full account-switch browser journey",
+    "v3 optimizer",
+    "saved v3 plan and assistant explanation",
+    "production build"
+  ],
+  "no_remote_changes": true
+}

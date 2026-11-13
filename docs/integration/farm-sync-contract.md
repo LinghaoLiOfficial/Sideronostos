@@ -1,13 +1,15 @@
 # Farm synchronization and local drafts
 
-This is the first implementation stage of fields-bot-model-v3. The `/fields` UI,
-new optimizer and assistant integration are still pending; these APIs alone do not
-complete the product journey.
+The `/fields` UI now uses this contract for confirmed field synchronization,
+owner-scoped recovery and assistant context. The v3 optimizer and full end-to-end
+acceptance remain pending; synchronization does not imply calculation readiness.
 
 ## Server contract
 
 All farm routes require the existing verified-user dependency. Owner IDs come from
-authentication and cannot be supplied by the client.
+authentication and cannot be supplied by the client. The optional `X-Workspace-Owner`
+header checks that the captured UI account still matches the authenticated account;
+a mismatch returns 409. It never grants access to a different owner.
 
 - `GET /field-shift/farms`: owned current farm headers.
 - `GET /field-shift/farms/{id}`: header plus fields in its current partition.
@@ -90,5 +92,28 @@ into a different scope. Observations are similarly scoped by owner and field.
 `importLocalWorkspace(ownerId, 'legacy' | 'anonymous')` is an explicit atomic copy. It assigns
 new local farm/field IDs, rewires local relationships, clears backend links and preserves
 original data. Repeating an import does not overwrite a previously copied farm. Later edits
-to that source farm are not merged automatically. UI invocation and raw-archive export are
-not wired yet and remain part of the next stage.
+to that source farm are not merged automatically. The `/fields` synchronization panel exposes explicit import and raw-archive export.
+Copies also clear pending receipt bodies/keys and synchronization errors.
+
+
+## UI recovery and partition metadata
+
+An optional `farm.partition` stores method, orientation, requested/generated counts,
+regular-grid dimensions and boundary source. A server farm with only one saved field
+out of four still declares four expected fields. A second device cannot recover the
+other three unsent boundaries; the UI explains that they remain on the original device.
+
+`OwnedWorkspace` writes each attempted request durably before issuing the POST. Network
+or server uncertainty retains that exact request for retry, even if the user has since
+edited the form. A definitive 4xx rejection clears the pending receipt and displays the
+error. Newer local edits survive a successful older receipt. Current server state is
+reloaded after receipt reconciliation; the receipt is not treated as a live snapshot.
+
+Remote conflicts never silently overwrite local changes. After reviewing the server
+version, adopting it creates a separately named, unlinked local copy of the previous
+farm and fields. The copy cannot replay old synchronization keys into another partition.
+
+Field names/details and backend IDs survive map selection and coordinate rounding.
+Temporary AOI uses separate map layers and selection APIs. The real mobile polygon
+check in `output/evidence/fields-bot-v3/aoi-field-isolation.json` confirms no change to
+permanent field version, geometry or data.

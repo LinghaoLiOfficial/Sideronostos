@@ -140,7 +140,9 @@ class FarmService:
         replay = await self._receipt(session, owner, body.idempotency_key, digest)
         if replay is not None:
             return replay
-        data = body.farm.model_dump(mode="json", exclude={"local_id", "expected_version"})
+        data = body.farm.model_dump(
+            mode="json", exclude={"local_id", "expected_version"}, exclude_none=True
+        )
         now = utcnow()
         try:
             created = await session.scalar(

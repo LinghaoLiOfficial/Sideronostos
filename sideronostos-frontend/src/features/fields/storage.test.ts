@@ -133,3 +133,14 @@ it("isolates observations by account even when local field IDs coincide", async 
   expect((await storage.getFieldObservations("same-field", "obs-b"))[0].value).toBe(9)
   expect(await storage.getFieldObservations("same-field")).toEqual([])
 })
+
+it("does not copy an old synchronization receipt into a newly owned local import", async () => {
+  const storage = await import("./storage")
+  const { farm, fields } = createDemoFarm()
+  farm.properties.pendingSync = { idempotency_key: "old-attempt", farm: { local_id: farm.properties.id, name: farm.properties.name, geometry: farm.geometry, partition_revision: "old" }, fields: [] }
+  farm.properties.syncError = "old failure"
+  await storage.replaceStoredWorkspace([farm], fields)
+  const copied = await storage.importLocalWorkspace("receipt-import-owner", "anonymous")
+  expect(copied.farms[0].properties.pendingSync).toBeUndefined()
+  expect(copied.farms[0].properties.syncError).toBeNull()
+})

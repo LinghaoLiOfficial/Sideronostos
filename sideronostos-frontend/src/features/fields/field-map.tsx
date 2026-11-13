@@ -1,7 +1,7 @@
 "use client"
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
-import type { Feature, Polygon } from "geojson"
+import type { Feature, Geometry as GeoGeometry, Polygon } from "geojson"
 import {
   Crosshair,
   Globe2,
@@ -31,6 +31,9 @@ import {
 } from "terra-draw"
 import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter"
 
+import { toFieldFeature } from "./map-feature"
+import type { Geometry, LayerManifest, RegionSelection } from "@/lib/api/rotation-types"
+import { ScienceRaster } from "./science-raster"
 import { Button } from "@/components/ui/button"
 import { buildGibsTileUrl, GIBS_LAYERS } from "@/data/gibs-layers"
 import { featureBounds, validatePolygon } from "@/features/fields/geometry"
@@ -51,10 +54,16 @@ export interface FieldMapHandle {
   selectField: (field: FieldFeature, fit?: boolean) => void
   deleteSelected: () => void
   replaceFields: (fields: FieldFeature[]) => void
+  startQuery: (kind: "point" | "polygon") => void
+  queryViewport: () => Promise<boolean>
   resetWorld: () => void
 }
 
 interface FieldMapProps {
+  selection?: RegionSelection | null
+  scienceLayer?: LayerManifest | null
+  onCancelQuery?: () => void
+  onQuery?: (kind: RegionSelection["kind"], geometry: Geometry) => Promise<boolean>
   farms: FarmFeature[]
   fields: FieldFeature[]
   selectedFieldId: string | null
@@ -97,29 +106,6 @@ function toDrawFeature(field: FieldFeature): GeoJSONStoreFeatures {
   } as unknown as GeoJSONStoreFeatures
 }
 
-function toFieldFeature(feature: GeoJSONStoreFeatures, index: number): FieldFeature | null {
-  if (feature.geometry.type !== "Polygon") return null
-  const properties = feature.properties as Record<string, unknown>
-  const id = typeof properties.id === "string" ? properties.id : String(feature.id)
-  const now = new Date().toISOString()
-  const candidate: FieldFeature = {
-    type: "Feature",
-    id,
-    geometry: feature.geometry as Polygon,
-    properties: {
-      id,
-      farmId: typeof properties.farmId === "string" ? properties.farmId : "",
-      name: typeof properties.name === "string" ? properties.name : `Field ${index + 1}`,
-      status: properties.status === "confirmed" ? "confirmed" : "candidate",
-      partitionIndex: typeof properties.partitionIndex === "number" ? properties.partitionIndex : index + 1,
-      boundarySource: properties.boundarySource === "edited" ? "edited" : "generated",
-      farmerConfirmed: properties.farmerConfirmed === true,
-      createdAt: typeof properties.createdAt === "string" ? properties.createdAt : now,
-      updatedAt: now,
-    },
-  }
-  return validatePolygon(candidate).valid ? candidate : null
-}
 
 function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
   const [query, setQuery] = useState("")
@@ -174,7 +160,7 @@ function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
             setQuery(event.target.value)
             setResults([])
           }}
-          placeholder={MAPTILER_KEY ? "Search a place or farm" : "Search needs a MapTiler key"}
+          placeholder={MAPTILER_KEY ? "Search a place or farm" : "地点搜索暂不可用"}
           disabled={!MAPTILER_KEY}
           aria-label="Search places"
           className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm text-neutral-900 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
@@ -203,6 +189,10 @@ function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
 export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function FieldMap(
   {
     farms,
+    selection,
+    scienceLayer,
+    onQuery,
+    onCancelQuery,
     fields,
     selectedFieldId,
     settings,
@@ -229,8 +219,37 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
   const onErrorRef = useRef(onError)
   const replacingRef = useRef(false)
   const drawingFarmRef = useRef(false)
-  const requestedModeRef = useRef<"select" | "polygon">("select")
+  const requestedModeRef = useRef<"select" | "polygon" | "static">("select")
   const [drawMode, setDrawMode] = useState<"select" | "polygon">("select")
+  const [queryMode, setQueryMode] = useState<"point" | "polygon" | null>(null)
+  const queryModeRef = useRef<"point" | "polygon" | null>(null)
+  const [queryVertices, setQueryVertices] = useState<[number, number][]>([])
+  const [queryBusy, setQueryBusy] = useState(false)
+  const queryState = useRef({ active: true, revision: 0, busy: false })
+  useEffect(() => { const state = queryState.current; state.active = true; return () => { state.active = false; state.revision++ } }, [])
+  function leaveQuery() {
+    onCancelQuery?.()
+    queryState.current.revision++; queryModeRef.current = null; setQueryMode(null)
+    setQueryVertices([]); drawingFarmRef.current = false
+    requestedModeRef.current = "select"; drawRef.current?.setMode("select"); setDrawMode("select")
+  }
+  function startQuery(kind: "point" | "polygon") {
+    queryState.current.revision++; queryModeRef.current = kind; setQueryMode(kind); setQueryVertices([])
+    drawingFarmRef.current = false; requestedModeRef.current = "static"; drawRef.current?.setMode("static")
+  }
+  async function finishQuery() {
+    if (!onQuery || queryVertices.length < 3 || queryState.current.busy) return
+    const geometry: Geometry = { type: "Polygon", coordinates: [[...queryVertices, queryVertices[0]]] }
+    const validation = validatePolygon({ type: "Feature", properties: {}, geometry })
+    if (!validation.valid) { onError(validation.errors[0]); return }
+    const revision = queryState.current.revision
+    queryState.current.busy = true; setQueryBusy(true)
+    try { const saved = await onQuery("polygon", geometry); if (saved && queryState.current.active && queryState.current.revision === revision) leaveQuery() }
+    finally { queryState.current.busy = false; if (queryState.current.active) setQueryBusy(false) }
+  }
+  const queryGeometry: GeoGeometry | null = queryVertices.length > 2 ? { type: "Polygon", coordinates: [[...queryVertices, queryVertices[0]]] }
+    : queryVertices.length > 1 ? { type: "LineString", coordinates: queryVertices } : queryVertices.length ? { type: "Point", coordinates: queryVertices[0] } : null
+
 
   useEffect(() => {
     selectedIdRef.current = selectedFieldId
@@ -254,7 +273,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
   function snapshotFields() {
     const snapshot = drawRef.current?.getSnapshot() ?? []
     const next = snapshot
-      .map((feature, index) => toFieldFeature(feature, index))
+      .map((feature, index) => toFieldFeature(feature, index, fieldsRef.current))
       .filter((field): field is FieldFeature => field !== null)
     onFieldsChange(next)
   }
@@ -270,6 +289,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       "td-point-marker",
       "farm-boundaries-fill",
       "farm-boundaries-line",
+      "query-aoi-fill", "query-aoi-line", "query-aoi-point", "query-draft-fill", "query-draft-line", "query-draft-point",
     ]) {
       if (map.getLayer(layerId)) map.moveLayer(layerId)
     }
@@ -289,17 +309,20 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
 
   useImperativeHandle(ref, () => ({
     startFarmDrawing() {
+      leaveQuery()
       drawingFarmRef.current = true
       requestedModeRef.current = "polygon"
       drawRef.current?.setMode("polygon")
       setDrawMode("polygon")
     },
     startSelecting() {
+      leaveQuery()
       requestedModeRef.current = "select"
       drawRef.current?.setMode("select")
       setDrawMode("select")
     },
     selectField(field, fit = true) {
+      leaveQuery()
       const draw = drawRef.current
       if (draw) {
         const hasField = () => draw.getSnapshot().some((feature) => String(feature.id) === field.properties.id)
@@ -324,6 +347,13 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       snapshotFields()
     },
     replaceFields,
+    startQuery,
+    async queryViewport() {
+      const bounds = mapRef.current?.getBounds()
+      if (!bounds || !onQuery) return false
+      const w = Math.max(-180, bounds.getWest()), e = Math.min(180, bounds.getEast()), s = Math.max(-85.051129, bounds.getSouth()), n = Math.min(85.051129, bounds.getNorth())
+      return onQuery("viewport", { type: "Polygon", coordinates: [[[w,s],[e,s],[e,n],[w,n],[w,s]]] })
+    },
     resetWorld() {
       mapRef.current?.flyTo({ center: [8, 22], zoom: 1.5, duration: 800 })
     },
@@ -389,12 +419,13 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       onFarmCreatedRef.current(geometry)
     })
     draw.on("change", (ids, type) => {
-      if (replacingRef.current || type === "create" || drawingFarmRef.current) return
+      if (replacingRef.current || type === "create" || drawingFarmRef.current || queryModeRef.current) return
       const snapshot = draw.getSnapshot()
-        .map((feature, index) => toFieldFeature(feature, index))
+        .map((feature, index) => toFieldFeature(feature, index, fieldsRef.current))
         .filter((field): field is FieldFeature => field !== null)
       const changedId = String(ids[0] ?? "")
       const previousChanged = fieldsRef.current.find((field) => field.properties.id === changedId)
+      if (previousChanged && JSON.stringify(toDrawFeature(previousChanged).geometry) === JSON.stringify(draw.getSnapshotFeature(changedId)?.geometry)) return
       if (previousChanged?.properties.status === "confirmed") {
         replaceFields(fieldsRef.current)
         onErrorRef.current("Confirmed field boundaries are locked. Create a new draft partition to revise them.")
@@ -417,8 +448,8 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       replaceFields(synced)
       onFieldsChangeRef.current(synced)
     })
-    draw.on("select", (id) => onSelectFieldRef.current(String(id)))
-    draw.on("deselect", () => onSelectFieldRef.current(null))
+    draw.on("select", (id) => { if (!replacingRef.current && !queryModeRef.current) onSelectFieldRef.current(String(id)) })
+    draw.on("deselect", () => { if (!replacingRef.current && !queryModeRef.current) onSelectFieldRef.current(null) })
   }
 
   useEffect(() => () => {
@@ -465,6 +496,12 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
         renderWorldCopies={false}
         attributionControl={false}
         onLoad={handleMapLoad}
+        onClick={event => {
+          if (!queryModeRef.current || queryState.current.busy) return
+          const point: [number, number] = [event.lngLat.lng, event.lngLat.lat]
+          if (queryModeRef.current === "point") void onQuery?.("point", { type: "Point", coordinates: point })
+          else setQueryVertices(old => { if (old.length >= 200) { onError("临时选区最多 200 个顶点。"); return old } return [...old, point] })
+        }}
         onMoveEnd={handleMoveEnd}
         onMouseMove={(event) => onCoordinateChange([event.lngLat.lng, event.lngLat.lat])}
         onError={(event) => {
@@ -494,6 +531,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
             </Source>
           )
         })}
+        {scienceLayer && <ScienceRaster key={scienceLayer.id} layer={scienceLayer} />}
         {farms.length > 0 && (
           <Source
             id="farm-boundaries"
@@ -512,6 +550,8 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
             />
           </Source>
         )}
+        {selection && <QueryShape id="query-aoi" geometry={selection.geometry} />}
+        {queryGeometry && <QueryShape id="query-draft" geometry={queryGeometry} />}
         <NavigationControl position="bottom-right" showCompass={false} />
         <GeolocateControl position="bottom-right" trackUserLocation />
         <FullscreenControl position="bottom-right" />
@@ -520,8 +560,10 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       </Map>
 
       <SearchBox mapRef={mapRef} />
+      {queryMode && <div className="absolute left-3 right-14 top-16 z-20 max-w-sm rounded border bg-background p-3 shadow-lg" role="region" aria-label="临时提问选区工具"><p className="text-sm font-medium">{queryMode === "polygon" ? `临时提问区域 · ${queryVertices.length} 个顶点` : "点击地图选择提问位置"}</p><p className="my-1 text-xs">农场与经营地块边界保持锁定。</p><div className="flex flex-wrap gap-2">{queryMode === "polygon" && <><Button size="sm" disabled={queryBusy || queryVertices.length < 3} onClick={() => void finishQuery()}>确认提问区域</Button><Button size="sm" variant="outline" disabled={queryBusy || !queryVertices.length} onClick={() => setQueryVertices(v => v.slice(0, -1))}>撤回顶点</Button></>}<Button size="sm" variant="ghost" disabled={queryBusy} onClick={leaveQuery}>结束提问选区</Button></div></div>}
 
-      <div className="absolute left-3 top-16 z-10 flex flex-col gap-1 border border-black/10 bg-white p-1 text-neutral-900 shadow-lg">
+
+      <div className={cn("absolute left-3 top-16 z-10 flex flex-col gap-1 border border-black/10 bg-white p-1 text-neutral-900 shadow-lg", queryMode && "hidden")}>
         <Button
           type="button"
           size="icon"
@@ -529,6 +571,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           title="Select and edit fields"
           aria-label="Select and edit fields"
           onClick={() => {
+            leaveQuery()
             drawRef.current?.setMode("select")
             requestedModeRef.current = "select"
             setDrawMode("select")
@@ -544,6 +587,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           title="Draw farm boundary"
           aria-label="Draw farm boundary"
           onClick={() => {
+            leaveQuery()
             drawingFarmRef.current = true
             requestedModeRef.current = "polygon"
             drawRef.current?.setMode("polygon")
@@ -567,7 +611,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
         </Button>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-2 border border-black/10 bg-white/95 px-3 py-2 text-xs text-neutral-700 shadow-lg backdrop-blur md:flex">
+      <div className="absolute bottom-20 xl:bottom-8 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-2 border border-black/10 bg-white/95 px-3 py-2 text-xs text-neutral-700 shadow-lg backdrop-blur md:flex">
         {drawMode === "polygon" ? (
           <><Crosshair className="size-4 text-primary" /> Draw the farm boundary; click the first point to finish</>
         ) : (
@@ -580,9 +624,17 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           "absolute right-3 top-3 z-10 hidden border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow md:block",
           "max-w-56",
         )}>
-          Development basemap · add <code>NEXT_PUBLIC_MAPTILER_KEY</code> for satellite imagery and search
+          备用底图 · 卫星底图与地点搜索暂不可用，仍可通过边界文件或坐标选区。
         </div>
       )}
     </div>
   )
 })
+
+function QueryShape({ id, geometry }: { id: string; geometry: GeoGeometry }) {
+  return <Source id={id} type="geojson" data={{ type: "Feature", properties: {}, geometry }}>
+    <Layer id={`${id}-fill`} type="fill" filter={["==", ["geometry-type"], "Polygon"]} paint={{ "fill-color": "#7c3aed", "fill-opacity": 0.15 }} />
+    <Layer id={`${id}-line`} type="line" filter={["!=", ["geometry-type"], "Point"]} paint={{ "line-color": "#7c3aed", "line-width": 3, "line-dasharray": [2, 2] }} />
+    <Layer id={`${id}-point`} type="circle" filter={["==", ["geometry-type"], "Point"]} paint={{ "circle-color": "#7c3aed", "circle-radius": 7, "circle-stroke-color": "#fff", "circle-stroke-width": 2 }} />
+  </Source>
+}

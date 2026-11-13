@@ -12,6 +12,10 @@ export interface FarmProperties {
   backendFarmId?: string
   backendVersion?: number
   partitionRevision?: string
+  expectedFieldCount?: number
+  partitionMetadataKnown?: boolean
+  syncError?: string | null
+  pendingSync?: import("@/lib/api/farms").FarmSyncInput
   id: string
   name: string
   boundarySource: FarmBoundarySource

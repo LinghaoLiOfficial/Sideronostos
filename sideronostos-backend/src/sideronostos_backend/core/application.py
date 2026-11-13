@@ -57,6 +57,7 @@ def create_app(
             "Content-Type",
             "X-CSRF-Token",
             "X-Request-ID",
+            "X-Workspace-Owner",
         ],
         expose_headers=["X-Request-ID"],
     )

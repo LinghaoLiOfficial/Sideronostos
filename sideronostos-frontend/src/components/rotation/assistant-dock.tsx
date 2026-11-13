@@ -39,6 +39,7 @@ export type AssistantDockProps = {
   ownerId: string;
   context: AssistantContext;
   contextLabel: string;
+  contextPending?: boolean;
   onAction: (action: AssistantAction) => void;
   openRequest?: { id: number; text: string };
 };
@@ -112,6 +113,7 @@ function AssistantSession({
   ownerId,
   context,
   contextLabel,
+  contextPending = false,
   onAction,
   openRequest,
 }: AssistantDockProps) {
@@ -270,7 +272,7 @@ function AssistantSession({
   }
   async function send(event?: FormEvent, previous?: Submission) {
     event?.preventDefault();
-    if (pending || (!text.trim() && !previous)) return;
+    if (contextPending || pending || (!text.trim() && !previous)) return;
     const requestSequence = ++sequence.current;
     // Freeze at the click, before conversation creation can race a map selection.
     const body = previous?.body ?? {
@@ -764,6 +766,7 @@ function AssistantSession({
           </button>
         </div>
       )}
+      {contextPending && <p role="status" className={styles.chatFootnote}>正在核对地块、选区或历史方案，完成后可继续提问。</p>}
       <BotComposer
         inputRef={textarea}
         label="给轮作助手留言"
@@ -771,7 +774,7 @@ function AssistantSession({
         value={text}
         onChange={setText}
         onSend={() => void send()}
-        pending={pending}
+        pending={pending || contextPending}
         language={preferences.language === "zh" ? "zh-CN" : "en-US"}
         placeholder={
           preferences.language === "zh"

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -9,15 +9,18 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { buildAssistantContext } from "./assistant-context";
+import { useWorkspaceNavigation } from "./use-workspace-navigation";
+import { useScienceQueries } from "./use-science-queries";
+import { useWorkspaceSession } from "./use-workspace-session";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Layers, Map, Plus, Sprout } from "lucide-react";
 import { Surface } from "@/components/ui/surface";
-import { ApiError, getCurrentUser, type AuthUser } from "@/lib/api/client";
+import { ApiError, type AuthUser } from "@/lib/api/client";
 import * as fieldsApi from "@/lib/api/field-shift";
 import * as api from "@/lib/api/rotation";
 import type { Field } from "@/lib/api/field-shift-types";
 import type {
-  AssistantContext,
   ChangedCondition,
   Geometry,
   RegionSelection,
@@ -68,7 +71,7 @@ function Header({
 }) {
   return (
     <header className={styles.header}>
-      <Link className={styles.brand} href="/agriculture">
+      <Link className={styles.brand} href="/refer-2">
         <Sprout size={25} />
         <span>
           Agrisata <small>FIELD SHIFT</small>
@@ -77,7 +80,7 @@ function Header({
       <nav aria-label="Field Shift 工作区">
         <Link
           aria-current={mode === "map" ? "page" : undefined}
-          href={`/field-shift/map${search ? "?" + search : ""}`}
+          href={`/fields${search ? "?" + search : ""}`}
         >
           <Map size={16} />
           地图
@@ -101,15 +104,7 @@ function Header({
 }
 export function RotationWorkspace({ mode }: { mode: "map" | "rotation" }) {
   const search = useSearchParams();
-  const session = useQuery({
-    queryKey: ["field-shift", "session"],
-    queryFn: getCurrentUser,
-    retry: false,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: "always",
-  });
-  const ready = session.isFetchedAfterMount && !session.isFetching;
+  const { session, ready } = useWorkspaceSession();
   if (!ready)
     return (
       <Surface tone="light" className={styles.app}>
@@ -165,9 +160,9 @@ function OwnerWorkspace({
   owner: AuthUser;
   mode: "map" | "rotation";
 }) {
-  const router = useRouter(),
-    search = useSearchParams(),
-    client = useQueryClient();
+  const navigation = useWorkspaceNavigation(`/field-shift/${mode}`);
+  const { search, latestSearch, revision: contextRevision, setRevision: setContextRevision } = navigation;
+  const client = useQueryClient();
   const requestedField = search.get("field"),
     selectionId = search.get("selection"),
     runId = search.get("run"),
@@ -202,12 +197,7 @@ function OwnerWorkspace({
     [savedMessage, setSavedMessage] = useState<string | null>(null);
   const selectionSeq = useRef(0),
     abort = useRef<AbortController | null>(null),
-    mounted = useRef(true),
-    latestSearch = useRef(search.toString());
-  useEffect(() => {
-    latestSearch.current = search.toString();
-  }, [search]);
-  const [contextRevision, setContextRevision] = useState(1);
+    mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -229,37 +219,7 @@ function OwnerWorkspace({
   });
   const selectedField = fields.data?.items.find((f) => f.id === requestedField),
     profile = profiles.data?.items[0];
-  const selection = useQuery({
-    queryKey: ["rotation", owner.id, "selection", selectionId],
-    queryFn: () => api.getSelection(selectionId!),
-    enabled: Boolean(selectionId),
-    retry: false,
-  });
-  const facts = useQuery({
-    queryKey: [
-      "rotation",
-      owner.id,
-      "facts",
-      selectionId,
-      selection.data?.revision,
-      dates,
-    ],
-    queryFn: ({ signal }) => api.getRegionFacts(selection.data!, dates, signal),
-    enabled: Boolean(selection.data),
-    retry: false,
-  });
-  const layers = useQuery({
-    queryKey: ["rotation", owner.id, "layers"],
-    queryFn: api.listLayers,
-    retry: false,
-  });
-  const manifest = useQuery({
-    queryKey: ["rotation", owner.id, "manifest", layerId],
-    queryFn: () => api.getLayerManifest(layerId),
-    enabled: Boolean(layerId),
-    retry: false,
-    staleTime: Infinity,
-  });
+  const { selection, facts, layers, manifest } = useScienceQueries(owner.id, selectionId, layerId, dates);
   const run = useQuery({
     queryKey: ["rotation", owner.id, "run", runId],
     queryFn: () => api.getRun(runId!),
@@ -289,18 +249,7 @@ function OwnerWorkspace({
     retry: false,
   });
   function navigate(patch: Record<string, string | null>, nextMode = mode) {
-    setContextRevision((value) => value + 1);
-    const params = new URLSearchParams(latestSearch.current);
-    for (const [key, value] of Object.entries(patch)) {
-      if (value) params.set(key, value);
-      else params.delete(key);
-    }
-    latestSearch.current = params.toString();
-    const url = `/field-shift/${nextMode}${params.size ? "?" + params : ""}`;
-    // These query values belong to this client workspace. Next integrates native
-    // history with useSearchParams, without reusing a prefetched page's old URL.
-    if (nextMode === mode) globalThis.history.replaceState(null, "", url);
-    else router.replace(url, { scroll: false });
+    navigation.navigate(patch, `/field-shift/${nextMode}`);
   }
   async function selectRegion(
     kind: RegionSelection["kind"],
@@ -361,10 +310,10 @@ function OwnerWorkspace({
       );
       setContextRevision((value) => value + 1);
     },
-    [client, owner.id],
+    [client, owner.id, setContextRevision],
   );
   async function saveBoundary() {
-    if (!selectedField || selection.data?.kind !== "polygon") return;
+    if (!selectedField || selectedField.farm_id || selection.data?.kind !== "polygon") return;
     const origin = { field: selectedField.id, selection: selection.data.id };
     setBoundaryBusy(true);
     setBoundaryMessage(null);
@@ -412,7 +361,7 @@ function OwnerWorkspace({
       );
       setContextRevision((value) => value + 1);
     },
-    [],
+    [setContextRevision],
   );
   const fieldStale =
     run.data?.field_snapshots.some((snapshot) => {
@@ -431,36 +380,14 @@ function OwnerWorkspace({
       allOptions(run.data).find(
         (o) => o.id === (planId ? saved.data?.option_id : optionId),
       );
-  const context: AssistantContext = {
-    revision: contextRevision,
-    page: mode,
-    selection: selection.data
-      ? { id: selection.data.id, revision: selection.data.revision }
-      : null,
-    dates,
-    fields: hasRun
-      ? []
-      : mode === "rotation"
-        ? draftFields
-            .filter((f) =>
-              fields.data?.items.some(
-                (current) =>
-                  current.id === f.id && current.version === f.expected_version,
-              ),
-            )
-            .map((f) => ({ id: f.id, expected_version: f.expected_version }))
-        : selectedField
-          ? [{ id: selectedField.id, expected_version: selectedField.version }]
-          : [],
-    run_id: hasRun ? run.data!.id : null,
-    option_id: hasRun ? (actualOption?.id ?? null) : null,
-    compare_run_id: hasRun && !planId ? compareId : null,
-    compare_option_id: hasRun && !planId ? compareOptionId : null,
-    draft: {
-      dirty: hasRun && !planId && visibleChanges.length > 0,
-      changed_fields: hasRun && !planId ? visibleChanges : [],
-    },
-  };
+  const context = buildAssistantContext({
+    revision: contextRevision, page: mode,
+    selection: selection.data ? { id: selection.data.id, revision: selection.data.revision } : null,
+    dates, fields: mode === "rotation" ? draftFields.filter(f => fields.data?.items.some(current => current.id === f.id && current.version === f.expected_version))
+      : selectedField ? [{ id: selectedField.id, expected_version: selectedField.version }] : [],
+    runId: hasRun ? run.data!.id : null, optionId: actualOption?.id,
+    compareRunId: compareId, compareOptionId, saved: Boolean(planId), changes: visibleChanges,
+  });
   const contextLabel = [
     hasRun
       ? run.data!.field_snapshots.map((f) => f.name).join("、")
@@ -668,7 +595,7 @@ function OwnerWorkspace({
                 清除选区
               </button>
             </div>
-            {selection.data.kind === "polygon" && selectedField && (
+            {selection.data.kind === "polygon" && selectedField && !selectedField.farm_id && (
               <details className={styles.details}>
                 <summary>将区域保存为「{selectedField.name}」的边界</summary>
                 <p className={styles.help}>
@@ -823,7 +750,7 @@ function OwnerWorkspace({
           ) : (
             <>
               <div className={styles.planningNavigation}>
-                <Link href={`/field-shift/map?${search}`}>
+                <Link href={`/fields?${search}`}>
                   <ArrowLeft size={14} />
                   返回地图
                 </Link>
@@ -929,6 +856,7 @@ function OwnerWorkspace({
             ownerId={owner.id}
             context={context}
             contextLabel={contextLabel}
+            contextPending={selecting || Boolean((runId || planId) && !hasRun) || Boolean(selectionId && !selection.data)}
             openRequest={openRequest}
             onAction={(action) => {
               if (action === "open_planner" || action === "edit_conditions") {
@@ -937,7 +865,7 @@ function OwnerWorkspace({
                   () => document.getElementById("planning-conditions")?.focus(),
                   50,
                 );
-              } else if (action === "choose_field") navigate({}, "map");
+              } else if (action === "choose_field") navigation.navigate({}, "/fields");
             }}
           />
         </section>

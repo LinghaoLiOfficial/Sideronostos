@@ -1,0 +1,42 @@
+{
+  "id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+  "version": 1,
+  "data": {
+    "name": "Iowa benchmark field 1",
+    "area_ha": 1.8405225977659225,
+    "latitude": 41.99925,
+    "longitude": -93.5,
+    "soil_texture": "loam",
+    "irrigation_available": false,
+    "profile_id": "temperate-demo",
+    "history": [],
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -93.502,
+            41.999
+          ],
+          [
+            -93.498,
+            41.999
+          ],
+          [
+            -93.498,
+            41.9995
+          ],
+          [
+            -93.502,
+            41.9995
+          ],
+          [
+            -93.502,
+            41.999
+          ]
+        ]
+      ]
+    },
+    "history_events": []
+  }
+}

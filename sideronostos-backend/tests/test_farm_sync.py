@@ -265,3 +265,32 @@ async def test_legacy_edit_cannot_overlap_a_sibling_managed_field(api):
         },
     )
     assert response.status_code == 422
+
+
+async def test_partition_metadata_survives_cross_device_restore(api):
+    client, _ = api
+    body = request_body()
+    body["farm"]["partition"] = {
+        "method": "regular-grid",
+        "orientation": "cardinal",
+        "requested_count": 2,
+        "generated_count": 2,
+        "grid_rows": 1,
+        "grid_columns": 2,
+        "boundary_source": "drawn",
+    }
+    response = await client.post("/field-shift/farms/sync", json=body)
+    assert response.status_code == 200
+    restored = await client.get("/field-shift/farms/" + response.json()["farm"]["id"])
+    assert restored.json()["partition"] == body["farm"]["partition"]
+
+
+async def test_account_context_guard_rejects_a_request_after_login_switch(api):
+    client, identity = api
+    old_owner = identity["id"]
+    identity["id"] = str(uuid4())
+    headers = {"X-Workspace-Owner": old_owner}
+    assert (await client.get("/field-shift/farms", headers=headers)).status_code == 409
+    result = await client.post("/field-shift/farms/sync", json=request_body(), headers=headers)
+    assert result.status_code == 409
+    assert (await client.get("/field-shift/farms")).json() == {"items": []}

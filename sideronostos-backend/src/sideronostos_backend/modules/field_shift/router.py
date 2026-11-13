@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import Field as PydField
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -118,22 +118,37 @@ async def get_plan(plan_id: str, user: User, session: Session) -> SavedPlan:
     return await FieldShiftService().get_plan(session, user.id, plan_id)
 
 
+async def farm_identity(
+    user: User,
+    expected_owner: Annotated[str | None, Header(alias="X-Workspace-Owner", max_length=100)] = None,
+) -> AuthPrincipal:
+    # Consistency guard only: authentication still exclusively determines ownership.
+    if expected_owner is not None and expected_owner != user.id:
+        raise HTTPException(
+            status_code=409, detail="Account changed; reload the workspace before retrying"
+        )
+    return user
+
+
+FarmUser = Annotated[AuthPrincipal, Depends(farm_identity)]
+
+
 @router.get("/farms")
-async def list_farms(user: User, session: Session) -> dict[str, object]:
+async def list_farms(user: FarmUser, session: Session) -> dict[str, object]:
     from .farm_service import FarmService
 
     return {"items": await FarmService().list_farms(session, user.id)}
 
 
 @router.get("/farms/{farm_id}")
-async def get_farm(farm_id: str, user: User, session: Session) -> dict[str, object]:
+async def get_farm(farm_id: str, user: FarmUser, session: Session) -> dict[str, object]:
     from .farm_service import FarmService
 
     return await FarmService().get_farm(session, user.id, farm_id)
 
 
 @router.post("/farms/sync")
-async def sync_farm(body: FarmSyncInput, user: User, session: Session) -> dict[str, object]:
+async def sync_farm(body: FarmSyncInput, user: FarmUser, session: Session) -> dict[str, object]:
     from .farm_service import FarmService
 
     return await FarmService().sync(session, user.id, body)
