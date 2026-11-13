@@ -1,0 +1,23 @@
+{
+  "checkpoint": 6,
+  "date": "2026-11-14",
+  "frontend": {
+    "passed": 286,
+    "files": 48,
+    "typescript": "passed",
+    "scoped_eslint_errors": 0,
+    "scoped_eslint_warnings": 0
+  },
+  "backend": {
+    "passed": 531,
+    "skipped": 0,
+    "warnings": 5,
+    "database": "sideronostos_fields_v3_test",
+    "ruff": "passed",
+    "mypy_files": 23
+  },
+  "contract_evidence": "frontend-contract-v3.json",
+  "daily_planner_routed": false,
+  "new_browser_journey_verified": false,
+  "goal_complete": false
+}

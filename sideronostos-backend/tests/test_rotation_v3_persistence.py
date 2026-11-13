@@ -159,3 +159,53 @@ async def test_comparison_preserves_unknown_optional_metrics_as_null(api):
     assert response.status_code == 200, response.text
     assert response.json()["delta"]["profit"] is None
     assert response.json()["unavailable_metrics"] == ["profit"]
+
+
+async def test_daily_catalogue_history_can_be_saved_and_used_for_readiness(api):
+    from sideronostos_backend.modules.agri_data.schemas import validate_geometry
+    from sideronostos_backend.modules.field_shift.models import FarmRecord
+    from sideronostos_backend.modules.field_shift.schemas import FieldInput
+
+    client, _, body, factory, fid, farmid = api
+    await publish_weather(factory)
+    geometry = {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [-93.501, 41.999],
+                [-93.499, 41.999],
+                [-93.499, 42.001],
+                [-93.501, 42.001],
+                [-93.501, 41.999],
+            ]
+        ],
+    }
+    async with factory() as session:
+        row = await session.get(FieldRecord, fid)
+        row.data = {
+            **row.data,
+            "geometry": geometry,
+            "area_ha": validate_geometry(geometry)["area_ha"],
+        }
+        farm = await session.get(FarmRecord, farmid)
+        farm.data = {**farm.data, "geometry": geometry}
+        await session.commit()
+    saved = (await client.get("/field-shift/fields/" + fid)).json()
+    update = {k: v for k, v in saved.items() if k in FieldInput.model_fields}
+    update["history_events"] = [
+        {
+            "id": "previous-maize",
+            "crop_id": "maize",
+            "profile_id": body["profile_id"],
+            "precision": "year",
+            "end_year": 2020,
+        }
+    ]
+    response = await client.patch(
+        "/field-shift/fields/" + fid, json={**update, "expected_version": saved["version"]}
+    )
+    assert response.status_code == 200, response.text
+    body["fields"][0]["expected_version"] = response.json()["version"]
+    body["field_conditions"][fid]["values"]["history_state"]["value"] = "recorded"
+    report = await client.post("/rotation-optimizer/v3/readiness", json=body)
+    assert report.status_code == 200 and report.json()["ready"], report.text

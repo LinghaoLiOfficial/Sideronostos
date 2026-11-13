@@ -1,0 +1,413 @@
+{
+  "evidence_kind": "Actual TypeScript planner request through Python preflight, preparation and real Gurobi; offline engineering fixture, not browser acceptance",
+  "input_basis": "v3-real-weather-execution.json / input_snapshot",
+  "request": {
+    "model_version": "rotation-milp-v3.0",
+    "profile_id": "iowa-engineering-v3-20261114",
+    "fields": [
+      {
+        "id": "field-1",
+        "expected_version": 1
+      }
+    ],
+    "start": "2027-01-01",
+    "end": "2027-12-31",
+    "allowed_crop_ids": [
+      "maize",
+      "oat",
+      "pea"
+    ],
+    "periods": [
+      {
+        "id": "year-2027",
+        "start": "2027-01-01",
+        "end": "2027-12-31"
+      }
+    ],
+    "field_conditions": {
+      "field-1": {
+        "values": {
+          "field_capacity": {
+            "value": 0.3,
+            "unit": "m3/m3",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "wilting_point": {
+            "value": 0.12,
+            "unit": "m3/m3",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "depth_m": {
+            "value": 1,
+            "unit": "m",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "ph": {
+            "value": 6.5,
+            "unit": "pH",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "salinity_ds_m": {
+            "value": 0.5,
+            "unit": "dS/m",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "drainage": {
+            "value": "well",
+            "unit": "category",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "slope_deg": {
+            "value": 2,
+            "unit": "degree",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "aspect": {
+            "value": "flat",
+            "unit": "category",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "terrain_position": {
+            "value": "level",
+            "unit": "category",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "mechanical_access": {
+            "value": true,
+            "unit": "1",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "effective_rain_fraction": {
+            "value": 0.8,
+            "unit": "1",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "history_reviewed": {
+            "value": true,
+            "unit": "1",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "history_state": {
+            "value": "no_prior_crop",
+            "unit": "category",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "history_absence_reason": {
+            "value": "Engineering fixture assumes previously uncropped land; not a real farmer declaration.",
+            "unit": "text",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "initial_water_policy": {
+            "value": "independent_wilting_point_v1",
+            "unit": "category",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "management_reviewed": {
+            "value": true,
+            "unit": "1",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "baseline_confirmed": {
+            "value": true,
+            "unit": "1",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          }
+        },
+        "forbidden_crop_ids": [],
+        "water_system_id": "farm-1-water",
+        "bare_limit": null,
+        "bare_limit_disabled": "Engineering fixture: no bare-day cap imposed; confirm local requirements before use."
+      }
+    },
+    "farm_resources": {
+      "farm-1": {
+        "daily": {
+          "farm-1-water": {
+            "kind": "water",
+            "machine_type": null,
+            "field_ids": [
+              "field-1"
+            ],
+            "water_basis": "net",
+            "irrigation_efficiency": null,
+            "default": {
+              "amount": {
+                "value": 1000,
+                "unit": "m3/day",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            },
+            "overrides": {}
+          },
+          "resource-d0ec8a3e-b187-4856-9123-8be040ac01c9": {
+            "kind": "machine",
+            "machine_type": "tractor",
+            "field_ids": [
+              "field-1"
+            ],
+            "water_basis": null,
+            "irrigation_efficiency": null,
+            "default": {
+              "amount": {
+                "value": 16,
+                "unit": "h/day",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            },
+            "overrides": {}
+          },
+          "resource-b44fadd2-968d-4e14-8792-0e9614f3493f": {
+            "kind": "machine",
+            "machine_type": "harvester",
+            "field_ids": [
+              "field-1"
+            ],
+            "water_basis": null,
+            "irrigation_efficiency": null,
+            "default": {
+              "amount": {
+                "value": 16,
+                "unit": "h/day",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            },
+            "overrides": {}
+          }
+        },
+        "period_limits": [
+          {
+            "kind": "seed",
+            "crop_id": "maize",
+            "period_id": "year-2027",
+            "limit": {
+              "amount": {
+                "value": 100000,
+                "unit": "kg",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            }
+          },
+          {
+            "kind": "market",
+            "crop_id": "maize",
+            "period_id": "year-2027",
+            "limit": {
+              "amount": {
+                "value": 100000,
+                "unit": "kg",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            }
+          },
+          {
+            "kind": "seed",
+            "crop_id": "oat",
+            "period_id": "year-2027",
+            "limit": {
+              "amount": {
+                "value": 100000,
+                "unit": "kg",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            }
+          },
+          {
+            "kind": "market",
+            "crop_id": "oat",
+            "period_id": "year-2027",
+            "limit": {
+              "amount": {
+                "value": 100000,
+                "unit": "kg",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            }
+          },
+          {
+            "kind": "seed",
+            "crop_id": "pea",
+            "period_id": "year-2027",
+            "limit": {
+              "amount": {
+                "value": 100000,
+                "unit": "kg",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            }
+          },
+          {
+            "kind": "market",
+            "crop_id": "pea",
+            "period_id": "year-2027",
+            "limit": {
+              "amount": {
+                "value": 100000,
+                "unit": "kg",
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remediable": false,
+              "gap_unit_cost": null,
+              "remedy": null
+            }
+          }
+        ]
+      }
+    },
+    "sources": {
+      "engineering-fixture": {
+        "id": "engineering-fixture",
+        "kind": "engineering_assumption",
+        "title": "Explicit engineering fixture / 用户选择的工程演示假设",
+        "locator": "integration:model-v3-engineering-fixture",
+        "region_id": "iowa-engineering",
+        "observed_start": null,
+        "observed_end": null,
+        "applicable_start": "2027-01-01",
+        "applicable_end": "2027-12-31",
+        "quality": "estimated",
+        "confirmed": true,
+        "limitations": [
+          "Synthetic operating assumptions, not field measurements or farmer records; requires local calibration."
+        ]
+      }
+    },
+    "baseline": [
+      {
+        "field_id": "field-1",
+        "crop_id": "maize",
+        "sow_date": "2027-04-20"
+      }
+    ],
+    "weights": {
+      "profit": 0.25,
+      "water": 0.2,
+      "rotation": 0.1,
+      "soil": 0.15,
+      "risk": 0.15,
+      "bare": 0.15
+    },
+    "disabled_metrics": {},
+    "scenario": {
+      "temperature_change_c": 0.0,
+      "rainfall_change_pct": 0.0
+    },
+    "accept_engineering_assumptions": true,
+    "idempotency_key": "frontend-contract-v3"
+  },
+  "ready": true,
+  "stage": "prepared",
+  "errors": [],
+  "candidate_count": 9,
+  "scientific_valid": true,
+  "solve": {
+    "status": "optimal",
+    "selected_ids": [
+      "field-1:maize:2027-04-20"
+    ],
+    "gap_cost": 0.0,
+    "score": -0.001678869003559013,
+    "gap_optimality_proven": true
+  }
+}
