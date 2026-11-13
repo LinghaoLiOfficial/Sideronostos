@@ -43,7 +43,7 @@ raw facts and server-computed change directions; the model must not invent numer
 
 ## Retrieval and answer validation
 
-Prompt candidate: `farmer-evidence-bound-20261114-v16-daily`. New workflows and daily runs use
+Prompt candidate: `farmer-evidence-bound-20261114-v17-daily-diagnostics`. New workflows and daily runs use
 HELPV3. Old v1/v2 results retain compatible product help. V3 excludes HELPV2; old results
 exclude HELPV3/MODELV3/DATAV3 before lexical/vector rankings. The visible projection and
 citation binding repeat this scope so hidden/incompatible passages cannot become citations.
@@ -69,3 +69,21 @@ source entailment and owner isolation. Review development/regression before a pr
 preserve previous v1/v2/v3 scores and untouched protected expectations. Record provider/model,
 configuration, source hash, retrieval release, real costs/errors and human semantic judgment
 separately. Current real-region calibration and independent agronomic review remain absent.
+
+
+## Preparation failures and frozen inputs
+
+Blocked daily preparation now adds sourced facts for the preparation stage, error total,
+bounded shown-error count, affected field/crop/baseline date and recorded per-reason candidate
+counts. These are diagnostics for that frozen generated set, not validated schedule metrics
+or proof that all agronomic choices fail. Rejection reasons may overlap and cannot be added
+into a distinct-candidate count. Chat can suggest reviewing actual form inputs but cannot
+relax hard limits or add irrigation infrastructure. The actual rainfed browser run supplies
+the regression: nine rejected candidates, no plan metric, no nonexistent option request.
+
+Prompt v17 and the failure adapter are unevaluated semantic candidates. The v5 input archive
+preserves the original 26 case expectations and changes only the two failed-run contexts
+(7 added bound facts each). The other 24 contexts are byte-equivalent as JSON values.
+The v4 archive remains immutable. See `ai-diagnostics-fixture-update.json` for both hashes.
+All seven current owner/version gates and compact/full projection equivalence checks pass.
+No provider calls or held-out answer evaluations were made for this change.

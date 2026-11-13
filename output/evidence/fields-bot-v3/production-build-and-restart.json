@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-11-13T23:58:30.700868+00:00",
+  "frontend_build": "PASS, Next.js 16.2.9 Turbopack",
+  "frontend_source_commit": "152958a",
+  "build_id": "fh-XlGZQRDDV-BFDnh2xz",
+  "backend_regressions": {
+    "passed": 548,
+    "skipped": 0,
+    "warnings": "5 existing PDF/SWIG deprecations"
+  },
+  "candidate_prompt": "farmer-evidence-bound-20261114-v17-daily-diagnostics",
+  "local_frontend_mode": "next start after stopping development server",
+  "local_api_restarted": true,
+  "actual_browser_checks": [
+    "Saved v3 plan reloaded after frontend/API restart; server plan/run both 200",
+    "Refresh cookie restored identity after initial in-memory token loss (initial 401 then authenticated 200)",
+    "Return to /fields retained plan/run/option/field/layer/selection",
+    "Prepared SMAP PNGs returned 200 and rendered alongside restored AOI; off-viewport canceled tiles did not display false failure"
+  ],
+  "legacy_http_redirect": {
+    "status": 307,
+    "location": "/fields?plan=f6c7bf75-4d0a-47d5-b586-8c132466a65e&run=1d241a5f-96b1-47d0-951c-726a7f6b55f4&option=option-1&field=1c1c559e-e891-4163-93a5-6c086b4e891d&layer=smap-20261107-journey-v1%3Aam&selection=d77b7152-6eda-4122-ab74-97b91a0ad01d"
+  },
+  "screenshots": [
+    "fields-v3-production-saved-plan.png",
+    "fields-v3-production-restored-map.png"
+  ],
+  "deployment_performed": false,
+  "not_verified": [
+    "Live AI generation and semantic gates (provider 403 remains)",
+    "Complete account-switch, conflict/retry, multi-field and diagnostic browser matrix",
+    "Real regional calibration and production hosting infrastructure"
+  ]
+}

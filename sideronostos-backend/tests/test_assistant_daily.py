@@ -219,3 +219,52 @@ def test_all_generated_daily_alternatives_have_qualified_pairwise_directions(dai
     assert len(comparisons) == 2
     assert comparisons[1]["direction_second_minus_first"]["water"] == "lower"
     assert not any(f["option_role"] is None and "Baseline" in f["label"] for f in view["facts"])
+
+
+def test_actual_preparation_failure_exposes_bound_reason_count_and_baseline_date():
+    run = json.loads(
+        (
+            Path(__file__).parents[2]
+            / "output/evidence/fields-bot-v3/browser-rainfed-blocked-run.json"
+        ).read_text()
+    )
+    run["selected_option_id"] = None
+    facts, view = projected(run, "为什么这次没有方案？需要改什么？")
+    lookup = {fact["key"]: fact for fact in facts}
+    count = lookup["current.preparation.rejected.irrigation_unavailable"]
+    assert count["value"] == 9
+    assert count["source"]["run_id"] == run["id"]
+    assert count["source"]["failure_scope"] == "generated_candidates_only"
+    assert "灌溉设施" in count["label"]
+    sow = lookup["current.preparation.error.0.sow_date"]
+    assert sow["value"] == "2027-04-20"
+    assert sow["source"]["field_id"] == run["field_snapshots"][0]["id"]
+    assert any(f["id"] == count["id"] and f["render_reference"] for f in view["facts"])
+    assert (
+        view["context"]["answer_requirement"] == "explain_run_status_without_requesting_an_option"
+    )
+    assert not any(f["key"].endswith(".water") or f["key"].endswith(".profit") for f in facts)
+
+
+def test_preparation_error_details_are_bounded_without_hiding_total(daily_run):
+    daily_run.update(
+        status="failed",
+        selected_option_id=None,
+        result={
+            "error_code": "preparation_blocked",
+            "preparation": {
+                "ready": False,
+                "stage": "candidate_preparation",
+                "errors": ["field_has_no_candidate"] * 20,
+                "rejected_by_reason": {},
+            },
+        },
+    )
+    facts, _ = projected(daily_run)
+    lookup = {f["key"]: f for f in facts}
+    assert lookup["current.preparation.error_count"]["value"] == 20
+    assert len([key for key in lookup if key.startswith("current.preparation.error.")]) == 12
+    assert lookup["current.preparation.shown_error_count"]["value"] == 12
+    assert any(
+        "full" in line for line in lookup["current.preparation.shown_error_count"]["limitations"]
+    )

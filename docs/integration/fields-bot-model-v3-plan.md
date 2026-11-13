@@ -485,3 +485,30 @@ screenshots/PDF in `output/playwright/`. Fresh frontend suite: 312 passed / 55 f
 TypeScript and focused ESLint pass. Backend agri persistence: 3 passed; Ruff/mypy pass.
 No live AI calls were retried. Provider access and semantic acceptance remain HOLD;
 other product checks continue. The overall goal remains ACTIVE.
+
+
+## Checkpoint 10 — failure evidence and local production restart (2026-11-14)
+
+Actual rainfed-run evidence exposed a bot gap: only generic failure status was available.
+`daily_evidence.py` now binds stage/error counts, bounded affected field/crop/date details
+and per-reason candidate rejection counts. It never creates a schedule or inferred metric.
+Prompt candidate v17 distinguishes these explicit preparation checks from global agronomic
+infeasibility, and warns against adding overlapping rejection counts. A real-run regression
+failed before the adapter change and passes afterward; truncation preserves totals.
+
+The original frozen v4 inputs and all 26 expectations are unchanged. A new v5 archive changes
+only two failed-run contexts, adding seven facts each; the other 24 contexts match exactly.
+All seven owner/version checks and model-projection equivalence checks pass. Provider access
+has not changed, so no embeddings/generation request was retried and no semantic score exists.
+
+Full backend suite: 548 passed / 0 skipped, five existing PDF/SWIG deprecations. Frontend
+production build passes TypeScript and produces all routes. The development server was
+replaced by local `next start`; after restarting the API, the actual browser reopened the
+same immutable saved plan and returned to its field/AOI/science layer. A direct old map URL
+returns HTTP 307 with all parameters retained. Real tiles render; canceled offscreen tiles
+do not trigger an error banner. This is a local production-mode smoke, not a deployment.
+
+Evidence: `ai-diagnostics-fixture-update.json`, `eval-fixtures-v5-daily.json.gz`,
+`production-build-and-restart.json` and production screenshots. Remaining work includes
+multi-field/diagnostic UI, the broader account/conflict/retry matrix, final requirements
+handoff and live semantic evaluation after access is restored. Goal remains ACTIVE.

@@ -1,0 +1,44 @@
+{
+  "prompt_candidate": "farmer-evidence-bound-20261114-v17-daily-diagnostics",
+  "generation_calls": 0,
+  "semantic_acceptance": "NOT VERIFIED; provider HTTP 403 unchanged, no retries",
+  "case_sha256": "913f3fe3ac7868b9314a3ce1ac1befc383291f77593bbaf7ff9b9168289ada53",
+  "previous_fixture_sha256": "2d0e39511afde7324736cd7199d523c2db836ddacee16173930957e7202c9bb3",
+  "new_fixture_sha256": "f67a50f3cf5d80302a6db3ff1eb340e2c32dc4378137eed5511a632ce5d9474f",
+  "new_archive_sha256": "5a8cab0639f37c03ac16247934ec591f3c10792bc14474dd2bb2cf68adc41e69",
+  "case_expectations_changed": false,
+  "old_fixture_unchanged": true,
+  "changes": [
+    {
+      "case": "daily-v4-07",
+      "keys": [
+        "facts"
+      ],
+      "old_fact_count": 4,
+      "new_fact_count": 11
+    },
+    {
+      "case": "daily-v4-21",
+      "keys": [
+        "facts"
+      ],
+      "old_fact_count": 4,
+      "new_fact_count": 11
+    }
+  ],
+  "reasons": [
+    "Add recorded candidate-preparation failure facts with bound reason counts and baseline date."
+  ],
+  "owner_gate_results": {
+    "primary": true,
+    "diagnostic": true,
+    "failed": true,
+    "field": true,
+    "map": true,
+    "comparison": true,
+    "field_version": true
+  },
+  "all_compacted_projections_identical": true,
+  "unchanged_contexts": 24,
+  "science_note": "Actual SMAP was published during map QA, but the original map fixture is a viewport without prepared area statistics; its frozen context is unchanged."
+}

@@ -43,7 +43,7 @@ The existing real runner accepts `--split dev|test|regression`, `--cases`, `--fi
 
 ## Daily v3 candidate (2026-11-14)
 
-Current prompt is `farmer-evidence-bound-20261114-v16-daily`. Daily metric/gap projection,
+Current prompt is `farmer-evidence-bound-20261114-v17-daily-diagnostics`. Daily metric/gap projection,
 shared nullable comparisons and compatible versioned help retrieval have deterministic tests.
 The 47-source v3 manifest has been validated and prepared offline; vector activation and
 semantic acceptance remain pending. See `docs/integration/model-v3-assistant-contract.md`.
@@ -72,3 +72,16 @@ vectors were reused only for exact input hashes and the same embedding namespace
 Wait for access/configuration correction, resume the same staging identity, verify full
 embedding coverage, then activate only that isolated release. No model-quality or
 protected-test pass can be claimed from fixture preparation or cache reuse.
+
+
+### Diagnostics input revision, before any daily candidate outputs
+
+Use the new `output/evidence/fields-bot-v3/eval-fixtures-v5-daily.json.gz` for the current
+v17 candidate; decompress into a new plain JSON file for `run.py`. Its uncompressed SHA256
+is `f67a50f3cf5d80302a6db3ff1eb340e2c32dc4378137eed5511a632ce5d9474f`.
+The v4 archive remains unchanged. Cases and expected scores retain SHA256
+`913f3fe3ac7868b9314a3ce1ac1befc383291f77593bbaf7ff9b9168289ada53`.
+Only daily-v4-07 and daily-v4-21 gain recorded preparation-failure facts; 24 other contexts
+are identical. `ai-diagnostics-fixture-update.json` records the reason, hashes and gates.
+This is a disclosed pre-output input revision, not a higher evaluation score. Live semantic
+acceptance remains unverified; do not retry provider calls until access/configuration changes.
