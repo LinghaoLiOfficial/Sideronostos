@@ -77,7 +77,7 @@ async def test_field_setup_explains_required_inputs_without_saved_records(offlin
     text = " ".join(p["text"] for p in result["paragraphs"]).casefold()
     for required in ("name", "area", "latitude", "longitude", "soil", "irrigation", "profile"):
         assert required in text
-    assert "use module tools" in text and "create field" in text
+    assert "farm tasks" in text and "add a field" in text and "save field" in text
     assert result["needs_clarification"] is False
     assert result["citations"]
     assert result["paragraphs"][0]["evidence_ids"]
@@ -152,3 +152,27 @@ async def test_configured_llm_receives_product_help_without_needing_saved_fields
     assert result["citations"][0]["source"]["access_scope"] == "product_help"
     assert "parameter profile" in requests[0][-1].content
     assert result["metrics"]["model"] != "local-mock"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("question", "language", "expected"),
+    [
+        ("For Maize near Iowa, USA: Which local sources can I use?", "en", "dated report"),
+        ("关于爱荷华附近的玉米：应该核对哪些本地资料？", "zh", "日期"),
+    ],
+)
+async def test_local_form_does_not_request_region_and_crop_again_when_sources_are_missing(
+    offline, question, language, expected
+):
+    context, evidence = context_and_evidence()
+    context.update(language=language, bot_id="local-knowledge-guide", preset="local_agriculture")
+    result = await pipeline.generate_answer(
+        question, context, evidence, language=language, detail="brief", history=[]
+    )
+    text = " ".join(p["text"] for p in result["paragraphs"])
+    assert expected in text
+    assert "Which crop, region" not in text
+    assert "请告诉我作物、地区" not in text
+    assert result["citations"] == []
+    assert result["needs_clarification"] is True

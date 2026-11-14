@@ -11,7 +11,7 @@ const api = vi.hoisted(() => ({
   listModuleOperations: vi.fn(), listModuleOperationHistory: vi.fn(), postModuleOperation: vi.fn(),
   listActions: vi.fn(), getAction: vi.fn(), postAction: vi.fn(),
 }));
-const auth = vi.hoisted(() => ({ getCurrentUser: vi.fn() }));
+const auth = vi.hoisted(() => ({ getCurrentUser: vi.fn(), apiRequest: vi.fn() }));
 vi.mock("@/features/si/agent-api", () => api);
 vi.mock("@/lib/api/client", () => auth);
 
@@ -43,7 +43,7 @@ beforeEach(() => {
   api.listModuleOperationHistory.mockResolvedValue({ items: [] });
   api.listActions.mockResolvedValue({ items: [] });
 });
-afterEach(() => { cleanup(); vi.clearAllMocks(); vi.unstubAllGlobals(); localStorage.clear(); });
+afterEach(() => { cleanup(); vi.clearAllMocks(); vi.unstubAllGlobals(); localStorage.clear(); sessionStorage.clear(); });
 
 it("keeps stable catalog identities across the four module routes", () => {
   expect(botsForModule("remote-sensing").map((bot) => bot.id)).toEqual(["remote-water", "remote-soil", "remote-weather"]);
@@ -98,28 +98,17 @@ it("creates a scoped conversation, sends, and shows the server reply and source"
   expect(await screen.findByText("No current observation")).toBeVisible();
 });
 
-it("opens a module API from a fresh field specialist chat and returns the completed page", async () => {
+it("opens named farm records from a fresh specialist conversation", async () => {
   const user = userEvent.setup();
   const fieldChat = { ...conversation("field-1", "field-guide"), preset: "field_management" };
   api.createConversation.mockResolvedValue(fieldChat);
-  api.listModuleOperations.mockResolvedValue({ items: [{
-    operation_id: "list_fields", title: "List fields", method: "GET", path: "/field-shift/fields",
-    path_parameters: [], query_parameters: [], required_query_parameters: [], body: null,
-    body_required: false, required_body_parameters: [], required_inputs: [],
-  }] });
-  api.postModuleOperation.mockResolvedValue({
-    status: "succeeded", operation_id: "list_fields", text: "Fields are ready.",
-    missing_inputs: [], status_code: 200, result: { items: [{ id: "north" }] },
-    content_type: "application/json", href: "/field-shift",
-  });
+  auth.apiRequest.mockResolvedValue({ items: [{ id: "north", name: "North meadow", area_ha: 4, latitude: 35, longitude: -90 }] });
   render(<MultiBotDock module="field-management" locale="en" />);
   await user.click(screen.getByRole("button", { name: "Open Field guide" }));
-  await user.click(await screen.findByRole("button", { name: "Use module tools" }));
+  await user.click(await screen.findByRole("button", { name: "Farm tasks" }));
   expect(api.createConversation).toHaveBeenCalledWith({ preset: "field_management", bot_id: "field-guide", language: "en", detail: "brief" });
-  await user.click(await screen.findByText(/Farm tasks/));
-  await user.click(screen.getByRole("button", { name: "Continue task" }));
-  await waitFor(() => expect(api.postModuleOperation).toHaveBeenCalledWith("field-1", expect.objectContaining({ operation_id: "list_fields" })));
-  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift");
+  await user.click(await screen.findByRole("button", { name: "My fields" }));
+  expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/field-shift?field=north&step=field");
 });
 
 it("opens cited web search results from the source panel", async () => {

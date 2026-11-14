@@ -32,45 +32,45 @@ BOT_NAMES = {
 CAPABILITIES = {
     "field-guide": (
         "I can explain field setup and the saved field records available in this conversation. "
-        "To create or update a field, open Use module tools and choose the relevant operation; "
+        "To create or update a field, open Farm tasks and choose Add a field or My fields; "
         "the form asks for the details it needs.",
         "我可以说明地块填写步骤，并解释当前对话中可用的地块记录。"
-        "要创建或修改地块，请打开“使用模块工具”并选择对应操作，表单会提示需要填写的信息。",
+        "要创建或修改地块，请打开“农场任务”并选择对应操作，表单会提示需要填写的信息。",
     ),
     "remote-water": (
         "I can explain published surface soil moisture, historical rainfall and reference "
-        "evapotranspiration for a selected area. Use module tools to find available layers "
+        "evapotranspiration for a selected area. Open Farm tasks to find available maps "
         "and observations; a missing reading remains unavailable.",
         "我可以解释选区内已发布的表层土壤湿度、历史降雨和参考蒸散资料。"
-        "打开“使用模块工具”可以查询可用图层和观测；缺失的读数仍无法提供。",
+        "打开“农场任务”可以查询可用图层和观测；缺失的读数仍无法提供。",
     ),
     "remote-soil": (
         "I can explain published SMAP surface soil moisture for a selected area and its "
-        "limits. Use module tools to open a supported layer or find an observation. "
+        "limits. Open Farm tasks to view an observation map or check a saved field. "
         "These surface readings do not establish root-zone moisture.",
         "我可以解释选区内已发布的 SMAP 表层土壤湿度及其局限。"
-        "打开“使用模块工具”可以查看支持的图层或查询观测。表层读数不能确定根区湿度。",
+        "打开“农场任务”可以查看支持的图层或查询观测。表层读数不能确定根区湿度。",
     ),
     "remote-weather": (
         "I can explain published historical rainfall and reference evapotranspiration for "
-        "a selected area and date range. Use module tools to find an observation. "
+        "a selected area and date range. Open Farm tasks to check a saved field. "
         "This assistant does not provide a future weather forecast.",
         "我可以解释指定选区和时间范围内已发布的历史降雨与参考蒸散资料。"
-        "打开“使用模块工具”可以查询观测。本助手不提供未来天气预报。",
+        "打开“农场任务”可以查询观测。本助手不提供未来天气预报。",
     ),
     "local-knowledge-guide": (
         "I can answer questions from the available local knowledge sources and show their "
         "references. Local prices and varieties in this demo are examples. "
-        "This module currently has no operational tools.",
+        "Open Farm tasks → Ask about my area to include your region and crop.",
         "我可以依据可用的本地知识资料回答问题，并展示来源。"
-        "演示中的本地价格与品种是示例。本模块目前没有业务操作工具。",
+        "演示中的本地价格与品种是示例。打开“农场任务”→“询问本地农业”，可提供地区和作物。",
     ),
     "rotation-guide": (
         "I can explain rotation planning, saved plans and their trade-offs using the "
-        "available evidence. Open Use module tools to choose a planning operation and "
-        "provide its required inputs; a calculation needs its own confirmed result.",
+        "available evidence. Open Farm tasks to view saved plans and calculations, or "
+        "choose Plan the next seasons to prepare a new plan in the full planner.",
         "我可以依据可用资料说明轮作规划步骤、存档方案及其取舍。"
-        "打开“使用模块工具”可选择规划操作并填写必要信息；计算结果以服务端确认的结果为准。",
+        "打开“农场任务”可查看已保存计划和计算，或选择“规划接下来的种植季”；计算结果以服务端确认的结果为准。",
     ),
 }
 
@@ -80,16 +80,16 @@ FIELD_SETUP = (
         "texture, irrigation availability, and a parameter profile ready. The profile "
         "provides the crop settings used by the planner.",
         "Planting history and a field boundary can be added later. If the soil texture "
-        "is unknown, choose Unknown.",
-        "Open Use module tools → Create field, fill in those details, and choose Continue "
-        "action. After the server confirms creation, Open result takes you to the saved field.",
+        "is unknown, choose I’m not sure.",
+        "Open Farm tasks → Add a field, fill in those details, and choose Save field. "
+        "After the server confirms creation, Open saved field takes you to the saved field.",
     ),
     (
         "添加地块时，请准备名称、以公顷计的面积、位置经纬度、土壤质地、是否具备灌溉条件，"
         "并选择资料配置。配置提供规划所用的作物参数。",
-        "种植历史和地块边界可以稍后补充；不清楚土壤质地时，可以选择“未知”。",
-        "打开“使用模块工具”→“创建地块”，填写这些信息并点击“继续操作”。"
-        "服务端确认创建成功后，“打开结果”会带你查看保存的地块。",
+        "种植历史和地块边界可以稍后补充；不清楚土壤质地时，可以选择“不确定”。",
+        "打开“农场任务”→“添加地块”，填写这些信息并点击“保存地块”。"
+        "服务端确认创建成功后，“打开已保存地块”会带你查看保存的地块。",
     ),
 )
 
@@ -100,16 +100,16 @@ FIELD_SETUP = (
 FARMER_HELP: dict[str, tuple[tuple[str, str], ...]] = {
     "field-guide": (
         (
-            "I can start with your saved fields and planting history. To add a field, open Use module tools → Create field. What name, area, location, soil texture, irrigation status and parameter profile should I use? I will only call it created after the server confirms it and provides the field link.",
-            "可以先从已保存的地块和种植历史入手。要新增地块，请打开“使用模块工具”→“创建地块”。这块地叫什么、面积多大、位置在哪里、土壤质地和灌溉条件如何、选用哪个参数配置？服务端确认并给出地块链接后，才能算创建成功。",
+            "I can start with your saved fields and planting history. To add a field, open Farm tasks → Add a field. What name, area, location, soil texture, irrigation status and parameter profile should I use? I will only call it created after the server confirms it and provides the field link.",
+            "可以先从已保存的地块和种植历史入手。要新增地块，请打开“农场任务”→“添加地块”。这块地叫什么、面积多大、位置在哪里、土壤质地和灌溉条件如何、选用哪个参数配置？服务端确认并给出地块链接后，才能算创建成功。",
         ),
         (
             "I cannot identify the north field or its past crop from that description alone. Which saved field do you mean? Open its planting history to check the recorded crop; if last year's beans are missing, you can add a verified history entry with the field tools.",
             "仅凭“北边那块地”，我还不能确定是哪块地，也不能推断去年种了什么。你说的是账户中的哪块地？可以先打开它的种植历史核对；如果豆类记录缺失，再用地块工具补录确认过的历史。",
         ),
         (
-            "I can help correct a saved field, but I need to know which one and confirm the area you supplied before changing it. Open Use module tools → Update field, select the field and enter the corrected area. Which field should be changed? I will give you the saved field link only after the update succeeds.",
-            "可以修改已保存地块的面积，但需要先确认是哪块地和正确面积。打开“使用模块工具”→“更新地块”，选择地块并填写修正后的面积。要改哪块地？更新成功后我会给出保存后的地块链接。",
+            "I can help correct a saved field, but I need to know which one and confirm the area you supplied before changing it. Open Farm tasks → My fields → Edit details, select the field and enter the corrected area. Which field should be changed? I will give you the saved field link only after the update succeeds.",
+            "可以修改已保存地块的面积，但需要先确认是哪块地和正确面积。打开“农场任务”→“我的地块”→“修改资料”，选择地块并填写修正后的面积。要改哪块地？更新成功后我会给出保存后的地块链接。",
         ),
     ),
     "remote-water": (
@@ -156,8 +156,8 @@ FARMER_HELP: dict[str, tuple[tuple[str, str], ...]] = {
     ),
     "rotation-guide": (
         (
-            "I can help prepare a rotation run. Open Use module tools → Create planning run after choosing your saved fields. Which fields, planting history and planning dates should it use, and what constraints matter to you? Please also confirm whether the demo crop and weather assumptions are suitable for comparison. A plan exists only after the calculation succeeds; then I can link its result.",
-            "可以一起准备轮作计算。先选择已保存的地块，再打开“使用模块工具”→“创建规划任务”。请告诉我地块、种植历史、规划时段，以及重要的限制条件；也请确认演示作物和天气假设是否适合用于比较。计算成功后才会有可打开的方案结果。",
+            "I can help prepare a rotation run. Open Farm tasks → Plan the next seasons after choosing your saved fields. Which fields, planting history and planning dates should it use, and what constraints matter to you? Please also confirm whether the demo crop and weather assumptions are suitable for comparison. A plan exists only after the calculation succeeds; then I can link its result.",
+            "可以一起准备轮作计算。先选择已保存的地块，再打开“农场任务”→“规划接下来的种植季”。请告诉我地块、种植历史、规划时段，以及重要的限制条件；也请确认演示作物和天气假设是否适合用于比较。计算成功后才会有可打开的方案结果。",
         ),
         (
             "I cannot tell why the last calculation stopped without its run. Which saved run do you mean? Open that run's status and diagnostics first. If it failed because of temporary execution, retry the same run; if inputs need changing, edit the planning form and submit a new calculation. I will confirm the new result only after the server does.",

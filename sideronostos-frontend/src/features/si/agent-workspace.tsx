@@ -12,8 +12,7 @@ import { setLocale, useLocale } from "@/lib/i18n/locale";
 import type { AssistantMessage, Citation, Fact } from "@/lib/api/rotation-types";
 import * as api from "./agent-api";
 import type { AgentConversation, AgentConversationPage, AgentDomain } from "./agent-api";
-import { AgentActions } from "./agent-actions";
-import { ModuleOperations } from "./module-operations";
+import { FarmerTasks } from "./farmer-tasks";
 
 const domains: { id: AgentDomain; en: string; zh: string }[] = [
   { id: "field_management", en: "Field management", zh: "地块管理" },
@@ -153,9 +152,10 @@ export function AgentWorkspace() {
     } catch { setError("request"); return null; }
     finally { setBusy(false); }
   }
-  async function send() {
-    const text = draft.trim();
-    if (!text || busy) return;
+  async function send(question?: string) {
+    const text = (question ?? draft).trim();
+    if (!text || busy) return false;
+    if (question) setDraft(question);
     let chatId = id;
     if (!chatId) chatId = await create();
     if (!chatId) return;
@@ -179,7 +179,8 @@ export function AgentWorkspace() {
         if (active.current === chatId) setPage((previous) => previous ? { ...previous, messages: [...previous.messages.filter((row) => row.id !== message.id), message].sort((a, b) => a.sequence - b.sequence) } : previous);
       }
       if (message.status === "pending") setError("failed");
-    } catch { setError("request"); }
+      return true;
+    } catch { setError("request"); return false; }
     finally { setOutgoing(null); setBusy(false); }
   }
   async function language(next: string) {
@@ -233,7 +234,7 @@ export function AgentWorkspace() {
         </div></div>
         {error && <div role="alert" className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2 text-sm text-destructive"><span>{error === "failed" ? l.failed : l.error}</span></div>}
         {source && <section aria-label={zh ? "依据详情" : "Source details"} className="mx-auto mb-2 w-[calc(100%-2rem)] max-w-3xl rounded-lg border border-border bg-card p-4 text-sm"><div className="flex justify-between gap-2"><h3 className="font-semibold">{source.title}</h3><button type="button" aria-label={zh ? "关闭依据" : "Close source"} onClick={() => setSource(null)}><X size={16} /></button></div><p className="mt-2 text-muted-foreground">{source.text}</p>{source.url && <a className="mt-2 inline-block text-primary underline" href={source.url} target="_blank" rel="noreferrer">{zh ? "打开来源" : "Open source"}</a>}</section>}
-        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{id && user && <><ModuleOperations key={`operations:${id}`} conversationId={id} language={zh ? "zh" : "en"} /><AgentActions key={`actions:${id}`} conversationId={id} ensureConversation={create} domain={domain} botId={selectedBot.id} language={zh ? "zh" : "en"} userId={user.id} /></>}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + selectedBot.name[locale] + "留言" : "Message " + selectedBot.name[locale]} placeholder={zh ? "说说你想了解或完成什么…" : "Ask a question or describe a task…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
+        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{id && user ? <FarmerTasks key={`${selectedBot.id}:${id}`} conversationId={id} ensureConversation={create} botId={selectedBot.id} language={zh ? "zh" : "en"} userId={user.id} onAsk={async (question) => { if (!await send(question)) throw new Error("Question not sent"); }} /> : <button className="mb-3 min-h-10 rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted" disabled={busy} onClick={() => void create()}>{zh ? "打开农场任务" : "Open farm tasks"}</button>}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + selectedBot.name[locale] + "留言" : "Message " + selectedBot.name[locale]} placeholder={zh ? "询问问题，或从上方选择任务…" : "Ask a question, or choose a task above…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
       </section>
     </main>}
   </div>;

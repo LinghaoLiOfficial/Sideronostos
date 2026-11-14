@@ -20,6 +20,6 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], ...(channel ? { channel } : {}) } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    { name: "mobile", use: { ...devices["Pixel 7"], ...(channel ? { channel } : {}) } },
   ],
 })

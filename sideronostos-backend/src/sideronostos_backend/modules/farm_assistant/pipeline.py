@@ -425,6 +425,18 @@ def _mock_answer(
                 if context.get("language") != "zh"
                 else "目前没有足以核实你所在县情况的资料。请告诉我哪个县和哪种作物？"
             )
+        if bot_id == "local-knowledge-guide" and re.match(
+            r"(?:For .+? near .+?:|关于.+?附近的.+?：)", question, re.I
+        ):
+            text = (
+                "I have your crop, region and question, but no verified local source for "
+                "that answer yet. Share an extension-office link or a dated report, and "
+                "I can help check it. Example prices and varieties are not current local advice."
+                if context.get("language") != "zh"
+                else "已收到你提供的作物、地区和问题，但目前还没有足以核实答案的本地来源。"
+                "请提供农技推广机构的链接或带日期的报告，我可以帮你核对。"
+                "示例价格和品种不能作为当前本地建议。"
+            )
         answer = ModelAnswer(
             paragraphs=[Paragraph(text=text)], actions=[], needs_clarification=True
         )

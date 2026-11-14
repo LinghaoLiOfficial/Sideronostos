@@ -9,8 +9,7 @@ import type { CatalogBot } from "@/lib/bot-catalog";
 import type { Locale } from "@/lib/i18n/locale";
 import * as api from "@/features/si/agent-api";
 import type { AgentConversation, AgentDomain } from "@/features/si/agent-api";
-import { AgentActions } from "@/features/si/agent-actions";
-import { ModuleOperations } from "@/features/si/module-operations";
+import { FarmerTasks } from "@/features/si/farmer-tasks";
 import styles from "./MultiBotDock.module.css";
 
 type BotConversation = AgentConversation & { bot_id: string };
@@ -27,7 +26,7 @@ const labels = {
     source: "View source", closeSource: "Close source", older: "Load earlier messages",
     facts: "View data used", localLimit: "Prices and crop varieties are examples, not live local data.",
     weatherLimit: "This chat does not provide a live forecast.",
-    tools: "Use module tools", toolsError: "Module tools could not be opened. Try again.",
+    tools: "Farm tasks", toolsError: "Your tasks could not be opened. Try again.",
   },
   "zh-CN": {
     loading: "正在加载对话…", empty: "向这位助手提问。",
@@ -39,7 +38,7 @@ const labels = {
     source: "查看依据", closeSource: "关闭依据", older: "加载更早的消息",
     facts: "查看当时的数据", localLimit: "价格与品种数据为示例，并非实时本地数据。",
     weatherLimit: "此对话不提供实时天气预报。",
-    tools: "使用模块工具", toolsError: "模块工具未能打开，请重试。",
+    tools: "农场任务", toolsError: "暂时无法打开任务，请重试。",
   },
 };
 
@@ -151,9 +150,10 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
     finally { if (alive.current) setToolsBusy(false); }
   }
 
-  async function send() {
-    const text = draft.trim();
-    if (!text || sending.current || loading || unauthenticated) return;
+  async function send(question?: string) {
+    const text = (question ?? draft).trim();
+    if (!text || sending.current || loading || unauthenticated) return false;
+    if (question) setDraft(question);
     sending.current = true;
     setBusy(true);
     setError(null);
@@ -178,12 +178,14 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
         setMessages((previous) => upsert(previous, reply));
       }
       if (reply.status === "pending") setError("delayed");
+      return true;
     } catch (cause) {
       if (alive.current) {
         const unavailable = !accepted && typeof cause === "object" && cause !== null
           && "status" in cause && cause.status === 503;
         setError(accepted ? "poll" : unavailable ? "unavailable" : "send");
       }
+      return false;
     } finally {
       sending.current = false;
       if (alive.current) setBusy(false);
@@ -235,14 +237,13 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
     {source && <section className={styles.sourcePanel} aria-label={locale === "en" ? "Source details" : "依据详情"}><button type="button" aria-label={l.closeSource} onClick={() => setSource(null)}>×</button><h3>{source.title}</h3><p>{source.text}</p>{source.url && <a href={source.url} target="_blank" rel="noreferrer">{locale === "en" ? "Open source" : "打开来源"}</a>}</section>}
     {error && <p role="alert" className={styles.chatError}>{error === "send" ? l.sendError : error === "poll" ? l.pollError : error === "delayed" ? l.delayed : error === "preferences" ? l.preferencesError : error === "unavailable" ? l.unavailable : l.sourceError}</p>}
     <div className={styles.composerWrap}>
-      {bot.module !== "local-knowledge" && <>
+      <>
         <button type="button" className={styles.toolToggle} disabled={toolsBusy} aria-expanded={toolsOpen} onClick={() => void openTools()}>{l.tools}</button>
         {toolsError && <p role="alert" className={styles.chatError}>{l.toolsError}</p>}
-        {toolsOpen && conversationId && userId && <div className={styles.toolsArea}>
-          <AgentActions key={`actions:${conversationId}`} conversationId={conversationId} ensureConversation={ensureConversation} domain={bot.presetId as AgentDomain} botId={bot.id} language={locale === "en" ? "en" : "zh"} userId={userId} />
-          {bot.id !== "remote-soil" && bot.id !== "remote-weather" && <ModuleOperations key={`operations:${conversationId}`} conversationId={conversationId} language={locale === "en" ? "en" : "zh"} />}
+        {toolsOpen && conversationId && userId && <div className={styles.toolsArea} data-task-scroll>
+          <FarmerTasks compact key={`${bot.id}:${conversationId}`} conversationId={conversationId} ensureConversation={ensureConversation} botId={bot.id} language={locale === "en" ? "en" : "zh"} userId={userId} onAsk={async (question) => { if (!await send(question)) throw new Error("Question not sent"); }} />
         </div>}
-      </>}
+      </>
       <BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={locale === "en" ? `Message ${bot.name.en}` : `给${bot.name["zh-CN"]}留言`} placeholder={locale === "en" ? "Ask a question…" : "说说你想了解什么…"} language={locale === "en" ? "en-US" : "zh-CN"} />
       {bot.id === "local-knowledge-guide" && <p className={styles.limit}>{l.localLimit}</p>}
       {bot.id === "remote-weather" && <p className={styles.limit}>{l.weatherLimit}</p>}

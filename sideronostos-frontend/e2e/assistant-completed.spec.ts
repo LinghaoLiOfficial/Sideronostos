@@ -18,24 +18,11 @@ test("completes a mock assistant chat and opens its knowledge citation", async (
     if (route.request().method() === "GET") return route.fulfill({ json: { items: [] } });
     return route.fulfill({ status: 201, json: chat });
   });
-  await page.route("**/farm-assistant/conversations/browser-chat-1/actions", (route) =>
-    route.fulfill({ json: { items: [] } }));
-  await page.route("**/farm-assistant/conversations/browser-chat-1/operations/history", (route) =>
-    route.fulfill({ json: { items: [] } }));
-  await page.route("**/farm-assistant/conversations/browser-chat-1/operations", (route) => {
-    if (route.request().method() === "GET") return route.fulfill({ json: { items: [{
-      operation_id: "list_profiles_field_shift_profiles_get",
-      method: "GET", path: "/field-shift/profiles", path_parameters: [],
-      query_parameters: [], required_query_parameters: [], body: null, body_required: false,
-      required_body_parameters: [], required_inputs: [],
-    }] } });
-    return route.fulfill({ json: {
-      status: "succeeded", operation_id: "list_profiles_field_shift_profiles_get",
-      text: "Operation list_profiles_field_shift_profiles_get completed.", missing_inputs: [],
-      status_code: 200, result: { items: [{ id: "temperate-demo" }] },
-      content_type: "application/json", href: "/field-shift",
-    } });
-  });
+  await page.route("**/field-shift/profiles", (route) => route.fulfill({ json: { items: [{ id: "temperate-demo", name: "Temperate crop example", is_demo: true, crops: [] }] } }));
+  await page.route("**/farm-assistant/conversations/browser-chat-1/actions", (route) => route.fulfill({ json: {
+    status: "succeeded", action: "field.create", text: "Field saved.", missing_fields: [], pending: null,
+    result: { id: "north", name: "North meadow" }, href: "/field-shift?field=north&step=field",
+  } }));
   await page.route("**/farm-assistant/conversations/browser-chat-1/messages", (route) =>
     route.fulfill({ status: 200, json: {
       id: "browser-message-1",
@@ -87,13 +74,16 @@ test("completes a mock assistant chat and opens its knowledge citation", async (
     "https://example.org/agrisata/field-guide",
   );
   await page.getByRole("button", { name: "Close source" }).click();
-  await page.getByText(/Farm tasks/).click();
-  await page.getByRole("button", { name: "Continue task" }).click();
-  await expect(page.getByText(/Operation list_profiles/)).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift");
-  const receipt = page.getByRole("region", { name: "Operation result" });
-  const completedCard = receipt.getByText("Task completed").locator("..");
-  await expect(completedCard.getByText("1 record found")).toBeVisible();
+  await page.getByRole("button", { name: "Add a field", exact: true }).click();
+  await page.getByLabel("Field name", { exact: true }).fill("North meadow");
+  await page.getByLabel("Area (ha)").fill("4");
+  await page.getByLabel("Latitude").fill("42");
+  await page.getByLabel("Longitude").fill("-93.5");
+  await page.getByLabel("Crop settings").selectOption("temperate-demo");
+  await page.getByRole("button", { name: "Save field", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/field-shift?field=north&step=field");
+  const receipt = page.getByRole("region", { name: "Farm tasks" });
+  await expect(receipt.getByText("North meadow has been added.")).toBeVisible();
   const screenshot = receipt.getByRole("img", { name: "Completed task screenshot" });
   await expect(screenshot).toBeVisible();
   await expect.poll(() => screenshot.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);

@@ -9,5 +9,5 @@ export default defineConfig([
     files: ["src/features/fields/fields-workspace.tsx"],
     rules: { "@next/next/no-img-element": "off" },
   },
-  globalIgnores([".next/**", "coverage/**", "next-env.d.ts", "public/vendor/**"]),
+  globalIgnores([".next/**", ".next-*/**", "coverage/**", "next-env.d.ts", "public/vendor/**"]),
 ]);

@@ -66,10 +66,15 @@ and a browser-generated screenshot of the completion card. HTTP 202 remains
 The water specialist can use all remote-sensing operations. The soil and
 weather specialists retain their scoped guided actions; generic operations
 are blocked for them so they cannot retrieve the other specialty's data
-through an unfiltered business endpoint. The catalog is an explicit task
-picker with labelled inputs for scalar fields and advanced JSON input for
-complex request bodies. It does not infer
-operations from free chat prose.
+through an unfiltered business endpoint. The farmer workspace and module docks
+now use task-specific controls in
+`FarmerTasks`, rather than the generic catalog picker. Saved fields, maps, plans
+and calculations are selected by name. Field creation and observation lookup use
+the scoped action journal; field edits and calculation controls use the module
+journal. A lost response reuses the same request key, and restored completion
+results are checked against owned server history. Complex farm boundary editing
+and new rotation preparation open the existing full workspaces. Free chat does
+not autonomously execute a write. See [farmer task workflows](farmer-tasks.md).
 
 Chat first routes complete greetings and thanks to a conversational reply. A greeting
 followed by a substantive question continues to the question handler. Field-creation
@@ -130,8 +135,8 @@ from the mock KB; that module has no business API. The existing functional
   scenario inputs for a complete operational matrix.
 - Free-text chat now routes common greetings, product-use questions, and
   missing-context requests to bot-specific guidance in the local mock demo.
-  Chat prose alone does not trigger a write. The generic operation picker and
-  guided actions remain the execution path. A production AI provider and real
+  Chat prose alone does not trigger a write. The farmer task controls and linked
+  workspaces remain the execution path. A production AI provider and real
   agronomic corpus have not been configured or evaluated.
 
 ## Farmer-facing answer boundaries
