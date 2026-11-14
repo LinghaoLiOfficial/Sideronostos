@@ -102,6 +102,17 @@ it("recovers the conversation list after a temporary load failure", async () => 
   expect(screen.getByText("No conversations yet")).toBeInTheDocument();
 });
 
+it("renders a late load failure in the currently selected language", async () => {
+  const user = userEvent.setup();
+  let fail!: (error: Error) => void;
+  api.listConversations.mockReturnValue(new Promise((_, reject) => { fail = reject; }));
+  api.setPreferences.mockResolvedValue({ language: "zh", detail: "brief" });
+  render(<AgentWorkspace />);
+  await user.selectOptions(screen.getByRole("combobox", { name: "Language" }), "zh-CN");
+  await act(async () => fail(new Error("offline")));
+  expect(await screen.findByRole("alert")).toHaveTextContent("发生错误。草稿已保留。");
+});
+
 it("keeps the first reply when an empty-chat load finishes late", async () => {
   const user = userEvent.setup();
   api.listConversations.mockResolvedValue({ items: [] });

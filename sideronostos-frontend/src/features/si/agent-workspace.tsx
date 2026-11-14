@@ -45,7 +45,7 @@ export function AgentWorkspace() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<"request" | "failed" | null>(null);
   const [menu, setMenu] = useState(false);
   const [outgoing, setOutgoing] = useState<string | null>(null);
   const [source, setSource] = useState<{ title: string; text: string } | null>(null);
@@ -75,20 +75,18 @@ export function AgentWorkspace() {
       } catch (cause) {
         if (!live) return;
         if (cause instanceof Error && "status" in cause && cause.status === 401) setUser(null);
-        else setError(l.error);
+        else setError("request");
       } finally { if (live) setLoading(false); }
     })();
     return () => { live = false; };
   // The initial account/history request must not rerun on a language change.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reload]);
   useEffect(() => {
     if (!id) return;
     if (justCreated.current === id) { justCreated.current = null; return; }
     let live = true;
-    api.getConversation(id).then((next) => { if (live) setPage(next); }).catch(() => { if (live) setError(l.error); });
+    api.getConversation(id).then((next) => { if (live) setPage(next); }).catch(() => { if (live) setError("request"); });
     return () => { live = false; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
   useEffect(() => { end.current?.scrollIntoView?.({ block: "end" }); }, [page?.messages.length, outgoing]);
 
@@ -129,7 +127,7 @@ export function AgentWorkspace() {
       if (user) localStorage.setItem("agrisata-agent-chat:" + user.id, chat.id);
       setMenu(false);
       return chat.id;
-    } catch { setError(l.error); return null; }
+    } catch { setError("request"); return null; }
     finally { setBusy(false); }
   }
   async function send() {
@@ -157,8 +155,8 @@ export function AgentWorkspace() {
         message = await api.getMessage(chatId, message.id);
         if (active.current === chatId) setPage((previous) => previous ? { ...previous, messages: [...previous.messages.filter((row) => row.id !== message.id), message].sort((a, b) => a.sequence - b.sequence) } : previous);
       }
-      if (message.status === "pending") setError(l.failed);
-    } catch { setError(l.error); }
+      if (message.status === "pending") setError("failed");
+    } catch { setError("request"); }
     finally { setOutgoing(null); setBusy(false); }
   }
   async function language(next: string) {
@@ -168,12 +166,12 @@ export function AgentWorkspace() {
     try {
       await api.setPreferences(body);
       if (id) await api.setPreferences(body, id);
-    } catch { setError(next === "en" ? labels.en.error : labels.zh.error); }
+    } catch { setError("request"); }
   }
   async function openSource(message: AssistantMessage, evidence: string) {
     if (!id) return;
     try { setSource(sourceView(await api.getSource(id, message.id, evidence))); }
-    catch { setError(l.error); }
+    catch { setError("request"); }
   }
   async function older() {
     if (!id || !page?.next_before_sequence) return;
@@ -181,7 +179,7 @@ export function AgentWorkspace() {
     try {
       const previous = await api.getConversation(id, page.next_before_sequence);
       if (active.current === id) setPage((current) => current ? { ...current, messages: [...previous.messages, ...current.messages], next_before_sequence: previous.next_before_sequence } : current);
-    } catch { setError(l.error); }
+    } catch { setError("request"); }
     finally { setBusy(false); }
   }
 
@@ -212,7 +210,7 @@ export function AgentWorkspace() {
           {!page?.messages.length && !outgoing && <div className="my-auto py-12 text-center"><div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-primary/15 text-primary"><Leaf size={28} /></div><h3 className="text-2xl font-semibold">{l.start}</h3><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">{zh ? domains.find((item) => item.id === domain)?.zhHint : domains.find((item) => item.id === domain)?.enHint}</p></div>}
           <div className="space-y-6">{page?.messages.map((message) => <div key={message.id} className="space-y-3"><div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground">{message.text}</div><div className="max-w-[95%] rounded-2xl rounded-bl-sm bg-muted px-4 py-3 text-sm leading-7 sm:max-w-[85%]">{message.status === "pending" ? <span className="flex items-center gap-2 text-muted-foreground"><LoaderCircle size={15} className="animate-spin" />{l.pending}</span> : message.status === "failed" || message.status === "interrupted" ? <span role="alert">{l.failed}</span> : message.response ? <>{message.response.paragraphs.map((paragraph, index) => <p key={index} className="mb-2 last:mb-0">{paragraph.text}</p>)}{[...new Set(message.response.paragraphs.flatMap((paragraph) => paragraph.evidence_ids))].map((evidence) => <button key={evidence} type="button" onClick={() => void openSource(message, evidence)} className="mr-2 mt-2 rounded-md border border-border px-2 py-1 text-xs text-primary">{l.source} {evidence}</button>)}{message.facts.length > 0 && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer">{zh ? "查看当时的数据" : "View data used"}</summary><dl>{message.facts.map((fact) => <div key={fact.id}><dt className="inline font-medium">{fact.label}: </dt><dd className="inline">{fact.display}</dd></div>)}</dl></details>}{message.response.actions.includes("open_planner") && <Link href="/field-shift/rotation" className="mt-3 block text-xs text-primary underline">{zh ? "打开轮作规划" : "Open rotation planner"}</Link>}</> : null}</div></div>)}{outgoing && <div className="ml-auto w-fit max-w-[85%] rounded-2xl bg-primary/70 px-4 py-3 text-sm text-primary-foreground">{outgoing}</div>}</div><div ref={end} />
         </div></div>
-        {error && <div role="alert" className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2 text-sm text-destructive"><span>{error}</span>{!user && <button type="button" className="shrink-0 underline" onClick={() => { setError(null); setLoading(true); setReload((value) => value + 1); }}>{l.retry}</button>}</div>}
+        {error && <div role="alert" className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2 text-sm text-destructive"><span>{error === "failed" ? l.failed : l.error}</span>{!user && <button type="button" className="shrink-0 underline" onClick={() => { setError(null); setLoading(true); setReload((value) => value + 1); }}>{l.retry}</button>}</div>}
         {source && <section aria-label={zh ? "依据详情" : "Source details"} className="mx-auto mb-2 w-[calc(100%-2rem)] max-w-3xl rounded-lg border border-border bg-card p-4 text-sm"><div className="flex justify-between gap-2"><h3 className="font-semibold">{source.title}</h3><button type="button" aria-label={zh ? "关闭依据" : "Close source"} onClick={() => setSource(null)}><X size={16} /></button></div><p className="mt-2 text-muted-foreground">{source.text}</p></section>}
         <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{id && user && <AgentActions key={id} conversationId={id} ensureConversation={create} domain={domain} language={zh ? "zh" : "en"} userId={user.id} />}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + name(domain, zh) + "留言" : "Message " + name(domain, zh)} placeholder={zh ? "说说你想了解或完成什么…" : "Ask a question or describe a task…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
       </section>
