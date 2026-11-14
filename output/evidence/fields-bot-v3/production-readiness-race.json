@@ -1,0 +1,44 @@
+{
+  "verified_at": "2026-11-14T00:28:01.802598+00:00",
+  "method": "Actual local next build/start and real API readiness; one response intentionally held until a UI draft edit",
+  "build": "Next production build exited 0; TypeScript passed; 23 routes generated",
+  "full_frontend_suite": "314 passed / 56 files",
+  "race": {
+    "controlledDelay": true,
+    "oldReady": true,
+    "requestFailure": "net::ERR_ABORTED",
+    "delivery": "fulfilled_or_canceled_browser",
+    "generationDisabled": true,
+    "readinessPanels": 0
+  },
+  "fresh_check": {
+    "status": 200,
+    "ready": false,
+    "blocked": [
+      {
+        "path": "fields.1c1c559e-e891-4163-93a5-6c086b4e891d.machine.tractor",
+        "value": null,
+        "unit": "validation",
+        "expected_unit": "validation",
+        "sources": [],
+        "missing_reason": null,
+        "status": "blocked",
+        "issues": [
+          "machine_membership_missing"
+        ],
+        "warnings": [],
+        "engineering_assumption": false,
+        "blocks": [
+          "machine_resources"
+        ]
+      }
+    ]
+  },
+  "rendered": {
+    "correctionHref": "#daily-resources",
+    "message": "还有 1 组资料需要核对\n\n共有 1 条检查未通过；同一份资料可能影响多条检查。先按下列分组处理，未知值没有被替换为零。\n\nIowa benchmark field 1 · 资料与条件 · 1 条检查\n\n尚未为地块指定必需设备，请在共享资源中勾选该设备覆盖的地块\n\n去核对资料\n展开逐项依据（1 条）\n所有输入状态与天气限制"
+  },
+  "draft_restored_from_frozen_run_after_check": true,
+  "saved_plan_reopened_after_production_restart": "47b5a6c2-49d7-4b2c-bc6b-2a5fd0f764d3",
+  "llm_call_sent": false
+}

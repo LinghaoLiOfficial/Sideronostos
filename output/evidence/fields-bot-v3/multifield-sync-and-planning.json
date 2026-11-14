@@ -1,0 +1,113 @@
+{
+  "verified_at": "2026-11-14T00:21:09.793487+00:00",
+  "owner_id": "7b2ced63-3f88-4de3-a574-2d8119262950",
+  "farm_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+  "method": "Actual browser import, confirmation, field form, controlled lost acknowledgement, reload/retry, real concurrent API edit, reviewed conflict resolution, linked year-precision histories, shared-machine membership, readiness, Temporal/Gurobi calculation, comparison and save",
+  "scope": "Isolated engineering benchmark; no actual pilot farm; no semantic AI output",
+  "uncertain_save": {
+    "controlled_failure": "Browser route fetched actual committed API response, then substituted one 503",
+    "pending_request_survived_reload": true,
+    "retry_request_exact": true,
+    "idempotency_key": "44df3523-8ccc-45bd-b818-597c75039474",
+    "same_server_field_and_version": true,
+    "no_duplicate_records": true,
+    "field_count": 2
+  },
+  "version_conflict": {
+    "stale_version": 1,
+    "result": "conflict",
+    "server_updated_version": 2,
+    "reviewed_save_expected_version": 2,
+    "reviewed_saved_version": 3,
+    "local_input_preserved": true
+  },
+  "run_id": "e8823ed8-eab5-4e95-ac0a-e7566955e1cd",
+  "job_id": "bc2bbcac-00ae-4769-8dfd-da27f9089d08",
+  "status": "optimal",
+  "fields": [
+    {
+      "id": "bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+      "version": 2,
+      "history_precision": [
+        "year"
+      ]
+    },
+    {
+      "id": "cf6f0815-af82-412d-9228-fbeefdf06355",
+      "version": 4,
+      "history_precision": [
+        "year"
+      ]
+    }
+  ],
+  "candidate_count": 12,
+  "options": [
+    {
+      "id": "option-1",
+      "metrics": {
+        "bare": 898.1645989346981,
+        "risk": 0.19712830736709713,
+        "soil": 1.840501227325201,
+        "water": 3692.71806529952,
+        "profit": 2208.601472790241,
+        "rotation": 0.0
+      },
+      "gap_cost": 0.0,
+      "scientific_valid": true,
+      "schedule_valid": true
+    },
+    {
+      "id": "option-2",
+      "metrics": {
+        "bare": 912.8886087532996,
+        "risk": 0.22002275124803278,
+        "soil": 1.840501227325201,
+        "water": 3862.9643839945393,
+        "profit": 2208.601472790241,
+        "rotation": 0.0
+      },
+      "gap_cost": 0.0,
+      "scientific_valid": true,
+      "schedule_valid": true
+    }
+  ],
+  "shared_resource_membership": [
+    {
+      "kind": "water",
+      "field_ids": [
+        "cf6f0815-af82-412d-9228-fbeefdf06355",
+        "bf76d0ee-020a-4654-b31b-2435ffa3ff0d"
+      ],
+      "machine_type": null
+    },
+    {
+      "kind": "machine",
+      "field_ids": [
+        "cf6f0815-af82-412d-9228-fbeefdf06355",
+        "bf76d0ee-020a-4654-b31b-2435ffa3ff0d"
+      ],
+      "machine_type": "tractor"
+    },
+    {
+      "kind": "machine",
+      "field_ids": [
+        "cf6f0815-af82-412d-9228-fbeefdf06355",
+        "bf76d0ee-020a-4654-b31b-2435ffa3ff0d"
+      ],
+      "machine_type": "harvester"
+    }
+  ],
+  "saved_plan_id": "7847c28a-e6bc-4491-8f99-834a7e84c861",
+  "saved_snapshot_equals_run_export": true,
+  "saved_option_equals_selected_run_option": true,
+  "archive": "multifield-browser-run-and-plan.json.gz",
+  "uncompressed_sha256": "a462c8767e793357c8a5704cfee0cd37b7a911b8cbdf3ee549c68aee8e327795",
+  "mobile": {
+    "width": 390,
+    "viewport": {
+      "width": 390,
+      "height": 844
+    }
+  },
+  "regression_fix": "Readiness messages now explain incompatible history catalogue and missing equipment; equipment correction links target shared resources; failing regression reproduced then fixed."
+}

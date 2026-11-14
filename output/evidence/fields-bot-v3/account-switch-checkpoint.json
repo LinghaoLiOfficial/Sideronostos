@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-11-14T00:05:57.674091+00:00",
+  "method": "Actual same-browser sign out confirmation, second test user login, old owner deep link, public API reads",
+  "second_owner_id": "7b2ced63-3f88-4de3-a574-2d8119262950",
+  "registration": "Public auth API, actual local worker delivery to Mailpit, verification API; no external email",
+  "initial_farms": 0,
+  "foreign_resources": {
+    "plan": 404,
+    "run": 404,
+    "field": 404,
+    "selection": 404
+  },
+  "actual_ui": {
+    "old_field_name_absent": true,
+    "old_saved_plan_title_absent": true,
+    "current_account": "第二测试农户",
+    "clear_inaccessible_aoi_button_used": true,
+    "return_from_inaccessible_saved_plan_button_used": true,
+    "assistant_recovered_to_unselected_field_and_aoi": true,
+    "assistant_input_enabled": true,
+    "generation_call_sent": false
+  },
+  "regression": "Failure before fix: inaccessible AOI only had retry and held context pending; focused UI test passes after explicit clear action",
+  "screenshots": [
+    "fields-v3-other-account-isolation.png",
+    "fields-v3-other-account-recovery.png",
+    "fields-v3-account-roundtrip.png"
+  ],
+  "still_remaining": "Delayed response race and final requirement audit; live AI depends on provider access.",
+  "round_trip": {
+    "same_browser_logout_login": true,
+    "first_owner_field_restored": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+    "first_owner_field_version_unchanged": 2,
+    "first_owner_plan_restored": "f6c7bf75-4d0a-47d5-b586-8c132466a65e",
+    "second_owner_farm_not_shown": true,
+    "reverse_foreign_api_statuses": {
+      "farm": 404,
+      "field": 404,
+      "run": 404,
+      "plan": 404
+    }
+  }
+}

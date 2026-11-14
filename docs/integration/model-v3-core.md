@@ -145,6 +145,11 @@ saved-plan restoration and daily assistant evidence. A real browser-submitted ra
 scenario was rejected for missing irrigation infrastructure; its revised, explicitly
 irrigated engineering scenario produced two verified alternatives and a durable saved plan.
 
-Remaining: live AI semantic evaluation and knowledge publication, prepared-raster parity,
-legacy-map migration, broader recovery/account/race checks, production build and regional
-calibration. Automated kernel or UI tests alone do not establish full product acceptance.
+Prepared-raster parity, legacy map redirect, local production build/restart, account round trip,
+uncertain-save retry, real field-version conflict, two-field shared-resource planning and diagnostic
+UI/save/comparison now have running-system evidence in `fields-bot-model-v3-plan.md` checkpoints
+9–11 and `output/evidence/fields-bot-v3/`.
+
+Remaining: live AI semantic evaluation and knowledge publication (provider access HOLD),
+remaining delayed-response/batch browser checks, final requirements/data handoff audit and
+regional calibration. Automated kernel or UI tests alone do not establish full product acceptance.

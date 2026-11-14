@@ -55,6 +55,12 @@ const issues: Record<string, string> = {
   engineering_assumption_unaccepted: "工程假设尚未接受",
   weather_release_unavailable: "尚无适用的已发布天气数据",
   utc_daily_proxy_unaccepted: "尚未接受 UTC 日聚合近似",
+  history_catalogue_incompatible:
+    "前茬记录的作物目录与当前参数包不一致，请在前茬记录中核对并补充；无需编造更精确的日期",
+  machine_membership_missing:
+    "尚未为地块指定必需设备，请在共享资源中勾选该设备覆盖的地块",
+  ambiguous_machine_assignment:
+    "同一地块被分配到多组同类设备，请在共享资源中核对并保留一组",
   history_unknown: "需要真实前茬或此前未种植的依据",
   field_version_changed: "地块版本已改变",
   baseline_missing: "缺少原定种法",
@@ -65,7 +71,7 @@ const issues: Record<string, string> = {
 function label(path: string, fields: Field[]) {
   const [kind, id, parameter] = path.split(".");
   if (kind === "fields")
-    return `${fields.find((f) => f.id === id)?.name ?? "经营地块"} · ${fieldParameters[parameter as FieldParameter]?.label ?? "资料与条件"}`;
+    return `${fields.find((f) => f.id === id)?.name ?? "经营地块"} · ${fieldParameters[parameter as FieldParameter]?.label ?? (parameter === "history" ? "前茬记录" : parameter === "machine" ? "设备归属" : "资料与条件")}`;
   if (kind === "farms") return "农场共享资源与供需";
   if (kind === "weather") return "历史气象资料";
   if (kind === "profile") return "地区与作物参数";
@@ -80,17 +86,20 @@ export function DailyReadinessPanel({
 }) {
   const blocked = report.items.filter((item) => item.status === "blocked");
   const groups = new Map<string, typeof blocked>();
+  const targetFor = (path: string) => {
+    const [kind, , parameter] = path.split(".");
+    if (kind === "farms" || (kind === "fields" && parameter === "machine"))
+      return "daily-resources";
+    if (kind === "fields") return "daily-conditions";
+    if (["profile", "weather"].includes(kind)) return "daily-profile";
+    return "daily-fields";
+  };
   for (const item of blocked) {
     const [kind, id] = item.path.split(".");
-    const key = ["fields", "farms"].includes(kind) ? `${kind}.${id}` : kind;
+    const scope = ["fields", "farms"].includes(kind) ? `${kind}.${id}` : kind;
+    const key = `${scope}:${targetFor(item.path)}`;
     groups.set(key, [...(groups.get(key) ?? []), item]);
   }
-  const targets: Record<string, string> = {
-    fields: "daily-conditions",
-    farms: "daily-resources",
-    profile: "daily-profile",
-    weather: "daily-profile",
-  };
   return (
     <section
       className={styles.dailyPanel}
@@ -111,7 +120,7 @@ export function DailyReadinessPanel({
         {[...groups].map(([key, items]) => (
           <li key={key}>
             <strong>
-              {label(key, fields)} · {items.length} 条检查
+              {label(key.split(":")[0], fields)} · {items.length} 条检查
             </strong>
             <p>
               {[...new Set(items.flatMap((item) => item.issues))]
@@ -121,9 +130,7 @@ export function DailyReadinessPanel({
                 )
                 .join("；")}
             </p>
-            <a href={`#${targets[key.split(".")[0]] ?? "daily-fields"}`}>
-              去核对资料
-            </a>
+            <a href={`#${targetFor(items[0].path)}`}>去核对资料</a>
             <details>
               <summary>展开逐项依据（{items.length} 条）</summary>
               <ul className={styles.readinessList}>

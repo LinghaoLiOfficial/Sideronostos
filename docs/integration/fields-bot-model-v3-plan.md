@@ -402,9 +402,9 @@ cross-run/plan-only owner context. This is a checkpoint, not full-goal completio
 
 | Boundary | Current evidence | Remaining acceptance |
 |---|---|---|
-| Owned field/farm synchronization | Real DB regressions; browser persisted field/version and new-session restoration | Full account switch, conflict, partial retry and restart browser matrix |
+| Owned field/farm synchronization | Real DB regressions; same-browser A→B→A isolation; actual partial farm progress; committed-response loss, reload and identical retry; real second-client field conflict and explicit review | Remaining delayed-response browser race and batch mixed-item checks |
 | v3 scientific/math/task execution | Enumerated oracle, independent checks, real Gurobi and real Temporal attempt | Final requirement audit and production configuration checks |
-| Daily form/readiness/results/save | 305 frontend regressions; real incomplete, hard-failure, successful compare/save/reopen paths | Multi-field UI, diagnostic remedy UI, print/export and remaining responsive paths |
+| Daily form/readiness/results/save | 314 frontend regressions; actual two-field shared resources, year-precision history, readiness, worker solve, compare/save; diagnostic/null metric/cross-run comparison/mobile/save; print/export | Final requirement audit and delayed-response acceptance |
 | Bot numeric/evidence boundaries | Deterministic and owned DB tests; saved context on mobile | Frozen daily cases, real retrieval/generation, semantic rubric and held-out gate |
 | Knowledge v3 | Manifest/readers validated, 4,911 chunks prepared offline | Versioned vector publication and retrieval/generation evaluation |
 | Unified map | Actual prepared SMAP parity, AOI camera restoration, error/retry, mobile evidence sheet, old URL redirect and planner without duplicate map | Broader account/race/restart journey remains |
@@ -512,3 +512,55 @@ Evidence: `ai-diagnostics-fixture-update.json`, `eval-fixtures-v5-daily.json.gz`
 `production-build-and-restart.json` and production screenshots. Remaining work includes
 multi-field/diagnostic UI, the broader account/conflict/retry matrix, final requirements
 handoff and live semantic evaluation after access is restored. Goal remains ACTIVE.
+
+
+## Checkpoint 11 — account round trip, two-field planning and diagnostic UI (2026-11-14)
+
+A second engineering account was registered and verified through the actual local email
+worker and Mailpit. In the same browser, A→B→A sign-out/login preserves each account's
+workspace. Both directions reject foreign farm/field/run/plan records with 404; the first
+account's original field remains version 2 and its immutable plan is unchanged. An inaccessible
+AOI previously had only retry and held the assistant context pending. A failing regression
+now guards a visible clear action that preserves the field and observation dates.
+
+Through the actual MapLibre import/confirmation/form flow, the second account saved a
+3.68 ha engineering farm with two fields. While only one was saved the UI showed 1 / 2.
+For the second field, a controlled browser route let the real API commit, then replaced
+its acknowledgement with a single 503. Reload retained the durable request. The visible
+retry sent the exact original key and payload, recovered the same field/version, and made
+no duplicate. A separate real API client then updated that field: the stale UI submission
+returned an item conflict, retained the local input, and required explicit latest-version
+review before saving version 3. This is a controlled local fault test, not a production outage.
+
+Readiness correctly blocked two legacy history catalogues and missing machine membership
+for the added field. Its generic messages and wrong correction target obscured those actions;
+a failing UI regression now requires specific explanations and a shared-resources link.
+The user flow explicitly linked each known 2026 pea record to the current catalogue while
+retaining **year precision**. Saved field versions became 4 and 2; the planner required
+adopting and reconfirming them. Both fields were explicitly assigned the same water,
+tractor and harvester groups. No dates or actual-farm data were invented.
+
+Actual UI submission `e8823ed8-eab5-4e95-ac0a-e7566955e1cd` completed through Temporal
+and Gurobi with 12 candidates, two distinct zero-gap options and the original baseline.
+The UI displayed both timelines and six original metrics. Saved plan
+`7847c28a-e6bc-4491-8f99-834a7e84c861` exactly matches the selected option and the run's
+exported input snapshot. The 390 px mobile page has document width 390 px.
+
+The existing actual diagnostic run was also inspected through desktop/mobile UI: 30 positive
+water-gap rows, 369.2760942213342 USD verified remedy cost, and null profit shown as 未计算.
+Cross-run comparison with the compatible zero-gap run shows profit as 无法比较 and explicitly
+avoids comparing scores under different weights. All 30 gaps can be expanded. The diagnostic
+save dialog states its status; plan `47b5a6c2-49d7-4b2c-bc6b-2a5fd0f764d3` reopens after
+reload with the same snapshot, remedies and limits. The mobile assistant receives its context;
+no generation or resource-booking action was sent.
+
+Evidence: `account-switch-checkpoint.json`, `multifield-sync-and-planning.json`, the compressed
+actual run/plan archive, `diagnostic-ui-and-comparison.json`, and named screenshots. Frontend
+suite: **314 passed / 56 files**, scoped ESLint passes. Backend was not changed in this phase;
+the prior full 548-test result remains applicable. Fresh production build and TypeScript checks pass; the saved diagnostic plan reopens under
+`next start`. `production-readiness-race.json` records a real readiness response held until
+a draft edit: the old ready=true request is aborted, no stale report is rendered and submission
+remains disabled. A fresh response reports missing equipment, and the rendered correction link
+points to shared resources. The original draft was then explicitly restored from its run. Live AI provider access remains HOLD. Outstanding work is the
+remaining delayed-response/batch acceptance, final requirements and data handoff audit, and
+live knowledge/semantic evaluation after access is restored. Goal remains ACTIVE.

@@ -1,0 +1,475 @@
+{
+  "verified_at": "2026-11-14T00:23:56.626913+00:00",
+  "method": "Actual production-mode desktop/mobile UI and authenticated journey API; no generation call",
+  "run_id": "c10b3fa4-fa9b-4074-b623-d7f86041713d",
+  "plan_id": "47b5a6c2-49d7-4b2c-bc6b-2a5fd0f764d3",
+  "ui": {
+    "profit_display": "未计算",
+    "all_positive_gap_rows": 30,
+    "explicit_diagnostic_save_dialog": true,
+    "full_gap_expansion_clicked": true,
+    "saved_plan_reopened_after_reload": true,
+    "comparison_profit_delta_display": "无法比较",
+    "different_weights_score_warning_visible": true,
+    "mobile": {
+      "shownGapRows": 30,
+      "width": 390,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  },
+  "verification": {
+    "valid": true,
+    "metrics": {
+      "bare": 449.0875138548851,
+      "risk": 0.09856529813233908,
+      "soil": 0.9202612988829613,
+      "water": 1846.3804711066712,
+      "profit": null,
+      "rotation": 0
+    },
+    "gap_cost": 369.2760942213342,
+    "diagnostic": true
+  },
+  "comparison": {
+    "status": 200,
+    "result": {
+      "first_run_id": "c10b3fa4-fa9b-4074-b623-d7f86041713d",
+      "second_run_id": "1d241a5f-96b1-47d0-951c-726a7f6b55f4",
+      "first_option_id": "option-1",
+      "second_option_id": "option-1",
+      "delta": {
+        "bare": 0,
+        "risk": 0,
+        "soil": 0,
+        "water": 0,
+        "profit": null,
+        "rotation": 0
+      },
+      "unavailable_metrics": [
+        "profit"
+      ],
+      "model_version": "rotation-milp-v3.0",
+      "input_changes": {
+        "weights": {
+          "before": {
+            "bare": 0.2,
+            "risk": 0.15,
+            "soil": 0.15,
+            "water": 0.4,
+            "profit": 0,
+            "rotation": 0.1
+          },
+          "after": {
+            "bare": 0.15,
+            "risk": 0.15,
+            "soil": 0.15,
+            "water": 0.2,
+            "profit": 0.25,
+            "rotation": 0.1
+          }
+        },
+        "farm_resources": {
+          "before": {
+            "d0536d2e-811a-48bc-aaab-14ea97875eec": {
+              "daily": {
+                "d0536d2e-811a-48bc-aaab-14ea97875eec-water": {
+                  "kind": "water",
+                  "default": {
+                    "amount": {
+                      "unit": "m3/day",
+                      "value": 0,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": {
+                      "unit": "text",
+                      "value": "Engineering scenario only: obtain confirmed additional water allocation before implementation; no booking has been made.",
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remediable": true,
+                    "gap_unit_cost": {
+                      "unit": "USD/m3",
+                      "value": 0.2,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    }
+                  },
+                  "field_ids": [
+                    "1c1c559e-e891-4163-93a5-6c086b4e891d"
+                  ],
+                  "overrides": {},
+                  "water_basis": "net",
+                  "machine_type": null,
+                  "irrigation_efficiency": null
+                },
+                "resource-2bd2ce8f-0d71-442b-8610-22f7330a96b1": {
+                  "kind": "machine",
+                  "default": {
+                    "amount": {
+                      "unit": "h/day",
+                      "value": 16,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "field_ids": [
+                    "1c1c559e-e891-4163-93a5-6c086b4e891d"
+                  ],
+                  "overrides": {},
+                  "water_basis": null,
+                  "machine_type": "tractor",
+                  "irrigation_efficiency": null
+                },
+                "resource-efc3fe7f-2f6a-4d5a-a930-e29b17b3fd93": {
+                  "kind": "machine",
+                  "default": {
+                    "amount": {
+                      "unit": "h/day",
+                      "value": 16,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "field_ids": [
+                    "1c1c559e-e891-4163-93a5-6c086b4e891d"
+                  ],
+                  "overrides": {},
+                  "water_basis": null,
+                  "machine_type": "harvester",
+                  "irrigation_efficiency": null
+                }
+              },
+              "period_limits": [
+                {
+                  "kind": "seed",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "maize",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "market",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "maize",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "seed",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "oat",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "market",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "oat",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "seed",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "pea",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "market",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "pea",
+                  "period_id": "year-2027"
+                }
+              ]
+            }
+          },
+          "after": {
+            "d0536d2e-811a-48bc-aaab-14ea97875eec": {
+              "daily": {
+                "d0536d2e-811a-48bc-aaab-14ea97875eec-water": {
+                  "kind": "water",
+                  "default": {
+                    "amount": {
+                      "unit": "m3/day",
+                      "value": 1000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "field_ids": [
+                    "1c1c559e-e891-4163-93a5-6c086b4e891d"
+                  ],
+                  "overrides": {},
+                  "water_basis": "net",
+                  "machine_type": null,
+                  "irrigation_efficiency": null
+                },
+                "resource-2bd2ce8f-0d71-442b-8610-22f7330a96b1": {
+                  "kind": "machine",
+                  "default": {
+                    "amount": {
+                      "unit": "h/day",
+                      "value": 16,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "field_ids": [
+                    "1c1c559e-e891-4163-93a5-6c086b4e891d"
+                  ],
+                  "overrides": {},
+                  "water_basis": null,
+                  "machine_type": "tractor",
+                  "irrigation_efficiency": null
+                },
+                "resource-efc3fe7f-2f6a-4d5a-a930-e29b17b3fd93": {
+                  "kind": "machine",
+                  "default": {
+                    "amount": {
+                      "unit": "h/day",
+                      "value": 16,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "field_ids": [
+                    "1c1c559e-e891-4163-93a5-6c086b4e891d"
+                  ],
+                  "overrides": {},
+                  "water_basis": null,
+                  "machine_type": "harvester",
+                  "irrigation_efficiency": null
+                }
+              },
+              "period_limits": [
+                {
+                  "kind": "seed",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "maize",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "market",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "maize",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "seed",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "oat",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "market",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "oat",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "seed",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "pea",
+                  "period_id": "year-2027"
+                },
+                {
+                  "kind": "market",
+                  "limit": {
+                    "amount": {
+                      "unit": "kg",
+                      "value": 100000,
+                      "source_ids": [
+                        "engineering-fixture"
+                      ],
+                      "missing_reason": null
+                    },
+                    "remedy": null,
+                    "remediable": false,
+                    "gap_unit_cost": null
+                  },
+                  "crop_id": "pea",
+                  "period_id": "year-2027"
+                }
+              ]
+            }
+          }
+        },
+        "disabled_metrics": {
+          "before": {
+            "profit": "Engineering evaluation: no locally confirmed price/cost objective; do not infer profit."
+          },
+          "after": {}
+        }
+      },
+      "score_comparable": false,
+      "interpretation": "second minus first; estimates under their respective scenarios, not measured outcomes"
+    }
+  },
+  "saved_snapshot_exact": true,
+  "remedy": "Obtain confirmed additional water allocation; no booking has been made",
+  "screenshot_prefix": "fields-v3-diagnostic",
+  "semantic_assistant_evaluation": "NOT RUN; provider access HOLD"
+}
