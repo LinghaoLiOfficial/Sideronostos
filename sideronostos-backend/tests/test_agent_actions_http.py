@@ -20,7 +20,10 @@ from sideronostos_backend.modules.agri_data.router import router as agri_data_ro
 from sideronostos_backend.modules.auth.dependencies import AuthPrincipal, require_verified_user
 from sideronostos_backend.modules.database.base import Base
 from sideronostos_backend.modules.database.session import get_session
-from sideronostos_backend.modules.farm_assistant.models import AssistantAction, Conversation
+from sideronostos_backend.modules.farm_assistant.models import (
+    AssistantAction,
+    Conversation,
+)
 from sideronostos_backend.modules.farm_assistant.router import router
 from sideronostos_backend.modules.field_shift.models import FieldRecord
 from sideronostos_backend.modules.field_shift.router import router as field_shift_router
@@ -42,6 +45,8 @@ async def api():
         "knowledge_releases",
         "assistant_conversations",
         "assistant_actions",
+        "assistant_messages",
+        "assistant_previews",
         "field_shift_farms",
         "field_shift_fields",
         "agri_data_selections",
@@ -139,6 +144,7 @@ async def api():
     app = create_app(modules=(ModuleSpec(name="farm_assistant", routers=(router,)),))
     app.include_router(field_shift_router)
     app.include_router(agri_data_router)
+    app.state.session_factory = factory
 
     @app.post("/rotation-optimizer/mock-job", operation_id="start_mock_job", status_code=202)
     async def start_mock_job():
@@ -176,6 +182,98 @@ def field_arguments(**changes):
     }
 
 
+async def test_three_turn_field_chat_requires_confirmation_and_creates_once(api, monkeypatch):
+    client, factory, identity, conversation_id, _ = api
+    original_owner = identity["id"]
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+
+    async def ask(sequence: int, text: str):
+        response = await client.post(
+            path,
+            json={
+                "client_message_id": f"chat-field-turn-{sequence}",
+                "text": text,
+                "context": {"page": "map", "revision": sequence},
+            },
+        )
+        assert response.status_code == 200
+        return response.json()
+
+    first = await ask(1, "Please add a field for me.")
+    assert first["response"]["task"]["status"] == "needs_input"
+    second = await ask(
+        2,
+        "Call it North field. It is 4 hectares at latitude 42 and longitude -93.5. "
+        "Soil is loam, irrigation is available, no planting history. "
+        "Use the temperate demo crop settings.",
+    )
+    assert second["response"]["task"]["status"] == "awaiting_confirmation"
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 0
+    third = await ask(3, "Yes, create the field.")
+    task = third["response"]["task"]
+    assert task["status"] == "completed"
+    assert task["href"].startswith("/field-shift?field=")
+    assert task["preview_url"]
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 1
+    image = b"\x89PNG\r\n\x1a\n" + b"synthetic-page-image"
+
+    async def capture(href: str, authorization: str | None) -> bytes:
+        assert href == task["href"]
+        return image
+
+    monkeypatch.setattr(
+        "sideronostos_backend.modules.farm_assistant.preview.capture_result_page", capture
+    )
+    preview = await client.get(task["preview_url"])
+    assert preview.status_code == 200
+    assert preview.headers["content-type"] == "image/png"
+    assert preview.content == image
+    identity["id"] = str(uuid4())
+    denied = await client.get(task["preview_url"])
+    assert denied.status_code == 404
+    identity["id"] = original_owner
+    replay = await client.post(
+        path,
+        json={
+            "client_message_id": "chat-field-turn-3",
+            "text": "Yes, create the field.",
+            "context": {"page": "map", "revision": 3},
+        },
+    )
+    assert replay.json()["response"]["task"]["href"] == task["href"]
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 1
+
+
+async def test_field_chat_decline_never_creates_a_field(api):
+    client, factory, _, conversation_id, _ = api
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    for sequence, text in enumerate(
+        (
+            "Please add a field for me.",
+            "Call it North field. It is 4 hectares at latitude 42 and longitude -93.5. "
+            "Soil is loam, irrigation is available, no planting history. "
+            "Use the temperate demo crop settings.",
+            "No, don't create it.",
+        ),
+        start=1,
+    ):
+        response = await client.post(
+            path,
+            json={
+                "client_message_id": f"decline-field-turn-{sequence}",
+                "text": text,
+                "context": {"page": "map", "revision": sequence},
+            },
+        )
+        assert response.status_code == 200
+    assert response.json()["response"]["task"]["status"] == "cancelled"
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 0
+
+
 async def test_module_operations_are_catalogued_by_conversation_and_executed_idempotently(api):
     client, factory, identity, conversation_id, _ = api
     path = f"/farm-assistant/conversations/{conversation_id}/operations"
@@ -184,19 +282,21 @@ async def test_module_operations_are_catalogued_by_conversation_and_executed_ide
     tools = catalog.json()["items"]
     assert any(tool["operation_id"] == "list_profiles_field_shift_profiles_get" for tool in tools)
     create = next(
-        tool for tool in tools
-        if tool["operation_id"] == "create_field_field_shift_fields_post"
+        tool for tool in tools if tool["operation_id"] == "create_field_field_shift_fields_post"
     )
     assert "body.name" in create["required_inputs"]
     assert "body.area_ha" in create["required_inputs"]
 
-    result = await client.post(path, json={
-        "operation_id": "list_profiles_field_shift_profiles_get",
-        "path_params": {},
-        "query_params": {},
-        "body": None,
-        "idempotency_key": "module-list-profiles-1",
-    })
+    result = await client.post(
+        path,
+        json={
+            "operation_id": "list_profiles_field_shift_profiles_get",
+            "path_params": {},
+            "query_params": {},
+            "body": None,
+            "idempotency_key": "module-list-profiles-1",
+        },
+    )
     assert result.status_code == 200
     assert result.json()["status"] == "succeeded"
     assert "list_profiles_field_shift_profiles_get" not in result.json()["text"]
@@ -205,21 +305,27 @@ async def test_module_operations_are_catalogued_by_conversation_and_executed_ide
     history = await client.get(path + "/history")
     assert history.status_code == 200
     assert history.json()["items"][0]["outcome"] == result.json()
-    replay = await client.post(path, json={
-        "operation_id": "list_profiles_field_shift_profiles_get",
-        "path_params": {},
-        "query_params": {},
-        "body": None,
-        "idempotency_key": "module-list-profiles-1",
-    })
+    replay = await client.post(
+        path,
+        json={
+            "operation_id": "list_profiles_field_shift_profiles_get",
+            "path_params": {},
+            "query_params": {},
+            "body": None,
+            "idempotency_key": "module-list-profiles-1",
+        },
+    )
     assert replay.json() == result.json()
-    conflict = await client.post(path, json={
-        "operation_id": "create_field_field_shift_fields_post",
-        "path_params": {},
-        "query_params": {},
-        "body": field_arguments(name="Different field"),
-        "idempotency_key": "module-list-profiles-1",
-    })
+    conflict = await client.post(
+        path,
+        json={
+            "operation_id": "create_field_field_shift_fields_post",
+            "path_params": {},
+            "query_params": {},
+            "body": field_arguments(name="Different field"),
+            "idempotency_key": "module-list-profiles-1",
+        },
+    )
     assert conflict.status_code == 409
 
 
@@ -228,32 +334,45 @@ async def test_specialty_bot_cannot_bypass_its_remote_sensing_scope_via_generic_
     async with factory() as session:
         release = await session.scalar(select(KBRelease).limit(1))
         specialist = Conversation(
-            id=str(uuid4()), owner_user_id=identity["id"], preset="remote_sensing",
-            bot_id="remote-soil", language="en", detail="brief",
-            kb_release_id=release.id, next_sequence=1,
+            id=str(uuid4()),
+            owner_user_id=identity["id"],
+            preset="remote_sensing",
+            bot_id="remote-soil",
+            language="en",
+            detail="brief",
+            kb_release_id=release.id,
+            next_sequence=1,
         )
         session.add(specialist)
         await session.commit()
     path = f"/farm-assistant/conversations/{specialist.id}/operations"
     assert (await client.get(path)).json()["items"] == []
-    attempt = await client.post(path, json={
-        "operation_id": "layers_agri_data_layers_get",
-        "path_params": {}, "query_params": {}, "body": None,
-        "idempotency_key": "specialist-scope-1",
-    })
+    attempt = await client.post(
+        path,
+        json={
+            "operation_id": "layers_agri_data_layers_get",
+            "path_params": {},
+            "query_params": {},
+            "body": None,
+            "idempotency_key": "specialist-scope-1",
+        },
+    )
     assert attempt.status_code == 422
 
 
 async def test_module_operation_reports_required_inputs_before_execution(api):
     client, _, _, conversation_id, _ = api
     path = f"/farm-assistant/conversations/{conversation_id}/operations"
-    response = await client.post(path, json={
-        "operation_id": "get_field_field_shift_fields__field_id__get",
-        "path_params": {},
-        "query_params": {},
-        "body": None,
-        "idempotency_key": "module-missing-path-1",
-    })
+    response = await client.post(
+        path,
+        json={
+            "operation_id": "get_field_field_shift_fields__field_id__get",
+            "path_params": {},
+            "query_params": {},
+            "body": None,
+            "idempotency_key": "module-missing-path-1",
+        },
+    )
     assert response.status_code == 200
     assert response.json()["status"] == "needs_input"
     assert response.json()["missing_inputs"] == ["field_id"]
@@ -262,11 +381,16 @@ async def test_module_operation_reports_required_inputs_before_execution(api):
 async def test_empty_module_list_is_explained_as_empty_data(api):
     client, _, _, conversation_id, _ = api
     path = f"/farm-assistant/conversations/{conversation_id}/operations"
-    response = await client.post(path, json={
-        "operation_id": "list_fields_field_shift_fields_get",
-        "path_params": {}, "query_params": {}, "body": None,
-        "idempotency_key": "module-empty-fields-1",
-    })
+    response = await client.post(
+        path,
+        json={
+            "operation_id": "list_fields_field_shift_fields_get",
+            "path_params": {},
+            "query_params": {},
+            "body": None,
+            "idempotency_key": "module-empty-fields-1",
+        },
+    )
     assert response.json()["status"] == "succeeded"
     assert response.json()["result"]["items"] == []
     assert "No records" in response.json()["text"]
@@ -281,8 +405,11 @@ async def test_accepted_module_job_reports_progress_without_claiming_completion(
         await session.commit()
     path = f"/farm-assistant/conversations/{conversation_id}/operations"
     request = {
-        "operation_id": "start_mock_job", "path_params": {}, "query_params": {},
-        "body": None, "idempotency_key": "module-start-job-1",
+        "operation_id": "start_mock_job",
+        "path_params": {},
+        "query_params": {},
+        "body": None,
+        "idempotency_key": "module-start-job-1",
     }
     result = await client.post(path, json=request)
     assert result.status_code == 200

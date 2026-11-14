@@ -13,6 +13,7 @@ from ..knowledge.models import KBRelease
 from ..knowledge.store import active_release
 from ..rotation_optimizer.service import digest
 from .bot_scope import default_bot_id, scope_context
+from .chat_workflow import handle_field_chat
 from .context import freeze_context
 from .models import AssistantMessage, Conversation, FarmerPreference, utcnow
 from .pipeline import collect_evidence, generate_answer
@@ -357,23 +358,26 @@ async def process_message(factory: async_sessionmaker[AsyncSession], identifier:
             ]
         async with asyncio.timeout(max(0.01, seconds)):
             async with factory() as session:
-                release = await session.get(KBRelease, context["kb_release_id"])
-                if release is None or release.status != "published":
-                    raise ValueError("Pinned knowledge release unavailable")
-                evidence = await collect_evidence(session, question, context, release)
-                current = await session.get(AssistantMessage, identifier, with_for_update=True)
-                if current is None or current.status != "pending":
-                    return
-                current.evidence_snapshot = evidence
-                await session.commit()
-            response = await generate_answer(
-                question,
-                context,
-                evidence,
-                language=context["language"],
-                detail=context["detail"],
-                history=history,
-            )
+                response = await handle_field_chat(session, identifier)
+            if response is None:
+                async with factory() as session:
+                    release = await session.get(KBRelease, context["kb_release_id"])
+                    if release is None or release.status != "published":
+                        raise ValueError("Pinned knowledge release unavailable")
+                    evidence = await collect_evidence(session, question, context, release)
+                    current = await session.get(AssistantMessage, identifier, with_for_update=True)
+                    if current is None or current.status != "pending":
+                        return
+                    current.evidence_snapshot = evidence
+                    await session.commit()
+                response = await generate_answer(
+                    question,
+                    context,
+                    evidence,
+                    language=context["language"],
+                    detail=context["detail"],
+                    history=history,
+                )
     except asyncio.CancelledError:
         # If the web worker exits, the persisted deadline makes this recoverable.
         raise

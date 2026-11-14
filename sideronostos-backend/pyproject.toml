@@ -39,7 +39,7 @@ nasa = [
   "shapely>=2.1,<3",
   "xarray>=2025.1,<2027",
 ]
-assistant = ["sideronostos-backend[knowledge,science,optimizer]"]
+assistant = ["sideronostos-backend[knowledge,science,optimizer]", "playwright>=1.65,<2"]
 [project.scripts]
 sideronostos_backend = "sideronostos_backend.app:app"
 sideronostos_nasa = "sideronostos_backend.modules.agri_data.acquisition.cli:main"

@@ -401,6 +401,15 @@ export type AssistantAnswer = {
   warnings?: string[];
   retrieval_mode?: string;
   kb_release_id?: string;
+  task?: AssistantTask;
+};
+export type AssistantTask = {
+  id: string;
+  status: "needs_input" | "awaiting_confirmation" | "completed" | "failed" | "cancelled";
+  missing_inputs: string[];
+  summary: Record<string, unknown> | null;
+  href: string | null;
+  preview_url: string | null;
 };
 export type AssistantMessage = {
   id: string;

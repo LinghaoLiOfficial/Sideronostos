@@ -7,6 +7,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -102,3 +103,17 @@ class AssistantAction(Base):
     audit_events: Mapped[list[dict[str, str]]] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class AssistantPreview(Base):
+    """A private, bounded screenshot of a confirmed result page."""
+
+    __tablename__ = "assistant_previews"
+
+    workflow_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("assistant_conversations.id"), index=True
+    )
+    owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
+    png: Mapped[bytes] = mapped_column(LargeBinary)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

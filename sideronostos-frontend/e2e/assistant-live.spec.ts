@@ -20,6 +20,33 @@ async function addField(page: Page, name: string) {
   await expect(page.getByRole("link", { name: "Open saved field" })).toHaveAttribute("href", /field-shift\?field=/);
 }
 
+test("three turn farmer chat confirms a field and shows its actual result page", async ({ page }, testInfo) => {
+  await page.goto("/si/multi-agent");
+  await chooseBot(page, "Field guide");
+  const composer = page.getByRole("textbox", { name: "Message Field guide" });
+  await composer.fill("Please add a field for me.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByText(/To add this field, please tell me/)).toBeVisible();
+  const fieldName = `North field chat ${Date.now()}`;
+  await composer.fill(`Call it ${fieldName}. It is 4 hectares at latitude 42 and longitude -93.5. Soil is loam, irrigation is available, no planting history. Use the temperate demo crop settings.`);
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByText(/Please confirm: should I create this field/)).toBeVisible();
+  await page.reload();
+  await expect(page.getByText(/Please confirm: should I create this field/)).toBeVisible();
+  await composer.fill("Yes, create the field.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  const link = page.getByRole("link", { name: "Open saved field" });
+  await expect(link).toHaveAttribute("href", /\/field-shift\?field=[a-f0-9-]+&step=field/);
+  const preview = page.getByRole("img", { name: "Saved field result page" });
+  await expect(preview).toBeVisible({ timeout: 30_000 });
+  await preview.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `output/playwright/agent-three-turn-chat-${testInfo.project.name}.png`, fullPage: true });
+  await link.click();
+  await expect(page).toHaveURL(/\/field-shift\?field=[a-f0-9-]+&step=field/);
+  await expect(page.getByTestId("result-ready")).toHaveText(fieldName);
+  await page.screenshot({ path: `output/playwright/agent-three-turn-result-${testInfo.project.name}.png`, fullPage: true });
+});
+
 test("creates an owned field, restores the server-confirmed result and opens the saved page", async ({ page }) => {
   await page.goto("/si/multi-agent");
   await chooseBot(page, "Field guide");

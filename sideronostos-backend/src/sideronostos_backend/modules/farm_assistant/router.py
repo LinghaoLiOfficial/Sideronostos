@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth.dependencies import AuthPrincipal, require_verified_user
 from ..database.session import get_session
+from . import preview
 from .action_execution import AssistantActionService
 from .agent_actions import ActionOutcome, ActionRequest
 from .models import AssistantMessage
@@ -82,9 +83,7 @@ async def get_action(
 async def module_operations(
     conversation_id: str, user: User, session: Session, request: Request
 ) -> dict[str, Any]:
-    items = await ModuleOperationService().catalog(
-        session, request.app, user.id, conversation_id
-    )
+    items = await ModuleOperationService().catalog(session, request.app, user.id, conversation_id)
     return {"items": items}
 
 
@@ -156,6 +155,18 @@ async def message(
     if row is None:
         raise HTTPException(404, "Message not found")
     return message_view(row)
+
+
+@router.get("/conversations/{conversation_id}/previews/{workflow_id}")
+async def result_preview(
+    conversation_id: str, workflow_id: str, user: User, session: Session, request: Request
+) -> Response:
+    png = await preview.owned_preview(
+        session, user.id, conversation_id, workflow_id, request.headers.get("authorization")
+    )
+    return Response(
+        content=png, media_type="image/png", headers={"Cache-Control": "private, no-store"}
+    )
 
 
 @router.get("/conversations/{conversation_id}/messages/{message_id}/sources/{evidence_id}")

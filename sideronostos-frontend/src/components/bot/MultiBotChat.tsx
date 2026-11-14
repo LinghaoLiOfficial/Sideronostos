@@ -10,6 +10,7 @@ import type { Locale } from "@/lib/i18n/locale";
 import * as api from "@/features/si/agent-api";
 import type { AgentConversation, AgentDomain } from "@/features/si/agent-api";
 import { FarmerTasks } from "@/features/si/farmer-tasks";
+import { TaskResultCard } from "@/features/si/task-result-card";
 import styles from "./MultiBotDock.module.css";
 
 type BotConversation = AgentConversation & { bot_id: string };
@@ -227,6 +228,7 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
             : message.status === "failed" || message.status === "interrupted" ? <span role="alert">{l.failed}</span>
               : message.response ? <>
                 {message.response.paragraphs.map((paragraph, index) => <p key={index}>{paragraph.text}</p>)}
+                {message.response.task && <TaskResultCard task={message.response.task} language={locale === "en" ? "en" : "zh"} />}
                 {[...new Set(message.response.paragraphs.flatMap((paragraph) => paragraph.evidence_ids))].map((evidence) => <button key={evidence} type="button" className={styles.sourceButton} onClick={() => void openSource(message, evidence)}>{l.source} {evidence}</button>)}
                 {message.facts.length > 0 && <details className={styles.facts}><summary>{l.facts}</summary><dl>{message.facts.map((fact) => <div key={fact.id}><dt>{fact.label}: </dt><dd>{fact.display}</dd></div>)}</dl></details>}
               </> : null}

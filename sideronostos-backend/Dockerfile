@@ -8,6 +8,7 @@ COPY src ./src
 RUN if [ -n "$APP_EXTRA" ]; then uv sync --no-dev --extra "$APP_EXTRA"; else uv sync --no-dev; fi
 
 FROM python:3.12.13-slim
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 RUN apt-get update \
     && apt-get install --no-install-recommends -y ffmpeg \
     && rm -rf /var/lib/apt/lists/* \
@@ -15,6 +16,10 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=builder --chown=app:app /app/.venv /app/.venv
 COPY --from=builder --chown=app:app /app/src /app/src
+RUN if [ -x /app/.venv/bin/playwright ]; then \
+      /app/.venv/bin/playwright install --with-deps chromium \
+      && chmod -R a+rX /ms-playwright; \
+    fi
 ENV PATH="/app/.venv/bin:$PATH" PYTHONPATH=/app/src PYTHONUNBUFFERED=1
 USER app
 EXPOSE 8000
