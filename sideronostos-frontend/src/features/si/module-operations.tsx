@@ -52,6 +52,10 @@ export function ModuleOperations({ conversationId, language }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const touched = useRef(false);
+  const outcomeRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (outcome && touched.current) outcomeRef.current?.scrollIntoView?.({ block: "nearest" });
+  }, [outcome]);
   useEffect(() => {
     let live = true;
     api.listModuleOperations(conversationId).then(({ items }) => {
@@ -114,7 +118,7 @@ export function ModuleOperations({ conversationId, language }: Props) {
           <button type="button" onClick={() => void run()} disabled={busy} className="rounded-md bg-primary px-3 py-2 text-primary-foreground disabled:opacity-60">{busy && <LoaderCircle size={14} className="mr-1 inline animate-spin" />}{busy ? text.working : text.run}</button>
         </>}
       </>}
-      {outcome && <section aria-label={text.result} className="rounded-md bg-muted p-3">
+      {outcome && <section ref={outcomeRef} aria-label={text.result} className="rounded-md bg-muted p-3">
         {href && outcome.status === "succeeded" ?
           <CompletionReceipt href={href} message={outcome.text} language={language} linkLabel={text.open} fileName={`agrisata-${outcome.operation_id}.png`} captureKey={JSON.stringify(outcome.result)}>
             {resultSummary(outcome.result, language) && <p className="mt-2 font-medium">{resultSummary(outcome.result, language)}</p>}

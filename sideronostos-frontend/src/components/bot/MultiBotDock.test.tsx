@@ -8,6 +8,8 @@ import { MultiBotDock } from "./MultiBotDock";
 const api = vi.hoisted(() => ({
   listConversations: vi.fn(), createConversation: vi.fn(), getConversation: vi.fn(),
   sendMessage: vi.fn(), getMessage: vi.fn(), getSource: vi.fn(), setPreferences: vi.fn(),
+  listModuleOperations: vi.fn(), listModuleOperationHistory: vi.fn(), postModuleOperation: vi.fn(),
+  listActions: vi.fn(), getAction: vi.fn(), postAction: vi.fn(),
 }));
 const auth = vi.hoisted(() => ({ getCurrentUser: vi.fn() }));
 vi.mock("@/features/si/agent-api", () => api);
@@ -37,6 +39,9 @@ beforeEach(() => {
   auth.getCurrentUser.mockResolvedValue({ id: "farmer-1", email: "farmer@example.test", display_name: "Ava", email_verified: true });
   api.listConversations.mockResolvedValue({ items: [] });
   api.setPreferences.mockResolvedValue({ language: "zh", detail: "brief" });
+  api.listModuleOperations.mockResolvedValue({ items: [] });
+  api.listModuleOperationHistory.mockResolvedValue({ items: [] });
+  api.listActions.mockResolvedValue({ items: [] });
 });
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.unstubAllGlobals(); localStorage.clear(); });
 
@@ -91,6 +96,30 @@ it("creates a scoped conversation, sends, and shows the server reply and source"
   expect(await screen.findByText("Water reading is unavailable.")).toBeVisible();
   await user.click(screen.getByRole("button", { name: /View source/ }));
   expect(await screen.findByText("No current observation")).toBeVisible();
+});
+
+it("opens a module API from a fresh field specialist chat and returns the completed page", async () => {
+  const user = userEvent.setup();
+  const fieldChat = { ...conversation("field-1", "field-guide"), preset: "field_management" };
+  api.createConversation.mockResolvedValue(fieldChat);
+  api.listModuleOperations.mockResolvedValue({ items: [{
+    operation_id: "list_fields", title: "List fields", method: "GET", path: "/field-shift/fields",
+    path_parameters: [], query_parameters: [], required_query_parameters: [], body: null,
+    body_required: false, required_body_parameters: [], required_inputs: [],
+  }] });
+  api.postModuleOperation.mockResolvedValue({
+    status: "succeeded", operation_id: "list_fields", text: "Fields are ready.",
+    missing_inputs: [], status_code: 200, result: { items: [{ id: "north" }] },
+    content_type: "application/json", href: "/field-shift",
+  });
+  render(<MultiBotDock module="field-management" locale="en" />);
+  await user.click(screen.getByRole("button", { name: "Open Field guide" }));
+  await user.click(await screen.findByRole("button", { name: "Use module tools" }));
+  expect(api.createConversation).toHaveBeenCalledWith({ preset: "field_management", bot_id: "field-guide", language: "en", detail: "brief" });
+  await user.click(await screen.findByText(/Module operations/));
+  await user.click(screen.getByRole("button", { name: "Run operation" }));
+  await waitFor(() => expect(api.postModuleOperation).toHaveBeenCalledWith("field-1", expect.objectContaining({ operation_id: "list_fields" })));
+  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift");
 });
 
 it("opens cited web search results from the source panel", async () => {

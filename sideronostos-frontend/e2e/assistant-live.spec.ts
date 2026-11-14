@@ -10,7 +10,7 @@ test("uses real HTTP handlers for knowledge, field creation, result link, and sc
   await expect(composer).toBeVisible();
   await composer.fill("What can I do when planning a field?");
   await page.getByRole("button", { name: "Send message" }).click();
-  await expect(page.getByText(/For your farm planning/)).toBeVisible();
+  await expect(page.getByText(/For your farm planning/).first()).toBeVisible();
   await page.screenshot({ path: "output/playwright/assistant-live-answer.png", fullPage: true });
   await page.getByRole("button", { name: /View source/ }).first().click();
   await expect(page.getByRole("link", { name: "Open source" })).toBeVisible();
@@ -78,4 +78,48 @@ test("runs the other module assistants against real HTTP handlers", async ({ pag
   await page.getByText(/Module operations/).click();
   await expect(page.getByText("This assistant has no operational APIs. Ask it a question to search its knowledge base.")).toBeVisible();
   await page.screenshot({ path: "output/playwright/assistant-live-local-knowledge.png", fullPage: true });
+});
+
+test("executes a field operation from its own module dock", async ({ page }) => {
+  await page.goto("/si/field-management");
+  await page.getByRole("button", { name: "Open Field guide" }).click();
+  await page.getByRole("button", { name: "Use module tools" }).click();
+  await page.getByText(/Module operations/).click();
+  await page.getByRole("combobox", { name: "Choose an API operation" }).selectOption("create_field_field_shift_fields_post");
+  const name = `Dock field ${Date.now()}`;
+  await page.getByRole("textbox", { name: "JSON request body" }).fill(JSON.stringify({
+    name, area_ha: 2.5, latitude: 42, longitude: -93.5,
+    soil_texture: "loam", irrigation_available: true,
+    profile_id: "temperate-demo", history: [],
+  }));
+  await page.getByRole("button", { name: "Run operation" }).click();
+  const result = page.getByRole("region", { name: "Operation result" });
+  await expect(result.getByRole("link", { name: "Open result" })).toHaveAttribute("href", /\/field-shift\?field=/);
+  await expect(result.getByRole("img", { name: "Completed task screenshot" })).toBeVisible();
+  await page.screenshot({ path: "output/playwright/assistant-live-module-dock.png", fullPage: true });
+});
+
+test("opens real remote and rotation results from their module docks and answers local knowledge", async ({ page }) => {
+  for (const item of [
+    { route: "/si/remote-sensing", bot: "Water specialist", operation: "layers_agri_data_layers_get", href: /\/field-shift\/map/ },
+    { route: "/si/rotation-recommendation", bot: "Rotation guide", operation: "profiles_rotation_optimizer_profiles_get", href: /\/field-shift\/rotation/ },
+  ]) {
+    await page.goto(item.route);
+    await page.getByRole("button", { name: `Open ${item.bot}` }).click();
+    await page.getByRole("button", { name: "Use module tools" }).click();
+    await page.getByText(/Module operations/).click();
+    await page.getByRole("combobox", { name: "Choose an API operation" }).selectOption(item.operation);
+    await page.getByRole("button", { name: "Run operation" }).click();
+    const result = page.getByRole("region", { name: "Operation result" });
+    await expect(result.getByRole("link", { name: "Open result" })).toHaveAttribute("href", item.href);
+    await expect(result.getByRole("img", { name: "Completed task screenshot" })).toBeVisible();
+  }
+  await page.goto("/si/local-knowledge");
+  await page.getByRole("button", { name: "Open Local knowledge" }).click();
+  await expect(page.getByRole("button", { name: "Use module tools" })).toHaveCount(0);
+  await page.getByRole("textbox", { name: "Message Local knowledge" }).fill("What should I check before planning a field?");
+  const response = page.waitForResponse((event) => event.url().endsWith("/messages") && event.request().method() === "POST");
+  await page.getByRole("button", { name: "Send message" }).click();
+  expect((await response).status()).toBe(200);
+  await expect(page.getByText(/For your farm planning/).first()).toBeVisible();
 });

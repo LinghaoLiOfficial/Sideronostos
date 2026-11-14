@@ -89,16 +89,21 @@ workspace shows only the corresponding guided action choices. Published data
 may be unavailable for a selection; neither specialty creates an observation.
 
 The four SI module routes are still placeholder pages. Their bottom-right
-docks now support authenticated chat, source viewing, and voice draft entry;
-guided actions are available in the multi-agent workspace. The existing
-functional `/fields` and rotation assistants are unchanged.
+docks support authenticated chat, source viewing, and voice draft entry.
+The field, remote-sensing, and rotation docks can now create an owned
+conversation from the tool button, execute their allowed module operations,
+and show a result link and completion receipt. Field and remote-sensing docks
+also expose their scoped guided actions. The local-knowledge dock answers
+from the mock KB; that module has no business API. The existing functional
+`/fields` and rotation assistants are unchanged.
 
 ## Verification and remaining gates
 
 - A dedicated local browser smoke uses real assistant, knowledge, field,
   remote-sensing, and rotation HTTP handlers with PostgreSQL. It verifies a
   sourced answer, field creation and reopen, operation history restoration,
-  remote layer listing, rotation profile listing, and local-knowledge chat.
+  remote layer listing, rotation profile listing, and local-knowledge chat
+  from both the multi-agent workspace and the matching module docks.
   The identity is synthetic, the KB is explicitly mock, and the web preset
   may return no external hit. A separate browser component test mocks API
   replies.
@@ -115,6 +120,7 @@ functional `/fields` and rotation assistants are unchanged.
 
 The checked-in browser evidence is under `docs/integration/evidence`:
 `assistant-field-completion.png`, `assistant-field-result-page.png`,
+`assistant-field-module-dock.png`,
 `assistant-remote-sensing.png`, `assistant-rotation.png`, and
 `assistant-local-knowledge.png`. These show synthetic test-user data, not a
 production deployment.

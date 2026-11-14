@@ -9,6 +9,8 @@ import type { CatalogBot } from "@/lib/bot-catalog";
 import type { Locale } from "@/lib/i18n/locale";
 import * as api from "@/features/si/agent-api";
 import type { AgentConversation, AgentDomain } from "@/features/si/agent-api";
+import { AgentActions } from "@/features/si/agent-actions";
+import { ModuleOperations } from "@/features/si/module-operations";
 import styles from "./MultiBotDock.module.css";
 
 type BotConversation = AgentConversation & { bot_id: string };
@@ -25,6 +27,7 @@ const labels = {
     source: "View source", closeSource: "Close source", older: "Load earlier messages",
     facts: "View data used", localLimit: "Prices and crop varieties are examples, not live local data.",
     weatherLimit: "This chat does not provide a live forecast.",
+    tools: "Use module tools", toolsError: "Module tools could not be opened. Try again.",
   },
   "zh-CN": {
     loading: "正在加载对话…", empty: "向这位助手提问。",
@@ -36,6 +39,7 @@ const labels = {
     source: "查看依据", closeSource: "关闭依据", older: "加载更早的消息",
     facts: "查看当时的数据", localLimit: "价格与品种数据为示例，并非实时本地数据。",
     weatherLimit: "此对话不提供实时天气预报。",
+    tools: "使用模块工具", toolsError: "模块工具未能打开，请重试。",
   },
 };
 
@@ -59,6 +63,10 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
   const [unauthenticated, setUnauthenticated] = useState(false);
   const [reload, setReload] = useState(0);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [toolsBusy, setToolsBusy] = useState(false);
+  const [toolsError, setToolsError] = useState(false);
   const [conversationLanguage, setConversationLanguage] = useState<"en" | "zh" | null>(null);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [nextBefore, setNextBefore] = useState<number | null>(null);
@@ -76,8 +84,9 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
     let current = true;
     (async () => {
       try {
-        await getCurrentUser();
+        const currentUser = await getCurrentUser();
         if (!current) return;
+        setUserId(currentUser.id);
         const history = await api.listConversations();
         if (!current) return;
         const latest = history.items.filter((item) => belongsToBot(item, bot))
@@ -121,6 +130,27 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
     return () => { current = false; };
   }, [conversationId, conversationLanguage, locale]);
 
+  async function ensureConversation(): Promise<string | null> {
+    if (conversationId) return conversationId;
+    const body = { preset: bot.presetId as AgentDomain, bot_id: bot.id, language: locale === "en" ? "en" as const : "zh" as const, detail: "brief" as const };
+    const created = await api.createConversation(body);
+    if (!alive.current) return null;
+    if (!belongsToBot(created, bot)) throw new Error("Conversation identity mismatch");
+    setConversationId(created.id);
+    setConversationLanguage(created.language);
+    return created.id;
+  }
+
+  async function openTools() {
+    if (toolsBusy) return;
+    if (conversationId) { setToolsOpen((value) => !value); return; }
+    setToolsBusy(true);
+    setToolsError(false);
+    try { if (await ensureConversation()) setToolsOpen(true); }
+    catch { if (alive.current) setToolsError(true); }
+    finally { if (alive.current) setToolsBusy(false); }
+  }
+
   async function send() {
     const text = draft.trim();
     if (!text || sending.current || loading || unauthenticated) return;
@@ -130,15 +160,8 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
     let chatId = conversationId;
     let accepted = false;
     try {
-      if (!chatId) {
-        const body = { preset: bot.presetId as AgentDomain, bot_id: bot.id, language: locale === "en" ? "en" as const : "zh" as const, detail: "brief" as const };
-        const created = await api.createConversation(body);
-        if (!alive.current) return;
-        if (!belongsToBot(created, bot)) throw new Error("Conversation identity mismatch");
-        chatId = created.id;
-        setConversationId(chatId);
-        setConversationLanguage(created.language);
-      }
+      chatId = await ensureConversation();
+      if (!chatId) return;
       const clientId = retry.current?.text === text ? retry.current.id : crypto.randomUUID();
       retry.current = { text, id: clientId };
       let reply = await api.sendMessage(chatId, { client_message_id: clientId, text, context: { page: "map", revision: 1 } });
@@ -212,6 +235,14 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
     {source && <section className={styles.sourcePanel} aria-label={locale === "en" ? "Source details" : "依据详情"}><button type="button" aria-label={l.closeSource} onClick={() => setSource(null)}>×</button><h3>{source.title}</h3><p>{source.text}</p>{source.url && <a href={source.url} target="_blank" rel="noreferrer">{locale === "en" ? "Open source" : "打开来源"}</a>}</section>}
     {error && <p role="alert" className={styles.chatError}>{error === "send" ? l.sendError : error === "poll" ? l.pollError : error === "delayed" ? l.delayed : error === "preferences" ? l.preferencesError : error === "unavailable" ? l.unavailable : l.sourceError}</p>}
     <div className={styles.composerWrap}>
+      {bot.module !== "local-knowledge" && <>
+        <button type="button" className={styles.toolToggle} disabled={toolsBusy} aria-expanded={toolsOpen} onClick={() => void openTools()}>{l.tools}</button>
+        {toolsError && <p role="alert" className={styles.chatError}>{l.toolsError}</p>}
+        {toolsOpen && conversationId && userId && <div className={styles.toolsArea}>
+          <AgentActions key={`actions:${conversationId}`} conversationId={conversationId} ensureConversation={ensureConversation} domain={bot.presetId as AgentDomain} botId={bot.id} language={locale === "en" ? "en" : "zh"} userId={userId} />
+          {bot.id !== "remote-soil" && bot.id !== "remote-weather" && <ModuleOperations key={`operations:${conversationId}`} conversationId={conversationId} language={locale === "en" ? "en" : "zh"} />}
+        </div>}
+      </>}
       <BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={locale === "en" ? `Message ${bot.name.en}` : `给${bot.name["zh-CN"]}留言`} placeholder={locale === "en" ? "Ask a question…" : "说说你想了解什么…"} language={locale === "en" ? "en-US" : "zh-CN"} />
       {bot.id === "local-knowledge-guide" && <p className={styles.limit}>{l.localLimit}</p>}
       {bot.id === "remote-weather" && <p className={styles.limit}>{l.weatherLimit}</p>}

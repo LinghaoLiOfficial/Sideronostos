@@ -147,6 +147,24 @@
 .sourcePanel p { margin: 0; color: #5d5965; line-height: 1.5; }
 .chatError { margin: 0; padding: 8px 16px; color: #9d3030; font-size: 12px; }
 .composerWrap { flex: none; border-top: 1px solid #ece9ef; padding-bottom: 10px; }
+.toolToggle { margin: 8px 16px 2px; padding: 7px 11px; border: 1px solid #d5cbea; border-radius: 8px; background: #faf9fc; color: #55417c; font: inherit; font-size: 12px; font-weight: 650; cursor: pointer; }
+.toolToggle:disabled { opacity: .6; cursor: wait; }
+.toolsArea {
+  --background: #fff;
+  --foreground: #282735;
+  --card: #faf9fc;
+  --card-foreground: #282735;
+  --muted: #f2f1f3;
+  --muted-foreground: #5d5965;
+  --border: #ded8ea;
+  --primary: #584489;
+  --primary-foreground: #fff;
+  --destructive: #9d3030;
+  max-height: min(45dvh, 300px);
+  overflow-y: auto;
+  padding: 8px 16px 0;
+  overscroll-behavior: contain;
+}
 .limit { margin: 5px 18px 0; color: #6a6071; text-align: center; font-size: 10px; line-height: 1.4; }
 @media (max-width: 700px) {
   .cluster { right: 12px; bottom: calc(18px + env(safe-area-inset-bottom)); gap: 7px; padding: 7px 8px 7px 11px; min-height: 64px; border-radius: 22px; }
