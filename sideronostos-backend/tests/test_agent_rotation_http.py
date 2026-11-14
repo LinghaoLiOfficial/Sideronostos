@@ -24,7 +24,9 @@ from sideronostos_backend.modules.rotation_optimizer.router import router as rot
 pytestmark = pytest.mark.asyncio
 
 
-async def test_rotation_bot_confirms_real_run_waits_for_worker_and_exports_csv(setup):  # noqa: F811
+async def test_rotation_bot_confirms_real_run_waits_for_worker_and_exports_csv(
+    setup, monkeypatch  # noqa: F811
+):
     factory, owner, _, request = setup
     conversation_id = str(uuid4())
     release_id = "agent-rotation-kb-" + uuid4().hex
@@ -95,6 +97,19 @@ async def test_rotation_bot_confirms_real_run_waits_for_worker_and_exports_csv(s
         final = completed.json()
         assert final["status"] == "completed"
         assert final["preview_url"] and final["result_page_url"]
+        assert final["href"] == f"/field-shift/rotation?run={run_id}&option=option-1"
+        captured = []
+
+        async def capture(target, authorization):
+            captured.append(target)
+            return b"\x89PNG\r\n\x1a\nsynthetic-preview"
+
+        monkeypatch.setattr(
+            "sideronostos_backend.modules.farm_assistant.preview.capture_result_page", capture
+        )
+        preview = await client.get(final["preview_url"])
+        assert preview.status_code == 200
+        assert captured == [f"/field-shift/rotation?run={run_id}&option=option-1"]
         result_data = await client.get(
             f"/farm-assistant/conversations/{conversation_id}/results/{task['id']}"
         )

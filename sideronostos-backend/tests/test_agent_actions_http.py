@@ -1,17 +1,25 @@
 """Real PostgreSQL action journey against an explicitly dedicated test database."""
 
 import asyncio
+import calendar
+import hashlib
 import json
 import os
 from datetime import UTC, datetime
+from types import SimpleNamespace
 from uuid import uuid4
 
 import httpx
+import numpy as np
 import pytest
 import pytest_asyncio
+from agent_execution_evidence import record as record_execution
+from agent_execution_evidence import save as save_execution
 from sqlalchemy import func, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from test_farm_sync import request_body as farm_request_body
+from test_field_shift_persistence import planning_input
 
 from sideronostos_backend.core import installed_models  # noqa: F401
 from sideronostos_backend.core.application import create_app
@@ -30,6 +38,7 @@ from sideronostos_backend.modules.farm_assistant.router import router
 from sideronostos_backend.modules.farm_assistant.schemas import ConversationCreate
 from sideronostos_backend.modules.field_shift.models import FieldRecord
 from sideronostos_backend.modules.field_shift.router import router as field_shift_router
+from sideronostos_backend.modules.field_shift.schemas import Environment, EnvironmentMonth
 from sideronostos_backend.modules.field_shift.service import FieldShiftService
 from sideronostos_backend.modules.knowledge.models import KBRelease
 
@@ -50,12 +59,13 @@ async def api():
         "assistant_actions",
         "assistant_messages",
         "assistant_previews",
-        "field_shift_farms",
-        "field_shift_fields",
         "agri_data_selections",
         "agri_data_releases",
     }
-    tables = [table for table in Base.metadata.sorted_tables if table.name in table_names]
+    tables = [
+        table for table in Base.metadata.sorted_tables
+        if table.name in table_names or table.name.startswith("field_shift_")
+    ]
     async with engine.begin() as connection:
         await connection.run_sync(lambda sync: Base.metadata.create_all(sync, tables=tables))
     factory = async_sessionmaker(engine, expire_on_commit=False)
@@ -753,6 +763,194 @@ async def test_weather_bot_confirms_real_selection_then_reads_published_rainfall
     answer = " ".join(paragraph["text"] for paragraph in facts["paragraphs"])
     assert "4 mm" in answer
     assert "synthetic" in answer.lower()
+
+
+async def test_field_guide_executes_all_fourteen_real_field_routes_through_chat(api, monkeypatch):
+    client, _, _, conversation_id, _ = api
+    from sideronostos_backend.modules.field_shift import service as field_service
+
+    async def synthetic_weather(latitude, longitude, reference_year=2025):
+        return Environment(
+            status="live", source_name="Synthetic test weather", source_url=None,
+            reference_year=reference_year, fetched_at=datetime.now(UTC),
+            spatial_resolution="Synthetic regional fixture", fingerprint="agent-field-weather-v1",
+            months=[EnvironmentMonth(
+                month=month, rainfall_mm=50, tmin_c=10, tmax_c=25,
+                reference_et_mm=100, valid_days=calendar.monthrange(2025, month)[1],
+                expected_days=calendar.monthrange(2025, month)[1],
+            ) for month in range(1, 13)],
+            limitations=["Synthetic test data"], evidence=[],
+        )
+
+    monkeypatch.setattr(field_service, "fetch_environment", synthetic_weather)
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    completed: set[str] = set()
+    evidence: dict[str, dict] = {}
+
+    async def execute(operation_id: str, *, body=None, path_params=None, query_params=None):
+        payload = {"path_params": path_params or {}, "query_params": query_params or {}}
+        if body is not None:
+            payload["body"] = body
+        question = f"Please run {operation_id} " + json.dumps(payload)
+        message = await client.post(path, json={
+            "client_message_id": "field-matrix-" + uuid4().hex,
+            "text": question,
+            "context": {"page": "map", "revision": 1},
+        })
+        assert message.status_code == 200, operation_id
+        task = message.json()["response"]["task"]
+        assert task["operation_id"] == operation_id
+        if task["status"] == "awaiting_confirmation":
+            confirmed = await client.post(path, json={
+                "client_message_id": "field-matrix-confirm-" + uuid4().hex,
+                "text": "Confirm", "context": {"page": "map", "revision": 1},
+            })
+            assert confirmed.status_code == 200, operation_id
+            task = confirmed.json()["response"]["task"]
+        assert task["status"] == "completed", (operation_id, task)
+        assert task["execution"]["status"] == "succeeded"
+        completed.add(operation_id)
+        record_execution(evidence, operation_id, task)
+        return task["execution"]["result"]
+
+    await execute("list_profiles_field_shift_profiles_get")
+    await execute("list_farms_field_shift_farms_get")
+    farm = await execute("sync_farm_field_shift_farms_sync_post", body=farm_request_body())
+    await execute("get_farm_field_shift_farms__farm_id__get",
+                  path_params={"farm_id": farm["farm"]["id"]})
+    field = await execute("create_field_field_shift_fields_post", body=field_arguments(
+        name="Field route matrix", latitude=41, longitude=-94,
+        history=[{"year": 2025, "crop_id": "wheat"}],
+    ))
+    field_id = field["id"]
+    await execute("list_fields_field_shift_fields_get")
+    await execute("get_field_field_shift_fields__field_id__get",
+                  path_params={"field_id": field_id})
+    updated = await execute(
+        "update_field_field_shift_fields__field_id__patch",
+        path_params={"field_id": field_id},
+        body=field_arguments(
+            name="Field route matrix updated", latitude=41, longitude=-94,
+            history=[{"year": 2025, "crop_id": "wheat"}], expected_version=1,
+        ),
+    )
+    assert updated["version"] == 2
+    await execute("get_environment_field_shift_fields__field_id__environment_get",
+                  path_params={"field_id": field_id})
+    analysis = await execute(
+        "create_analysis_field_shift_fields__field_id__analyses_post",
+        path_params={"field_id": field_id},
+        body=planning_input(expected_field_version=2),
+    )
+    await execute("get_analysis_field_shift_analyses__analysis_id__get",
+                  path_params={"analysis_id": analysis["id"]})
+    await execute("list_plans_field_shift_plans_get")
+    saved = await execute("save_plan_field_shift_plans_post", body={
+        "analysis_id": analysis["id"], "option_id": analysis["alternatives"][0]["id"],
+        "title": "Field route matrix plan", "notes": "Synthetic test only",
+    })
+    await execute("get_plan_field_shift_plans__plan_id__get",
+                  path_params={"plan_id": saved["id"]})
+    assert completed == {
+        tool.operation_id
+        for tool in ModuleToolExecutor(client._transport.app).tools_for("field_management")
+    }
+    save_execution("field_management", evidence)
+
+
+async def test_remote_bot_executes_all_six_real_observation_routes_through_chat(
+    api, monkeypatch, tmp_path
+):
+    client, factory, _, conversation_id, _ = api
+    from sideronostos_backend.modules.agri_data import service as agri_service
+    from sideronostos_backend.modules.agri_data.adapters.smap_l3 import PROJECT
+
+    asset_dir = tmp_path / "agent-test-smap"
+    asset_dir.mkdir()
+    asset = asset_dir / "synthetic.npz"
+    xs, _ = PROJECT.transform(np.array([-93.51, -93.49]), np.array([0, 0]))
+    _, ys = PROJECT.transform(np.array([0, 0]), np.array([42.01, 41.99]))
+    np.savez_compressed(
+        asset,
+        moisture=np.array([[0.23, 0.24], [0.25, 0.26]], dtype=np.float32),
+        retrieval_qa=np.zeros((2, 2), dtype=np.uint16),
+        surface_qa=np.zeros((2, 2), dtype=np.uint16),
+        time_seconds=np.zeros((2, 2), dtype=np.float64),
+        uncertainty=np.full((2, 2), 0.01, dtype=np.float32),
+        x_centers=xs,
+        y_centers=ys,
+    )
+    monkeypatch.setattr(
+        agri_service, "get_agri_data_settings", lambda: SimpleNamespace(asset_root=tmp_path)
+    )
+    async with factory() as session:
+        release = await session.get(ScienceRelease, "agent-test-smap")
+        release.data = {
+            **release.data,
+            "passes": {"AM": {
+                "asset": asset.name, "asset_sha256": hashlib.sha256(asset.read_bytes()).hexdigest()
+            }},
+        }
+        conversation = await session.get(Conversation, conversation_id)
+        conversation.preset = "remote_sensing"
+        conversation.bot_id = "remote-water"
+        await session.commit()
+
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    completed: set[str] = set()
+    evidence: dict[str, dict] = {}
+
+    async def execute(operation_id: str, *, body=None, path_params=None):
+        payload = {"path_params": path_params or {}}
+        if body is not None:
+            payload["body"] = body
+        reply = await client.post(path, json={
+            "client_message_id": "remote-matrix-" + uuid4().hex,
+            "text": f"Please run {operation_id} " + json.dumps(payload),
+            "context": {"page": "map", "revision": 1},
+        })
+        assert reply.status_code == 200, operation_id
+        task = reply.json()["response"]["task"]
+        if task["status"] == "awaiting_confirmation":
+            confirmed = await client.post(path, json={
+                "client_message_id": "remote-confirm-" + uuid4().hex,
+                "text": "Confirm", "context": {"page": "map", "revision": 1},
+            })
+            assert confirmed.status_code == 200, operation_id
+            task = confirmed.json()["response"]["task"]
+        assert task["status"] == "completed", (operation_id, task)
+        assert task["execution"]["status"] == "succeeded"
+        completed.add(operation_id)
+        record_execution(evidence, operation_id, task)
+        return task["execution"]
+
+    layers = await execute("layers_agri_data_layers_get")
+    assert layers["result"]["items"][0]["id"] == "agent-test-smap:am"
+    layer_id = "agent-test-smap:am"
+    manifest = await execute("manifest_agri_data_layers__layer_id__manifest_get",
+                             path_params={"layer_id": layer_id})
+    assert manifest["result"]["id"] == layer_id
+    tile = await execute("tile_agri_data_layers__layer_id__tiles__z___x___y__get",
+                         path_params={"layer_id": layer_id, "z": "0", "x": "0", "y": "0"})
+    assert tile["content_type"].startswith("image/png")
+    assert tile["result"]["image_base64"].startswith("iVBOR")
+    selection = await execute("create_selection_agri_data_selections_post", body={
+        "kind": "point", "revision": 1,
+        "geometry": {"type": "Point", "coordinates": [-93.5, 42]},
+    })
+    selection_id = selection["result"]["id"]
+    await execute("get_selection_agri_data_selections__selection_id__get",
+                  path_params={"selection_id": selection_id})
+    facts = await execute("facts_agri_data_selections__selection_id__facts_get",
+                          path_params={"selection_id": selection_id})
+    assert {fact["metric"] for fact in facts["result"]["facts"]} >= {
+        "surface_soil_moisture", "rainfall_total"
+    }
+    assert completed == {
+        tool.operation_id
+        for tool in ModuleToolExecutor(client._transport.app).tools_for("remote_sensing")
+    }
+    save_execution("remote_sensing", evidence)
 
 
 async def test_module_operation_reports_required_inputs_before_execution(api):

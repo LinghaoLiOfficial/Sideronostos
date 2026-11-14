@@ -1,0 +1,400 @@
+{
+  "environment": "synthetic verified owner, dedicated PostgreSQL/pgvector, real assistant and business HTTP routes, synthetic weather/SMAP/NASA catalog fixtures; no live NASA acquisition or production model",
+  "total": 39,
+  "passed": 39,
+  "items": [
+    {
+      "domain": "rotation",
+      "operation_id": "cancel_rotation_optimizer_runs__run_id__cancel_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "compare_rotation_optimizer_compare_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "create_analysis_field_shift_fields__field_id__analyses_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 201,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "create_daily_rotation_optimizer_v3_runs_post",
+      "chat_status": "pending",
+      "business_status": "pending",
+      "business_http_status": 202,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "final_workflow_status": "completed",
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "create_field_field_shift_fields_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 201,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "create_rotation_optimizer_runs_post",
+      "chat_status": "pending",
+      "business_status": "pending",
+      "business_http_status": 202,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "final_workflow_status": "completed",
+      "passed": true
+    },
+    {
+      "domain": "remote_sensing",
+      "operation_id": "create_selection_agri_data_selections_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 201,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "daily_profiles_rotation_optimizer_v3_profiles_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "daily_readiness_rotation_optimizer_v3_readiness_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "data_release_availability_rotation_optimizer_data_releases__release_id__availability_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "data_release_rotation_optimizer_data_releases__release_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "data_releases_rotation_optimizer_data_releases_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "export_csv_rotation_optimizer_runs__run_id__export_csv_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "text/csv; charset=utf-8",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "export_rotation_optimizer_runs__run_id__export_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "remote_sensing",
+      "operation_id": "facts_agri_data_selections__selection_id__facts_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "get_analysis_field_shift_analyses__analysis_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "get_environment_field_shift_fields__field_id__environment_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "get_farm_field_shift_farms__farm_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "get_field_field_shift_fields__field_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "get_plan_field_shift_plans__plan_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "get_rotation_optimizer_runs__run_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "remote_sensing",
+      "operation_id": "get_selection_agri_data_selections__selection_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "remote_sensing",
+      "operation_id": "layers_agri_data_layers_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "list_farms_field_shift_farms_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "list_fields_field_shift_fields_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "list_plans_field_shift_plans_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "list_profiles_field_shift_profiles_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "remote_sensing",
+      "operation_id": "manifest_agri_data_layers__layer_id__manifest_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "plan_rotation_optimizer_plans__plan_id__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "plans_rotation_optimizer_plans_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "preflight_rotation_optimizer_preflight_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "profiles_rotation_optimizer_profiles_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "retry_rotation_optimizer_runs__run_id__retry_post",
+      "chat_status": "pending",
+      "business_status": "pending",
+      "business_http_status": 202,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "final_workflow_status": "completed",
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "runs_rotation_optimizer_runs_get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "save_plan_field_shift_plans_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 201,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "rotation",
+      "operation_id": "save_rotation_optimizer_plans_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 201,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "sync_farm_field_shift_farms_sync_post",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "remote_sensing",
+      "operation_id": "tile_agri_data_layers__layer_id__tiles__z___x___y__get",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "image/png",
+      "result_link_present": true,
+      "passed": true
+    },
+    {
+      "domain": "field_management",
+      "operation_id": "update_field_field_shift_fields__field_id__patch",
+      "chat_status": "completed",
+      "business_status": "succeeded",
+      "business_http_status": 200,
+      "content_type": "application/json",
+      "result_link_present": true,
+      "passed": true
+    }
+  ]
+}

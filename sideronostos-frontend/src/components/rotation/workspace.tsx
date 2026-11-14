@@ -725,7 +725,9 @@ function OwnerWorkspace({
         ) : saved.error ? (
           <QueryError error={saved.error} retry={() => void saved.refetch()} />
         ) : saved.data ? (
-          <SavedPlan plan={saved.data} />
+          <div data-testid="result-ready">
+            <SavedPlan plan={saved.data} />
+          </div>
         ) : null}
         <button
           type="button"
@@ -810,38 +812,46 @@ function OwnerWorkspace({
           <QueryError error={run.error} retry={() => void run.refetch()} />
         )}
         {run.data && (
-          <RunResults
-            key={run.data.id}
-            owner={owner.id}
-            run={run.data}
-            changes={visibleChanges}
-            selectedOptionId={optionId}
-            onSelect={(id) => navigate({ option: id })}
-            onExplain={(option) => {
-              navigate({ option: option.id });
-              setOpenRequest({
-                id: Date.now(),
-                text: t("请解释这个方案的主要取舍，以及我需要核对什么。"),
-              });
-            }}
-            onUpdate={updateRun}
-            onSaved={(plan) => {
-              client.setQueryData(
-                ["rotation", owner.id, "plan", plan.id],
-                plan,
-              );
-              void client.invalidateQueries({
-                queryKey: ["rotation", owner.id, "plans"],
-              });
-              setSavedMessage(t("计划已保存，包含本次输入、结果与来源。"));
-              navigate({ plan: plan.id });
-            }}
-            compareRunId={compareId}
-            compareOptionId={compareOptionId}
-            onCompare={(id, option) =>
-              navigate({ compare: id, compareOption: option })
+          <div
+            data-testid={
+              ["optimal", "feasible", "infeasible"].includes(run.data.status)
+                ? "result-ready"
+                : undefined
             }
-          />
+          >
+            <RunResults
+              key={run.data.id}
+              owner={owner.id}
+              run={run.data}
+              changes={visibleChanges}
+              selectedOptionId={optionId}
+              onSelect={(id) => navigate({ option: id })}
+              onExplain={(option) => {
+                navigate({ option: option.id });
+                setOpenRequest({
+                  id: Date.now(),
+                  text: t("请解释这个方案的主要取舍，以及我需要核对什么。"),
+                });
+              }}
+              onUpdate={updateRun}
+              onSaved={(plan) => {
+                client.setQueryData(
+                  ["rotation", owner.id, "plan", plan.id],
+                  plan,
+                );
+                void client.invalidateQueries({
+                  queryKey: ["rotation", owner.id, "plans"],
+                });
+                setSavedMessage(t("计划已保存，包含本次输入、结果与来源。"));
+                navigate({ plan: plan.id });
+              }}
+              compareRunId={compareId}
+              compareOptionId={compareOptionId}
+              onCompare={(id, option) =>
+                navigate({ compare: id, compareOption: option })
+              }
+            />
+          </div>
         )}
       </>
     );

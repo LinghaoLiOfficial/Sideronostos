@@ -2,6 +2,38 @@ import { expect, test, type Page } from "@playwright/test";
 
 test.skip(!process.env.ASSISTANT_LIVE_BACKEND, "Requires the dedicated live assistant test app and seeded test database");
 
+test("opens the completed rotation plan generated through chat", async ({ page }, testInfo) => {
+  const resultUrl = process.env.ASSISTANT_LIVE_ROTATION_URL;
+  test.skip(!resultUrl, "Requires a completed synthetic rotation run from run_live_rotation_chat.py");
+  await page.goto(resultUrl!);
+  await expect(page).toHaveURL(/\/field-shift\/rotation\?run=[a-f0-9-]+&option=option-1/);
+  const result = page.getByTestId("result-ready");
+  await expect(result).toContainText("Results of this calculation");
+  await expect(result).toContainText("Estimated water");
+  await expect(result).toContainText("Maize");
+  await result.scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: `output/playwright/rotation-real-result-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+});
+
+test("opens the rotation plan saved through chat", async ({ page }, testInfo) => {
+  const resultUrl = process.env.ASSISTANT_LIVE_SAVED_PLAN_URL;
+  test.skip(!resultUrl, "Requires a confirmed synthetic saved plan from run_live_rotation_chat.py");
+  await page.goto(resultUrl!);
+  await expect(page).toHaveURL(/\/field-shift\/rotation\?plan=[a-f0-9-]+/);
+  const result = page.getByTestId("result-ready");
+  await expect(result).toContainText("Farmer rotation plan");
+  await expect(result).toContainText("Estimated water");
+  await expect(result).toContainText("Saved from chat");
+  await result.scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: `output/playwright/rotation-saved-plan-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+});
+
 async function chooseBot(page: Page, name: string) {
   await expect(page.getByRole("textbox", { name: /^Message / })).toBeVisible();
   const menu = page.getByRole("button", { name: "Open menu", exact: true });

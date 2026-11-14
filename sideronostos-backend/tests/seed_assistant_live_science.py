@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import os
 
+from rotation_v3_application_helpers import weather
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
@@ -45,7 +46,18 @@ async def main() -> None:
                 or row.data.get("source_kind") != "synthetic_test"
             ):
                 raise RuntimeError("The demo release ID is occupied by non-synthetic data")
+            daily = weather()
+            historical = await session.get(ScienceRelease, daily["release_id"])
+            if historical is None:
+                session.add(ScienceRelease(
+                    id=daily["release_id"], product="NASA_POWER_DAILY",
+                    status="published", manifest_sha256=daily["manifest_sha256"], data=daily,
+                ))
+                await session.commit()
+            elif historical.data.get("source_kind") != "synthetic_test_only":
+                raise RuntimeError("The rotation weather release is not synthetic test data")
             print(f"Published synthetic release: {RELEASE_ID}")
+            print(f"Published synthetic rotation weather: {daily['release_id']}")
     finally:
         await engine.dispose()
 

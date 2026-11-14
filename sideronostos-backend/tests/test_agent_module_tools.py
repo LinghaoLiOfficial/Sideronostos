@@ -171,6 +171,28 @@ def test_offline_tool_planner_honors_action_clauses_and_negation():
     ).operation_id == ("create_rotation_optimizer_runs_post")
 
 
+def test_rotation_preview_accepts_only_a_single_internal_result_identifier():
+    from sideronostos_backend.modules.farm_assistant.preview import _capture_path
+
+    identifier = "00000000-0000-4000-8000-000000000001"
+    assert _capture_path(f"/field-shift/rotation?run={identifier}").endswith(identifier)
+    assert _capture_path(f"/field-shift/rotation?plan={identifier}").endswith(identifier)
+    assert _capture_path(f"/field-shift/rotation?run={identifier}&option=option-1").endswith(
+        "option-1"
+    )
+    for invalid in (
+        f"https://example.test/field-shift/rotation?run={identifier}",
+        f"//example.test/field-shift/rotation?run={identifier}",
+        f"/field-shift/rotation?run={identifier}&next=https://example.test",
+        f"/field-shift/rotation?run={identifier}&run={identifier}",
+        f"/field-shift/rotation?run={identifier}&option=../../secret",
+        "/field-shift/rotation?run=not-a-uuid",
+        f"/field-shift/rotation?run={identifier}#fragment",
+    ):
+        with pytest.raises(ValueError):
+            _capture_path(invalid)
+
+
 def test_field_list_reply_uses_a_farmer_readable_singular_label():
     tool = next(
         item for item in ModuleToolExecutor(create_product_app()).tools_for("field_management")
@@ -192,6 +214,32 @@ def test_field_list_reply_uses_a_farmer_readable_singular_label():
         tool, {"status": "succeeded", "result": {"items": []}}, "en"
     )
     assert empty.startswith("I found no saved fields")
+
+
+def test_weather_fact_reply_distinguishes_overlapping_releases_and_metrics():
+    tool = next(
+        item for item in ModuleToolExecutor(create_product_app()).tools_for("remote_sensing")
+        if item.operation_id == "facts_agri_data_selections__selection_id__facts_get"
+    )
+    def fact(metric: str, value: float, release: str) -> dict:
+        return {
+            "metric": metric, "value": value, "unit": "mm",
+            "period": {"start": "2025-01-01", "end": "2025-01-01"},
+            "source": {"release_id": release},
+            "source_kind": "synthetic_test_only",
+        }
+
+    outcome = {"status": "succeeded", "result": {"facts": [
+        fact("rainfall_total", 4.0, "release-a"),
+        fact("reference_et0_total", 9.0, "release-a"),
+        fact("rainfall_total", 2.0, "release-b"),
+    ]}}
+    answer = _farmer_outcome_text(tool, outcome, "en", "Show rainfall for this point")
+    assert "release-a" in answer and "release-b" in answer
+    assert "4 mm" in answer and "2 mm" in answer
+    assert "9 mm" not in answer
+    assert "two releases" in answer.lower()
+    assert "synthetic" in answer.lower()
 
 
 def test_chinese_farmer_requests_select_only_tools_allowed_to_the_bot():

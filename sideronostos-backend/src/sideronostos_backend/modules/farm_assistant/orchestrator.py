@@ -21,6 +21,11 @@ from .module_tools import (
 )
 
 ACTIVE = ("needs_input", "awaiting_confirmation")
+READ_ONLY_POST = frozenset({
+    "preflight_rotation_optimizer_preflight_post",
+    "daily_readiness_rotation_optimizer_v3_readiness_post",
+    "compare_rotation_optimizer_compare_post",
+})
 CONFIRM = re.compile(
     r"^(?:yes[, ]*)?(?:confirm|go ahead|do it|proceed)"
     r"(?: this operation)?[.! ]*$|^确认(?:执行)?[。! ]*$",
@@ -359,6 +364,11 @@ def _farmer_outcome_text(
             "surface_soil_moisture": ("地表土壤水分", "surface soil moisture"),
         }
         readings = []
+        release_ids = {
+            str((fact.get("source") or {}).get("release_id"))
+            for fact in selected
+            if (fact.get("source") or {}).get("release_id")
+        }
         for fact in selected:
             metric = str(fact.get("metric", "observation"))
             label = labels.get(metric, (metric, metric))[0 if language == "zh" else 1]
@@ -366,27 +376,43 @@ def _farmer_outcome_text(
             start, end = period.get("start"), period.get("end")
             when = start if start == end else f"{start} to {end}" if start and end else ""
             value = fact.get("value")
+            source_id = (fact.get("source") or {}).get("release_id")
+            source_label = f" [{source_id}]" if len(release_ids) > 1 and source_id else ""
             if isinstance(value, (int, float)) and not isinstance(value, bool):
                 amount = f"{value:g} {fact.get('unit', '')}".strip()
-                readings.append(f"{when}: {label} {amount}" if when else f"{label} {amount}")
+                reading = f"{when}: {label} {amount}" if when else f"{label} {amount}"
+                readings.append(reading + source_label)
             else:
                 incomplete = f"{label} data are incomplete"
-                readings.append(f"{when}: {incomplete}" if when else incomplete)
-        synthetic = any(fact.get("source_kind") == "synthetic_test" for fact in selected)
+                reading = f"{when}: {incomplete}" if when else incomplete
+                readings.append(reading + source_label)
+        synthetic = any(
+            str(fact.get("source_kind", "")).startswith("synthetic_test")
+            for fact in selected
+        )
+        multiple = len(release_ids) > 1
         if language == "zh":
             caveat = (
                 "这是合成测试数据，并非实时 NASA 观测。"
                 if synthetic else "请按来源核对其空间与时间覆盖范围。"
             )
             details = "；".join(readings)
-            return f"所选位置的已发布资料显示：{details}。{caveat}可打开结果页面查看来源。"
+            comparison = "这里有两份发布数据，请先核对采用哪份数据。" if multiple else ""
+            return (
+                f"所选位置的已发布资料显示：{details}。"
+                f"{comparison}{caveat}可打开结果页面查看来源。"
+            )
         caveat = (
             "This is synthetic test data, not a live NASA observation. "
             if synthetic else "Check the source's spatial and time coverage. "
         )
+        comparison = (
+            "These two releases should be checked before choosing a dataset. "
+            if multiple else ""
+        )
         return (
             f"The published record for this map point shows {'; '.join(readings)}. "
-            f"{caveat}Open the result page to review the source."
+            f"{comparison}{caveat}Open the result page to review the source."
         )
     items = data.get("items")
     if not isinstance(items, list):
@@ -640,7 +666,7 @@ async def handle_module_chat(
             title=tool.title,
             missing=missing,
         )
-    if tool.method != "GET":
+    if tool.method != "GET" and tool.operation_id not in READ_ONLY_POST:
         flow.status = "awaiting_confirmation"
         flow.updated_at = utcnow()
         await session.commit()
@@ -759,6 +785,21 @@ async def refresh_module_workflow(
             "completed", "complete", "succeeded", "optimal", "feasible", "infeasible"
         }:
             flow.status = "completed"
+            computed = checked.data.get("result")
+            options = (computed.get("options") or []) if isinstance(computed, dict) else []
+            selected = next(
+                (
+                    option.get("id") for option in options
+                    if isinstance(option, dict) and option.get("feasible")
+                ),
+                None,
+            )
+            if (
+                isinstance(selected, str)
+                and re.fullmatch(r"[A-Za-z0-9_-]{1,80}", selected)
+                and outcome.get("href") == f"/field-shift/rotation?run={run_id}"
+            ):
+                outcome["href"] += f"&option={selected}"
         elif business_status in {"failed", "cancelled", "timeout_no_solution"}:
             flow.status = "failed"
         outcome.update(

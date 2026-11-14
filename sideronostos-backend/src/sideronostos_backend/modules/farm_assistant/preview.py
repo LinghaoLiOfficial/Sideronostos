@@ -30,9 +30,30 @@ def generic_result_path(conversation_id: str, workflow_id: str) -> str:
     return f"/si/multi-agent/results/{workflow_id}?conversation={conversation_id}"
 
 
+def rotation_result_path(href: str) -> str:
+    parsed = urlsplit(href)
+    if parsed.scheme or parsed.netloc or parsed.fragment or parsed.path != "/field-shift/rotation":
+        raise ValueError("Preview target is not an internal rotation result")
+    query = parse_qs(parsed.query, strict_parsing=True)
+    if set(query) not in ({"run"}, {"plan"}, {"run", "option"}):
+        raise ValueError("Preview target is not a single rotation result")
+    identifier = query.get("run") or query.get("plan") or []
+    if len(identifier) != 1:
+        raise ValueError("Preview target is not a single rotation result")
+    UUID(identifier[0])
+    if "option" in query and (
+        len(query["option"]) != 1
+        or re.fullmatch(r"[A-Za-z0-9_-]{1,80}", query["option"][0]) is None
+    ):
+        raise ValueError("Preview target has an invalid rotation option")
+    return href
+
+
 def _capture_path(href: str) -> str:
     if href.startswith("/field-shift?"):
         return field_result_path(href)
+    if href.startswith("/field-shift/rotation?"):
+        return rotation_result_path(href)
     parsed = urlsplit(href)
     if parsed.scheme or parsed.netloc or parsed.fragment:
         raise ValueError("Preview target must be an internal result page")
@@ -82,7 +103,7 @@ async def capture_result_page(href: str, authorization: str | None) -> bytes:
             await page.locator('[data-testid="result-ready"]').wait_for(timeout=20_000)
             image = (
                 await page.locator('[data-testid="result-ready"]').screenshot(type="png")
-                if path.startswith("/si/multi-agent/results/")
+                if path.startswith(("/si/multi-agent/results/", "/field-shift/rotation?"))
                 else await page.screenshot(full_page=True, type="png")
             )
             if len(image) > 4 * 1024 * 1024:
@@ -127,6 +148,25 @@ async def owned_preview(
             try:
                 target = field_result_path(href)
             except (ValueError, KeyError, IndexError) as error:
+                raise HTTPException(404, "Result preview not found") from error
+        elif (
+            isinstance(href, str)
+            and href.startswith("/field-shift/rotation?")
+            and tool_id.startswith((
+                "create_rotation_optimizer_runs_post",
+                "create_daily_rotation_optimizer_v3_runs_post",
+                "get_rotation_optimizer_runs__",
+                "cancel_rotation_optimizer_runs__",
+                "retry_rotation_optimizer_runs__",
+                "export_rotation_optimizer_runs__",
+                "export_csv_rotation_optimizer_runs__",
+                "save_rotation_optimizer_plans_post",
+                "plan_rotation_optimizer_plans__",
+            ))
+        ):
+            try:
+                target = rotation_result_path(href)
+            except ValueError as error:
                 raise HTTPException(404, "Result preview not found") from error
         else:
             target = generic_result_path(conversation_id, workflow_id)
