@@ -12,6 +12,7 @@ const api = vi.hoisted(() => ({
   getMessage: vi.fn(),
   getSource: vi.fn(),
   setPreferences: vi.fn(),
+  listActions: vi.fn().mockResolvedValue({ items: [] }),
 }));
 vi.mock("./agent-api", () => api);
 vi.mock("@/lib/api/client", () => ({

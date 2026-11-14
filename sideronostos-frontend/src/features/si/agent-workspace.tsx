@@ -10,6 +10,7 @@ import { setLocale, useLocale } from "@/lib/i18n/locale";
 import type { AssistantMessage, Citation, Fact } from "@/lib/api/rotation-types";
 import * as api from "./agent-api";
 import type { AgentConversation, AgentConversationPage, AgentDomain } from "./agent-api";
+import { AgentActions } from "./agent-actions";
 
 const domains: { id: AgentDomain; en: string; zh: string; enHint: string; zhHint: string; icon: typeof Leaf }[] = [
   { id: "field_management", en: "Field management", zh: "地块管理", enHint: "Understand your fields and keep their details together.", zhHint: "了解地块，整理地块资料。", icon: Leaf },
@@ -213,7 +214,7 @@ export function AgentWorkspace() {
         </div></div>
         {error && <div role="alert" className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2 text-sm text-destructive"><span>{error}</span>{!user && <button type="button" className="shrink-0 underline" onClick={() => { setError(null); setLoading(true); setReload((value) => value + 1); }}>{l.retry}</button>}</div>}
         {source && <section aria-label={zh ? "依据详情" : "Source details"} className="mx-auto mb-2 w-[calc(100%-2rem)] max-w-3xl rounded-lg border border-border bg-card p-4 text-sm"><div className="flex justify-between gap-2"><h3 className="font-semibold">{source.title}</h3><button type="button" aria-label={zh ? "关闭依据" : "Close source"} onClick={() => setSource(null)}><X size={16} /></button></div><p className="mt-2 text-muted-foreground">{source.text}</p></section>}
-        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl"><BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + name(domain, zh) + "留言" : "Message " + name(domain, zh)} placeholder={zh ? "说说你想了解或完成什么…" : "Ask a question or describe a task…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
+        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{id && user && <AgentActions key={id} conversationId={id} ensureConversation={create} domain={domain} language={zh ? "zh" : "en"} userId={user.id} />}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + name(domain, zh) + "留言" : "Message " + name(domain, zh)} placeholder={zh ? "说说你想了解或完成什么…" : "Ask a question or describe a task…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
       </section>
     </main>}
   </div>;
