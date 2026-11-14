@@ -456,6 +456,7 @@ function OwnerWorkspace({
     compareRunId: compareId,
     compareOptionId,
     saved: Boolean(planId),
+    planId: hasRun ? planId : null,
     changes: visibleChanges,
   });
   const contextLabel = [

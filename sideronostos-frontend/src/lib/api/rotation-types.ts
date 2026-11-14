@@ -347,6 +347,7 @@ export type AssistantContext = {
   dates?: { start: string; end: string } | null;
   fields?: { id: string; expected_version: number }[];
   run_id?: string | null;
+  plan_id?: string | null;
   option_id?: string | null;
   compare_run_id?: string | null;
   compare_option_id?: string | null;
@@ -413,6 +414,7 @@ export type AssistantMessage = {
     selection_kind: string | null;
     run_id: string | null;
     option_id: string | null;
+    plan_id?: string | null;
   };
   response: AssistantAnswer | null;
   facts: Fact[];

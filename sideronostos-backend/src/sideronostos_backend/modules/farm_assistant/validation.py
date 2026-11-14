@@ -28,10 +28,22 @@ def affirmed(pattern: str, text: str) -> bool:
                 clause[: match.start()],
                 re.I,
             )
-            if not negated_report and not re.search(
-                r"不能|没有|尚未|并未|未|不要|不是|不代表|不保证|无法|不可|拒绝|"
-                r"\bnot\b|\bnever\b|\bcannot\b|can.t|don.t|\bno\b",
-                prefix,
+            negated_proof = re.search(
+                r"(?:(?:doesn['’]t|does not|cannot|can['’]t)\s+"
+                r"(?:(?:directly|really)\s+)?(?:prove|establish|confirm)|"
+                r"(?:不能|无法|不)(?:直接)?(?:证明|说明|表明))"
+                r"[^。,.!?;；，]{0,30}$",
+                clause[: match.start()],
+                re.I,
+            )
+            if (
+                not negated_report
+                and not negated_proof
+                and not re.search(
+                    r"不能|没有|尚未|并未|未|不要|不是|不代表|不保证|无法|不可|拒绝|"
+                    r"\bnot\b|\bnever\b|\bcannot\b|can.t|don.t|\bno\b",
+                    prefix,
+                )
             ):
                 return True
     return False
@@ -91,8 +103,18 @@ def bind_answer(
     *,
     allowed_actions: list[str],
     can_claim_optimal: bool,
+    answer_requirement: str | None = None,
 ) -> dict[str, Any]:
+    if answer_requirement == "ask_to_select_specific_option" and not answer.needs_clarification:
+        raise ValueError(
+            "Ask the user to select a specific option; do not explain an unselected plan"
+        )
     values = {f["id"]: f for f in facts}
+    resource_dates = {
+        f["key"].removesuffix(".date"): f["id"]
+        for f in facts
+        if ".resource." in f.get("key", "") and f["key"].endswith(".date")
+    }
     sources = {k["id"] for k in knowledge} | set(values)
     if not set(answer.actions) <= set(allowed_actions):
         raise ValueError("Action not available in this context")
@@ -104,6 +126,29 @@ def bind_answer(
             raise ValueError("Unknown numeric fact reference")
         if any(not fact_is_renderable(values[ref]) for ref in refs):
             raise ValueError("Placeholder requires a numeric or date fact")
+        for ref in refs:
+            fact = values[ref]
+            key = fact.get("key", "")
+            if ".resource." in key and key.rsplit(".", 1)[1] in {
+                "used",
+                "capacity",
+                "gap",
+                "gap_cost",
+            }:
+                day_ref = resource_dates.get(key.rsplit(".", 1)[0])
+                if day_ref and day_ref not in refs:
+                    raise ValueError(
+                        "A resource amount must include its matching date in the paragraph"
+                    )
+        if re.search(
+            r"\{\{F\d+\}\}\s*(?:m[²³23]|USD|ha(?:-days)?|mm|hours|days|"
+            r"person-days|score(?:·ha)?|立方米|毫米|美元|公顷)(?=\W|$)",
+            raw,
+            re.I,
+        ):
+            raise ValueError(
+                "Do not repeat a unit after a fact placeholder; it already includes its unit"
+            )
         # A validated slot already names its source fact unambiguously. Derive
         # its citation here instead of asking the model to repeat the same ID.
         evidence_ids = list(dict.fromkeys([*paragraph.evidence_ids, *refs]))
@@ -146,6 +191,15 @@ def bind_answer(
             remainder,
         ):
             raise ValueError("Unsupported agricultural guarantee")
+        if any(
+            f.get("source", {}).get("model_version") == "rotation-milp-v3.0"
+            and f["source"].get("implementation_ready") is False
+            for f in facts
+        ) and affirmed(
+            r"已具备实施条件|可直接实施|可以直接实施|ready to implement|ready for implementation",
+            remainder,
+        ):
+            raise ValueError("Unsupported farm implementation readiness claim")
         if not can_claim_optimal and affirmed(r"最优|\boptimal\b", remainder):
             raise ValueError("Unsupported optimality claim")
         rendered = PLACEHOLDER.sub(lambda m: str(values[m.group(1)]["display"]), raw)
