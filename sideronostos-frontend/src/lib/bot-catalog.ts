@@ -23,10 +23,18 @@ export type CatalogBot = {
 export const modulePalette = {
   general: { bot: "#5a9b79", highlight: "#73bb8d" },
   "field-management": { bot: "#4d9b75", highlight: "#73bb8d" },
-  "remote-sensing": { bot: "#3a91a7", highlight: "#62b9c6" },
+  "remote-sensing": {
+    bot: "#3a91a7",
+    highlight: "#62b9c6",
+    variants: { water: "#2f88a5", soil: "#4c8091", weather: "#579cab" },
+  },
   "local-knowledge": { bot: "#ca9a4e", highlight: "#d6ad6b" },
   "rotation-recommendation": { bot: "#8671d9", highlight: "#b6a1e6" },
-} as const satisfies Record<SiBotModule, { bot: string; highlight: string }>;
+} as const satisfies Record<SiBotModule, {
+  bot: string;
+  highlight: string;
+  variants?: Partial<Record<BotAvatarVariant, string>>;
+}>;
 
 export const botCatalog: readonly CatalogBot[] = [
   {
@@ -56,7 +64,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "remote-sensing",
     presetId: "remote_sensing",
     avatar: "water",
-    color: modulePalette["remote-sensing"].bot,
+    color: modulePalette["remote-sensing"].variants.water,
     name: { en: "Water specialist", "zh-CN": "水分助手" },
     shortName: { en: "Water", "zh-CN": "水分" },
     capability: { en: "Water observations and their data limits", "zh-CN": "水分观测与数据局限" },
@@ -67,7 +75,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "remote-sensing",
     presetId: "remote_sensing",
     avatar: "soil",
-    color: modulePalette["remote-sensing"].bot,
+    color: modulePalette["remote-sensing"].variants.soil,
     name: { en: "Soil specialist", "zh-CN": "土壤助手" },
     shortName: { en: "Soil", "zh-CN": "土壤" },
     capability: { en: "Soil observations and their data limits", "zh-CN": "土壤观测与数据局限" },
@@ -78,7 +86,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "remote-sensing",
     presetId: "remote_sensing",
     avatar: "weather",
-    color: modulePalette["remote-sensing"].bot,
+    color: modulePalette["remote-sensing"].variants.weather,
     name: { en: "Weather specialist", "zh-CN": "天气助手" },
     shortName: { en: "Weather", "zh-CN": "天气" },
     capability: { en: "Weather observations and their data limits", "zh-CN": "天气观测与数据局限" },

@@ -107,26 +107,6 @@
 .avatar[data-avatar="rotation"] {
   border-radius: 28px 26px 24px 25px;
 }
-.avatarOrbit {
-  position: absolute;
-  width: 103%;
-  height: 41%;
-  left: -3%;
-  bottom: -11%;
-  border: 1px solid #ffffff76;
-  border-radius: 50%;
-  transform: rotate(-16deg);
-}
-.avatarOrbit::after {
-  content: "";
-  position: absolute;
-  width: 64%;
-  height: 60%;
-  top: -6px;
-  left: 24%;
-  border-top: 1px solid #ffffff65;
-  border-radius: 50%;
-}
 .avatarSprout {
   position: absolute;
   top: 4px;
@@ -153,43 +133,20 @@
 .avatarEyes {
   position: absolute;
   z-index: 1;
-  top: 24px;
+  top: 27px;
   left: 50%;
   display: flex;
-  gap: 9px;
-  transform: translateX(-50%);
-}
-.avatarEye {
-  position: relative;
-  width: 12px;
-  height: 15px;
-  overflow: hidden;
-  border-radius: 50%;
-  background: #fffdf8;
-  box-shadow: 0 1px 3px #12271835;
-  animation: avatarBlink 5.2s infinite;
-}
-.avatarEye::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 8px;
-  top: 4px;
-  left: 3px;
-  border-radius: 50%;
-  background: #17352c;
-  transform: translate(var(--gaze-x, 0px), var(--gaze-y, 0px));
+  gap: 10px;
+  transform: translate(calc(-50% + var(--gaze-x, 0px)), var(--gaze-y, 0px));
   transition: transform 120ms ease;
 }
-.avatarSmile {
-  position: absolute;
-  z-index: 1;
-  top: 43px;
-  left: calc(50% - 5px);
-  width: 10px;
-  height: 5px;
-  border-bottom: 1.5px solid #17352c;
-  border-radius: 0 0 50% 50%;
+.avatarEye {
+  width: 7px;
+  height: 9px;
+  border-radius: 50%;
+  background: #17352c;
+  box-shadow: 0 1px 0 #ffffff8c;
+  animation: avatarBlink 5.2s infinite;
 }
 .avatarSymbol {
   position: absolute;
@@ -219,10 +176,8 @@
 .smallAvatar .avatarSprout::before,
 .smallAvatar .avatarSprout::after { width: 6px; height: 4px; top: -1px; }
 .smallAvatar .avatarSprout::before { left: -5px; }
-.smallAvatar .avatarEyes { top: 13px; gap: 5px; }
-.smallAvatar .avatarEye { width: 7px; height: 9px; }
-.smallAvatar .avatarEye::after { width: 4px; height: 5px; top: 2px; left: 2px; }
-.smallAvatar .avatarSmile { top: 24px; left: calc(50% - 3px); width: 6px; height: 3px; }
+.smallAvatar .avatarEyes { top: 14px; gap: 6px; }
+.smallAvatar .avatarEye { width: 4px; height: 6px; }
 .smallAvatar .avatarSymbol { width: 10px; height: 10px; right: 2px; bottom: 2px; }
 @keyframes avatarFloat {
   0%, 100% { transform: translateY(0) rotate(-2deg); }

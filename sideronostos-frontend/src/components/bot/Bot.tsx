@@ -31,12 +31,10 @@ export function BotAvatar({ small = false, variant }: { small?: boolean; variant
       className={`${styles.avatar} ${small ? styles.smallAvatar : ""}`}
       data-avatar={variant}
     >
-      <span className={styles.avatarOrbit} />
       <span className={styles.avatarSprout} />
       <span className={styles.avatarEyes}>
         <i className={styles.avatarEye} /><i className={styles.avatarEye} />
       </span>
-      <span className={styles.avatarSmile} />
       <Icon className={styles.avatarSymbol} strokeWidth={1.8} />
     </span>
   );

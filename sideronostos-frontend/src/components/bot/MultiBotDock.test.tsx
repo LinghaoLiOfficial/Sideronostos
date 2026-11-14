@@ -2,8 +2,18 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { botsForModule } from "@/lib/bot-catalog";
+import { botCatalog, botsForModule } from "@/lib/bot-catalog";
 import { MultiBotDock } from "./MultiBotDock";
+
+function hue(hex: string): number {
+  const [red, green, blue] = [1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16) / 255);
+  const maximum = Math.max(red, green, blue);
+  const minimum = Math.min(red, green, blue);
+  const difference = maximum - minimum;
+  if (!difference) return 0;
+  const sector = maximum === red ? ((green - blue) / difference) % 6 : maximum === green ? (blue - red) / difference + 2 : (red - green) / difference + 4;
+  return (sector * 60 + 360) % 360;
+}
 
 const api = vi.hoisted(() => ({
   listConversations: vi.fn(), createConversation: vi.fn(), getConversation: vi.fn(),
@@ -50,7 +60,11 @@ it("keeps stable catalog identities across the four module routes", () => {
   expect(botsForModule("field-management").map((bot) => bot.id)).toEqual(["field-guide"]);
   expect(botsForModule("local-knowledge").map((bot) => bot.id)).toEqual(["local-knowledge-guide"]);
   expect(botsForModule("rotation-recommendation").map((bot) => bot.id)).toEqual(["rotation-guide"]);
-  expect(new Set(botsForModule("remote-sensing").map((bot) => bot.color)).size).toBe(1);
+  expect(new Set(botCatalog.map((bot) => bot.color)).size).toBe(botCatalog.length);
+  const remoteColors = botsForModule("remote-sensing").map((bot) => bot.color);
+  expect(new Set(remoteColors).size).toBe(3);
+  const remoteHues = remoteColors.map(hue);
+  expect(Math.max(...remoteHues) - Math.min(...remoteHues)).toBeLessThan(20);
 });
 
 it("gives each specialist the same responsive face with a small domain crest", () => {
@@ -59,6 +73,8 @@ it("gives each specialist the same responsive face with a small domain crest", (
   for (const button of buttons) {
     expect(button.querySelectorAll("i[class*='avatarEye']")).toHaveLength(2);
     expect(button.querySelector("svg")).toBeInTheDocument();
+    expect(button.querySelector("[class*='avatarSmile']")).not.toBeInTheDocument();
+    expect(button.querySelector("[class*='avatarOrbit']")).not.toBeInTheDocument();
   }
   fireEvent.pointerMove(buttons[0], { pointerType: "mouse", clientX: 30, clientY: 30 });
   expect(buttons[0].style.getPropertyValue("--gaze-x")).not.toBe("");

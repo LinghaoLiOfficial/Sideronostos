@@ -14,7 +14,11 @@ Scope: shared Bot controls, chat navigation and result presentation. The four `/
 
 ## Verification and limits
 
+### Subsequent visual refinement
+
+The shared face now uses only two small eyes and a sprout; the smile and decorative orbit were removed. Hover tilt, float, blink, pointer gaze, and the corner specialty icon remain. Water, soil, and weather now have distinct blue-green tones with nearby hues, all set in the central `modulePalette`. A mobile selector specificity fix hides the expanded text label at narrow widths so all three avatars fit. The earlier table records the first visual pass; this refinement supersedes its face and exact-color choices.
+
 - Frontend: 64 test files, 383 tests passed in the final standalone run; TypeScript and production build passed. ESLint has no errors and three warnings, two in unrelated existing files and one for an in-memory business result image. A concurrent test/build run timed out in two unrelated suites; both passed when rerun alone and in the final full run.
 - Backend: Ruff passed; all 43 focused action and rotation tests passed against a disposable local pgvector PostgreSQL database, including real HTTP calls, confirmation and job completion. The temporary database and container were removed after verification.
-- Browser: the Bot dock and avatar were inspected on the existing `/si/remote-sensing` placeholder. The server had only the frontend listening; opening a conversation showed its failure state. Therefore this review does **not** claim a fresh authenticated end-to-end conversation, screenshot service result, or mobile visual pass.
+- Browser: the Bot dock and avatar were inspected on the existing `/si/remote-sensing` placeholder, including an expanded dock at 400 CSS px after the visual refinement. The server had only the frontend listening; opening a conversation showed its failure state. Therefore this review does **not** claim a fresh authenticated end-to-end conversation or screenshot service result.
 - The module pages are intentionally untouched. Final page layout and dock collision avoidance require the future published module UI.
