@@ -93,6 +93,50 @@ it("creates a scoped conversation, sends, and shows the server reply and source"
   expect(await screen.findByText("No current observation")).toBeVisible();
 });
 
+it("opens cited web search results from the source panel", async () => {
+  const user = userEvent.setup();
+  api.createConversation.mockResolvedValue(conversation("water-1", "remote-water"));
+  api.sendMessage.mockResolvedValue(message("message-1", "Find current water guidance"));
+  api.getSource.mockResolvedValue({
+    id: "source-1",
+    release_id: "mock-release",
+    chunk_id: "web-chunk",
+    page: 1,
+    excerpt: "External guidance snippet",
+    source: {
+      id: "web-remote-water-1",
+      title: "NASA water guidance",
+      url: "https://earthdata.nasa.gov/example",
+      access_scope: "web_snapshot",
+      locator_type: "section",
+      regions: ["external"],
+      limitations: ["Verify the linked source."],
+      sha256: "",
+    },
+    claims: [],
+  });
+  render(<MultiBotDock module="remote-sensing" locale="en" />);
+  await user.click(screen.getByRole("button", { name: "Open Water specialist" }));
+  await user.type(await screen.findByRole("textbox", { name: "Message Water specialist" }), "Find current guidance");
+  await user.click(screen.getByRole("button", { name: "Send message" }));
+  expect(await screen.findByText("Water reading is unavailable.")).toBeVisible();
+  await user.click(screen.getByRole("button", { name: /View source/ }));
+  const link = await screen.findByRole("link", { name: "Open source" });
+  expect(link).toHaveAttribute("href", "https://earthdata.nasa.gov/example");
+  expect(link).toHaveAttribute("target", "_blank");
+});
+
+it("explains when the backend has no published knowledge release", async () => {
+  const user = userEvent.setup();
+  api.createConversation.mockRejectedValue({ status: 503 });
+  render(<MultiBotDock module="remote-sensing" locale="en" />);
+  await user.click(screen.getByRole("button", { name: "Open Water specialist" }));
+  await user.type(await screen.findByRole("textbox", { name: "Message Water specialist" }), "Explain this area");
+  await user.click(screen.getByRole("button", { name: "Send message" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("published knowledge base is not ready");
+  expect(screen.getByRole("textbox")).toHaveValue("Explain this area");
+});
+
 it("polls a pending response and reports a failed reply honestly", async () => {
   const user = userEvent.setup();
   api.createConversation.mockResolvedValue(conversation("water-1", "remote-water"));

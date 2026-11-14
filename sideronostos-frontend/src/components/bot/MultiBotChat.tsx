@@ -12,7 +12,7 @@ import type { AgentConversation, AgentDomain } from "@/features/si/agent-api";
 import styles from "./MultiBotDock.module.css";
 
 type BotConversation = AgentConversation & { bot_id: string };
-type ErrorKind = "load" | "send" | "poll" | "delayed" | "source" | "preferences" | null;
+type ErrorKind = "load" | "send" | "poll" | "delayed" | "source" | "preferences" | "unavailable" | null;
 
 const labels = {
   en: {
@@ -21,7 +21,7 @@ const labels = {
     loadError: "Conversation could not be loaded.", sendError: "Message could not be sent. Your draft is safe.",
     failed: "This reply could not be completed.", delayed: "The reply is still processing. Reopen this specialist to refresh it.",
     pollError: "Reply status could not be refreshed. Reopen this specialist to check it.",
-    sourceError: "Source could not be loaded.", preferencesError: "Conversation language could not be updated.", pending: "Working on your request…",
+    sourceError: "Source could not be loaded.", preferencesError: "Conversation language could not be updated.", unavailable: "The published knowledge base is not ready. Ask an administrator to publish it, then try again.", pending: "Working on your request…",
     source: "View source", closeSource: "Close source", older: "Load earlier messages",
     facts: "View data used", localLimit: "Prices and crop varieties are examples, not live local data.",
     weatherLimit: "This chat does not provide a live forecast.",
@@ -32,7 +32,7 @@ const labels = {
     loadError: "无法加载对话。", sendError: "消息未能发送，草稿已保留。",
     failed: "这条回复未能完成。", delayed: "回复仍在处理中。重新打开此助手可刷新状态。",
     pollError: "无法刷新回复状态。重新打开此助手可查看结果。",
-    sourceError: "无法加载依据。", preferencesError: "无法更新对话语言。", pending: "正在处理你的请求…",
+    sourceError: "无法加载依据。", preferencesError: "无法更新对话语言。", unavailable: "知识库尚未发布，助手暂时无法开启。请先发布知识库后重试。", pending: "正在处理你的请求…",
     source: "查看依据", closeSource: "关闭依据", older: "加载更早的消息",
     facts: "查看当时的数据", localLimit: "价格与品种数据为示例，并非实时本地数据。",
     weatherLimit: "此对话不提供实时天气预报。",
@@ -45,8 +45,8 @@ function belongsToBot(item: AgentConversation, bot: CatalogBot): item is BotConv
 
 function sourceView(source: Fact | Citation) {
   return "excerpt" in source
-    ? { title: source.source.title, text: source.excerpt }
-    : { title: source.label, text: source.display };
+    ? { title: source.source.title, text: source.excerpt, url: source.source.url ?? undefined }
+    : { title: source.label, text: source.display, url: undefined };
 }
 
 function upsert(rows: AssistantMessage[], message: AssistantMessage) {
@@ -65,7 +65,7 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<ErrorKind>(null);
-  const [source, setSource] = useState<{ title: string; text: string } | null>(null);
+  const [source, setSource] = useState<{ title: string; text: string; url?: string } | null>(null);
   const alive = useRef(true);
   const sending = useRef(false);
   const retry = useRef<{ text: string; id: string } | null>(null);
@@ -155,8 +155,12 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
         setMessages((previous) => upsert(previous, reply));
       }
       if (reply.status === "pending") setError("delayed");
-    } catch {
-      if (alive.current) setError(accepted ? "poll" : "send");
+    } catch (cause) {
+      if (alive.current) {
+        const unavailable = !accepted && typeof cause === "object" && cause !== null
+          && "status" in cause && cause.status === 503;
+        setError(accepted ? "poll" : unavailable ? "unavailable" : "send");
+      }
     } finally {
       sending.current = false;
       if (alive.current) setBusy(false);
@@ -205,8 +209,8 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
       </div>)}
       <div ref={end} />
     </div>
-    {source && <section className={styles.sourcePanel} aria-label={locale === "en" ? "Source details" : "依据详情"}><button type="button" aria-label={l.closeSource} onClick={() => setSource(null)}>×</button><h3>{source.title}</h3><p>{source.text}</p></section>}
-    {error && <p role="alert" className={styles.chatError}>{error === "send" ? l.sendError : error === "poll" ? l.pollError : error === "delayed" ? l.delayed : error === "preferences" ? l.preferencesError : l.sourceError}</p>}
+    {source && <section className={styles.sourcePanel} aria-label={locale === "en" ? "Source details" : "依据详情"}><button type="button" aria-label={l.closeSource} onClick={() => setSource(null)}>×</button><h3>{source.title}</h3><p>{source.text}</p>{source.url && <a href={source.url} target="_blank" rel="noreferrer">{locale === "en" ? "Open source" : "打开来源"}</a>}</section>}
+    {error && <p role="alert" className={styles.chatError}>{error === "send" ? l.sendError : error === "poll" ? l.pollError : error === "delayed" ? l.delayed : error === "preferences" ? l.preferencesError : error === "unavailable" ? l.unavailable : l.sourceError}</p>}
     <div className={styles.composerWrap}>
       <BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={locale === "en" ? `Message ${bot.name.en}` : `给${bot.name["zh-CN"]}留言`} placeholder={locale === "en" ? "Ask a question…" : "说说你想了解什么…"} language={locale === "en" ? "en-US" : "zh-CN"} />
       {bot.id === "local-knowledge-guide" && <p className={styles.limit}>{l.localLimit}</p>}

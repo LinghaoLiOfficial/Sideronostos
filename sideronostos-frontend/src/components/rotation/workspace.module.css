@@ -1040,12 +1040,6 @@
   display: none;
 }
 @media print {
-  :global(html),
-  :global(body) {
-    color-scheme: light !important;
-    background: #fff !important;
-    color: #111 !important;
-  }
   :where(.app) button {
     display: none !important;
   }

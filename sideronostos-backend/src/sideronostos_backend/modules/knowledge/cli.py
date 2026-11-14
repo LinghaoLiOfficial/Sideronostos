@@ -19,6 +19,7 @@ from ...core.config import get_settings
 from ..database.session import create_engine, create_session_factory
 from .embeddings import EmbeddingProvider, validate_vector
 from .ingest import canonical_key, chunk_pages, extract_pages, validate_claim, verified_path
+from .mock_release import MOCK_MODEL, MOCK_RELEASE_ID, build_mock_bundle, mock_embedding
 from .models import KBRelease, KnowledgeChunk, KnowledgeClaim, KnowledgeSource
 from .schemas import ChunkSpec, ClaimSpec, SourceSpec
 from .settings import get_knowledge_settings
@@ -129,7 +130,7 @@ async def embed_staging(release_id: str, provider: EmbeddingProvider) -> dict[st
                 raise ValueError("Embedding updates are only allowed on staging releases")
             if (
                 release.embedding_namespace != provider.namespace
-                or release.embedding_model != provider.settings.embedding_model
+                or release.embedding_model != provider.model_name
                 or release.embedding_dimensions != provider.settings.embedding_dimensions
             ):
                 raise ValueError("Embedding provider changed; create a new release identity")
@@ -245,6 +246,64 @@ async def main_async(args: argparse.Namespace) -> None:
         finally:
             await provider.close()
         return
+    if args.command == "mock-bootstrap":
+        engine = create_engine(get_settings())
+        provider = EmbeddingProvider()
+        release_id = args.release or MOCK_RELEASE_ID
+        if not provider.mock_embeddings:
+            raise ValueError("mock-bootstrap requires local mock embeddings")
+        try:
+            factory = create_session_factory(engine)
+            async with factory() as session:
+                release = await session.get(KBRelease, release_id)
+                if release is None:
+                    bundle = build_mock_bundle()
+                    release = await stage_release(
+                        session,
+                        release_id=release_id,
+                        sources=bundle["sources"],
+                        chunks=bundle["chunks"],
+                        claims=bundle["claims"],
+                        embedding_model=MOCK_MODEL,
+                        dimensions=provider.settings.embedding_dimensions,
+                        namespace=provider.namespace,
+                        report=bundle["report"],
+                    )
+                    await session.flush()
+                elif (
+                    release.embedding_namespace != provider.namespace
+                    or release.embedding_model != MOCK_MODEL
+                ):
+                    raise ValueError("Existing mock release has a different embedding identity")
+                if release.status == "staging":
+                    rows = (
+                        await session.scalars(
+                            select(KnowledgeChunk)
+                            .where(
+                                KnowledgeChunk.release_id == release_id,
+                                KnowledgeChunk.embedding.is_(None),
+                            )
+                            .order_by(
+                                KnowledgeChunk.source_id,
+                                KnowledgeChunk.page,
+                                KnowledgeChunk.ordinal,
+                            )
+                        )
+                    ).all()
+                    for row in rows:
+                        row.embedding = mock_embedding(
+                            f"{row.lexical_terms} {row.text}",
+                            provider.settings.embedding_dimensions,
+                        )
+                    await session.commit()
+            async with factory() as session:
+                release = await activate_release(session, release_id)
+                await session.commit()
+                print(json.dumps({"id": release.id, "status": release.status, "mock": True}))
+        finally:
+            await provider.close()
+            await engine.dispose()
+        return
     engine = create_engine(get_settings())
     try:
         async with create_session_factory(engine)() as session:
@@ -254,11 +313,11 @@ async def main_async(args: argparse.Namespace) -> None:
                 try:
                     release = await stage_release(
                         session,
-                        release_id=args.release,
+                        release_id=args.release or "field-shift-knowledge-20261112-v1",
                         sources=[SourceSpec.model_validate(item) for item in bundle["sources"]],
                         chunks=[ChunkSpec.model_validate(item) for item in bundle["chunks"]],
                         claims=[ClaimSpec.model_validate(item) for item in bundle["claims"]],
-                        embedding_model=provider.settings.embedding_model,
+                        embedding_model=provider.model_name,
                         dimensions=provider.settings.embedding_dimensions,
                         namespace=provider.namespace,
                         report=bundle["report"],
@@ -266,7 +325,9 @@ async def main_async(args: argparse.Namespace) -> None:
                 finally:
                     await provider.close()
             else:
-                release = await activate_release(session, args.release)
+                release = await activate_release(
+                    session, args.release or "field-shift-knowledge-20261112-v1"
+                )
             await session.commit()
             print(
                 json.dumps(
@@ -283,7 +344,9 @@ async def main_async(args: argparse.Namespace) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["prepare", "stage", "embed", "activate"])
+    parser.add_argument(
+        "command", choices=["prepare", "stage", "embed", "activate", "mock-bootstrap"]
+    )
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--library-root", type=Path, default=get_knowledge_settings().library_root)
     parser.add_argument(
@@ -292,7 +355,7 @@ def main() -> None:
     parser.add_argument(
         "--prepared-root", type=Path, default=get_knowledge_settings().asset_root / "sources"
     )
-    parser.add_argument("--release", default="field-shift-knowledge-20261112-v1")
+    parser.add_argument("--release")
     args = parser.parse_args()
     asyncio.run(main_async(args))
 

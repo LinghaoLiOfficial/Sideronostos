@@ -101,13 +101,24 @@ async def test_weather_retrieval_uses_only_weather_sources(monkeypatch):
         captured.update(kwargs)
         return []
 
+    async def offline_search(preset, query):
+        captured["web_preset"] = preset
+        return []
+
     monkeypatch.setattr(pipeline, "EmbeddingProvider", Embedding)
     monkeypatch.setattr(pipeline, "search_release", search)
-    context = {"bot_id": "remote-weather", "facts": [], "selection": None}
+    monkeypatch.setattr(pipeline, "search_web", offline_search)
+    context = {
+        "bot_id": "remote-weather",
+        "preset": "remote_sensing",
+        "facts": [],
+        "selection": None,
+    }
     release = SimpleNamespace(id="release", embedding_namespace="test", manifest_sha256="a" * 64)
     await pipeline.collect_evidence(None, "Will it rain tomorrow?", context, release)
     assert set(captured["source_ids"]) == {"S01", "S11", "S29", "S36"}
     assert "SMAP006" not in captured["source_ids"]
+    assert captured["web_preset"] == "remote_sensing"
 
 
 @pytest.mark.parametrize(

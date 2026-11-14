@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr
 
@@ -12,6 +13,7 @@ class KnowledgeSettings(EnvironmentSettings):
     asset_root: Path = Path("../data/knowledge")
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = Field(default=1536, ge=1, le=3072)
+    embedding_mode: Literal["auto", "mock", "provider"] = "auto"
     api_key: SecretStr = SecretStr("")
     base_url: str | None = None
     request_timeout_seconds: float = Field(default=12, gt=0, le=30)

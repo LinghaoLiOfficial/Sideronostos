@@ -4,14 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Agrisata",
@@ -23,7 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang="zh-CN"
       data-scroll-behavior="smooth"
-      className={cn("dark font-sans", geist.variable)}
+      className="dark font-sans"
       suppressHydrationWarning
     >
       <body>

@@ -16,6 +16,7 @@ from sideronostos_backend.modules.database.base import Base
 from sideronostos_backend.modules.farm_assistant import pipeline
 from sideronostos_backend.modules.farm_assistant.context import freeze_context
 from sideronostos_backend.modules.farm_assistant.models import (
+    AssistantAction,
     AssistantMessage,
     Conversation,
     FarmerPreference,
@@ -28,7 +29,7 @@ from sideronostos_backend.modules.farm_assistant.schemas import (
     PreferenceInput,
 )
 from sideronostos_backend.modules.farm_assistant.service import AssistantService
-from sideronostos_backend.modules.field_shift.models import FieldRecord
+from sideronostos_backend.modules.field_shift.models import FarmRecord, FieldRecord
 from sideronostos_backend.modules.knowledge.models import KBActivation, KBRelease
 
 DOMAINS = ("field_management", "remote_sensing", "local_agriculture", "rotation")
@@ -44,9 +45,11 @@ async def assistant_db():
     tables = [
         model.__table__
         for model in (
+            FarmRecord,
             FieldRecord,
             KBRelease,
             KBActivation,
+            AssistantAction,
             FarmerPreference,
             Conversation,
             AssistantMessage,
@@ -79,7 +82,11 @@ async def assistant_db():
             ]
         )
         await session.flush()
-        session.add(KBActivation(name="default", release_id=release.id))
+        activation = await session.get(KBActivation, "default")
+        if activation is None:
+            session.add(KBActivation(name="default", release_id=release.id))
+        else:
+            activation.release_id = release.id
         await session.commit()
     yield factory, owner, field_id
     async with engine.begin() as connection:

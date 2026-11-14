@@ -14,6 +14,7 @@ const api = vi.hoisted(() => ({
   setPreferences: vi.fn(),
   listActions: vi.fn().mockResolvedValue({ items: [] }),
   listModuleOperations: vi.fn().mockResolvedValue({ items: [] }),
+  listModuleOperationHistory: vi.fn().mockResolvedValue({ items: [] }),
   postModuleOperation: vi.fn(),
 }));
 vi.mock("./agent-api", () => api);

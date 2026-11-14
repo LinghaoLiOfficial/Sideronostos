@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { listProfiles } from "@/lib/api/field-shift";
 import { listLayers } from "@/lib/api/rotation";
 import type { Profile } from "@/lib/api/field-shift-types";
 import type { ScienceLayer } from "@/lib/api/rotation-types";
 import * as api from "./agent-api";
 import type { AgentActionName, AgentActionOutcome, AgentDomain } from "./agent-api";
+import { CompletionReceipt } from "./completion-receipt";
 
 type Props = {
   conversationId: string | null;
@@ -140,7 +140,7 @@ export function AgentActions({ conversationId, ensureConversation, domain, botId
     <div className="flex flex-wrap gap-2">{available.map((item) => <button key={item} type="button" disabled={busy} aria-pressed={action === item} onClick={() => void start(item)} className={(action === item ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-muted") + " rounded-full border px-3 py-1.5 font-medium focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50"}>{item === "field.create" ? c.create : item === "remote_sensing.layer" ? c.layer : c.fact}</button>)}</div>
     {busy && <p role="status" className="mt-3 text-muted-foreground">{c.pending}</p>}
     {error && <p role="alert" className="mt-3 text-destructive">{c.error}</p>}
-    {outcome && <div className="mt-3"><p role="status" className="leading-6">{outcome.text}</p>{href && <Link href={href} className="mt-2 inline-block font-medium text-primary underline">{c.open}</Link>}</div>}
+    {outcome && <div className="mt-3">{href && outcome.status === "succeeded" ? <CompletionReceipt href={href} message={outcome.text} language={language} linkLabel={c.open} fileName={`agrisata-${outcome.action.replaceAll(".", "-")}.png`} /> : <p role="status" className="leading-6">{outcome.text}</p>}</div>}
     {action && outcome && (outcome.status === "needs_input" || (outcome.status === "failed" && outcome.pending)) && <form className="mt-4 grid gap-3 sm:grid-cols-2" onSubmit={(event) => { event.preventDefault(); void advance(); }}>
       {action === "field.create" && <>{field("name", c.name)}{field("area_ha", c.area, "number")}{field("latitude", c.lat, "number")}{field("longitude", c.lon, "number")}<label className="block text-sm"><span className="mb-1 block font-medium">{c.soil}</span><select className={common} value={values.soil_texture || "unknown"} onChange={(event) => update("soil_texture", event.target.value)}><option value="unknown">{c.unknown}</option><option value="sand">{c.sand}</option><option value="loam">{c.loam}</option><option value="clay">{c.clay}</option></select></label><label className="block text-sm"><span className="mb-1 block font-medium">{c.profile}</span><select className={common} aria-label={c.profile} required value={values.profile_id ?? ""} onChange={(event) => update("profile_id", event.target.value)}><option value="">—</option>{profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select></label><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={values.irrigation_available === "true"} onChange={(event) => update("irrigation_available", String(event.target.checked))} />{c.irrigation}</label></>}
       {action === "remote_sensing.layer" && <label className="block text-sm"><span className="mb-1 block font-medium">{c.published}</span><select className={common} aria-label={c.published} required value={values.layer_id ?? ""} onChange={(event) => update("layer_id", event.target.value)}><option value="">—</option>{layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.title}</option>)}</select>{layers.length === 0 && <span className="mt-1 block text-muted-foreground">{c.noLayers}</span>}</label>}

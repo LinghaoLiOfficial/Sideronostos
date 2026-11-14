@@ -27,6 +27,29 @@ export type AgentActionOutcome = {
   href: string | null;
 };
 export type AgentActionRequest = { action: AgentActionName; arguments: Record<string, unknown>; idempotency_key: string };
+export type ModuleOperation = {
+  operation_id: string;
+  title?: string;
+  method: string;
+  path: string;
+  path_parameters: string[];
+  query_parameters: string[];
+  required_query_parameters: string[];
+  body: Record<string, unknown> | null;
+  body_required: boolean;
+  required_body_parameters: string[];
+  required_inputs: string[];
+};
+export type ModuleOperationOutcome = {
+  status: "needs_input" | "pending" | "succeeded" | "failed";
+  operation_id: string;
+  text: string;
+  missing_inputs: string[];
+  status_code: number | null;
+  result: unknown;
+  content_type: string | null;
+  href: string | null;
+};
 
 const path = (conversation: string) => `/farm-assistant/conversations/${encodeURIComponent(conversation)}`;
 
@@ -62,3 +85,17 @@ export const getAction = (conversation: string, key: string) =>
 
 export const listActions = (conversation: string) =>
   apiRequest<{ items: { idempotency_key: string; outcome: AgentActionOutcome }[] }>(`${path(conversation)}/actions`);
+
+export const listModuleOperations = (conversation: string) =>
+  apiRequest<{ items: ModuleOperation[] }>(`${path(conversation)}/operations`);
+
+export const listModuleOperationHistory = (conversation: string) =>
+  apiRequest<{ items: { idempotency_key: string; outcome: ModuleOperationOutcome }[] }>(`${path(conversation)}/operations/history`);
+
+export const postModuleOperation = (conversation: string, body: {
+  operation_id: string;
+  path_params: Record<string, unknown>;
+  query_params: Record<string, unknown>;
+  body: unknown;
+  idempotency_key: string;
+}) => apiRequest<ModuleOperationOutcome>(`${path(conversation)}/operations`, { method: "POST", body });

@@ -9,6 +9,7 @@ from ..database.session import get_session
 from .action_execution import AssistantActionService
 from .agent_actions import ActionOutcome, ActionRequest
 from .models import AssistantMessage
+from .module_tools import ModuleOperationOutcome, ModuleOperationRequest, ModuleOperationService
 from .presets import enabled_presets
 from .schemas import ConversationCreate, MessageCreate, PreferenceInput
 from .service import AssistantService, message_view, process_message
@@ -75,6 +76,45 @@ async def get_action(
     conversation_id: str, idempotency_key: str, user: User, session: Session
 ) -> ActionOutcome:
     return await AssistantActionService().get(session, user.id, conversation_id, idempotency_key)
+
+
+@router.get("/conversations/{conversation_id}/operations")
+async def module_operations(
+    conversation_id: str, user: User, session: Session, request: Request
+) -> dict[str, Any]:
+    items = await ModuleOperationService().catalog(
+        session, request.app, user.id, conversation_id
+    )
+    return {"items": items}
+
+
+@router.get("/conversations/{conversation_id}/operations/history")
+async def module_operation_history(
+    conversation_id: str, user: User, session: Session
+) -> dict[str, Any]:
+    return {"items": await ModuleOperationService().history(session, user.id, conversation_id)}
+
+
+@router.post(
+    "/conversations/{conversation_id}/operations",
+    response_model=ModuleOperationOutcome,
+)
+async def execute_module_operation(
+    conversation_id: str,
+    body: ModuleOperationRequest,
+    user: User,
+    session: Session,
+    request: Request,
+) -> ModuleOperationOutcome:
+    return await ModuleOperationService().execute(
+        session,
+        request.app,
+        user.id,
+        conversation_id,
+        body,
+        headers=dict(request.headers),
+        cookies=request.cookies,
+    )
 
 
 @router.put("/conversations/{conversation_id}/preferences")

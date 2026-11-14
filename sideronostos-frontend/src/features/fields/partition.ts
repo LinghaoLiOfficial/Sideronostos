@@ -4,6 +4,10 @@ import type { Feature, Polygon, Position } from "geojson"
 import { createFieldFeature, validatePolygon } from "@/features/fields/geometry"
 import type { FarmFeature, FieldFeature, PartitionMethod, PartitionOrientation } from "@/types/workspace"
 
+const polygonClipping = (
+  clipping as unknown as { default: typeof import("polygon-clipping") }
+).default
+
 const EARTH_RADIUS = 6_371_008.8
 const MIN_AREA_SQUARE_METRES = 1
 
@@ -108,7 +112,7 @@ function rectangle(minX: number, minY: number, maxX: number, maxY: number): Loca
 }
 
 function intersectionArea(farm: LocalPolygon, bounds: LocalPolygon) {
-  return multiPolygonArea(clipping.intersection(farm, bounds))
+  return multiPolygonArea(polygonClipping.intersection(farm, bounds))
 }
 
 interface AlignedFarm {
@@ -179,7 +183,7 @@ function partitionIntoStrips(farm: FarmFeature, count: number, context: AlignedF
 
   const components: LocalPolygon[] = []
   for (let part = 0; part < count; part += 1) {
-    const clipped = clipping.intersection(
+    const clipped = polygonClipping.intersection(
       aligned,
       rectangle(minX - padding, cuts[part], maxX + padding, cuts[part + 1]),
     )
@@ -214,7 +218,7 @@ function gridComponents(context: AlignedFarm, rows: number, columns: number) {
   const components: LocalPolygon[] = []
   for (let row = 0; row < rows; row += 1) {
     for (let column = 0; column < columns; column += 1) {
-      const clipped = clipping.intersection(aligned, rectangle(
+      const clipped = polygonClipping.intersection(aligned, rectangle(
         minX + column * width,
         minY + row * height,
         minX + (column + 1) * width,
@@ -292,10 +296,10 @@ export function validateCandidatePartition(farm: FarmFeature, fields: FieldFeatu
   const farmArea = multiPolygonArea([localFarm])
   const fieldArea = localFields.reduce((sum, polygon) => sum + polygonArea(polygon), 0)
   const [firstField, ...remainingFields] = localFields
-  const unionGeometry = clipping.union(firstField, ...remainingFields)
+  const unionGeometry = polygonClipping.union(firstField, ...remainingFields)
   const unionArea = multiPolygonArea(unionGeometry)
-  const outsideArea = multiPolygonArea(clipping.difference(unionGeometry, localFarm))
-  const uncoveredArea = multiPolygonArea(clipping.difference(localFarm, unionGeometry))
+  const outsideArea = multiPolygonArea(polygonClipping.difference(unionGeometry, localFarm))
+  const uncoveredArea = multiPolygonArea(polygonClipping.difference(localFarm, unionGeometry))
   const overlapArea = Math.max(0, fieldArea - unionArea)
   const tolerance = Math.max(farmArea * 0.001, 0.5)
 

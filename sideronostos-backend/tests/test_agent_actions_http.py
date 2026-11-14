@@ -16,12 +16,14 @@ from sideronostos_backend.core import installed_models  # noqa: F401
 from sideronostos_backend.core.application import create_app
 from sideronostos_backend.core.modules import ModuleSpec
 from sideronostos_backend.modules.agri_data.models import RegionSelection, ScienceRelease
+from sideronostos_backend.modules.agri_data.router import router as agri_data_router
 from sideronostos_backend.modules.auth.dependencies import AuthPrincipal, require_verified_user
 from sideronostos_backend.modules.database.base import Base
 from sideronostos_backend.modules.database.session import get_session
 from sideronostos_backend.modules.farm_assistant.models import AssistantAction, Conversation
 from sideronostos_backend.modules.farm_assistant.router import router
 from sideronostos_backend.modules.field_shift.models import FieldRecord
+from sideronostos_backend.modules.field_shift.router import router as field_shift_router
 from sideronostos_backend.modules.field_shift.service import FieldShiftService
 from sideronostos_backend.modules.knowledge.models import KBRelease
 
@@ -40,6 +42,7 @@ async def api():
         "knowledge_releases",
         "assistant_conversations",
         "assistant_actions",
+        "field_shift_farms",
         "field_shift_fields",
         "agri_data_selections",
         "agri_data_releases",
@@ -53,6 +56,11 @@ async def api():
     conversation_id = str(uuid4())
     selection_id = str(uuid4())
     async with factory() as session:
+        for fixed_id in ("agent-test-smap", "agent-test-weather"):
+            previous = await session.get(ScienceRelease, fixed_id)
+            if previous is not None:
+                await session.delete(previous)
+        await session.flush()
         release = KBRelease(
             id="agent-test-kb-" + uuid4().hex,
             status="published",
@@ -129,6 +137,12 @@ async def api():
         await session.commit()
 
     app = create_app(modules=(ModuleSpec(name="farm_assistant", routers=(router,)),))
+    app.include_router(field_shift_router)
+    app.include_router(agri_data_router)
+
+    @app.post("/rotation-optimizer/mock-job", operation_id="start_mock_job", status_code=202)
+    async def start_mock_job():
+        return {"id": "job-1"}
 
     async def principal():
         return AuthPrincipal(identity["id"], "farmer@example.test", "Farmer", datetime.now(UTC))
@@ -160,6 +174,129 @@ def field_arguments(**changes):
         "history": [],
         **changes,
     }
+
+
+async def test_module_operations_are_catalogued_by_conversation_and_executed_idempotently(api):
+    client, factory, identity, conversation_id, _ = api
+    path = f"/farm-assistant/conversations/{conversation_id}/operations"
+    catalog = await client.get(path)
+    assert catalog.status_code == 200
+    tools = catalog.json()["items"]
+    assert any(tool["operation_id"] == "list_profiles_field_shift_profiles_get" for tool in tools)
+    create = next(
+        tool for tool in tools
+        if tool["operation_id"] == "create_field_field_shift_fields_post"
+    )
+    assert "body.name" in create["required_inputs"]
+    assert "body.area_ha" in create["required_inputs"]
+
+    result = await client.post(path, json={
+        "operation_id": "list_profiles_field_shift_profiles_get",
+        "path_params": {},
+        "query_params": {},
+        "body": None,
+        "idempotency_key": "module-list-profiles-1",
+    })
+    assert result.status_code == 200
+    assert result.json()["status"] == "succeeded"
+    assert "list_profiles_field_shift_profiles_get" not in result.json()["text"]
+    assert result.json()["result"]["items"]
+    assert result.json()["href"] == "/field-shift"
+    history = await client.get(path + "/history")
+    assert history.status_code == 200
+    assert history.json()["items"][0]["outcome"] == result.json()
+    replay = await client.post(path, json={
+        "operation_id": "list_profiles_field_shift_profiles_get",
+        "path_params": {},
+        "query_params": {},
+        "body": None,
+        "idempotency_key": "module-list-profiles-1",
+    })
+    assert replay.json() == result.json()
+    conflict = await client.post(path, json={
+        "operation_id": "create_field_field_shift_fields_post",
+        "path_params": {},
+        "query_params": {},
+        "body": field_arguments(name="Different field"),
+        "idempotency_key": "module-list-profiles-1",
+    })
+    assert conflict.status_code == 409
+
+
+async def test_specialty_bot_cannot_bypass_its_remote_sensing_scope_via_generic_operations(api):
+    client, factory, identity, _, _ = api
+    async with factory() as session:
+        release = await session.scalar(select(KBRelease).limit(1))
+        specialist = Conversation(
+            id=str(uuid4()), owner_user_id=identity["id"], preset="remote_sensing",
+            bot_id="remote-soil", language="en", detail="brief",
+            kb_release_id=release.id, next_sequence=1,
+        )
+        session.add(specialist)
+        await session.commit()
+    path = f"/farm-assistant/conversations/{specialist.id}/operations"
+    assert (await client.get(path)).json()["items"] == []
+    attempt = await client.post(path, json={
+        "operation_id": "layers_agri_data_layers_get",
+        "path_params": {}, "query_params": {}, "body": None,
+        "idempotency_key": "specialist-scope-1",
+    })
+    assert attempt.status_code == 422
+
+
+async def test_module_operation_reports_required_inputs_before_execution(api):
+    client, _, _, conversation_id, _ = api
+    path = f"/farm-assistant/conversations/{conversation_id}/operations"
+    response = await client.post(path, json={
+        "operation_id": "get_field_field_shift_fields__field_id__get",
+        "path_params": {},
+        "query_params": {},
+        "body": None,
+        "idempotency_key": "module-missing-path-1",
+    })
+    assert response.status_code == 200
+    assert response.json()["status"] == "needs_input"
+    assert response.json()["missing_inputs"] == ["field_id"]
+
+
+async def test_empty_module_list_is_explained_as_empty_data(api):
+    client, _, _, conversation_id, _ = api
+    path = f"/farm-assistant/conversations/{conversation_id}/operations"
+    response = await client.post(path, json={
+        "operation_id": "list_fields_field_shift_fields_get",
+        "path_params": {}, "query_params": {}, "body": None,
+        "idempotency_key": "module-empty-fields-1",
+    })
+    assert response.json()["status"] == "succeeded"
+    assert response.json()["result"]["items"] == []
+    assert "No records" in response.json()["text"]
+
+
+async def test_accepted_module_job_reports_progress_without_claiming_completion(api):
+    client, factory, _, conversation_id, _ = api
+    async with factory() as session:
+        conversation = await session.get(Conversation, conversation_id)
+        conversation.preset = "rotation"
+        conversation.bot_id = "rotation-guide"
+        await session.commit()
+    path = f"/farm-assistant/conversations/{conversation_id}/operations"
+    request = {
+        "operation_id": "start_mock_job", "path_params": {}, "query_params": {},
+        "body": None, "idempotency_key": "module-start-job-1",
+    }
+    result = await client.post(path, json=request)
+    assert result.status_code == 200
+    assert result.json()["status"] == "pending"
+    assert result.json()["status_code"] == 202
+    assert result.json()["href"] == "/field-shift/rotation?run=job-1"
+    assert (await client.post(path, json=request)).json() == result.json()
+
+
+async def test_module_operation_catalog_is_owner_bound(api):
+    client, _, identity, conversation_id, _ = api
+    identity["id"] = str(uuid4())
+    response = await client.get(f"/farm-assistant/conversations/{conversation_id}/operations")
+    assert response.status_code == 404
 
 
 async def test_field_action_resumes_persists_and_retries_once(api):
