@@ -106,6 +106,11 @@ async def evaluate_one(client: httpx.AsyncClient, case: dict, limit: asyncio.Sem
                 paragraph["text"]
                 for paragraph in (message.get("response") or {}).get("paragraphs", [])
             )
+            expected_fragments = case.get("expected_answer_contains", [])
+            result["operation_check"] = result["operation_check"] and all(
+                fragment.casefold() in result["answer"].casefold()
+                for fragment in expected_fragments
+            )
             result["error_code"] = message.get("error_code")
         except (httpx.HTTPError, KeyError, ValueError) as error:
             result["error"] = str(error)

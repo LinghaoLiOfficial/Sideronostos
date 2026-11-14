@@ -100,6 +100,39 @@ def choose_tool(question: str, tools: list[ModuleTool]) -> ModuleTool | None:
         return direct[0]
     if not REQUEST.search(clause):
         return None
+    if re.search(r"\b(?:satellite|remote sensing)\b.*\blayers?\b", clause, re.I):
+        return next(
+            (tool for tool in tools if tool.operation_id == "layers_agri_data_layers_get"),
+            None,
+        )
+    if re.search(r"\bcrop\s+profiles?\b", clause, re.I) and re.search(
+        r"\brotation\b", clause, re.I
+    ):
+        return next(
+            (
+                tool for tool in tools
+                if tool.operation_id == "profiles_rotation_optimizer_profiles_get"
+            ),
+            None,
+        )
+    if re.search(r"\b(?:save|create|mark|pin)\b.*\b(?:point|spot)\b.*\bmap\b", clause, re.I):
+        return next(
+            (
+                tool for tool in tools
+                if tool.operation_id == "create_selection_agri_data_selections_post"
+            ),
+            None,
+        )
+    if re.search(r"\b(?:rainfall|rain|weather|moisture)\b", clause, re.I) and re.search(
+        r"\b(?:facts?|readings?|amount)\b", clause, re.I
+    ):
+        return next(
+            (
+                tool for tool in tools
+                if tool.operation_id == "facts_agri_data_selections__selection_id__facts_get"
+            ),
+            None,
+        )
     chinese_routes = (
         (r"(?:列出|查看|查询).{0,12}(?:我的|已保存)?地块", "list_fields_field_shift_fields_get"),
         (r"(?:列出|查看|查询).{0,12}(?:我的)?农场", "list_farms_field_shift_farms_get"),
@@ -201,9 +234,29 @@ def _supplied(question: str, tool: ModuleTool, context: dict[str, Any]) -> dict[
                 supplied["path_params"][key] = fields[0]["id"]
                 selected_field = fields[0]
         elif key in {"run_id", "plan_id", "analysis_id", "selection_id"}:
-            value = context.get("reference", {}).get(key)
+            reference = context.get("reference", {})
+            value = (
+                (reference.get("selection") or {}).get("id")
+                if key == "selection_id" else reference.get(key)
+            )
             if value:
                 supplied["path_params"][key] = value
+    if tool.operation_id.startswith("create_selection_") and supplied["body"] is None:
+        latitude = re.search(r"\blatitude\s*(?:=|:|is)?\s*(-?\d+(?:\.\d+)?)", question, re.I)
+        longitude = re.search(r"\blongitude\s*(?:=|:|is)?\s*(-?\d+(?:\.\d+)?)", question, re.I)
+        if latitude and longitude:
+            supplied["body"] = {
+                "kind": "point",
+                "revision": context.get("reference", {}).get("revision", 1),
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [float(longitude.group(1)), float(latitude.group(1))],
+                },
+            }
+    if tool.path.endswith("/facts") and not supplied["query_params"]:
+        dates = re.findall(r"\b\d{4}-\d{2}-\d{2}\b", question)
+        if len(dates) == 2:
+            supplied["query_params"] = {"start": dates[0], "end": dates[1]}
     if tool.operation_id.startswith("create_field_") and supplied["body"] is None:
         details = _details(question)
         if details:
@@ -278,10 +331,63 @@ def _reply(
     }
 
 
-def _farmer_outcome_text(tool: ModuleTool, outcome: dict[str, Any], language: str) -> str:
+def _farmer_outcome_text(
+    tool: ModuleTool, outcome: dict[str, Any], language: str, question: str = ""
+) -> str:
     data = outcome.get("result")
     if outcome.get("status") != "succeeded" or not isinstance(data, dict):
         return str(outcome.get("text", ""))
+    if tool.operation_id.startswith("facts_"):
+        facts = data.get("facts")
+        if not isinstance(facts, list) or not facts:
+            return (
+                "所选位置和时段没有已发布的观测值。可打开结果页面核对数据覆盖范围。"
+                if language == "zh" else
+                "I found no published observation for this selected area and period. "
+                "Open the result page to check data coverage."
+            )
+        requested_metric = (
+            "rainfall_total" if re.search(r"\brain(?:fall)?\b|降雨|降水", question, re.I)
+            else "surface_soil_moisture" if re.search(r"\bmoisture\b|土壤水分", question, re.I)
+            else None
+        )
+        relevant = [fact for fact in facts if fact.get("metric") == requested_metric]
+        selected = (relevant or facts)[:3]
+        labels = {
+            "rainfall_total": ("历史降雨量", "historical rainfall"),
+            "reference_et0_total": ("参考蒸散量", "reference evapotranspiration"),
+            "surface_soil_moisture": ("地表土壤水分", "surface soil moisture"),
+        }
+        readings = []
+        for fact in selected:
+            metric = str(fact.get("metric", "observation"))
+            label = labels.get(metric, (metric, metric))[0 if language == "zh" else 1]
+            period = fact.get("period") or {}
+            start, end = period.get("start"), period.get("end")
+            when = start if start == end else f"{start} to {end}" if start and end else ""
+            value = fact.get("value")
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                amount = f"{value:g} {fact.get('unit', '')}".strip()
+                readings.append(f"{when}: {label} {amount}" if when else f"{label} {amount}")
+            else:
+                incomplete = f"{label} data are incomplete"
+                readings.append(f"{when}: {incomplete}" if when else incomplete)
+        synthetic = any(fact.get("source_kind") == "synthetic_test" for fact in selected)
+        if language == "zh":
+            caveat = (
+                "这是合成测试数据，并非实时 NASA 观测。"
+                if synthetic else "请按来源核对其空间与时间覆盖范围。"
+            )
+            details = "；".join(readings)
+            return f"所选位置的已发布资料显示：{details}。{caveat}可打开结果页面查看来源。"
+        caveat = (
+            "This is synthetic test data, not a live NASA observation. "
+            if synthetic else "Check the source's spatial and time coverage. "
+        )
+        return (
+            f"The published record for this map point shows {'; '.join(readings)}. "
+            f"{caveat}Open the result page to review the source."
+        )
     items = data.get("items")
     if not isinstance(items, list):
         return str(outcome.get("text", ""))
@@ -481,7 +587,38 @@ async def handle_module_chat(
         if flow.status == "awaiting_confirmation" and CONFIRM.fullmatch(question):
             return await _execute(session, flow, tool, app, headers, cookies, preset, language)
 
-    payload = _merge(flow.arguments["payload"], _supplied(question, tool, message.context_snapshot))
+    context = message.context_snapshot
+    if "selection_id" in tool.path_parameters and re.search(
+        r"\b(?:this|that|the selected)\s+(?:point|spot|area|selection)\b", question, re.I
+    ):
+        reference = dict(context.get("reference") or {})
+        if not reference.get("selection"):
+            prior = (
+                await session.scalars(
+                    select(AssistantAction)
+                    .where(
+                        AssistantAction.conversation_id == message.conversation_id,
+                        AssistantAction.owner_user_id == message.owner_user_id,
+                        AssistantAction.action == "chat.module.operation",
+                        AssistantAction.status == "completed",
+                    )
+                    .order_by(AssistantAction.updated_at.desc())
+                    .limit(10)
+                )
+            ).all()
+            saved = next(
+                (
+                    item for row in prior
+                    if row.arguments.get("operation_id", "").startswith("create_selection_")
+                    for item in [(row.outcome or {}).get("result")]
+                    if isinstance(item, dict) and isinstance(item.get("id"), str)
+                ),
+                None,
+            )
+            if saved:
+                reference["selection"] = {"id": saved["id"]}
+                context = {**context, "reference": reference}
+    payload = _merge(flow.arguments["payload"], _supplied(question, tool, context))
     if "idempotency_key" in tool.required_body_parameters:
         body = payload["body"] if isinstance(payload["body"], dict) else {}
         payload["body"] = {**body, "idempotency_key": f"agent-{flow.id}"}
@@ -515,7 +652,7 @@ async def handle_module_chat(
             "Please confirm before I make this change.",
             title=tool.title,
         )
-    return await _execute(session, flow, tool, app, headers, cookies, preset, language)
+    return await _execute(session, flow, tool, app, headers, cookies, preset, language, question)
 
 
 async def _execute(
@@ -527,6 +664,7 @@ async def _execute(
     cookies: dict[str, str],
     preset: str,
     language: str,
+    question: str = "",
 ) -> dict[str, Any]:
     payload = flow.arguments["payload"]
     flow.status = "executing"
@@ -554,7 +692,7 @@ async def _execute(
     await session.commit()
     return _reply(
         flow,
-        _farmer_outcome_text(tool, flow.outcome, language),
+        _farmer_outcome_text(tool, flow.outcome, language, question),
         title=tool.title,
         outcome=flow.outcome,
     )
@@ -617,7 +755,9 @@ async def refresh_module_workflow(
         if not checked.succeeded or not isinstance(checked.data, dict):
             raise HTTPException(502, "The business job status could not be verified")
         business_status = checked.data.get("status")
-        if business_status in {"completed", "complete", "succeeded"}:
+        if business_status in {
+            "completed", "complete", "succeeded", "optimal", "feasible", "infeasible"
+        }:
             flow.status = "completed"
         elif business_status in {"failed", "cancelled", "timeout_no_solution"}:
             flow.status = "failed"

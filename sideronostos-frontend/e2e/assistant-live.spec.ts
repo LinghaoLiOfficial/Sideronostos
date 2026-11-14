@@ -93,6 +93,28 @@ test("general assistant returns both owned results from one cross-module request
   });
 });
 
+test("weather specialist confirms a mapped point and shows its sourced rainfall", async ({ page }, testInfo) => {
+  await page.goto("/si/multi-agent");
+  await chooseBot(page, "Weather specialist");
+  const composer = page.getByRole("textbox", { name: "Message Weather specialist" });
+  await composer.fill("Please save a point on the map at latitude 42 and longitude -93.5 so I can check the rain there.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByText(/Please confirm before I make this change/)).toBeVisible();
+  await composer.fill("Confirm");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByRole("link", { name: "Open result page" }).last()).toHaveAttribute("href", /\/field-shift\/map\?selection=/);
+  await composer.fill("Please show rainfall facts for this point from 2025-01-01 to 2025-01-01.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByText(/historical rainfall 4 mm/)).toBeVisible();
+  await expect(page.getByText(/synthetic test data, not a live NASA observation/i)).toBeVisible();
+  await expect(page.getByRole("img", { name: "Task result page" }).last()).toBeVisible({ timeout: 30_000 });
+  await page.screenshot({ path: `output/playwright/weather-point-chat-${testInfo.project.name}.png`, fullPage: true });
+  await page.getByRole("link", { name: "View task details" }).last().click();
+  await expect(page.getByTestId("result-ready")).toContainText("Historical rainfall: 4 mm");
+  await expect(page.getByTestId("result-ready")).toContainText("Synthetic test data");
+  await page.screenshot({ path: `output/playwright/weather-point-result-${testInfo.project.name}.png`, fullPage: true });
+});
+
 test("creates an owned field, restores the server-confirmed result and opens the saved page", async ({ page }) => {
   await page.goto("/si/multi-agent");
   await chooseBot(page, "Field guide");

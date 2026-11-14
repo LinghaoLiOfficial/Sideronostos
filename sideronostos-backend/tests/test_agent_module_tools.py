@@ -156,6 +156,12 @@ def test_offline_tool_planner_honors_action_clauses_and_negation():
     )
     assert selected is not None
     assert selected.operation_id == "update_field_field_shift_fields__field_id__patch"
+    assert choose_tool(
+        "Could you show the satellite layers we have around the farm?", tools
+    ).operation_id == "layers_agri_data_layers_get"
+    assert choose_tool(
+        "Please list the crop profiles I can use for a rotation plan.", tools
+    ).operation_id == "profiles_rotation_optimizer_profiles_get"
     rotation = ModuleToolExecutor(create_product_app()).tools_for("rotation")
     assert choose_tool("Please list the crop profiles I can plan with.", rotation).operation_id == (
         "profiles_rotation_optimizer_profiles_get"

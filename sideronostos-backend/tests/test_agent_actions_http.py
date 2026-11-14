@@ -455,7 +455,7 @@ async def test_chat_async_job_waits_for_real_completion_before_preview(api):
     assert still_pending.status_code == 200
     assert still_pending.json()["status"] == "pending"
     assert still_pending.json()["preview_url"] is None
-    client._transport.app.state.mock_job_status = "completed"
+    client._transport.app.state.mock_job_status = "optimal"
     completed = await client.get(refresh_path)
     assert completed.status_code == 200
     assert completed.json()["status"] == "completed"
@@ -692,6 +692,67 @@ async def test_soil_and_weather_specialists_call_scoped_business_tools_from_chat
         fact["metric"] in {"rainfall_total", "reference_et0_total"}
         for fact in weather_task["execution"]["result"]["facts"]
     )
+
+
+async def test_weather_bot_confirms_real_selection_then_reads_published_rainfall(api):
+    client, factory, identity, conversation_id, _ = api
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    async with factory() as session:
+        conversation = await session.get(Conversation, conversation_id)
+        conversation.preset = "remote_sensing"
+        conversation.bot_id = "remote-weather"
+        await session.commit()
+
+    async def ask(turn: int, text: str) -> dict:
+        response = await client.post(path, json={
+            "client_message_id": f"weather-selection-{turn}",
+            "text": text,
+            "context": {"page": "map", "revision": 1},
+        })
+        assert response.status_code == 200
+        return response.json()["response"]
+
+    proposed = await ask(
+        1,
+        "Please save a point on the map at latitude 42 and longitude -93.5 "
+        "so I can check the rain there.",
+    )
+    assert proposed["task"]["status"] == "awaiting_confirmation"
+    async with factory() as session:
+        assert await session.scalar(
+            select(func.count()).select_from(RegionSelection).where(
+                RegionSelection.owner_user_id == identity["id"]
+            )
+        ) == 1  # The fixture's existing selection; no new one before confirmation.
+
+    saved = await ask(2, "Confirm")
+    task = saved["task"]
+    assert task["status"] == "completed"
+    new_id = task["execution"]["result"]["id"]
+    assert new_id
+    assert task["result_page_url"]
+    async with factory() as session:
+        assert await session.scalar(
+            select(func.count()).select_from(RegionSelection).where(
+                RegionSelection.owner_user_id == identity["id"]
+            )
+        ) == 2
+
+    facts = await ask(
+        3,
+        "Please show rainfall facts for this point from 2025-01-01 to 2025-01-01.",
+    )
+    fact_task = facts["task"]
+    assert fact_task["status"] == "completed"
+    actual = fact_task["execution"]["result"]
+    assert actual["online_fetch_performed"] is False
+    rainfall = next(fact for fact in actual["facts"] if fact["metric"] == "rainfall_total")
+    assert rainfall["value"] == 4.0
+    assert rainfall["source"]["release_id"] == "agent-test-weather"
+    assert rainfall["source_kind"] == "synthetic_test"
+    answer = " ".join(paragraph["text"] for paragraph in facts["paragraphs"])
+    assert "4 mm" in answer
+    assert "synthetic" in answer.lower()
 
 
 async def test_module_operation_reports_required_inputs_before_execution(api):
