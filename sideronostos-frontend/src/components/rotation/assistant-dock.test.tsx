@@ -645,3 +645,18 @@ it("preserves an unsent draft when collapsed without exposing a full-screen acti
   );
   expect(api.sendMessage).not.toHaveBeenCalled();
 });
+
+it("keeps the message draft while unresolved map or historical context blocks sending", async () => {
+  api.getPreferences.mockResolvedValue({ language: "zh", detail: "brief" });
+  api.listConversations.mockResolvedValue({ items: [] });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const view = (pending: boolean) => <QueryClientProvider client={client}><AssistantDock ownerId="context-owner" context={context} contextLabel="正在核对旧方案" contextPending={pending} onAction={vi.fn()} /></QueryClientProvider>;
+  const { rerender } = render(view(true));
+  fireEvent.click(screen.getByRole("button", { name: "打开轮作助手" }));
+  fireEvent.change(screen.getByRole("textbox", { name: "给轮作助手留言" }), { target: { value: "解释这个历史方案" } });
+  expect(screen.getByRole("button", { name: "发送消息" })).toBeDisabled();
+  expect(api.sendMessage).not.toHaveBeenCalled();
+  rerender(view(false));
+  expect(screen.getByRole("textbox", { name: "给轮作助手留言" })).toHaveValue("解释这个历史方案");
+  expect(screen.getByRole("button", { name: "发送消息" })).toBeEnabled();
+});

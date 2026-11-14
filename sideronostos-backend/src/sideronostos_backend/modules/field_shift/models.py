@@ -14,8 +14,40 @@ def utcnow() -> datetime:
     return datetime.now(UTC)
 
 
+class FarmRecord(Base):
+    __tablename__ = "field_shift_farms"
+    __table_args__ = (UniqueConstraint("owner_user_id", "local_id", name="uq_farm_owner_local"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
+    local_id: Mapped[str] = mapped_column(String(100))
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    data: Mapped[dict[str, Any]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class FarmSyncReceipt(Base):
+    __tablename__ = "field_shift_farm_sync_receipts"
+
+    owner_user_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    idempotency_key: Mapped[str] = mapped_column(String(80), primary_key=True)
+    payload_hash: Mapped[str] = mapped_column(String(64))
+    response: Mapped[dict[str, Any]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class FieldRecord(Base):
     __tablename__ = "field_shift_fields"
+    __table_args__ = (
+        UniqueConstraint(
+            "farm_id", "partition_revision", "local_id", name="uq_farm_partition_field"
+        ),
+    )
+
+    farm_id: Mapped[str | None] = mapped_column(ForeignKey("field_shift_farms.id"), nullable=True)
+    partition_revision: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    local_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     owner_user_id: Mapped[str] = mapped_column(String(36), index=True)

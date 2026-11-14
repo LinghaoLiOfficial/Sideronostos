@@ -11,8 +11,8 @@ import { errorMessage, initialFieldDraft, parseFieldDraft } from "./model";
 import { useDraft } from "./use-draft";
 import styles from "./field-shift.module.css";
 
-export function FieldForm({ field, profiles, userId, onSave, onReload }: { field?: Field; profiles: Profile[]; userId: string; onSave: (value: FieldInput, expectedVersion?: number) => Promise<void>; onReload?: () => Promise<Field> }) {
-  const draft = useDraft(`field-shift:${userId}:field:${field?.id ?? "new"}:v1`, initialFieldDraft(profiles[0]?.id ?? "", field));
+export function FieldForm({ field, profiles, userId, onSave, onReload, geometryLocked = false, onDirtyChange, draftKey }: { field?: Field; profiles: Profile[]; userId: string; onSave: (value: FieldInput, expectedVersion?: number) => Promise<void>; onReload?: () => Promise<Field>; draftKey?: string; geometryLocked?: boolean; onDirtyChange?: (dirty: boolean) => void }) {
+  const draft = useDraft(draftKey ?? `field-shift:${userId}:field:${field?.id ?? "new"}:v1`, initialFieldDraft(profiles[0]?.id ?? "", field));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [reloading, setReloading] = useState(false);
@@ -22,7 +22,9 @@ export function FieldForm({ field, profiles, userId, onSave, onReload }: { field
   const [latest, setLatest] = useState<Field | null>(null);
   const [version, setVersion] = useState<number | undefined>(undefined);
   const profile = profiles.find((item) => item.id === draft.value.profile_id);
-  const set = (change: Partial<typeof draft.value>) => draft.update({ ...draft.value, ...change });
+  useEffect(() => { onDirtyChange?.(draft.dirty); }, [draft.dirty, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
+  const set = (change: Partial<typeof draft.value>) => { draft.update({ ...draft.value, ...change }); onDirtyChange?.(true); };
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
@@ -48,11 +50,11 @@ export function FieldForm({ field, profiles, userId, onSave, onReload }: { field
     {!draft.storageAvailable && <p className={styles.warning}>浏览器无法保留草稿，请在离开页面前保存。</p>}
     <div className={styles.formGrid}>
       <label className={styles.field}>地块名称<Input aria-label="地块名称" value={draft.value.name} maxLength={120} onChange={(e) => set({ name: e.target.value })} placeholder="例如：河边的西田" autoComplete="off" /></label>
-      <label className={styles.field}>面积（公顷）<Input aria-label="面积（公顷）" type="number" min="0" step="any" value={draft.value.area_ha} onChange={(e) => set({ area_ha: e.target.value })} placeholder="如 2.5" /></label>
-      <label className={styles.field}>纬度<Input aria-label="纬度" type="number" min="-90" max="90" step="any" value={draft.value.latitude} onChange={(e) => set({ latitude: e.target.value })} placeholder="−90 至 90" /></label>
-      <label className={styles.field}>经度<Input aria-label="经度" type="number" min="-180" max="180" step="any" value={draft.value.longitude} onChange={(e) => set({ longitude: e.target.value })} placeholder="−180 至 180" /></label>
+      <label className={styles.field}>面积（公顷）<Input aria-label="面积（公顷）" readOnly={geometryLocked} type="number" min="0" step="any" value={draft.value.area_ha} onChange={(e) => set({ area_ha: e.target.value })} placeholder="如 2.5" /></label>
+      <label className={styles.field}>纬度<Input aria-label="纬度" readOnly={geometryLocked} type="number" min="-90" max="90" step="any" value={draft.value.latitude} onChange={(e) => set({ latitude: e.target.value })} placeholder="−90 至 90" /></label>
+      <label className={styles.field}>经度<Input aria-label="经度" readOnly={geometryLocked} type="number" min="-180" max="180" step="any" value={draft.value.longitude} onChange={(e) => set({ longitude: e.target.value })} placeholder="−180 至 180" /></label>
     </div>
-    <p className={styles.help}>使用地块中心点查询区域气象；这不是地块测绘边界。可从地图服务复制经纬度。</p>
+    <p className={styles.help}>{geometryLocked ? "面积与地块内部参考点来自已确认的地图边界，保存时由服务器复核。" : "使用地块中心点查询区域气象；这不是地块测绘边界。可从地图服务复制经纬度。"}</p>
     <div className={styles.formGrid}>
       <label className={styles.field}>土壤质地<select aria-label="土壤质地" className={styles.select} value={draft.value.soil_texture} onChange={(e) => set({ soil_texture: e.target.value as FieldInput["soil_texture"] })}><option value="unknown">尚不清楚</option><option value="sand">砂土</option><option value="loam">壤土</option><option value="clay">黏土</option></select></label>
       <label className={styles.field}>地区与作物配置<select aria-label="地区与作物配置" className={styles.select} value={draft.value.profile_id} onChange={(e) => set({ profile_id: e.target.value })}>{profiles.map((p) => <option key={p.id} value={p.id}>{p.name}{p.is_demo ? "（示范）" : ""}</option>)}</select></label>
