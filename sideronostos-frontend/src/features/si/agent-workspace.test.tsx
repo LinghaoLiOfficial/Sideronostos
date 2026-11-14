@@ -59,6 +59,8 @@ it("creates a conversation for the selected specialist identity", async () => {
   api.createConversation.mockResolvedValue({ id: "soil-1", bot_id: "remote-soil", preset: "remote_sensing", language: "en", detail: "brief", kb_release_id: "kb", created_at: "2026-11-14T08:00:00Z", updated_at: "2026-11-14T08:00:00Z" });
   render(<AgentWorkspace />);
   await screen.findByRole("heading", { name: "Your assistants" });
+  const identities = screen.getByRole("navigation", { name: "Bot identities" });
+  expect(within(within(identities).getByRole("group", { name: "Remote sensing" })).getAllByRole("button")).toHaveLength(3);
   await user.click(screen.getByRole("button", { name: "Soil specialist" }));
   await user.click(screen.getByRole("button", { name: "New chat" }));
   await waitFor(() => expect(api.createConversation).toHaveBeenCalledWith({ preset: "remote_sensing", bot_id: "remote-soil", language: "en", detail: "brief" }));

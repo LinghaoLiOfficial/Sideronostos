@@ -222,7 +222,10 @@ export function AgentWorkspace() {
           <h2 className="text-lg font-semibold">{selectedBot.name[locale]}</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">{selectedBot.capability[locale]}</p>
           <nav aria-label={zh ? "Bot 身份" : "Bot identities"} className="mt-3 flex gap-2 overflow-x-auto pb-1">
-            {botCatalog.map((bot) => <button key={bot.id} type="button" aria-label={bot.name[locale]} aria-pressed={selectedBot.id === bot.id} onClick={() => chooseBot(bot)} style={{ "--bot-accent": bot.color } as CSSProperties} className={(selectedBot.id === bot.id ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:bg-muted") + " flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-primary"}><BotAvatar variant={bot.avatar} small /><span>{bot.name[locale]}</span></button>)}
+            {domains.map((entry) => <div key={entry.id} role="group" aria-label={zh ? entry.zh : entry.en} className="flex shrink-0 items-center gap-2 border-r border-border pr-2 last:border-r-0">
+              <span className="max-w-20 text-xs leading-tight text-muted-foreground">{zh ? entry.zh : entry.en}</span>
+              {botCatalog.filter((bot) => bot.presetId === entry.id).map((bot) => <button key={bot.id} type="button" aria-label={bot.name[locale]} aria-pressed={selectedBot.id === bot.id} onClick={() => chooseBot(bot)} style={{ "--bot-accent": bot.color } as CSSProperties} className={(selectedBot.id === bot.id ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:bg-muted") + " flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-primary"}><BotAvatar variant={bot.avatar} small /><span>{bot.name[locale]}</span></button>)}
+            </div>)}
           </nav>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8" aria-live="polite"><div className="mx-auto flex min-h-full max-w-3xl flex-col">
