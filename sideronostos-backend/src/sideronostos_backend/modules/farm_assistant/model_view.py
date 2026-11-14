@@ -8,9 +8,17 @@ Only relevant options/metrics are exposed, preventing accidental cross-option co
 import re
 from typing import Any
 
+from .daily_evidence import daily_option_state, daily_verified, is_daily_run
+from .intents import compares_current_alternatives, excluded_product_sources
 from .schemas import fact_is_renderable
 
 METRIC_WORDS = {
+    "profit": r"收益|利润|profit|revenue",
+    "water": r"水|灌溉|water|irrigat",
+    "rotation": r"衔接|轮作评分|rotation score|transition",
+    "soil": r"土壤|soil",
+    "risk": r"风险|暴露|risk|exposure",
+    "bare": r"裸地|bare|fallow",
     "water_m3": r"水|灌溉|water|irrigat",
     "cost_usd": r"投入|成本|预算|cost|budget",
     "labor_days": r"劳力|劳动|labou?r",
@@ -32,7 +40,7 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
     )
     calendar = bool(re.search(r"日期|日历|收获|播种|calendar|harvest|sow", text))
     compare = context.get("comparison")
-    both_options = bool(re.search(r"两个方案|两种方案|two options", text))
+    both_options = compares_current_alternatives(question, context)
     compare_request = bool(
         compare
         or (
@@ -62,6 +70,7 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
         ],
         "allowed_actions": context["allowed_actions"],
         "has_map_selection": bool(context.get("selection")),
+        "has_saved_plan": bool(context.get("saved_plan")),
         "owned_fields": [
             {
                 "name": f["name"],
@@ -95,11 +104,22 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
         and re.search(r"增产|产量|收益|利润|yield|profit", text)
     )
     if unsupported_yield:
-        requirement = "yield_and_profit_are_not_computed_even_after_recalculation"
+        requirement = (
+            "estimates_are_not_guaranteed_yield_profit_or_measured_savings"
+            if run and is_daily_run(run)
+            else "yield_and_profit_are_not_computed_even_after_recalculation"
+        )
         summary["allowed_actions"] = []
     elif compare_request and not compare:
         requirement = "ask_for_other_completed_calculation_before_comparing"
-    elif run and run["status"] in ("infeasible", "failed", "cancelled", "pending", "running"):
+    elif run and run["status"] in (
+        "infeasible",
+        "failed",
+        "cancelled",
+        "pending",
+        "running",
+        "timeout_no_solution",
+    ):
         requirement = "explain_run_status_without_requesting_an_option"
     elif (
         run
@@ -134,6 +154,10 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
                 if requirement == "ask_to_select_specific_option"
                 else entry["status"],
                 "specific_option_selected": bool(entry.get("selected_option_id")),
+                "model_version": entry.get("request", {}).get(
+                    "model_version", "rotation-milp-v2.0"
+                ),
+                "daily_metrics": is_daily_run(entry),
                 "parameter_applicability": entry["provenance"]["benchmark_scope"],
                 "result_basis": "model estimates, not measured farm outcomes",
                 "limitations": entry["provenance"]["limitations"],
@@ -146,6 +170,7 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
                         "role": "baseline"
                         if o["id"] == "baseline"
                         else option_roles.get(o["id"], "selected plan"),
+                        **(daily_option_state(entry, o) if is_daily_run(entry) else {}),
                         "feasible": o["feasible"],
                         "violations": sorted(
                             {v.split(":")[0] for v in o["verification"]["violations"]}
@@ -169,20 +194,43 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
     summary["calculations"] = summaries
     if option_roles and run:
         alternatives = (run.get("result") or {}).get("options", [])
-        if len(alternatives) == 2:
-            first, second = (o["verification"]["totals"] for o in alternatives)
-            summary["within_run_comparison"] = {
-                "basis": "alternative B minus alternative A from the same calculation",
-                "direction_B_minus_A": {
-                    metric: "unchanged"
-                    if abs(second[metric] - first[metric]) < 1e-6
-                    else "lower"
-                    if second[metric] < first[metric]
-                    else "higher"
-                    for metric in METRIC_WORDS
-                    if metric in first and metric in second
-                },
-            }
+        if len(alternatives) >= 2:
+            metric_key = "metrics" if is_daily_run(run) else "totals"
+            comparisons = []
+            first_option = alternatives[0]
+            for second_option in alternatives[1:]:
+                pair = [first_option, second_option]
+                first, second = (o["verification"][metric_key] for o in pair)
+                trustworthy = not is_daily_run(run) or all(daily_verified(run, o) for o in pair)
+                definitions = [o.get("objective_definition", {}) for o in pair]
+                comparisons.append(
+                    {
+                        "first": option_roles[first_option["id"]],
+                        "second": option_roles[second_option["id"]],
+                        "score_comparable": all(
+                            definitions[0].get(k) == definitions[1].get(k)
+                            for k in ("weights", "scales", "references")
+                        ),
+                        "direction_second_minus_first": {
+                            metric: "unavailable"
+                            if not trustworthy or first[metric] is None or second[metric] is None
+                            else "unchanged"
+                            if abs(second[metric] - first[metric]) < 1e-6
+                            else "lower"
+                            if second[metric] < first[metric]
+                            else "higher"
+                            for metric in METRIC_WORDS
+                            if metric in first and metric in second
+                        },
+                    }
+                )
+            summary["within_run_comparisons"] = comparisons
+            if len(alternatives) == 2:
+                summary["within_run_comparison"] = {
+                    "basis": "alternative B minus alternative A from the same calculation",
+                    "score_comparable": comparisons[0]["score_comparable"],
+                    "direction_B_minus_A": comparisons[0]["direction_second_minus_first"],
+                }
     if compare:
         summary["score_comparable"] = compare["score_comparable"]
         summary["changed_input_categories"] = list(compare["input_changes"])
@@ -198,6 +246,11 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
         fact["key"]: "{{" + fact["id"] + "}}"
         for fact in evidence["facts"]
         if ".year." in fact["key"]
+    }
+    resource_dates = {
+        f["key"].removesuffix(".date"): "{{" + f["id"] + "}}"
+        for f in evidence["facts"]
+        if ".resource." in f["key"] and f["key"].endswith(".date")
     }
     facts = []
     for fact in evidence["facts"]:
@@ -225,6 +278,8 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
         if requirement and source.get("option_id"):
             continue
         if source.get("option_id") and entry:
+            if both_options and source["option_id"] not in option_roles:
+                continue
             if not entry.get("selected_option_id") and not both_options:
                 continue
             if source["option_id"] != entry["selected_option_id"] and not both_options:
@@ -271,10 +326,48 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
                 else source.get("kind", "provided_evidence"),
                 "limitations": fact.get("limitations", []),
                 "quality_status": source.get("status"),
+                "resource_kind": source.get("resource_kind"),
+                # Resource rows are individual daily/period constraints, not horizon totals.
+                # Link the already-bound date instead of exposing IDs or inventing a sum.
+                **(
+                    {
+                        "scope": "single_resource_constraint_not_plan_total",
+                        "resource_group": key.rsplit(".", 1)[0],
+                        "quantity_kind": key.rsplit(".", 1)[1],
+                        "date_reference": resource_dates.get(key.rsplit(".", 1)[0]),
+                    }
+                    if ".resource." in key
+                    else {}
+                ),
+                "input_sources": source.get("input_sources", []),
                 "data_release": source.get("release_id"),
                 "data_product": source.get("product"),
             }
         )
+    fact_lookup = {f["key"]: f for f in evidence["facts"]}
+    visible_ids = {f["id"] for f in facts}
+    overviews = []
+    for key, count in fact_lookup.items():
+        if not key.endswith(".gap_count") or count["id"] not in visible_ids:
+            continue
+        shown = fact_lookup.get(key.removesuffix(".gap_count") + ".gap_details_count")
+        if shown is None or shown["id"] not in visible_ids:
+            continue
+        overviews.append(
+            {
+                "option_role": option_roles.get(count["source"].get("option_id"), "selected plan"),
+                "count_reference": "{{" + count["id"] + "}}",
+                "shown_count_reference": "{{" + shown["id"] + "}}",
+                "details_truncated": count["value"] > shown["value"],
+                "gap_total_reference": None,
+                "scope": (
+                    "counts_of_constraints_not_water_volume; amounts_belong_to_individual_rows"
+                ),
+                "remaining_details": "result page and export",
+            }
+        )
+    if overviews:
+        summary["resource_gap_overviews"] = overviews
     # Compare annual estimates server-side; the model only sees bound references.
     # Group at the same precision as add_fact's displayed values, preserving ties.
     originals = {fact["id"]: fact for fact in evidence["facts"]}
@@ -307,5 +400,6 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
             "reviewed_claims": [redact_quantities(c["statement"]) for c in item["claims"]],
         }
         for item in evidence["knowledge"]
+        if item["source"].get("id") not in excluded_product_sources(context)
     ]
     return {"context": summary, "facts": facts, "knowledge": knowledge}
