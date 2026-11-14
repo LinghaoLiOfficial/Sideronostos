@@ -195,3 +195,21 @@ def test_real_solver_tiny_deadline_never_claims_a_proven_optimum_without_one():
         assert not result["score_optimality_proven"]
     if result["status"] == "timeout_no_solution":
         assert not result["selected_ids"]
+
+
+def test_alternative_search_cannot_degrade_the_fixed_resource_gap_priority():
+    from rotation_v3_helpers import candidate, cap, problem
+
+    from sideronostos_backend.modules.rotation_optimizer.v3.model import Problem
+    from sideronostos_backend.modules.rotation_optimizer.v3.solver import solve
+
+    p = problem(
+        candidates=[candidate("a", water_mm=[1.0, 1.0]), candidate("b", water_mm=[2.0, 2.0])]
+    )
+    for limit in p["daily_resources"][0]["days"].values():
+        limit.update(cap(0.0, soft=True, cost=1.0))
+    model = Problem.model_validate(p)
+    first = solve(model, time_limit=5)
+    assert first["gap_cost"] == 40.0
+    other = solve(model, time_limit=5, exclude=first["selected_ids"], max_gap_cost=40.0)
+    assert other["status"] == "infeasible" and not other["selected_ids"]

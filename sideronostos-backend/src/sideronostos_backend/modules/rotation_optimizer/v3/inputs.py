@@ -22,6 +22,8 @@ FieldParameter = Literal[
     "salinity_ds_m",
     "drainage",
     "slope_deg",
+    "aspect",
+    "terrain_position",
     "mechanical_access",
     "effective_rain_fraction",
     "history_reviewed",

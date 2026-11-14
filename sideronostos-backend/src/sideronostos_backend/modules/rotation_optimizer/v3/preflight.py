@@ -27,6 +27,8 @@ FIELD_REQUIREMENTS: dict[
     "salinity_ds_m": ("dS/m", "number", 0, 100, "soil_suitability"),
     "drainage": ("category", "text", None, None, "soil_suitability"),
     "slope_deg": ("degree", "number", 0, 90, "terrain"),
+    "aspect": ("category", "text", None, None, "terrain"),
+    "terrain_position": ("category", "text", None, None, "terrain"),
     "mechanical_access": ("1", "boolean", None, None, "management"),
     "effective_rain_fraction": ("1", "number", 0, 1, "soil_water"),
     "initial_water_policy": ("category", "text", None, None, "soil_water"),
@@ -268,6 +270,8 @@ def assess_inputs(
         )
         if distance > profile.weather_radius_km:
             audit.issue(prefix + ".location", "outside_weather_coverage", "weather")
+        if field.soil_texture == "unknown":
+            audit.issue(prefix + ".soil_texture", "soil_texture_missing", "soil_suitability")
         conditions = draft.field_conditions.get(field.id, FieldConditions())
         values: dict[str, RecordedValue] = {str(k): v for k, v in conditions.values.items()}
         for key, (unit, value_kind, low, high, feature) in FIELD_REQUIREMENTS.items():
@@ -282,6 +286,10 @@ def assess_inputs(
             audit.issue(
                 prefix + ".initial_water_policy", "unsupported_initial_water_policy", "soil_water"
             )
+        if supplied.get("aspect") not in (None, "flat", "north", "east", "south", "west"):
+            audit.issue(prefix + ".aspect", "unknown_aspect_class", "terrain")
+        if supplied.get("terrain_position") not in (None, "level", "slope", "depression"):
+            audit.issue(prefix + ".terrain_position", "unknown_terrain_position", "terrain")
         if supplied.get("drainage") not in (None, "poor", "moderate", "well"):
             audit.issue(prefix + ".drainage", "unknown_drainage_class", "soil_suitability")
         if all(supplied.get(k) is not None for k in ("field_capacity", "wilting_point", "depth_m")):

@@ -24,6 +24,8 @@ from .profiles import get_profile, profile_hash
 from .requests import PreflightRequest, RunRequest, resolve_history
 from .schemas import PlanningField
 from .settings import get_rotation_settings
+from .v3.inputs import RunRequest as DailyRunRequest
+from .v3.service import prepare_input_snapshot
 
 ACTIVE = ("pending", "running")
 
@@ -195,7 +197,7 @@ class RotationService:
         return report
 
     async def create_run(
-        self, session: AsyncSession, owner: str, body: RunRequest
+        self, session: AsyncSession, owner: str, body: RunRequest | DailyRunRequest
     ) -> dict[str, Any]:
         await session.execute(
             text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": "rotation-owner:" + owner}
@@ -223,6 +225,45 @@ class RotationService:
             raise HTTPException(
                 429, "Finish or cancel an existing calculation before starting another"
             )
+        if isinstance(body, DailyRunRequest):
+            snapshot = await prepare_input_snapshot(session, owner, body, lock=True)
+            if not snapshot["readiness"]["ready"]:
+                raise HTTPException(
+                    422,
+                    {
+                        "code": "planning_data_not_ready",
+                        "readiness": snapshot["readiness"],
+                    },
+                )
+        else:
+            snapshot = await self._prepare_v2_snapshot(session, owner, body)
+        identifier = str(uuid4())
+        job = await JobService().enqueue(
+            session,
+            job_type="rotation.optimize",
+            payload={"run_id": identifier, "owner_user_id": owner},
+            idempotency_key=owner + ":" + body.idempotency_key,
+            created_by=owner,
+            maximum_attempts=2,
+            timeout_seconds=150,
+            concurrency_limit=1,
+        )
+        run = OptimizationRun(
+            id=identifier,
+            owner_user_id=owner,
+            idempotency_key=body.idempotency_key,
+            payload_hash=payload_hash,
+            job_id=job.id,
+            input_snapshot=snapshot,
+        )
+        session.add(run)
+        await session.commit()
+        return run_view(run)
+
+    async def _prepare_v2_snapshot(
+        self, session: AsyncSession, owner: str, body: RunRequest
+    ) -> dict[str, Any]:
+        payload = body.model_dump(mode="json")
         try:
             profile = get_profile(body.profile_id)
         except ValueError as error:
@@ -368,28 +409,7 @@ class RotationService:
             )
         snapshot["capacity"] = limits.as_dict()
         snapshot["preflight"] = preflight
-        identifier = str(uuid4())
-        job = await JobService().enqueue(
-            session,
-            job_type="rotation.optimize",
-            payload={"run_id": identifier, "owner_user_id": owner},
-            idempotency_key=owner + ":" + body.idempotency_key,
-            created_by=owner,
-            maximum_attempts=2,
-            timeout_seconds=150,
-            concurrency_limit=1,
-        )
-        run = OptimizationRun(
-            id=identifier,
-            owner_user_id=owner,
-            idempotency_key=body.idempotency_key,
-            payload_hash=payload_hash,
-            job_id=job.id,
-            input_snapshot=snapshot,
-        )
-        session.add(run)
-        await session.commit()
-        return run_view(run)
+        return snapshot
 
     async def get_run(
         self, session: AsyncSession, owner: str, identifier: str, *, evidence: bool = False
@@ -486,6 +506,10 @@ class RotationService:
         chosen = next((o for o in options if o and o["id"] == option_id), None)
         if chosen is None:
             raise HTTPException(404, "Option not found in this run")
+        if row.input_snapshot.get("schema") == "rotation-input-v3.0" and (
+            not chosen.get("complete") or not chosen.get("scientific_verification", {}).get("valid")
+        ):
+            raise HTTPException(409, "A complete independently verified v3 option is required")
         if not chosen["feasible"]:
             raise HTTPException(409, "The selected option is not feasible")
         saved = await session.scalar(
@@ -502,7 +526,9 @@ class RotationService:
                 option_id=option_id,
                 title=title,
                 data={
-                    "schema": "rotation-saved-v2.0",
+                    "schema": "rotation-saved-v3.0"
+                    if row.input_snapshot.get("schema") == "rotation-input-v3.0"
+                    else "rotation-saved-v2.0",
                     "input_snapshot": deepcopy(row.input_snapshot),
                     "option": deepcopy(chosen),
                     "notes": notes,
