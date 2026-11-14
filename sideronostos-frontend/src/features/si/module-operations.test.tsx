@@ -20,7 +20,7 @@ it("restores the last completed result link after reopening a conversation", asy
     },
   }] });
   render(<ModuleOperations conversationId="chat-restored" language="en" />);
-  await userEvent.setup().click(await screen.findByText(/Module operations/));
+  await userEvent.setup().click(await screen.findByText(/Farm tasks/));
   expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift?field=field-7&step=field");
   expect(screen.getByText("North field")).toBeInTheDocument();
 });
@@ -41,11 +41,11 @@ it("collects required API inputs, reports missing information, and opens a compl
     href: "/field-shift?field=field-7&step=field",
   });
   render(<ModuleOperations conversationId="chat-1" language="en" />);
-  await user.click(await screen.findByText(/Module operations/));
-  await user.click(screen.getByRole("button", { name: "Run operation" }));
+  await user.click(await screen.findByText(/Farm tasks/));
+  await user.click(screen.getByRole("button", { name: "Continue task" }));
   expect(await screen.findByText("Please provide field_id")).toBeInTheDocument();
   await user.type(screen.getByRole("textbox", { name: "field_id *" }), "field-7");
-  await user.click(screen.getByRole("button", { name: "Run operation" }));
+  await user.click(screen.getByRole("button", { name: "Continue task" }));
   await waitFor(() => expect(api.postModuleOperation).toHaveBeenCalledTimes(2));
   expect(api.postModuleOperation.mock.calls[1][1]).toEqual(expect.objectContaining({
     operation_id: "get_field", path_params: { field_id: "field-7" },
@@ -65,8 +65,8 @@ it("does not render an unsafe result URL", async () => {
     status_code: 200, result: [], content_type: "application/json", href: "//evil.example",
   });
   render(<ModuleOperations conversationId="chat-2" language="en" />);
-  await user.click(await screen.findByText(/Module operations/));
-  await user.click(screen.getByRole("button", { name: "Run operation" }));
+  await user.click(await screen.findByText(/Farm tasks/));
+  await user.click(screen.getByRole("button", { name: "Continue task" }));
   expect(await screen.findByText("Completed")).toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Open result" })).not.toBeInTheDocument();
 });
@@ -84,8 +84,39 @@ it("shows a progress link for an accepted job without a completion screenshot", 
     content_type: "application/json", href: "/field-shift/rotation?run=run-1",
   });
   render(<ModuleOperations conversationId="chat-3" language="en" />);
-  await user.click(await screen.findByText(/Module operations/));
-  await user.click(screen.getByRole("button", { name: "Run operation" }));
+  await user.click(await screen.findByText(/Farm tasks/));
+  await user.click(screen.getByRole("button", { name: "Continue task" }));
   expect(await screen.findByRole("link", { name: "View progress" })).toHaveAttribute("href", "/field-shift/rotation?run=run-1");
   expect(screen.queryByRole("img", { name: "Completed task screenshot" })).not.toBeInTheDocument();
+});
+
+it("collects a field task through labelled inputs and keeps complex JSON optional", async () => {
+  const user = userEvent.setup();
+  api.listModuleOperations.mockResolvedValue({ items: [{
+    operation_id: "create_field", title: "Create Field", method: "POST", path: "/field-shift/fields",
+    path_parameters: [], query_parameters: [], required_query_parameters: [],
+    body: { type: "object", properties: {
+      name: { type: "string" }, area_ha: { type: "number" },
+      irrigation_available: { type: "boolean" }, history: { type: "array" },
+    } },
+    body_required: true, required_body_parameters: ["name", "area_ha", "irrigation_available", "history"],
+    required_inputs: ["body.name", "body.area_ha", "body.irrigation_available", "body.history"],
+  }] });
+  api.postModuleOperation.mockResolvedValue({
+    status: "succeeded", operation_id: "create_field", text: "Your field is saved.",
+    missing_inputs: [], status_code: 201, result: { id: "field-9", name: "Creek field" },
+    content_type: "application/json", href: "/field-shift?field=field-9&step=field",
+  });
+  render(<ModuleOperations conversationId="chat-field" language="en" />);
+  await user.click(await screen.findByText(/Farm tasks/));
+  await user.type(screen.getByRole("textbox", { name: "Field name *" }), "Creek field");
+  await user.type(screen.getByRole("spinbutton", { name: "Area (hectares) *" }), "4");
+  await user.click(screen.getByRole("checkbox", { name: "Irrigation available *" }));
+  expect(screen.getByText("Advanced input for complex details")).toBeInTheDocument();
+  expect(screen.queryByRole("textbox", { name: "Advanced JSON input" })).not.toBeVisible();
+  await user.click(screen.getByRole("button", { name: "Continue task" }));
+  await waitFor(() => expect(api.postModuleOperation).toHaveBeenCalledWith("chat-field", expect.objectContaining({
+    body: { name: "Creek field", area_ha: 4, irrigation_available: true, history: [] },
+  })));
+  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift?field=field-9&step=field");
 });

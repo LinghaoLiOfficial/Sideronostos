@@ -66,8 +66,9 @@ and a browser-generated screenshot of the completion card. HTTP 202 remains
 The water specialist can use all remote-sensing operations. The soil and
 weather specialists retain their scoped guided actions; generic operations
 are blocked for them so they cannot retrieve the other specialty's data
-through an unfiltered business endpoint. The catalog is an explicit operation
-picker with JSON input for complex request bodies. It does not infer
+through an unfiltered business endpoint. The catalog is an explicit task
+picker with labelled inputs for scalar fields and advanced JSON input for
+complex request bodies. It does not infer
 operations from free chat prose.
 
 Chat first routes complete greetings and thanks to a conversational reply. A greeting

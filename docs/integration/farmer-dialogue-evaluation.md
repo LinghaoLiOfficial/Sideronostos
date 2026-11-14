@@ -12,6 +12,10 @@ Final: 36/36 replies completed; 36/36 were judged suitable as first responses to
 
 Judgment criteria: answer the actual question in the selected bot scope; avoid fabricated records, measurements, forecasts, profit and legal conclusions; ask only for the next useful input; distinguish an available tool from a completed operation. The verdict applies to these frozen prompts and this mock environment only.
 
+## Browser follow-up
+
+The separate local browser smoke passed four journeys after the dialogue changes. It sent chat messages, created a synthetic owned field through labelled task inputs, reopened the confirmed field result, restored operation history, and checked the water, rotation, and module-dock result links and completion receipts. The current screenshots are [field completion](evidence/assistant-field-completion.png), [opened field](evidence/assistant-field-result-page.png), [water](evidence/assistant-remote-sensing.png), and [rotation](evidence/assistant-rotation.png). The task picker still requires an explicit user choice; free chat prose does not execute a write.
+
 ## Backend diagnosis and fix
 
 - The local mock release stored `HELPV2` but version and specialist source filters excluded it, leaving many requests with no retrieved evidence. The old mock generator also copied the first lexical excerpt, even when it concerned a different module.

@@ -87,8 +87,8 @@ test("completes a mock assistant chat and opens its knowledge citation", async (
     "https://example.org/agrisata/field-guide",
   );
   await page.getByRole("button", { name: "Close source" }).click();
-  await page.getByText(/Module operations/).click();
-  await page.getByRole("button", { name: "Run operation" }).click();
+  await page.getByText(/Farm tasks/).click();
+  await page.getByRole("button", { name: "Continue task" }).click();
   await expect(page.getByText(/Operation list_profiles/)).toBeVisible();
   await expect(page.getByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift");
   const receipt = page.getByRole("region", { name: "Operation result" });

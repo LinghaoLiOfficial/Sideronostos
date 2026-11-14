@@ -243,7 +243,10 @@ def route_message(question: str, context: dict[str, Any]) -> DialogueRoute:
         r"who are you|你(?:是谁|能做什么|可以做什么|能帮我做什么)|有什么功能",
         text,
     ) or re.search(
-        r"new here|what can you actually help|first time here|先不填.*表|需要.{0,8}告诉你什么",
+        r"new here|what can you actually help|first time here|先不填.*表|需要.{0,8}告诉你什么|"
+        r"what (?:can|should) i (?:do|check).{0,40}(?:field|planning)|"
+        r"what can (?:the |a )?satellite map tell me|"
+        r"how do i prepare (?:a )?rotation",
         text,
     ):
         follow_up = GENERAL_FOLLOW_UP.get(bot, GENERAL_FOLLOW_UP["rotation-guide"])[int(zh)]

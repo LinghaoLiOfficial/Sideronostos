@@ -116,8 +116,8 @@ it("opens a module API from a fresh field specialist chat and returns the comple
   await user.click(screen.getByRole("button", { name: "Open Field guide" }));
   await user.click(await screen.findByRole("button", { name: "Use module tools" }));
   expect(api.createConversation).toHaveBeenCalledWith({ preset: "field_management", bot_id: "field-guide", language: "en", detail: "brief" });
-  await user.click(await screen.findByText(/Module operations/));
-  await user.click(screen.getByRole("button", { name: "Run operation" }));
+  await user.click(await screen.findByText(/Farm tasks/));
+  await user.click(screen.getByRole("button", { name: "Continue task" }));
   await waitFor(() => expect(api.postModuleOperation).toHaveBeenCalledWith("field-1", expect.objectContaining({ operation_id: "list_fields" })));
   expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift");
 });
