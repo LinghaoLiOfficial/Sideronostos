@@ -85,7 +85,9 @@ statuses; the dated checkpoints and current acceptance ledger below record subse
 
 Stages 1–3 are implemented. Stage 4 now has v3 planning/results and deterministic bot
 evidence integration, with live knowledge/AI acceptance still pending. Stage 5 has a real
-engineering browser/job/save/reopen checkpoint; full acceptance remains incomplete.
+engineering browser/job/save/reopen, account/recovery/race and compatibility evidence plus
+a completed data/requirements handoff. Full acceptance remains incomplete solely at the live
+knowledge/AI evaluation gate; see [acceptance-and-handoff.md](acceptance-and-handoff.md).
 Update this ledger only from inspected files and fresh verification output.
 
 ## Checkpoint 1 — 2026-11-14
@@ -564,3 +566,47 @@ remains disabled. A fresh response reports missing equipment, and the rendered c
 points to shared resources. The original draft was then explicitly restored from its run. Live AI provider access remains HOLD. Outstanding work is the
 remaining delayed-response/batch acceptance, final requirements and data handoff audit, and
 live knowledge/semantic evaluation after access is restored. Goal remains ACTIVE.
+
+
+## Checkpoint 12 — mixed batch recovery, stale context and handoff (2026-11-14)
+
+A two-item real API batch returned one conflict and one success. Preparation used two clearly
+controlled pre-write 422 responses to retain edited forms; a separate API client advanced the
+west field before the batch. Exact replay returned the same receipt without changing either
+server field. The UI correctly showed 1 / 2, but lacked an immediate batch-conflict review
+button. A failing regression now guards explicit latest-version review and disabled submission.
+After review, only the west field was retried with expected version 5 and saved version 6;
+the successful east sibling stayed at version 3. The UI recovered to 2 / 2.
+
+The successful batch item also retained its acknowledged session draft, misleading the assistant
+into reporting unsaved input. A separate failing regression now guards reconciliation of equal
+editable values and preservation of newer/different input. Production reload clears the stale
+notice and assistant dirty state without another server write. Full frontend suite: 317 passed
+in 56 files; changed-file ESLint and the rebuilt production TypeScript/build checks pass.
+Backend code is unchanged since its complete 548-test pass.
+
+A real AOI creation response was held until switching fields. The client aborted it with
+net::ERR_ABORTED; releasing it and rapidly switching east/west did not attach the old selection
+or disable the new field's composer. The previously saved two-field plan remains byte-for-byte
+equivalent as parsed JSON to its original archive, retaining east v2 / west v4 and their old
+names after current fields became v3 / v6. Browser result and assistant labels use old names.
+
+Existing actual v1 and v2 saved records were replayed read-only in the current production UI.
+Their original metrics, timeline and limitations render correctly; routes were removed after
+inspection. V2 was exported through a database-enforced READ ONLY transaction, with no original
+application DB migration or mutation. These replay checks establish renderer compatibility,
+not authorization; real DB regressions separately cover owner/legacy persistence boundaries.
+The native voice capability and control are still present. No user microphone was recorded,
+and no speech-accuracy claim or new AI generation was made.
+
+Evidence: `mixed-batch-recovery.json`, `selection-race-and-immutable-context.json`,
+`legacy-result-rendering.json`, `legacy-v2-readonly-snapshot.json.gz` and named screenshots.
+`acceptance-and-handoff.md` supplies A engineering steps, B actual-farm data responsibilities,
+current requirement/math mapping, migration boundaries and the per-file change inventory.
+
+The remaining required gate is live knowledge/AI semantic acceptance. The same embeddings
+HTTP 403 has persisted across checkpoints 8–12; no permission/configuration change was reported,
+so no further paid-provider retry was made. The staging release stays inactive; 26 daily cases
+and their frozen expectations are unchanged. Once access is restored, resume the documented
+embedding/publication/development/protected evaluation procedure. Do not claim overall completion,
+regional calibration, push, merge or deployment from the engineering evidence.

@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-11-14T00:46:48.471634+00:00",
+  "selection_race": {
+    "controlledResponseDelay": true,
+    "selectionId": "f67bb8ab-bf8b-4438-8ec0-4831d7f0c9af",
+    "status": 201,
+    "delivery": "released",
+    "aborted": {
+      "errorText": "net::ERR_ABORTED"
+    },
+    "url": "http://localhost:3040/fields?field=bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+    "context": "Engineering east field · batch reviewed · 未选临时区域 · 全部已发布观测",
+    "composerEnabled": true,
+    "oldSelectionMounted": 0
+  },
+  "saved_plan_browser": {
+    "url": "http://localhost:3040/field-shift/rotation?plan=7847c28a-e6bc-4491-8f99-834a7e84c861&field=bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+    "text": "Agrisata\nFIELD SHIFT\n地图\n轮作规划\n第二测试农户\n返回地图\n计算与已存计划\n\nSAVED DAILY PLAN\n\n双地块工程基准 · 2027逐日方案\n\n保存于 11/14/2026, 8:17:39 AM · 使用保存时的地块版本、经营条件、参数与天气\n\n仅用于工程验收；非真实农场建议。包含共享供水和设备、年份精度前茬及已核对版本。\n\n导出完整计划\n打印摘要\n当前偏好方案\n\n零资源缺口 · 工程基准。求解器找到结果不表示已具备实施条件；仍需核对当地品种、资料与实际资源。\n\n收益估计 · USD\n2,208.6\n净灌溉量 · m³\n3,692.72\n轮作衔接 · 分\n0\n土壤贡献 · 分·ha\n1.841\n气象与灌溉暴露 · 分·ha\n0.197\n裸地面积天数 · ha·天\n898.16\n\n收益是参数包产量、价格和成本的估算；土壤贡献是代理分数，风险指标描述历史气象暴露与灌溉依赖，均不是实测变化或损失概率。历史天气回放不是未来预报。\n\n经营资源缺口\n\n缺口补救成本估计：0 USD · 本次所列资源没有缺口\n\n生长期\n换茬占用\n空闲 / 休耕\n2027-01-01\n2027-12-31\nEngineering east field 1.841 ha\n玉米\n2027-04-20 播种 → 2027-08-31 预计成熟\n生长 134 天 · 换茬占用至 2027-09-14（14 天）\nEngineering west field · reviewed locally 1.841 ha\n玉米\n2027-04-20 播种 → 2027-08-31 预计成熟\n生长 134 天 · 换茬占用至 2027-09-14（14 天）\n\n收获日期由积温阈值与历史天气情景计算，需按当地品种、天气和田间成熟情况核对。\n\n本方案的偏好与求解边界\n资料依据与适用限制\n\n参数包 iowa-engineering-v3-20261114 · 历史天气 power-iowa-2025-v1\n\n历史天气回放，不是未来天气预测。气温情景调整 0 °C；降雨调整 0%。\n\n每个候选使用独立初始土壤水分假设，尚未实现跨季连续水量模拟。\n\n工程基准：尚未确定真实试点，参数和经营假设需要当地资料及农艺校准。\n\n来源、版本与限制\n返回规划\n轮作助手\n点我聊聊\n轮作助手\n\n解释数据，一起想清下一茬\n\nEngineering east field、Engineering west field · reviewed locally · 未选地图区域 · 方案 1 · 全部已发布观测\n下一茬，我们一起想。\n\n想知道下一茬种什么，还是想看看地里的水分？直接问我就好。\n\n轮作为什么要换不同科？\n帮我读懂当前方案\n这些数据能说明什么？\n\n按住输入框说话 · 语音由浏览器服务转写\n\n结合地里实际情况判断，依据可以展开查看。",
+    "speechCapability": true,
+    "voiceControlVisible": true
+  },
+  "scope": "Real API response held until field change; selected AOI was created but never mounted after abort. No AI message sent.",
+  "voice_boundary": "Native SpeechRecognition capability and visible control detected only; no user microphone recording or speech accuracy claim. Existing cancellation/error regression retained.",
+  "console_notes": [
+    "Initial /users/me 401 precedes successful refresh authentication",
+    "Next CSS preload warnings; no application exception observed"
+  ]
+}

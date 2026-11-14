@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-11-14T00:46:48.471634+00:00",
+  "method": "Controlled GET replay of existing actual records in the production frontend, no mocked calculation or new database write. All routes removed in finally. This proves rendering compatibility, not owner authorization; separate real DB regressions cover that boundary.",
+  "v1": {
+    "mode": "actual archived v1 response replay; database ownership not tested here",
+    "planId": "ca986abe-ba15-4766-b14c-3cd62b7f091f",
+    "text": "Field Shift\n地图与轮作助手\n第二测试农户\nMY FIELDS / 我的地块\n新建地块\nEngineering west field · batch reviewed\nEngineering east field · batch reviewed\n新建\n1\n地块与历史\n2\n环境与资料\n3\n目标与限制\n4\n比较与选择\n已存计划\n由你的条件出发\n先满足农艺与资源限制，再比较用水、覆盖、多样性和投入。\n\n当前使用可配置示范规则；实际种植前需要当地核对。\n\n返回农业首页\nField Shift 轮作规划\n返回已存计划\n导出完整 JSON\n打印计划\nAGRISATA / FIELD SHIFT\n南田三年轮作 · 少雨暖化情景\n\n南田 · 正式构建验收 · 2027–2029 · 保存于 2026年11月12日\n\n这是一份固定快照。之后地块或数据发生变化，都不会改写这份计划的原始依据。当前结果包含示范假设。\n\n环境依据：NASA POWER · 历史气象 · 2025 年历史资料 · 使用已缓存资料，获取于 2026年11月12日 · 气象再分析约 0.5° × 0.625°（非田块分辨率）。这是区域背景，不是田间实测或未来预报。\n\n我的备注\n\n实际播种前核对当地日历、土壤检测与收购渠道。\n\nROTATION OPTION\n田豌豆 Field pea → 向日葵 Sunflower → 春小麦 Spring wheat\n符合当前约束\n2027\n田豌豆 Field pea\n03/20 播种 → 06/17 收获\n2028\n向日葵 Sunflower\n05/01 播种 → 09/07 收获\n2029\n春小麦 Spring wheat\n03/15 播种 → 07/02 收获\n估计补灌缺口\n292.5 mm\n估计作物需水\n1,159.3 mm\n主作物生长覆盖\n330 天\n作物科多样性\n3 科\n估计投入\n1,170 USD/ha\n估计劳动\n15 天/ha\n\n通过现有数据可核查的配置规则；缺失历史、未知土壤和未确认地区仍需当地复核。\n\n指标解读与排序依据\n为什么得到这个结果\n7 项\n当时的地块和规划条件\n面积\n6.2 公顷\n参考位置\n42, -93.5\n土壤质地\n壤土\n灌溉条件\n可灌溉\n每季补灌上限\n300 mm\n每年投入预算\n1,500 USD/ha\n每年劳动上限\n30 天/ha\n气候情景\n降雨 -10%\n温度 +1°C\n参考资料\nNASA POWER · 历史气象\n2025 年 · 历史资料\n作物配置\n温带一年生作物 · 演示配置\n版本 1.0.0\n种植历史与优先级\n环境资料依据\n2 项\n当时使用的农艺规则来源\n3 项\n保留的限制与假设\n2025 年历史参考数据，只代表该年；不是未来天气预报，也不是多年气候常值。\nNASA POWER 气象数据来自区域再分析，约 0.5° × 0.625°，不能代表田块内的土壤或微气候实测。\n参考蒸散由月均温度近似估算，尚未当地校准；不包含土壤蓄水、径流、灌溉效率或作物逐阶段系数。\n未接入田块土壤检测、卫星植被时序或实际产量记录。\n所有播种日历、固定作物系数 Kc、投入成本与劳动量均为演示假设，未经当地校准，不是田间测量或具体种植建议。\n每年安排一季春播主作物；暂未模拟冬作、间作、覆盖作物或年内多季接茬。\n演示规则：同一作物再次种植前需间隔两年，同一植物科需间隔一年。这些保守示例规则必须经当地农艺人员核查。\n参考蒸散量采用月尺度 Hargreaves 估计，作物需水量使用固定 Kc；生长窗口内降雨的 80% 被假设为有效降雨。\n灌溉缺口为每月“需水量减有效降雨”的正值之和；未模拟土壤储水、径流、渗漏、灌溉效率或不同生育阶段的响应。\n生长期天数仅代表计划覆盖天数，不等于实测冠层覆盖率，也不是土壤健康、土壤碳、产量或利润的估计。\n资源上限逐年检查；比较指标汇总同一三年周期，成本按 USD/ha、劳动按天/ha 表示。美元仅为演示货币。\n各规划年重复使用同一历史参考年的气候；降雨和温度调整是假设情景，不是天气预报。\n尚未验证当地作物适宜性，也未模拟霜冻、作物温度阈值、具体病虫害或产量。“可行”仅指通过已有数据支持的配置规则，不能替代当地判断。\n\n完整逐月数据、作物参数和分析信息包含在 JSON 导出中。"
+  },
+  "v2": {
+    "mode": "read-only actual legacy record replay; no backend ownership or migration claim",
+    "planId": "48648ebd-6070-4d1f-9e48-a456d19758c7",
+    "runId": "da4fd8c7-2da9-4a4b-8b52-4ea82b6b6b55",
+    "schema": "rotation-saved-v2.0",
+    "text": "Agrisata\nFIELD SHIFT\n地图\n轮作规划\n第二测试农户\n返回地图\n计算与已存计划\n\nSAVED PLAN\n\n手机验收 · synthetic · 20261113\n\n保存于 11/13/2026, 1:18:25 AM · 保留保存时的输入与依据\n\nMobile-width synthetic acceptance; engineering benchmark only.\n\n导出计划\n打印\n用水估计 · m³\n19,451.7\n投入估计 · USD\n5,850\n劳力估计 · 人日\n32.5\n土地覆盖 · ha·天\n819\n科属多样性 · ha·科\n13\n\n以上为所选地块、整个规划期合计。覆盖与多样性是面积加权指标；用水为估计补水缺口，不是实测灌水量。\n\n生长期\n换茬占用\n空闲 / 休耕\n2027-01-01\n2028-12-31\n验收北田 · synthetic 8 ha\n燕麦\n2027-04-29 播种 → 2027-06-30 预计成熟\n生长 63 天 · 换茬占用至 2027-07-14（14 天）\n验收南田 · synthetic 5 ha\n燕麦\n2028-04-29 播种 → 2028-06-30 预计成熟\n生长 63 天 · 换茬占用至 2028-07-14（14 天）\n\n收获日期由积温阈值与历史天气情景计算，需按当地品种、天气和田间成熟情况核对。\n\n各年度资源与计算依据\n保存时的全部条件与来源\n返回规划\n轮作助手\n点我聊聊"
+  },
+  "v1_source": "output/evidence/production-saved-plan.json",
+  "v2_source": "Read from configured original application DB using SET TRANSACTION READ ONLY; no login, migration or data mutation",
+  "v2_archive": "legacy-v2-readonly-snapshot.json.gz",
+  "v2_raw_sha256": "eb49c3bb6ca35c8e9ba97b6fa8ff429cb1fb3f8f65dcc4ddd39a2701e9b849d4",
+  "v2_archive_sha256": "d186db2a743a003f1fa95b196831f4bb707c23775e8fdc033c15f30c7782e794",
+  "screenshots": [
+    "fields-v3-legacy-v1-plan.png",
+    "fields-v3-legacy-v2-plan.png"
+  ]
+}

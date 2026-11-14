@@ -1,8 +1,9 @@
 # Daily v3 data preparation contract
 
-Status at checkpoint 5: **profile, preflight, candidate compilation and frozen v3 jobs
-implemented**. Frontend planner/results and bot integration are still pending.
-`POST /rotation-optimizer/runs` remains v2. This is not a completed v3 farmer journey.
+Status: v3 profile, readiness, candidate preparation, frozen jobs, frontend planning/results,
+immutable saves and deterministic assistant evidence are implemented. Single- and two-field
+engineering browser journeys have been verified. Live AI semantic acceptance remains HOLD.
+`POST /rotation-optimizer/runs` remains the legacy v2 endpoint; new planning uses `/v3/runs`.
 
 ## Available API
 
@@ -151,5 +152,6 @@ requiring remedies. Saved plans include that label, the frozen inputs/profile/we
 actual selected weights and all source evidence. Missing optional metrics remain null,
 including comparison deltas. Different model releases cannot be directly compared.
 
-Next: connect v3 forms/readiness/results, saved snapshots and evidence-bound bot responses.
-No current UI is represented as already using the v3 planner.
+The current `/field-shift/rotation` form uses v3. Legacy results dispatch to their original
+readable views. See `acceptance-and-handoff.md` for the farmer workflow and actual data gaps;
+real v17 generation and v3 knowledge activation still require provider access and evaluation.

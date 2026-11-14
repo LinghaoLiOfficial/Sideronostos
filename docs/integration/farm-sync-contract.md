@@ -1,8 +1,9 @@
 # Farm synchronization and local drafts
 
 The `/fields` UI now uses this contract for confirmed field synchronization,
-owner-scoped recovery and assistant context. The v3 optimizer and full end-to-end
-acceptance remain pending; synchronization does not imply calculation readiness.
+owner-scoped recovery and assistant context. The v3 optimizer, two-field planning and
+immutable-save journeys now have actual running-system evidence; full live AI acceptance
+remains pending. Synchronization does not imply calculation readiness.
 
 ## Server contract
 
@@ -53,8 +54,9 @@ exclude older partitions. Legacy field detail reads remain available; legacy edi
 modify archived partition fields. Legacy field-list results still include archived fields;
 the integration UI must use farm partition metadata to distinguish them.
 
-The farm ID is the initial stable resource group ID. Resource definitions and freezing the
-farm/resource group into v3 optimizer snapshots are subsequent implementation work.
+The farm ID is the stable resource group ID. V3 requests associate daily water/machine
+and period seed/market resources with that farm. The run snapshot freezes farm identity,
+version, current partition and sourced resource calendars; saved plans retain that snapshot.
 
 ## Geometry invariants
 
@@ -117,3 +119,9 @@ Field names/details and backend IDs survive map selection and coordinate roundin
 Temporary AOI uses separate map layers and selection APIs. The real mobile polygon
 check in `output/evidence/fields-bot-v3/aoi-field-isolation.json` confirms no change to
 permanent field version, geometry or data.
+
+Batch item conflicts immediately expose the same latest-version review as individual saves;
+submission stays disabled until explicit acknowledgement. When another UI action acknowledges
+a field save, the form clears only a draft whose editable values match that saved record.
+A newer/different draft keeps its original version and content. Actual mixed-batch replay and
+sibling-version evidence are in `output/evidence/fields-bot-v3/mixed-batch-recovery.json`.

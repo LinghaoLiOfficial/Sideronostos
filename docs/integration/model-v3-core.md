@@ -3,8 +3,8 @@
 Status: **daily kernel, sourced preparation, queued v3 execution, versioned persistence,
 planner/results and assistant evidence projection implemented**. The isolated browser journey
 has generated, compared, saved and reopened a verified engineering scenario. Overall product
-acceptance remains in progress: real AI evaluation, scientific-raster migration, recovery
-coverage and real-region calibration are not implied by these implementation checks.
+acceptance remains incomplete because live AI evaluation is blocked. Raster migration and
+recovery now have running-system evidence; no real-region calibration is claimed.
 See `fields-bot-model-v3-plan.md` checkpoints and `model-v3-assistant-contract.md`.
 
 ## Authority and versioning
@@ -148,8 +148,9 @@ irrigated engineering scenario produced two verified alternatives and a durable 
 Prepared-raster parity, legacy map redirect, local production build/restart, account round trip,
 uncertain-save retry, real field-version conflict, two-field shared-resource planning and diagnostic
 UI/save/comparison now have running-system evidence in `fields-bot-model-v3-plan.md` checkpoints
-9–11 and `output/evidence/fields-bot-v3/`.
+9–12 and `output/evidence/fields-bot-v3/`.
 
-Remaining: live AI semantic evaluation and knowledge publication (provider access HOLD),
-remaining delayed-response/batch browser checks, final requirements/data handoff audit and
-regional calibration. Automated kernel or UI tests alone do not establish full product acceptance.
+Remaining acceptance gate: live AI semantic evaluation and knowledge publication (provider access HOLD).
+The completed engineering handoff, batch/race evidence and separate real-farm data preparation
+checklist are in `acceptance-and-handoff.md`. Regional calibration is a documented real-use
+prerequisite, not something proven by these engineering fixtures.

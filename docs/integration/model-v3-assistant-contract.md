@@ -1,6 +1,6 @@
 # Daily v3 assistant evidence contract
 
-Status: deterministic projection/validation implemented; real v16 semantic evaluation and
+Status: deterministic projection/validation implemented; real v17 semantic evaluation and
 v3 vector release are NOT VERIFIED. A working model call alone is insufficient acceptance.
 
 ## Responsibilities and immutable identity

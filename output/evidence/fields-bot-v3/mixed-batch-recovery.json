@@ -1,0 +1,982 @@
+{
+  "verified_at": "2026-11-14T00:46:48.471634+00:00",
+  "scope": "isolated engineering account; real API commits; controlled browser fault setup",
+  "setup": "Two deliberate pre-write 422 responses retain both edited forms. Another real API client advances west v4 to v5 before the two-item batch. These injected setup failures are not naturally occurring server errors.",
+  "mixed_batch": {
+    "status": 200,
+    "request": {
+      "idempotency_key": "78e5311f-5bc8-4a84-9051-08e75ea46bd4",
+      "farm": {
+        "local_id": "4b94b779-5ff1-4d56-99d9-55b55ebdf149",
+        "name": "Engineering two-field benchmark",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.501,
+                41.999
+              ],
+              [
+                -93.499,
+                41.999
+              ],
+              [
+                -93.499,
+                42.001
+              ],
+              [
+                -93.501,
+                42.001
+              ],
+              [
+                -93.501,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "expected_version": 1,
+        "partition": {
+          "method": "equal-area-strips",
+          "orientation": "cardinal",
+          "requested_count": 2,
+          "generated_count": 2,
+          "grid_rows": null,
+          "grid_columns": null,
+          "boundary_source": "imported"
+        }
+      },
+      "fields": [
+        {
+          "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+          "expected_version": 4,
+          "field": {
+            "name": "Engineering west field · batch reviewed",
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "area_ha": 1.8376999303814974,
+            "latitude": 42,
+            "longitude": -93.5005,
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "history_events": [
+              {
+                "id": "f3343cd2-3098-43a0-8822-d0a94a3b60e5",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ]
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "local_id": "f3d33edb-150f-47d6-b062-39c0bd801753",
+          "expected_version": 2,
+          "field": {
+            "name": "Engineering east field · batch reviewed",
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "area_ha": 1.8376999303539927,
+            "latitude": 42,
+            "longitude": -93.4995,
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "history_events": [
+              {
+                "id": "16dc268c-a94a-42dd-87b1-b852628ce08f",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.499,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    41.999
+                  ]
+                ]
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "result": {
+      "farm": {
+        "name": "Engineering two-field benchmark",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.501,
+                41.999
+              ],
+              [
+                -93.499,
+                41.999
+              ],
+              [
+                -93.499,
+                42.001
+              ],
+              [
+                -93.501,
+                42.001
+              ],
+              [
+                -93.501,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "partition": {
+          "method": "equal-area-strips",
+          "orientation": "cardinal",
+          "requested_count": 2,
+          "generated_count": 2,
+          "boundary_source": "imported"
+        },
+        "id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "local_id": "4b94b779-5ff1-4d56-99d9-55b55ebdf149",
+        "version": 1,
+        "resource_group_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "created_at": "2026-11-14T00:07:33.412109+00:00",
+        "updated_at": "2026-11-14T00:07:33.412109+00:00"
+      },
+      "items": [
+        {
+          "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+          "status": "conflict",
+          "field": null,
+          "error": "Field version changed; reload before synchronizing"
+        },
+        {
+          "local_id": "f3d33edb-150f-47d6-b062-39c0bd801753",
+          "status": "synced",
+          "field": {
+            "name": "Engineering east field · batch reviewed",
+            "area_ha": 1.840501227325201,
+            "latitude": 42,
+            "longitude": -93.4995,
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.499,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    41.999
+                  ]
+                ]
+              ]
+            },
+            "history_events": [
+              {
+                "id": "16dc268c-a94a-42dd-87b1-b852628ce08f",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "farm_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+            "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+            "local_id": "f3d33edb-150f-47d6-b062-39c0bd801753",
+            "id": "bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+            "version": 3,
+            "created_at": "2026-11-14T00:07:33.423881Z",
+            "updated_at": "2026-11-14T00:31:19.160693Z"
+          },
+          "error": null
+        }
+      ],
+      "complete": false
+    }
+  },
+  "exact_replay": {
+    "request": {
+      "idempotency_key": "78e5311f-5bc8-4a84-9051-08e75ea46bd4",
+      "farm": {
+        "local_id": "4b94b779-5ff1-4d56-99d9-55b55ebdf149",
+        "name": "Engineering two-field benchmark",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.501,
+                41.999
+              ],
+              [
+                -93.499,
+                41.999
+              ],
+              [
+                -93.499,
+                42.001
+              ],
+              [
+                -93.501,
+                42.001
+              ],
+              [
+                -93.501,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "expected_version": 1,
+        "partition": {
+          "method": "equal-area-strips",
+          "orientation": "cardinal",
+          "requested_count": 2,
+          "generated_count": 2,
+          "grid_rows": null,
+          "grid_columns": null,
+          "boundary_source": "imported"
+        }
+      },
+      "fields": [
+        {
+          "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+          "expected_version": 4,
+          "field": {
+            "name": "Engineering west field · batch reviewed",
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "area_ha": 1.8376999303814974,
+            "latitude": 42,
+            "longitude": -93.5005,
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "history_events": [
+              {
+                "id": "f3343cd2-3098-43a0-8822-d0a94a3b60e5",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ]
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "local_id": "f3d33edb-150f-47d6-b062-39c0bd801753",
+          "expected_version": 2,
+          "field": {
+            "name": "Engineering east field · batch reviewed",
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "area_ha": 1.8376999303539927,
+            "latitude": 42,
+            "longitude": -93.4995,
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "history_events": [
+              {
+                "id": "16dc268c-a94a-42dd-87b1-b852628ce08f",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.499,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    41.999
+                  ]
+                ]
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "response": {
+      "farm": {
+        "name": "Engineering two-field benchmark",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.501,
+                41.999
+              ],
+              [
+                -93.499,
+                41.999
+              ],
+              [
+                -93.499,
+                42.001
+              ],
+              [
+                -93.501,
+                42.001
+              ],
+              [
+                -93.501,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "partition": {
+          "method": "equal-area-strips",
+          "orientation": "cardinal",
+          "requested_count": 2,
+          "generated_count": 2,
+          "boundary_source": "imported"
+        },
+        "id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "local_id": "4b94b779-5ff1-4d56-99d9-55b55ebdf149",
+        "version": 1,
+        "resource_group_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "created_at": "2026-11-14T00:07:33.412109+00:00",
+        "updated_at": "2026-11-14T00:07:33.412109+00:00"
+      },
+      "items": [
+        {
+          "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+          "status": "conflict",
+          "field": null,
+          "error": "Field version changed; reload before synchronizing"
+        },
+        {
+          "local_id": "f3d33edb-150f-47d6-b062-39c0bd801753",
+          "status": "synced",
+          "field": {
+            "name": "Engineering east field · batch reviewed",
+            "area_ha": 1.840501227325201,
+            "latitude": 42,
+            "longitude": -93.4995,
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.499,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.499,
+                    41.999
+                  ]
+                ]
+              ]
+            },
+            "history_events": [
+              {
+                "id": "16dc268c-a94a-42dd-87b1-b852628ce08f",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "farm_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+            "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+            "local_id": "f3d33edb-150f-47d6-b062-39c0bd801753",
+            "id": "bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+            "version": 3,
+            "created_at": "2026-11-14T00:07:33.423881Z",
+            "updated_at": "2026-11-14T00:31:19.160693Z"
+          },
+          "error": null
+        }
+      ],
+      "complete": false
+    },
+    "exact_replay": true,
+    "unchanged_server_after_replay": true,
+    "current_fields": [
+      {
+        "id": "cf6f0815-af82-412d-9228-fbeefdf06355",
+        "name": "Engineering west field · concurrent batch client",
+        "version": 5
+      },
+      {
+        "id": "bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+        "name": "Engineering east field · batch reviewed",
+        "version": 3
+      }
+    ]
+  },
+  "reviewed_retry": {
+    "status": 200,
+    "request": {
+      "idempotency_key": "eda86467-ef6b-4272-9dc9-482aa8ebe639",
+      "farm": {
+        "local_id": "4b94b779-5ff1-4d56-99d9-55b55ebdf149",
+        "name": "Engineering two-field benchmark",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.501,
+                41.999
+              ],
+              [
+                -93.499,
+                41.999
+              ],
+              [
+                -93.499,
+                42.001
+              ],
+              [
+                -93.501,
+                42.001
+              ],
+              [
+                -93.501,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "expected_version": 1,
+        "partition": {
+          "method": "equal-area-strips",
+          "orientation": "cardinal",
+          "requested_count": 2,
+          "generated_count": 2,
+          "grid_rows": null,
+          "grid_columns": null,
+          "boundary_source": "imported"
+        }
+      },
+      "fields": [
+        {
+          "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+          "expected_version": 5,
+          "field": {
+            "name": "Engineering west field · batch reviewed",
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "area_ha": 1.8376999303814974,
+            "latitude": 42,
+            "longitude": -93.5005,
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "history_events": [
+              {
+                "id": "f3343cd2-3098-43a0-8822-d0a94a3b60e5",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ]
+                ]
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "result": {
+      "farm": {
+        "name": "Engineering two-field benchmark",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.501,
+                41.999
+              ],
+              [
+                -93.499,
+                41.999
+              ],
+              [
+                -93.499,
+                42.001
+              ],
+              [
+                -93.501,
+                42.001
+              ],
+              [
+                -93.501,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "partition": {
+          "method": "equal-area-strips",
+          "orientation": "cardinal",
+          "requested_count": 2,
+          "generated_count": 2,
+          "boundary_source": "imported"
+        },
+        "id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "local_id": "4b94b779-5ff1-4d56-99d9-55b55ebdf149",
+        "version": 1,
+        "resource_group_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "created_at": "2026-11-14T00:07:33.412109+00:00",
+        "updated_at": "2026-11-14T00:07:33.412109+00:00"
+      },
+      "items": [
+        {
+          "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+          "status": "synced",
+          "field": {
+            "name": "Engineering west field · batch reviewed",
+            "area_ha": 1.840501227325201,
+            "latitude": 42,
+            "longitude": -93.5005,
+            "soil_texture": "loam",
+            "irrigation_available": true,
+            "profile_id": "temperate-demo",
+            "history": [
+              {
+                "year": 2026,
+                "crop_id": "pea"
+              }
+            ],
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -93.5,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    42.001
+                  ],
+                  [
+                    -93.501,
+                    41.999
+                  ],
+                  [
+                    -93.5,
+                    41.999
+                  ]
+                ]
+              ]
+            },
+            "history_events": [
+              {
+                "id": "f3343cd2-3098-43a0-8822-d0a94a3b60e5",
+                "crop_id": "pea",
+                "profile_id": "iowa-engineering-v3-20261114",
+                "precision": "year",
+                "end_year": 2026,
+                "end_month": null,
+                "end_day": null,
+                "linked_legacy_year": 2026
+              }
+            ],
+            "farm_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+            "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+            "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+            "id": "cf6f0815-af82-412d-9228-fbeefdf06355",
+            "version": 6,
+            "created_at": "2026-11-14T00:10:42.266272Z",
+            "updated_at": "2026-11-14T00:34:19.849586Z"
+          },
+          "error": null
+        }
+      ],
+      "complete": true
+    }
+  },
+  "current_and_frozen_fields": {
+    "verified_at": "2026-11-14T00:42:03.572637+00:00",
+    "saved_plan_id": "7847c28a-e6bc-4491-8f99-834a7e84c861",
+    "saved_plan_unchanged": true,
+    "current_fields": [
+      {
+        "id": "cf6f0815-af82-412d-9228-fbeefdf06355",
+        "version": 6,
+        "name": "Engineering west field · batch reviewed"
+      },
+      {
+        "id": "bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+        "version": 3,
+        "name": "Engineering east field · batch reviewed"
+      }
+    ],
+    "snapshot_fields": [
+      {
+        "id": "bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+        "name": "Engineering east field",
+        "area_ha": 1.840501227325201,
+        "farm_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "history": [
+          {
+            "year": 2026,
+            "crop_id": "pea"
+          }
+        ],
+        "version": 2,
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.499,
+                41.999
+              ],
+              [
+                -93.499,
+                42.001
+              ],
+              [
+                -93.5,
+                42.001
+              ],
+              [
+                -93.5,
+                41.999
+              ],
+              [
+                -93.499,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "latitude": 42.0,
+        "local_id": "f3d33edb-150f-47d6-b062-39c0bd801753",
+        "longitude": -93.4995,
+        "created_at": "2026-11-14T00:07:33.423881Z",
+        "profile_id": "temperate-demo",
+        "updated_at": "2026-11-14T00:15:53.122121Z",
+        "soil_texture": "loam",
+        "history_events": [
+          {
+            "id": "16dc268c-a94a-42dd-87b1-b852628ce08f",
+            "crop_id": "pea",
+            "end_day": null,
+            "end_year": 2026,
+            "end_month": null,
+            "precision": "year",
+            "profile_id": "iowa-engineering-v3-20261114",
+            "linked_legacy_year": 2026
+          }
+        ],
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "irrigation_available": true
+      },
+      {
+        "id": "cf6f0815-af82-412d-9228-fbeefdf06355",
+        "name": "Engineering west field · reviewed locally",
+        "area_ha": 1.840501227325201,
+        "farm_id": "383a11a6-b86e-4fb9-ac15-ea8826fb611f",
+        "history": [
+          {
+            "year": 2026,
+            "crop_id": "pea"
+          }
+        ],
+        "version": 4,
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.5,
+                41.999
+              ],
+              [
+                -93.5,
+                42.001
+              ],
+              [
+                -93.501,
+                42.001
+              ],
+              [
+                -93.501,
+                41.999
+              ],
+              [
+                -93.5,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "latitude": 42.0,
+        "local_id": "6299d39c-c3fb-455c-b2c3-61e35bc2a936",
+        "longitude": -93.5005,
+        "created_at": "2026-11-14T00:10:42.266272Z",
+        "profile_id": "temperate-demo",
+        "updated_at": "2026-11-14T00:15:36.921333Z",
+        "soil_texture": "loam",
+        "history_events": [
+          {
+            "id": "f3343cd2-3098-43a0-8822-d0a94a3b60e5",
+            "crop_id": "pea",
+            "end_day": null,
+            "end_year": 2026,
+            "end_month": null,
+            "precision": "year",
+            "profile_id": "iowa-engineering-v3-20261114",
+            "linked_legacy_year": 2026
+          }
+        ],
+        "partition_revision": "8238ea3e-0ece-4bbd-85bf-f34ed3b403c5",
+        "irrigation_available": true
+      }
+    ]
+  },
+  "acknowledged_form_draft": {
+    "url": "http://localhost:3040/fields?field=bf76d0ee-020a-4654-b31b-2435ffa3ff0d",
+    "context": "Engineering east field · batch reviewed · 未选临时区域 · 全部已发布观测",
+    "restoredNotice": 0
+  },
+  "regressions": {
+    "observed_before_fix": [
+      "Bulk conflict had no immediate latest-version review action",
+      "Successful batch item retained the already-saved session draft and reported unsaved context"
+    ],
+    "fixed": [
+      "Block submit until explicit conflict review",
+      "Clear only editable draft values matching acknowledged saved fields; retain newer differing input"
+    ],
+    "frontend_tests": 317,
+    "test_files": 56,
+    "scoped_lint": "pass",
+    "production_build": "pass",
+    "backend_unchanged": true,
+    "previous_backend_passed": 548
+  },
+  "screenshots": [
+    "fields-v3-batch-conflict-review.png",
+    "fields-v3-selection-race-resolved.png",
+    "fields-v3-immutable-after-field-updates.png"
+  ]
+}

@@ -41,7 +41,7 @@ export function FieldCompletionPanel({ farm, field, ownerId, store, syncing, pla
       {profiles.isPending && <p role="status">正在加载地区配置…</p>}
       {profiles.isError && <div role="alert"><p>地区配置未载入，暂时无法保存。</p><Button onClick={() => void profiles.refetch()}>重试</Button></div>}
       {profiles.data && !profiles.data.items.length && <p role="alert">尚无可用地区配置。</p>}
-      {Boolean(profiles.data?.items.length) && <FieldForm key={`${field.properties.id}:${field.properties.backendVersion ?? 0}`} draftKey={`field-shift:${ownerId}:managed:${field.properties.id}:v1`} field={value} profiles={profiles.data!.items} userId={ownerId} geometryLocked onDirtyChange={onDirtyChange}
+      {Boolean(profiles.data?.items.length) && <FieldForm key={`${field.properties.id}:${field.properties.backendVersion ?? 0}`} draftKey={`field-shift:${ownerId}:managed:${field.properties.id}:v1`} field={value} profiles={profiles.data!.items} userId={ownerId} geometryLocked externallySaved={synced} externalConflict={field.properties.syncStatus === "conflict"} onDirtyChange={onDirtyChange}
         onReload={field.properties.backendFieldId ? () => getField(field.properties.backendFieldId!) : undefined}
         onSave={async (input, expectedVersion) => {
           if (pending) throw new Error("先核对上次保存结果，再提交当前修改。当前输入已保留。")

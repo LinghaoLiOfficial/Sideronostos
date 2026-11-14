@@ -66,6 +66,6 @@ Old `/field-shift/map?...` links redirect to `/fields?...`. Saved plans use froz
 editing current fields cannot change them. Iowa is an explicitly uncalibrated engineering
 benchmark. Real farms require a locally sourced parameter pack and operating conditions.
 
-See `../docs/integration/fields-bot-model-v3-plan.md` for current validation and open gates.
+See [acceptance and handoff](../docs/integration/acceptance-and-handoff.md) for engineering usage, real-farm data preparation and current limits; [implementation checkpoints](../docs/integration/fields-bot-model-v3-plan.md) record the validation and open AI gate.
 Live AI semantic acceptance is pending provider access; a visible chat panel is not proof
 of validated answers.

@@ -1,0 +1,1413 @@
+{
+  "recorded_at": "2026-11-14T00:48:52.701023+00:00",
+  "baseline": "8c498cf3863571fb78485c0494816a1058d7739e",
+  "branch": "codex/fields-bot-model-v3",
+  "snapshot": "Baseline-to-working-tree inventory before checkpoint 12 local commit; includes this inventory itself, no remote operations",
+  "count": 231,
+  "groups": {
+    "assistant-evidence": 13,
+    "backend-support": 2,
+    "daily-model": 20,
+    "daily-planning-ui": 10,
+    "documentation": 12,
+    "evidence": 78,
+    "farm-persistence": 7,
+    "field-details": 3,
+    "frontend-support": 4,
+    "knowledge": 2,
+    "map-workspace": 15,
+    "optimizer-integration": 4,
+    "regression": 42,
+    "routing-auth": 5,
+    "science-data": 2,
+    "shared-planning-context": 12
+  },
+  "files": [
+    {
+      "path": "ROTATION_V2.md",
+      "change": "M",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "docs/integration/acceptance-and-handoff.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "docs/integration/farm-sync-contract.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "docs/integration/fields-bot-model-v3-plan.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "docs/integration/model-v3-assistant-contract.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "docs/integration/model-v3-core.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "docs/integration/model-v3-data-contract.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/account-switch-checkpoint.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/ai-diagnostics-fixture-update.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/ai-evaluation-preparation.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/aoi-field-before.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/aoi-field-isolation.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/browser-irrigated-run.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/browser-journey-checkpoint.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/browser-rainfed-blocked-run.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/changed-files.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/checkpoint-2.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/checkpoint-3.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/checkpoint-4.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/checkpoint-5.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/checkpoint-6.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/diagnostic-ui-and-comparison.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-fixtures-v4-daily.json.gz",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-fixtures-v5-daily.json.gz",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/farm-migration.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/frontend-contract-v3.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/journey-data-readiness.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/kernel-smoke.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/knowledge-cache-reuse.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/legacy-result-rendering.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/legacy-v2-readonly-snapshot.json.gz",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/map-migration-and-plan-export.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/mixed-batch-recovery.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/multifield-browser-run-and-plan.json.gz",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/multifield-sync-and-planning.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/power-iowa-2025-full-raw.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/power-iowa-2025-prepared.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/power-v3-validation.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/production-build-and-restart.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/production-readiness-race.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/science-map-parity.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/selection-race-and-immutable-context.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/v3-real-weather-execution.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-account-roundtrip.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-anonymous.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-assistant-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-assistant-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-batch-conflict-review.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-comparison-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-diagnostic-comparison.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-diagnostic-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-diagnostic-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-diagnostic-saved-assistant-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-field-version-conflict.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-immutable-after-field-updates.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-legacy-v1-plan.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-legacy-v2-plan.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-multifield-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-multifield-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-other-account-isolation.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-other-account-recovery.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-plan-only-map-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-planner-mobile-initial.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-production-restored-map.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-production-saved-plan.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-query-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-rainfed-failure-recovered.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-readiness-desktop-grouped.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-readiness-desktop-initial.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-readiness-machine-recovery.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-saved-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-saved-map-assistant-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-saved-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-saved-plan-print.pdf",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-science-am-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-science-controlled-failure.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-science-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-science-native-grid.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-science-valid-aoi-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-selection-race-resolved.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-uncertain-sync.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-unified-planner-assistant-desktop.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-unified-planner-assistant-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/fields-v3-unified-planner-mobile.png",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/playwright/iowa-engineering-farm.geojson",
+      "change": "A",
+      "area": "evidence",
+      "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "sideronostos-backend/alembic/versions/foundation_0017_farms.py",
+      "change": "A",
+      "area": "farm-persistence",
+      "role": "Owned farm/field identity, geometry, versions, receipts or additive migration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/core/application.py",
+      "change": "M",
+      "area": "backend-support",
+      "role": "Supporting backend registration/configuration or API integration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/agri_data/schemas.py",
+      "change": "M",
+      "area": "science-data",
+      "role": "Scientific metadata, coverage or evidence integration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/agri_data/service.py",
+      "change": "M",
+      "area": "science-data",
+      "role": "Scientific metadata, coverage or evidence integration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/auth/service.py",
+      "change": "M",
+      "area": "backend-support",
+      "role": "Supporting backend registration/configuration or API integration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/context.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/daily_evidence.py",
+      "change": "A",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/evaluation/README.md",
+      "change": "M",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/evaluation/cases-v4-daily.json",
+      "change": "A",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/evaluation/cases-v4-daily.sha256",
+      "change": "A",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/evaluation/prepare_daily.py",
+      "change": "A",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/evaluation/replay.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/facts.py",
+      "change": "A",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/intents.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/model_view.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/pipeline.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/prompts.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/schemas.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/farm_assistant/validation.py",
+      "change": "M",
+      "area": "assistant-evidence",
+      "role": "Owner-bound context, verified facts, prompt/validation or frozen evaluation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/field_shift/farm_schemas.py",
+      "change": "A",
+      "area": "farm-persistence",
+      "role": "Owned farm/field identity, geometry, versions, receipts or additive migration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/field_shift/farm_service.py",
+      "change": "A",
+      "area": "farm-persistence",
+      "role": "Owned farm/field identity, geometry, versions, receipts or additive migration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/field_shift/models.py",
+      "change": "M",
+      "area": "farm-persistence",
+      "role": "Owned farm/field identity, geometry, versions, receipts or additive migration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/field_shift/router.py",
+      "change": "M",
+      "area": "farm-persistence",
+      "role": "Owned farm/field identity, geometry, versions, receipts or additive migration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/field_shift/schemas.py",
+      "change": "M",
+      "area": "farm-persistence",
+      "role": "Owned farm/field identity, geometry, versions, receipts or additive migration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/field_shift/service.py",
+      "change": "M",
+      "area": "farm-persistence",
+      "role": "Owned farm/field identity, geometry, versions, receipts or additive migration"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/knowledge/data/library-manifest-v3.json",
+      "change": "A",
+      "area": "knowledge",
+      "role": "Versioned source preparation and retrieval/publication boundaries"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/knowledge/data/readers/NASA-modeling-8c498cf.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/knowledge/data/readers/NASA-modeling-external-data-requirements-8c498cf.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/knowledge/data/readers/product-help-v3-20261114-v1.md",
+      "change": "A",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/knowledge/store.py",
+      "change": "M",
+      "area": "knowledge",
+      "role": "Versioned source preparation and retrieval/publication boundaries"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/comparison.py",
+      "change": "A",
+      "area": "optimizer-integration",
+      "role": "Version dispatch, frozen jobs/results, compatibility or comparison"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/execution.py",
+      "change": "M",
+      "area": "optimizer-integration",
+      "role": "Version dispatch, frozen jobs/results, compatibility or comparison"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/router.py",
+      "change": "M",
+      "area": "optimizer-integration",
+      "role": "Version dispatch, frozen jobs/results, compatibility or comparison"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/service.py",
+      "change": "M",
+      "area": "optimizer-integration",
+      "role": "Version dispatch, frozen jobs/results, compatibility or comparison"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/__init__.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/coefficients.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/contracts.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/data/profiles/iowa-engineering-v3-20261114.json",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/execution.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/inputs.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/milp.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/model.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/preflight.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/preparation_verify.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/prepare.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/profiles.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/readiness.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/resources.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/science.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/scientific_verify.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/service.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/solver.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/verify.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/src/sideronostos_backend/modules/rotation_optimizer/v3/weather.py",
+      "change": "A",
+      "area": "daily-model",
+      "role": "Versioned v3 contracts, readiness, preparation, model or independent verification"
+    },
+    {
+      "path": "sideronostos-backend/tests/rotation_v3_application_helpers.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/rotation_v3_helpers.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_agri_persistence.py",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_assistant_daily.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_assistant_daily_persistence.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_assistant_retrieval_scope.py",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_auth_return_path.py",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_farm_sync.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_knowledge_persistence.py",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_api.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_execution.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_model.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_persistence.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_preflight.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_prepare.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_profiles.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_readiness.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_science.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_scientific_verify.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_solver.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_rotation_v3_weather.py",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/README.md",
+      "change": "M",
+      "area": "documentation",
+      "role": "Implementation, contracts, data preparation or usage/validation documentation"
+    },
+    {
+      "path": "sideronostos-frontend/src/app/field-shift/map/page.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/app/field-shift/map/page.tsx",
+      "change": "M",
+      "area": "routing-auth",
+      "role": "Page navigation, compatible redirects and safe login return"
+    },
+    {
+      "path": "sideronostos-frontend/src/app/fields/fields.css",
+      "change": "M",
+      "area": "routing-auth",
+      "role": "Page navigation, compatible redirects and safe login return"
+    },
+    {
+      "path": "sideronostos-frontend/src/app/fields/page.tsx",
+      "change": "M",
+      "area": "routing-auth",
+      "role": "Page navigation, compatible redirects and safe login return"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/auth/auth-shell.tsx",
+      "change": "M",
+      "area": "routing-auth",
+      "role": "Page navigation, compatible redirects and safe login return"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/auth/field-shift-auth.test.tsx",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/auth/utils.ts",
+      "change": "M",
+      "area": "routing-auth",
+      "role": "Page navigation, compatible redirects and safe login return"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/field-shift/field-form.tsx",
+      "change": "M",
+      "area": "field-details",
+      "role": "Reusable agronomic input and explicit draft/version recovery"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/field-shift/journey.test.tsx",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/field-shift/use-draft.ts",
+      "change": "M",
+      "area": "field-details",
+      "role": "Reusable agronomic input and explicit draft/version recovery"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/field-shift/workspace.tsx",
+      "change": "M",
+      "area": "field-details",
+      "role": "Reusable agronomic input and explicit draft/version recovery"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/assistant-context.test.ts",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/assistant-context.ts",
+      "change": "A",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/assistant-dock.test.tsx",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/assistant-dock.tsx",
+      "change": "M",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-evidence.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-evidence.tsx",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-fields.tsx",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-model.test.ts",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-model.ts",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-planner.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-planner.tsx",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-readiness.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-readiness.tsx",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-resources.tsx",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-results.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/daily-results.tsx",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/history-editor.tsx",
+      "change": "M",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/planner-form.tsx",
+      "change": "M",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/results.tsx",
+      "change": "M",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/rotation-timeline.tsx",
+      "change": "A",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/use-daily-planning.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/use-daily-planning.ts",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/use-rotation-snapshots.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/use-rotation-snapshots.ts",
+      "change": "A",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/use-science-queries.ts",
+      "change": "A",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/use-workspace-navigation.ts",
+      "change": "A",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/use-workspace-session.ts",
+      "change": "A",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/workspace-version.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/workspace.module.css",
+      "change": "M",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/components/rotation/workspace.tsx",
+      "change": "M",
+      "area": "shared-planning-context",
+      "role": "Shared account/context/date/snapshot state and existing result/assistant integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/farm-sync.test.ts",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/farm-sync.ts",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/field-completion-panel.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/field-completion-panel.tsx",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/field-map.tsx",
+      "change": "M",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/fields-evidence-panel.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/fields-evidence-panel.tsx",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/fields-shell.tsx",
+      "change": "M",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/fields-workspace.tsx",
+      "change": "M",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/local-copy.ts",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/map-feature.test.ts",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/map-feature.ts",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/owned-workspace.test.ts",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/owned-workspace.ts",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/science-raster.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/science-raster.tsx",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/storage.test.ts",
+      "change": "M",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/storage.ts",
+      "change": "M",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/use-fields-context.ts",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/use-map-focus.test.tsx",
+      "change": "A",
+      "area": "regression",
+      "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/use-map-focus.ts",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/use-owned-workspace.ts",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/features/fields/workspace-sync-panel.tsx",
+      "change": "A",
+      "area": "map-workspace",
+      "role": "Owned map workspace, persistence/sync, temporary AOI, science raster or navigation"
+    },
+    {
+      "path": "sideronostos-frontend/src/lib/api/daily-types.ts",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/lib/api/daily.ts",
+      "change": "A",
+      "area": "daily-planning-ui",
+      "role": "Sourced v3 input, readiness, results, comparison or immutable saved view"
+    },
+    {
+      "path": "sideronostos-frontend/src/lib/api/farms.ts",
+      "change": "A",
+      "area": "frontend-support",
+      "role": "Shared types, API or supporting navigation integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/lib/api/field-shift-types.ts",
+      "change": "M",
+      "area": "frontend-support",
+      "role": "Shared types, API or supporting navigation integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/lib/api/rotation.ts",
+      "change": "M",
+      "area": "frontend-support",
+      "role": "Shared types, API or supporting navigation integration"
+    },
+    {
+      "path": "sideronostos-frontend/src/types/workspace.ts",
+      "change": "M",
+      "area": "frontend-support",
+      "role": "Shared types, API or supporting navigation integration"
+    }
+  ]
+}

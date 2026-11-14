@@ -11,7 +11,7 @@ import { errorMessage, initialFieldDraft, parseFieldDraft } from "./model";
 import { useDraft } from "./use-draft";
 import styles from "./field-shift.module.css";
 
-export function FieldForm({ field, profiles, userId, onSave, onReload, geometryLocked = false, onDirtyChange, draftKey }: { field?: Field; profiles: Profile[]; userId: string; onSave: (value: FieldInput, expectedVersion?: number) => Promise<void>; onReload?: () => Promise<Field>; draftKey?: string; geometryLocked?: boolean; onDirtyChange?: (dirty: boolean) => void }) {
+export function FieldForm({ field, profiles, userId, onSave, onReload, geometryLocked = false, externalConflict = false, externallySaved = false, onDirtyChange, draftKey }: { field?: Field; profiles: Profile[]; userId: string; onSave: (value: FieldInput, expectedVersion?: number) => Promise<void>; onReload?: () => Promise<Field>; draftKey?: string; geometryLocked?: boolean; externalConflict?: boolean; externallySaved?: boolean; onDirtyChange?: (dirty: boolean) => void }) {
   const draft = useDraft(draftKey ?? `field-shift:${userId}:field:${field?.id ?? "new"}:v1`, initialFieldDraft(profiles[0]?.id ?? "", field));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -21,13 +21,23 @@ export function FieldForm({ field, profiles, userId, onSave, onReload, geometryL
   const [conflict, setConflict] = useState(false);
   const [latest, setLatest] = useState<Field | null>(null);
   const [version, setVersion] = useState<number | undefined>(undefined);
+  const hasConflict = conflict || (externalConflict && version === undefined);
   const profile = profiles.find((item) => item.id === draft.value.profile_id);
+  // A batch save can acknowledge this form without invoking its submit callback.
+  // Compare only editable values; keep a newer/different draft and its original version.
+  useEffect(() => {
+    if (!externallySaved || !field || !profile || !draft.dirty) return;
+    const cropIds = profile.crops.map(c => c.id);
+    const current = parseFieldDraft(draft.value, cropIds).value;
+    const saved = parseFieldDraft(initialFieldDraft(field.profile_id, field), cropIds).value;
+    if (current && saved && JSON.stringify(current) === JSON.stringify(saved)) draft.clearIfUnchanged(draft.value);
+  }, [externallySaved, field, profile, draft]);
   useEffect(() => { onDirtyChange?.(draft.dirty); }, [draft.dirty, onDirtyChange]);
   useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
   const set = (change: Partial<typeof draft.value>) => { draft.update({ ...draft.value, ...change }); onDirtyChange?.(true); };
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (busy) return;
+    if (busy || hasConflict) return;
     const submitted = draft.value;
     const result = parseFieldDraft(draft.value, profile?.crops.map((c) => c.id) ?? []);
     if (result.error || !result.value) { setError(result.error ?? "请检查输入。"); return; }
@@ -64,8 +74,8 @@ export function FieldForm({ field, profiles, userId, onSave, onReload, geometryL
     <div className={styles.subsection}><div className={styles.rowBetween}><div><h3>过去种过什么？</h3><p className={styles.help}>每年一季主作物；未知时可留空，并保留为资料缺口。</p></div><Button type="button" variant="outline" size="sm" onClick={() => set({ history: [...draft.value.history, { year: "", crop_id: profile?.crops[0]?.id ?? "" }] })}><Plus size={16} />添加年份</Button></div>
       {draft.value.history.length === 0 ? <p className={styles.emptyInline}>尚未记录种植历史。</p> : <div className={styles.history}>{draft.value.history.map((item, index) => <div key={index} className={styles.historyRow}><label className={styles.field}>年份<Input aria-label={`历史年份 ${index + 1}`} type="number" value={item.year} min="1900" max="2200" placeholder="例如 2025" onChange={(e) => set({ history: draft.value.history.map((h, i) => i === index ? { ...h, year: e.target.value } : h) })} /></label><label className={styles.field}>作物<select className={styles.select} aria-label={`历史作物 ${index + 1}`} value={item.crop_id} onChange={(e) => set({ history: draft.value.history.map((h, i) => i === index ? { ...h, crop_id: e.target.value } : h) })}>{profile?.crops.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><Button type="button" variant="ghost" size="icon" aria-label={`删除历史 ${index + 1}`} onClick={() => set({ history: draft.value.history.filter((_, i) => i !== index) })}><Trash2 size={17} /></Button></div>)}</div>}
     </div>
-    {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-    {conflict && onReload && <div className={styles.notice}><Button type="button" variant="outline" onClick={reloadLatest} disabled={reloading}>{reloading ? "正在获取最新资料…" : "查看服务器上的最新资料"}</Button>{latest && <div className={styles.stack}><p>最新记录：{latest.name} · {latest.area_ha} 公顷 · ({latest.latitude}, {latest.longitude}) · 土壤 {latest.soil_texture} · {latest.irrigation_available ? "可灌溉" : "无补灌"}</p><p>历史：{latest.history.map((h) => `${h.year} ${profile?.crops.find((c) => c.id === h.crop_id)?.name ?? h.crop_id}`).join("、") || "未填写"}</p><Button type="button" variant="outline" onClick={() => { setVersion(latest.version); setConflict(false); setError(null); setLatest(null); }}>已核对，保留我的输入并重新保存</Button></div>}</div>}
-    <div className={styles.formFooter}><span>保存至你的账户</span><Button type="submit" disabled={busy || conflict}>{busy ? <LoaderCircle className="animate-spin" size={17} /> : <ArrowRight size={17} />}{busy ? "正在保存…" : "保存地块并继续"}</Button></div>
+    {error && (!externalConflict || conflict) && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
+    {hasConflict && onReload && <div className={styles.notice}><Button type="button" variant="outline" onClick={reloadLatest} disabled={reloading}>{reloading ? "正在获取最新资料…" : "查看服务器上的最新资料"}</Button>{latest && <div className={styles.stack}><p>最新记录：{latest.name} · {latest.area_ha} 公顷 · ({latest.latitude}, {latest.longitude}) · 土壤 {latest.soil_texture} · {latest.irrigation_available ? "可灌溉" : "无补灌"}</p><p>历史：{latest.history.map((h) => `${h.year} ${profile?.crops.find((c) => c.id === h.crop_id)?.name ?? h.crop_id}`).join("、") || "未填写"}</p><Button type="button" variant="outline" onClick={() => { setVersion(latest.version); setConflict(false); setError(null); setLatest(null); }}>已核对，保留我的输入并重新保存</Button></div>}</div>}
+    <div className={styles.formFooter}><span>保存至你的账户</span><Button type="submit" disabled={busy || hasConflict}>{busy ? <LoaderCircle className="animate-spin" size={17} /> : <ArrowRight size={17} />}{busy ? "正在保存…" : "保存地块并继续"}</Button></div>
   </fieldset></form>;
 }
