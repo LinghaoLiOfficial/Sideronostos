@@ -26,9 +26,10 @@ import { DailyFieldEditor } from "./daily-fields";
 import { DailyResourcesEditor } from "./daily-resources";
 import { DailyReadinessPanel } from "./daily-readiness";
 import { errorMessage } from "../field-shift/model";
+import { formatValue } from "./planning-model";
 import styles from "./workspace.module.css";
 
-type Props = {
+export type DailyPlannerProps = {
   owner: string;
   profile: DailyProfile;
   fields: Field[];
@@ -39,7 +40,7 @@ type Props = {
   onDraft: (changes: ChangedCondition[], fields: DailyDraft["fields"]) => void;
   onFieldSaved: (field: Field) => void;
 };
-export function DailyPlannerForm(props: Props) {
+export function DailyPlannerForm(props: DailyPlannerProps) {
   const { profile, fields, farms, run, onFieldSaved } = props;
   const [dirtyHistory, setDirtyHistory] = useState<Record<string, boolean>>({});
   const [defaultSource, setDefaultSource] = useState("");
@@ -57,6 +58,7 @@ export function DailyPlannerForm(props: Props) {
   });
   const { draft, replaceDraft } = planning;
   const active = activePlanningFields(fields, farms);
+  const mapField = active.find((f) => f.id === props.selectedFieldId);
   const chosen = fields.filter((f) => draft.fields.some((c) => c.id === f.id));
   const patch = (value: Partial<DailyDraft>) => {
     setLocalError(null);
@@ -137,6 +139,17 @@ export function DailyPlannerForm(props: Props) {
             一次最多 10
             个已同步且属于当前分割方案的地块。数量超限时请明确分批；共享资源的分配需要另行核对。
           </p>
+          {mapField && !draft.fields.some((f) => f.id === mapField.id) && (
+            <div className={styles.notice} role="status">
+              地图所选的「{mapField.name}」尚未加入保留的规划草稿。
+              <button
+                type="button"
+                onClick={() => reconcile(draft, [...chosen, mapField])}
+              >
+                将地图所选地块加入规划
+              </button>
+            </div>
+          )}
           {!active.length && (
             <p>
               还没有可参与本次规划的地块。
@@ -161,7 +174,7 @@ export function DailyPlannerForm(props: Props) {
                 <span>
                   <strong>{field.name}</strong>
                   <small>
-                    {field.area_ha} ha ·{" "}
+                    {formatValue(field.area_ha, 3)} ha ·{" "}
                     {farms.find((f) => f.id === field.farm_id)?.name ?? "农场"}{" "}
                     · 版本 {field.version}
                   </small>
@@ -319,7 +332,8 @@ export function DailyPlannerForm(props: Props) {
                   <button
                     type="button"
                     onClick={() =>
-                      patch({
+                      reconcile({
+                        ...draft,
                         fields: draft.fields.map((c) =>
                           c.id === field.id
                             ? { ...c, expected_version: field.version }
@@ -621,7 +635,7 @@ export function DailyPlannerForm(props: Props) {
             关闭收益等可选指标不会免除作物产量、气候适宜性、供水、设备等必需资料。
           </p>
         </details>
-        <div className={styles.benchmark}>
+        <div id="daily-profile" className={styles.benchmark}>
           <strong>
             {profile.scope === "benchmark_not_locally_calibrated"
               ? "当前是工程基准，试点地区尚未确定"

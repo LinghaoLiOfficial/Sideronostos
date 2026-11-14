@@ -1,8 +1,9 @@
 # Daily v3 computation contract and progress
 
-Status: **kernel and profile/data-preflight API implemented; solver application integration pending**. This document does not
-claim a working v3 farmer journey. Existing run/job dispatch still uses v2 as of this
-checkpoint; old results have not been reinterpreted.
+Status: **daily kernel, sourced preparation, queued v3 execution, versioned persistence,
+and planner/results UI implemented in stacked review branches**. Main's NASA historical
+benchmark remains on the v2 route. The isolated branch has automated frontend and backend
+verification; database-backed and actual worker journeys remain a merge gate.
 
 ## Authority and versioning
 
@@ -26,7 +27,7 @@ new scientific and mathematical contracts from existing v2 snapshots:
 
 Versions: `rotation-milp-v3.0`, `daily-root-zone-v3.0`. Readiness output is
 `rotation-readiness-v3.0`. The v3 profile and input snapshots now have their own contracts. See
-`model-v3-data-contract.md`; published results still need their v3 dispatcher.
+`model-v3-data-contract.md`; job dispatch explicitly preserves v2 and v3 snapshot versions.
 
 ## Daily conventions
 
@@ -38,13 +39,13 @@ Versions: `rotation-milp-v3.0`, `daily-root-zone-v3.0`. Readiness output is
   an intervening crop. Historical latest-possible end and precision remain explicit.
 - The default draft GDD recipe applies its documented one-sided temperature bounds.
   `bounded_both_v1` is also representable but must be paired with its own maturity
-  threshold; the recipe cannot silently change. Climate suitability still needs the
-  subsequent profile/preparation layer; maturity alone never proves suitability.
+  threshold; the recipe cannot silently change. The profile/preparation layer checks
+  climate suitability separately; maturity alone never proves suitability.
 - All daily capacities are explicit for every planning day. Seed/market periods partition
   the full horizon without overlap or gaps. No missing capacity becomes zero or infinity.
 - Model bounds currently remain 10 selected fields, 240 candidates and 1200 edges.
-  Excess is rejected, never truncated. The UI still needs a clear explanation of the
-  difference from the map's larger partition count.
+  Excess is rejected, never truncated. The planner explains the ten-field limit and
+  requires explicit batches; shared-resource allocation across batches still needs review.
 
 ## Root water and the independent-candidate limitation
 
@@ -76,9 +77,8 @@ FAO-56 defines root-zone available water, depletion and the need for an initial 
 those definitions support the water-state bookkeeping. The dry expansion policy above is
 our disclosed engineering choice, not a claim that FAO prescribes dry soil:
 [FAO-56 chapter 8](https://www.fao.org/4/X0490E/x0490e0e.htm).
-Existing FAO-56 ET0 calculation remains in `agri_data/recipes.py`; weather ingestion and
-its raw unit/QA/provenance verification now feeds v3 data preflight and still needs
-to be connected to candidate generation and the queued job snapshot.
+FAO-56 ET0 calculation remains in `agri_data/recipes.py`. Raw weather units, QA and
+provenance are checked before candidate preparation and retained in the queued job snapshot.
 
 ## Objectives, capacities and diagnosis
 
@@ -112,8 +112,8 @@ Positive gaps mark a diagnostic result. `resource_feasible` only concerns frozen
 constraints; it is not proof of local agronomic calibration. Timeout incumbents never
 claim proven priority optima. Excess incumbent slack can be reduced to the actual minimum
 needed by that fixed selection and is labelled accordingly. No solver/license fallback
-fabricates a result. Full v3 service publication still needs to call both independent
-verifiers before an option can reach the UI or assistant.
+fabricates a result. V3 service publication calls independent preparation/scientific
+and selected-schedule verifiers before publishing a verified option to the UI.
 
 ## Readiness boundary
 
@@ -125,8 +125,9 @@ Engineering assumptions require explicit acceptance and stay labelled as uncalib
 
 `assess_readiness` is a reusable engine. Its requirements and enabled features must be
 constructed by the server-owned profile/preparation policy, never chosen arbitrarily by
-an API client. That server policy is now exposed through the v3 data-preflight API;
-the farmer-facing v3 input flow and candidate-level checks remain pending.
+an API client. The v3 form calls that server policy before submission; the server repeats
+checks when freezing a task and candidate-level checks still run during preparation.
+Readiness means enough inputs to attempt calculation, not a promise of feasible candidates.
 
 ## Verification so far
 
@@ -136,7 +137,13 @@ intervening-species family conflicts, historical adjacency, actual Gurobi cancel
 license failure and tiny deadline behavior. A two-field cross-product enumerator computes
 its own objective/resource oracle and agrees with the actual Gurobi optimum.
 
-Remaining: suitability/economic/risk coefficient preparation and candidate-level checks,
-service/job/version dispatch with frozen active farm partition/resource snapshots,
-frontend planning/results, assistant/knowledge extension, frozen/live AI evaluation and
-the full real-browser saved-plan journey. A kernel test passing is not completion.
+The current implementation includes suitability/economic/risk preparation,
+candidate-level checks, versioned jobs with owned farm/resource snapshots, six-metric
+frontend comparison and saved-plan restoration. The review branch passed frontend
+unit tests, TypeScript and a production build; database-backed and actual worker
+journeys still need verification in an environment with the test database and worker.
+
+Remaining: multi-year NASA-bundle adaptation for v3 with frozen provenance,
+prepared-raster parity, regional calibration and live AI semantic quality gates.
+The independent-candidate soil-water limitation remains explicit. Automated tests
+alone do not establish full product acceptance.

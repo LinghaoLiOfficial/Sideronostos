@@ -1,0 +1,1773 @@
+{
+  "id": "8649a86b-3755-46c0-9150-b7438f495b1e",
+  "job_id": "75eb5d04-da55-4bc0-95a9-8df113c893ce",
+  "status": "failed",
+  "generation": 1,
+  "created_at": "2026-11-13T22:56:36.795932+00:00",
+  "updated_at": "2026-11-13T22:56:38.024365+00:00",
+  "request": {
+    "end": "2027-12-31",
+    "start": "2027-01-01",
+    "fields": [
+      {
+        "id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+        "expected_version": 1
+      }
+    ],
+    "periods": [
+      {
+        "id": "year-2027",
+        "end": "2027-12-31",
+        "start": "2027-01-01"
+      }
+    ],
+    "sources": {
+      "engineering-fixture": {
+        "id": "engineering-fixture",
+        "kind": "engineering_assumption",
+        "title": "Explicit engineering fixture / 用户选择的工程演示假设",
+        "locator": "integration:model-v3-engineering-fixture",
+        "quality": "estimated",
+        "confirmed": true,
+        "region_id": "iowa-engineering",
+        "limitations": [
+          "Synthetic operating assumptions, not field measurements or farmer records; requires local calibration."
+        ],
+        "observed_end": null,
+        "applicable_end": "2027-12-31",
+        "observed_start": null,
+        "applicable_start": "2027-01-01"
+      }
+    },
+    "weights": {
+      "bare": 0.15,
+      "risk": 0.15,
+      "soil": 0.15,
+      "water": 0.2,
+      "profit": 0.25,
+      "rotation": 0.1
+    },
+    "baseline": [
+      {
+        "crop_id": "maize",
+        "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+        "sow_date": "2027-04-20"
+      }
+    ],
+    "scenario": {
+      "rainfall_change_pct": 0.0,
+      "temperature_change_c": 0.0
+    },
+    "profile_id": "iowa-engineering-v3-20261114",
+    "model_version": "rotation-milp-v3.0",
+    "farm_resources": {
+      "d0536d2e-811a-48bc-aaab-14ea97875eec": {
+        "daily": {
+          "resource-2bd2ce8f-0d71-442b-8610-22f7330a96b1": {
+            "kind": "machine",
+            "default": {
+              "amount": {
+                "unit": "h/day",
+                "value": 16,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "field_ids": [
+              "1c1c559e-e891-4163-93a5-6c086b4e891d"
+            ],
+            "overrides": {},
+            "water_basis": null,
+            "machine_type": "tractor",
+            "irrigation_efficiency": null
+          },
+          "resource-efc3fe7f-2f6a-4d5a-a930-e29b17b3fd93": {
+            "kind": "machine",
+            "default": {
+              "amount": {
+                "unit": "h/day",
+                "value": 16,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "field_ids": [
+              "1c1c559e-e891-4163-93a5-6c086b4e891d"
+            ],
+            "overrides": {},
+            "water_basis": null,
+            "machine_type": "harvester",
+            "irrigation_efficiency": null
+          }
+        },
+        "period_limits": [
+          {
+            "kind": "seed",
+            "limit": {
+              "amount": {
+                "unit": "kg",
+                "value": 100000,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "crop_id": "maize",
+            "period_id": "year-2027"
+          },
+          {
+            "kind": "market",
+            "limit": {
+              "amount": {
+                "unit": "kg",
+                "value": 100000,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "crop_id": "maize",
+            "period_id": "year-2027"
+          },
+          {
+            "kind": "seed",
+            "limit": {
+              "amount": {
+                "unit": "kg",
+                "value": 100000,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "crop_id": "oat",
+            "period_id": "year-2027"
+          },
+          {
+            "kind": "market",
+            "limit": {
+              "amount": {
+                "unit": "kg",
+                "value": 100000,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "crop_id": "oat",
+            "period_id": "year-2027"
+          },
+          {
+            "kind": "seed",
+            "limit": {
+              "amount": {
+                "unit": "kg",
+                "value": 100000,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "crop_id": "pea",
+            "period_id": "year-2027"
+          },
+          {
+            "kind": "market",
+            "limit": {
+              "amount": {
+                "unit": "kg",
+                "value": 100000,
+                "source_ids": [
+                  "engineering-fixture"
+                ],
+                "missing_reason": null
+              },
+              "remedy": null,
+              "remediable": false,
+              "gap_unit_cost": null
+            },
+            "crop_id": "pea",
+            "period_id": "year-2027"
+          }
+        ]
+      }
+    },
+    "idempotency_key": "a3fe02f6-dc41-46cc-a5b0-671838728f18",
+    "allowed_crop_ids": [
+      "maize",
+      "oat",
+      "pea"
+    ],
+    "disabled_metrics": {},
+    "field_conditions": {
+      "1c1c559e-e891-4163-93a5-6c086b4e891d": {
+        "values": {
+          "ph": {
+            "unit": "pH",
+            "value": 6.5,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "aspect": {
+            "unit": "category",
+            "value": "flat",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "depth_m": {
+            "unit": "m",
+            "value": 1,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "drainage": {
+            "unit": "category",
+            "value": "well",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "slope_deg": {
+            "unit": "degree",
+            "value": 2,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "history_state": {
+            "unit": "category",
+            "value": "no_prior_crop",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "salinity_ds_m": {
+            "unit": "dS/m",
+            "value": 0.5,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "wilting_point": {
+            "unit": "m3/m3",
+            "value": 0.12,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "field_capacity": {
+            "unit": "m3/m3",
+            "value": 0.3,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "history_reviewed": {
+            "unit": "1",
+            "value": true,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "terrain_position": {
+            "unit": "category",
+            "value": "level",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "mechanical_access": {
+            "unit": "1",
+            "value": true,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "baseline_confirmed": {
+            "unit": "1",
+            "value": true,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "management_reviewed": {
+            "unit": "1",
+            "value": true,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "initial_water_policy": {
+            "unit": "category",
+            "value": "independent_wilting_point_v1",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "history_absence_reason": {
+            "unit": "text",
+            "value": "Engineering fixture assumes previously uncropped land; not a real farmer declaration.",
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          },
+          "effective_rain_fraction": {
+            "unit": "1",
+            "value": 0.8,
+            "source_ids": [
+              "engineering-fixture"
+            ],
+            "missing_reason": null
+          }
+        },
+        "bare_limit": null,
+        "water_system_id": null,
+        "forbidden_crop_ids": [],
+        "bare_limit_disabled": "Engineering fixture: no bare-day cap imposed; confirm local requirements before use."
+      }
+    },
+    "accept_engineering_assumptions": true
+  },
+  "field_snapshots": [
+    {
+      "id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+      "name": "Iowa benchmark field 1",
+      "area_ha": 1.8405225977659225,
+      "farm_id": "d0536d2e-811a-48bc-aaab-14ea97875eec",
+      "history": [],
+      "version": 1,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.502,
+              41.999
+            ],
+            [
+              -93.498,
+              41.999
+            ],
+            [
+              -93.498,
+              41.9995
+            ],
+            [
+              -93.502,
+              41.9995
+            ],
+            [
+              -93.502,
+              41.999
+            ]
+          ]
+        ]
+      },
+      "latitude": 41.99925,
+      "local_id": "58185bb4-aea7-4963-9ab0-7b50bbe05e87",
+      "longitude": -93.5,
+      "created_at": "2026-11-13T20:08:08.231030Z",
+      "profile_id": "temperate-demo",
+      "updated_at": "2026-11-13T20:08:08.231036Z",
+      "soil_texture": "loam",
+      "history_events": [],
+      "partition_revision": "8256cd37-efe4-4c29-a439-2eb82bef2556",
+      "irrigation_available": false
+    }
+  ],
+  "provenance": {
+    "sources": {
+      "engineering": {
+        "id": "engineering",
+        "kind": "engineering_assumption",
+        "title": "Declared v3 integration benchmark assumptions; not agronomic recommendations",
+        "locator": "repository:rotation_optimizer/v3/data/profiles/iowa-engineering-v3-20261114.json",
+        "quality": "estimated",
+        "confirmed": true,
+        "region_id": "iowa-engineering",
+        "limitations": [
+          "All thresholds, cultivar proxies, yield, price, costs, component scores, reference scales and machinery hours are engineering assumptions.",
+          "Transferred v2 GDD and Kc values remain uncalibrated; general references do not validate the whole parameter set.",
+          "Source confirmation means the declaration was reviewed, not that a real farm measurement exists."
+        ],
+        "observed_end": null,
+        "applicable_end": null,
+        "observed_start": null,
+        "applicable_start": null
+      }
+    },
+    "profile_id": "iowa-engineering-v3-20261114",
+    "limitations": [
+      "Engineering benchmark only: generic crop names stand for synthetic cultivar proxies, not registered varieties.",
+      "Actual pilot region and locally calibrated agronomy remain unchosen.",
+      "Historical POWER weather replay and optional perturbations are not future weather forecasts.",
+      "Independent candidates start at wilting point with newly explored roots also dry; no continuous cross-season soil-water simulation.",
+      "Risk is a weighted exposure and irrigation-dependence index, not a predicted yield-loss probability.",
+      "Soil scores describe assumed crop contributions, not measured carbon, nitrogen or soil health.",
+      "Capacities, farm soil measurements, history, baseline and permission to use engineering assumptions must be supplied explicitly.",
+      "Fixed positive scales are declared management reference values for engineering comparison, not computed single-objective optima.",
+      "UTC daily weather aggregates are explicitly used as local-date proxies in this engineering benchmark; accurate local agricultural days require hourly reaggregation or a validated local-day release.",
+      "Terrain screening uses declared slope/aspect/position and mechanical access. Depressions are excluded by this uncalibrated benchmark rule; no DEM or drainage observation is inferred."
+    ],
+    "profile_sha256": "7c26cee908448f73ca5477d37ce8e2192c386d358b035a22d35fdcfd21355be4",
+    "spatial_checks": [
+      {
+        "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+        "limit_km": 25.0,
+        "max_distance_km": 0.1994860818059902
+      }
+    ],
+    "weather_sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+    "benchmark_scope": "benchmark_not_locally_calibrated",
+    "weather_calendar": {
+      "basis": "historical_replay",
+      "ready": true,
+      "issues": [],
+      "warnings": [
+        "not_future_forecast",
+        "regional_background_not_field_station",
+        "utc_aggregate_not_local_day"
+      ],
+      "release_id": "power-iowa-2025-v1",
+      "source_end": "2025-12-31",
+      "source_kind": "reanalysis_and_satellite_inputs",
+      "source_start": "2025-01-01",
+      "invalid_dates": [],
+      "calendar_policy": "utc_daily_proxy_v1",
+      "manifest_sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+      "source_time_standard": "UTC",
+      "agricultural_timezone": "America/Chicago"
+    },
+    "parameter_origins": {
+      "scales": [
+        "engineering"
+      ],
+      "crops.oat": [
+        "engineering"
+      ],
+      "crops.pea": [
+        "engineering"
+      ],
+      "crops.maize": [
+        "engineering"
+      ],
+      "family_gaps": [
+        "engineering"
+      ],
+      "weather_center": [
+        "engineering"
+      ],
+      "default_weights": [
+        "engineering"
+      ],
+      "sowing_step_days": [
+        "engineering"
+      ],
+      "history_catalogue": [
+        "engineering"
+      ],
+      "transition_scores": [
+        "engineering"
+      ],
+      "weather_radius_km": [
+        "engineering"
+      ],
+      "weather_day_policy": [
+        "engineering"
+      ],
+      "compatible_history_profile_ids": [
+        "engineering"
+      ]
+    },
+    "weather_release_id": "power-iowa-2025-v1",
+    "weather_content_sha256": "40adf081c6787919914baa792984f66bb8e3eea99f1edd0b76f5f2535691b693"
+  },
+  "result": {
+    "schema": "rotation-result-v3.0",
+    "status": "failed",
+    "options": [],
+    "baseline": null,
+    "error_code": "preparation_blocked",
+    "preparation": {
+      "ready": false,
+      "stage": "candidate_preparation",
+      "errors": [
+        {
+          "code": "confirmed_baseline_unavailable",
+          "crop_id": "maize",
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-20"
+        },
+        {
+          "code": "field_has_no_candidate",
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d"
+        }
+      ],
+      "version": "daily-root-zone-v3.0",
+      "weather": {
+        "basis": "historical_replay",
+        "ready": true,
+        "issues": [],
+        "warnings": [
+          "not_future_forecast",
+          "regional_background_not_field_station",
+          "utc_aggregate_not_local_day"
+        ],
+        "release_id": "power-iowa-2025-v1",
+        "source_end": "2025-12-31",
+        "source_kind": "reanalysis_and_satellite_inputs",
+        "source_start": "2025-01-01",
+        "invalid_dates": [],
+        "calendar_policy": "utc_daily_proxy_v1",
+        "manifest_sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+        "source_time_standard": "UTC",
+        "agricultural_timezone": "America/Chicago"
+      },
+      "rejected": [
+        {
+          "crop_id": "maize",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-20",
+          "confirmed_baseline": true
+        },
+        {
+          "crop_id": "maize",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-05-04",
+          "confirmed_baseline": false
+        },
+        {
+          "crop_id": "maize",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-05-18",
+          "confirmed_baseline": false
+        },
+        {
+          "crop_id": "oat",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-01",
+          "confirmed_baseline": false
+        },
+        {
+          "crop_id": "oat",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-15",
+          "confirmed_baseline": false
+        },
+        {
+          "crop_id": "oat",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-29",
+          "confirmed_baseline": false
+        },
+        {
+          "crop_id": "pea",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-05",
+          "confirmed_baseline": false
+        },
+        {
+          "crop_id": "pea",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-19",
+          "confirmed_baseline": false
+        },
+        {
+          "crop_id": "pea",
+          "reasons": [
+            "irrigation_unavailable"
+          ],
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-05-03",
+          "confirmed_baseline": false
+        }
+      ],
+      "sampling": {
+        "scope": "generated_candidate_set",
+        "step_days": 14,
+        "attempted_starts": 9,
+        "includes_confirmed_baseline_dates": true
+      },
+      "baseline_ids": [],
+      "coefficient_recipe": "sourced-site-growth-economics-exposure-operations-v3.0",
+      "rejected_by_reason": {
+        "irrigation_unavailable": 9
+      }
+    },
+    "model_version": "rotation-milp-v3.0",
+    "precompute_version": "daily-root-zone-v3.0"
+  },
+  "input_snapshot": {
+    "farms": [
+      {
+        "id": "d0536d2e-811a-48bc-aaab-14ea97875eec",
+        "data": {
+          "name": "Engineering benchmark — Iowa",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -93.502,
+                  41.999
+                ],
+                [
+                  -93.498,
+                  41.999
+                ],
+                [
+                  -93.498,
+                  42.001
+                ],
+                [
+                  -93.502,
+                  42.001
+                ],
+                [
+                  -93.502,
+                  41.999
+                ]
+              ]
+            ]
+          },
+          "partition": {
+            "method": "equal-area-strips",
+            "orientation": "farm-axis",
+            "boundary_source": "imported",
+            "generated_count": 4,
+            "requested_count": 4
+          },
+          "partition_revision": "8256cd37-efe4-4c29-a439-2eb82bef2556"
+        },
+        "version": 1,
+        "local_id": "75a8db12-aea5-42c4-b014-29abacf1f834"
+      }
+    ],
+    "fields": [
+      {
+        "id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+        "name": "Iowa benchmark field 1",
+        "area_ha": 1.8405225977659225,
+        "farm_id": "d0536d2e-811a-48bc-aaab-14ea97875eec",
+        "history": [],
+        "version": 1,
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -93.502,
+                41.999
+              ],
+              [
+                -93.498,
+                41.999
+              ],
+              [
+                -93.498,
+                41.9995
+              ],
+              [
+                -93.502,
+                41.9995
+              ],
+              [
+                -93.502,
+                41.999
+              ]
+            ]
+          ]
+        },
+        "latitude": 41.99925,
+        "local_id": "58185bb4-aea7-4963-9ab0-7b50bbe05e87",
+        "longitude": -93.5,
+        "created_at": "2026-11-13T20:08:08.231030Z",
+        "profile_id": "temperate-demo",
+        "updated_at": "2026-11-13T20:08:08.231036Z",
+        "soil_texture": "loam",
+        "history_events": [],
+        "partition_revision": "8256cd37-efe4-4c29-a439-2eb82bef2556",
+        "irrigation_available": false
+      }
+    ],
+    "schema": "rotation-input-v3.0",
+    "profile": {
+      "id": "iowa-engineering-v3-20261114",
+      "name": "Iowa daily v3 engineering benchmark / 工程基准",
+      "crops": {
+        "oat": {
+          "name": "Spring oat / 春燕麦（benchmark）",
+          "soil": {
+            "ph_max": 8.0,
+            "ph_min": 5.5,
+            "min_depth_m": 0.4,
+            "max_slope_deg": 12.0,
+            "allowed_aspects": [
+              "flat",
+              "north",
+              "east",
+              "south",
+              "west"
+            ],
+            "allowed_drainage": [
+              "moderate",
+              "well"
+            ],
+            "allowed_textures": [
+              "sand",
+              "loam",
+              "clay"
+            ],
+            "max_salinity_ds_m": 2.0,
+            "allowed_terrain_positions": [
+              "level",
+              "slope"
+            ]
+          },
+          "canopy": {
+            "kc": [
+              0.3,
+              1.15,
+              0.25
+            ],
+            "root_max_m": 1.0,
+            "root_initial_m": 0.15,
+            "stage_fractions": [
+              0.2,
+              0.3,
+              0.3,
+              0.2
+            ],
+            "depletion_fraction": [
+              0.5,
+              0.5,
+              0.5,
+              0.5
+            ],
+            "residue_cover_days": 7,
+            "cover_start_fraction": 0.15
+          },
+          "family": "Poaceae",
+          "climate": {
+            "heat_c": 35.0,
+            "frost_c": 0.0,
+            "excess_rain_mm": 40.0,
+            "max_daylight_h": 18.0,
+            "min_daylight_h": 8.0,
+            "max_heat_fraction": 0.25,
+            "max_frost_fraction": 0.15,
+            "max_excess_fraction": 0.2
+          },
+          "economics": {
+            "cost_usd_ha": 650.0,
+            "price_usd_kg": 0.3
+          },
+          "phenology": {
+            "base_c": 0.0,
+            "upper_c": 30.0,
+            "gdd_recipe": "bounded_both_v1",
+            "maturity_gdd": 1200.0,
+            "turnaround_days": 14,
+            "max_growing_days": 150
+          },
+          "operations": [
+            {
+              "anchor": "sow",
+              "machine": "tractor",
+              "hours_ha": 1.0,
+              "offset_days": 0
+            },
+            {
+              "anchor": "harvest",
+              "machine": "harvester",
+              "hours_ha": 1.5,
+              "offset_days": 0
+            }
+          ],
+          "seed_kg_ha": 90.0,
+          "species_id": "avena-sativa",
+          "sow_windows": [
+            [
+              "04-01",
+              "04-29"
+            ]
+          ],
+          "yield_kg_ha": 3000.0,
+          "risk_weights": {
+            "heat": 0.25,
+            "frost": 0.25,
+            "excess_rain": 0.25,
+            "irrigation_dependence": 0.25
+          },
+          "soil_weights": {
+            "roots": 0.25,
+            "erosion": 0.25,
+            "nitrogen": 0.25,
+            "organic_matter": 0.25
+          },
+          "soil_components": {
+            "roots": 0.4,
+            "erosion": 0.6,
+            "nitrogen": 0.1,
+            "organic_matter": 0.6
+          }
+        },
+        "pea": {
+          "name": "Dry field pea / 干籽豌豆（benchmark）",
+          "soil": {
+            "ph_max": 8.0,
+            "ph_min": 5.5,
+            "min_depth_m": 0.4,
+            "max_slope_deg": 12.0,
+            "allowed_aspects": [
+              "flat",
+              "north",
+              "east",
+              "south",
+              "west"
+            ],
+            "allowed_drainage": [
+              "moderate",
+              "well"
+            ],
+            "allowed_textures": [
+              "sand",
+              "loam",
+              "clay"
+            ],
+            "max_salinity_ds_m": 2.0,
+            "allowed_terrain_positions": [
+              "level",
+              "slope"
+            ]
+          },
+          "canopy": {
+            "kc": [
+              0.5,
+              1.15,
+              0.3
+            ],
+            "root_max_m": 0.6,
+            "root_initial_m": 0.15,
+            "stage_fractions": [
+              0.2,
+              0.3,
+              0.3,
+              0.2
+            ],
+            "depletion_fraction": [
+              0.5,
+              0.5,
+              0.5,
+              0.5
+            ],
+            "residue_cover_days": 7,
+            "cover_start_fraction": 0.15
+          },
+          "family": "Fabaceae",
+          "climate": {
+            "heat_c": 35.0,
+            "frost_c": 0.0,
+            "excess_rain_mm": 40.0,
+            "max_daylight_h": 18.0,
+            "min_daylight_h": 8.0,
+            "max_heat_fraction": 0.25,
+            "max_frost_fraction": 0.15,
+            "max_excess_fraction": 0.2
+          },
+          "economics": {
+            "cost_usd_ha": 700.0,
+            "price_usd_kg": 0.4
+          },
+          "phenology": {
+            "base_c": 0.0,
+            "upper_c": 30.0,
+            "gdd_recipe": "bounded_both_v1",
+            "maturity_gdd": 1000.0,
+            "turnaround_days": 14,
+            "max_growing_days": 140
+          },
+          "operations": [
+            {
+              "anchor": "sow",
+              "machine": "tractor",
+              "hours_ha": 1.0,
+              "offset_days": 0
+            },
+            {
+              "anchor": "harvest",
+              "machine": "harvester",
+              "hours_ha": 1.5,
+              "offset_days": 0
+            }
+          ],
+          "seed_kg_ha": 180.0,
+          "species_id": "pisum-sativum",
+          "sow_windows": [
+            [
+              "04-05",
+              "05-03"
+            ]
+          ],
+          "yield_kg_ha": 2500.0,
+          "risk_weights": {
+            "heat": 0.25,
+            "frost": 0.25,
+            "excess_rain": 0.25,
+            "irrigation_dependence": 0.25
+          },
+          "soil_weights": {
+            "roots": 0.25,
+            "erosion": 0.25,
+            "nitrogen": 0.25,
+            "organic_matter": 0.25
+          },
+          "soil_components": {
+            "roots": 0.4,
+            "erosion": 0.6,
+            "nitrogen": 0.8,
+            "organic_matter": 0.6
+          }
+        },
+        "maize": {
+          "name": "Maize / 玉米（110-day hybrid example）",
+          "soil": {
+            "ph_max": 8.0,
+            "ph_min": 5.5,
+            "min_depth_m": 0.4,
+            "max_slope_deg": 12.0,
+            "allowed_aspects": [
+              "flat",
+              "north",
+              "east",
+              "south",
+              "west"
+            ],
+            "allowed_drainage": [
+              "moderate",
+              "well"
+            ],
+            "allowed_textures": [
+              "sand",
+              "loam",
+              "clay"
+            ],
+            "max_salinity_ds_m": 2.0,
+            "allowed_terrain_positions": [
+              "level",
+              "slope"
+            ]
+          },
+          "canopy": {
+            "kc": [
+              0.3,
+              1.2,
+              0.6
+            ],
+            "root_max_m": 1.2,
+            "root_initial_m": 0.15,
+            "stage_fractions": [
+              0.2,
+              0.3,
+              0.3,
+              0.2
+            ],
+            "depletion_fraction": [
+              0.5,
+              0.5,
+              0.5,
+              0.5
+            ],
+            "residue_cover_days": 7,
+            "cover_start_fraction": 0.15
+          },
+          "family": "Poaceae",
+          "climate": {
+            "heat_c": 35.0,
+            "frost_c": 0.0,
+            "excess_rain_mm": 40.0,
+            "max_daylight_h": 18.0,
+            "min_daylight_h": 8.0,
+            "max_heat_fraction": 0.25,
+            "max_frost_fraction": 0.15,
+            "max_excess_fraction": 0.2
+          },
+          "economics": {
+            "cost_usd_ha": 1200.0,
+            "price_usd_kg": 0.2
+          },
+          "phenology": {
+            "base_c": 10.0,
+            "upper_c": 30.0,
+            "gdd_recipe": "draft_one_sided_v1",
+            "maturity_gdd": 1483.3333333333333,
+            "turnaround_days": 14,
+            "max_growing_days": 200
+          },
+          "operations": [
+            {
+              "anchor": "sow",
+              "machine": "tractor",
+              "hours_ha": 1.0,
+              "offset_days": 0
+            },
+            {
+              "anchor": "harvest",
+              "machine": "harvester",
+              "hours_ha": 1.5,
+              "offset_days": 0
+            }
+          ],
+          "seed_kg_ha": 25.0,
+          "species_id": "zea-mays",
+          "sow_windows": [
+            [
+              "04-20",
+              "05-18"
+            ]
+          ],
+          "yield_kg_ha": 9000.0,
+          "risk_weights": {
+            "heat": 0.25,
+            "frost": 0.25,
+            "excess_rain": 0.25,
+            "irrigation_dependence": 0.25
+          },
+          "soil_weights": {
+            "roots": 0.25,
+            "erosion": 0.25,
+            "nitrogen": 0.25,
+            "organic_matter": 0.25
+          },
+          "soil_components": {
+            "roots": 0.7,
+            "erosion": 0.6,
+            "nitrogen": 0.1,
+            "organic_matter": 0.6
+          }
+        }
+      },
+      "scope": "benchmark_not_locally_calibrated",
+      "region": "Iowa benchmark centre only; no real pilot region chosen",
+      "scales": {
+        "bare": 36500.0,
+        "risk": 100.0,
+        "soil": 100.0,
+        "water": 100000.0,
+        "profit": 100000.0,
+        "rotation": 10.0
+      },
+      "sources": {
+        "engineering": {
+          "id": "engineering",
+          "kind": "engineering_assumption",
+          "title": "Declared v3 integration benchmark assumptions; not agronomic recommendations",
+          "locator": "repository:rotation_optimizer/v3/data/profiles/iowa-engineering-v3-20261114.json",
+          "quality": "estimated",
+          "confirmed": true,
+          "region_id": "iowa-engineering",
+          "limitations": [
+            "All thresholds, cultivar proxies, yield, price, costs, component scores, reference scales and machinery hours are engineering assumptions.",
+            "Transferred v2 GDD and Kc values remain uncalibrated; general references do not validate the whole parameter set.",
+            "Source confirmation means the declaration was reviewed, not that a real farm measurement exists."
+          ],
+          "observed_end": null,
+          "applicable_end": null,
+          "observed_start": null,
+          "applicable_start": null
+        }
+      },
+      "timezone": "America/Chicago",
+      "region_id": "iowa-engineering",
+      "family_gaps": {
+        "Poaceae": 365,
+        "Fabaceae": 365
+      },
+      "limitations": [
+        "Engineering benchmark only: generic crop names stand for synthetic cultivar proxies, not registered varieties.",
+        "Actual pilot region and locally calibrated agronomy remain unchosen.",
+        "Historical POWER weather replay and optional perturbations are not future weather forecasts.",
+        "Independent candidates start at wilting point with newly explored roots also dry; no continuous cross-season soil-water simulation.",
+        "Risk is a weighted exposure and irrigation-dependence index, not a predicted yield-loss probability.",
+        "Soil scores describe assumed crop contributions, not measured carbon, nitrogen or soil health.",
+        "Capacities, farm soil measurements, history, baseline and permission to use engineering assumptions must be supplied explicitly.",
+        "Fixed positive scales are declared management reference values for engineering comparison, not computed single-objective optima.",
+        "UTC daily weather aggregates are explicitly used as local-date proxies in this engineering benchmark; accurate local agricultural days require hourly reaggregation or a validated local-day release.",
+        "Terrain screening uses declared slope/aspect/position and mechanical access. Depressions are excluded by this uncalibrated benchmark rule; no DEM or drainage observation is inferred."
+      ],
+      "weather_center": [
+        -93.5,
+        42.0
+      ],
+      "default_weights": {
+        "bare": 0.15,
+        "risk": 0.15,
+        "soil": 0.15,
+        "water": 0.2,
+        "profit": 0.25,
+        "rotation": 0.1
+      },
+      "sowing_step_days": 14,
+      "history_catalogue": {
+        "oat": {
+          "family": "Poaceae",
+          "species_id": "avena-sativa",
+          "turnaround_days": 14
+        },
+        "pea": {
+          "family": "Fabaceae",
+          "species_id": "pisum-sativum",
+          "turnaround_days": 14
+        },
+        "maize": {
+          "family": "Poaceae",
+          "species_id": "zea-mays",
+          "turnaround_days": 14
+        },
+        "wheat": {
+          "family": "Poaceae",
+          "species_id": "triticum-aestivum",
+          "turnaround_days": 14
+        },
+        "barley": {
+          "family": "Poaceae",
+          "species_id": "hordeum-vulgare",
+          "turnaround_days": 14
+        },
+        "clover": {
+          "family": "Fabaceae",
+          "species_id": "trifolium",
+          "turnaround_days": 14
+        },
+        "alfalfa": {
+          "family": "Fabaceae",
+          "species_id": "medicago-sativa",
+          "turnaround_days": 14
+        },
+        "sorghum": {
+          "family": "Poaceae",
+          "species_id": "sorghum-bicolor",
+          "turnaround_days": 14
+        },
+        "soybean": {
+          "family": "Fabaceae",
+          "species_id": "glycine-max",
+          "turnaround_days": 14
+        }
+      },
+      "parameter_origins": {
+        "scales": [
+          "engineering"
+        ],
+        "crops.oat": [
+          "engineering"
+        ],
+        "crops.pea": [
+          "engineering"
+        ],
+        "crops.maize": [
+          "engineering"
+        ],
+        "family_gaps": [
+          "engineering"
+        ],
+        "weather_center": [
+          "engineering"
+        ],
+        "default_weights": [
+          "engineering"
+        ],
+        "sowing_step_days": [
+          "engineering"
+        ],
+        "history_catalogue": [
+          "engineering"
+        ],
+        "transition_scores": [
+          "engineering"
+        ],
+        "weather_radius_km": [
+          "engineering"
+        ],
+        "weather_day_policy": [
+          "engineering"
+        ],
+        "compatible_history_profile_ids": [
+          "engineering"
+        ]
+      },
+      "transition_scores": {
+        "oat": {
+          "pea": 1.0,
+          "maize": 0.2
+        },
+        "pea": {
+          "oat": 1.0,
+          "maize": 1.0
+        },
+        "maize": {
+          "oat": 0.2,
+          "pea": 1.0
+        }
+      },
+      "weather_radius_km": 25.0,
+      "weather_day_policy": "utc_daily_proxy_v1",
+      "weather_release_id": "power-iowa-2025-v1",
+      "compatible_history_profile_ids": [
+        "iowa-benchmark-20261112-v1"
+      ]
+    },
+    "request": {
+      "end": "2027-12-31",
+      "start": "2027-01-01",
+      "fields": [
+        {
+          "id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "expected_version": 1
+        }
+      ],
+      "periods": [
+        {
+          "id": "year-2027",
+          "end": "2027-12-31",
+          "start": "2027-01-01"
+        }
+      ],
+      "sources": {
+        "engineering-fixture": {
+          "id": "engineering-fixture",
+          "kind": "engineering_assumption",
+          "title": "Explicit engineering fixture / 用户选择的工程演示假设",
+          "locator": "integration:model-v3-engineering-fixture",
+          "quality": "estimated",
+          "confirmed": true,
+          "region_id": "iowa-engineering",
+          "limitations": [
+            "Synthetic operating assumptions, not field measurements or farmer records; requires local calibration."
+          ],
+          "observed_end": null,
+          "applicable_end": "2027-12-31",
+          "observed_start": null,
+          "applicable_start": "2027-01-01"
+        }
+      },
+      "weights": {
+        "bare": 0.15,
+        "risk": 0.15,
+        "soil": 0.15,
+        "water": 0.2,
+        "profit": 0.25,
+        "rotation": 0.1
+      },
+      "baseline": [
+        {
+          "crop_id": "maize",
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "sow_date": "2027-04-20"
+        }
+      ],
+      "scenario": {
+        "rainfall_change_pct": 0.0,
+        "temperature_change_c": 0.0
+      },
+      "profile_id": "iowa-engineering-v3-20261114",
+      "model_version": "rotation-milp-v3.0",
+      "farm_resources": {
+        "d0536d2e-811a-48bc-aaab-14ea97875eec": {
+          "daily": {
+            "resource-2bd2ce8f-0d71-442b-8610-22f7330a96b1": {
+              "kind": "machine",
+              "default": {
+                "amount": {
+                  "unit": "h/day",
+                  "value": 16,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "field_ids": [
+                "1c1c559e-e891-4163-93a5-6c086b4e891d"
+              ],
+              "overrides": {},
+              "water_basis": null,
+              "machine_type": "tractor",
+              "irrigation_efficiency": null
+            },
+            "resource-efc3fe7f-2f6a-4d5a-a930-e29b17b3fd93": {
+              "kind": "machine",
+              "default": {
+                "amount": {
+                  "unit": "h/day",
+                  "value": 16,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "field_ids": [
+                "1c1c559e-e891-4163-93a5-6c086b4e891d"
+              ],
+              "overrides": {},
+              "water_basis": null,
+              "machine_type": "harvester",
+              "irrigation_efficiency": null
+            }
+          },
+          "period_limits": [
+            {
+              "kind": "seed",
+              "limit": {
+                "amount": {
+                  "unit": "kg",
+                  "value": 100000,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "crop_id": "maize",
+              "period_id": "year-2027"
+            },
+            {
+              "kind": "market",
+              "limit": {
+                "amount": {
+                  "unit": "kg",
+                  "value": 100000,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "crop_id": "maize",
+              "period_id": "year-2027"
+            },
+            {
+              "kind": "seed",
+              "limit": {
+                "amount": {
+                  "unit": "kg",
+                  "value": 100000,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "crop_id": "oat",
+              "period_id": "year-2027"
+            },
+            {
+              "kind": "market",
+              "limit": {
+                "amount": {
+                  "unit": "kg",
+                  "value": 100000,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "crop_id": "oat",
+              "period_id": "year-2027"
+            },
+            {
+              "kind": "seed",
+              "limit": {
+                "amount": {
+                  "unit": "kg",
+                  "value": 100000,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "crop_id": "pea",
+              "period_id": "year-2027"
+            },
+            {
+              "kind": "market",
+              "limit": {
+                "amount": {
+                  "unit": "kg",
+                  "value": 100000,
+                  "source_ids": [
+                    "engineering-fixture"
+                  ],
+                  "missing_reason": null
+                },
+                "remedy": null,
+                "remediable": false,
+                "gap_unit_cost": null
+              },
+              "crop_id": "pea",
+              "period_id": "year-2027"
+            }
+          ]
+        }
+      },
+      "idempotency_key": "a3fe02f6-dc41-46cc-a5b0-671838728f18",
+      "allowed_crop_ids": [
+        "maize",
+        "oat",
+        "pea"
+      ],
+      "disabled_metrics": {},
+      "field_conditions": {
+        "1c1c559e-e891-4163-93a5-6c086b4e891d": {
+          "values": {
+            "ph": {
+              "unit": "pH",
+              "value": 6.5,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "aspect": {
+              "unit": "category",
+              "value": "flat",
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "depth_m": {
+              "unit": "m",
+              "value": 1,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "drainage": {
+              "unit": "category",
+              "value": "well",
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "slope_deg": {
+              "unit": "degree",
+              "value": 2,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "history_state": {
+              "unit": "category",
+              "value": "no_prior_crop",
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "salinity_ds_m": {
+              "unit": "dS/m",
+              "value": 0.5,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "wilting_point": {
+              "unit": "m3/m3",
+              "value": 0.12,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "field_capacity": {
+              "unit": "m3/m3",
+              "value": 0.3,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "history_reviewed": {
+              "unit": "1",
+              "value": true,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "terrain_position": {
+              "unit": "category",
+              "value": "level",
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "mechanical_access": {
+              "unit": "1",
+              "value": true,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "baseline_confirmed": {
+              "unit": "1",
+              "value": true,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "management_reviewed": {
+              "unit": "1",
+              "value": true,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "initial_water_policy": {
+              "unit": "category",
+              "value": "independent_wilting_point_v1",
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "history_absence_reason": {
+              "unit": "text",
+              "value": "Engineering fixture assumes previously uncropped land; not a real farmer declaration.",
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            },
+            "effective_rain_fraction": {
+              "unit": "1",
+              "value": 0.8,
+              "source_ids": [
+                "engineering-fixture"
+              ],
+              "missing_reason": null
+            }
+          },
+          "bare_limit": null,
+          "water_system_id": null,
+          "forbidden_crop_ids": [],
+          "bare_limit_disabled": "Engineering fixture: no bare-day cap imposed; confirm local requirements before use."
+        }
+      },
+      "accept_engineering_assumptions": true
+    },
+    "provenance": {
+      "sources": {
+        "engineering": {
+          "id": "engineering",
+          "kind": "engineering_assumption",
+          "title": "Declared v3 integration benchmark assumptions; not agronomic recommendations",
+          "locator": "repository:rotation_optimizer/v3/data/profiles/iowa-engineering-v3-20261114.json",
+          "quality": "estimated",
+          "confirmed": true,
+          "region_id": "iowa-engineering",
+          "limitations": [
+            "All thresholds, cultivar proxies, yield, price, costs, component scores, reference scales and machinery hours are engineering assumptions.",
+            "Transferred v2 GDD and Kc values remain uncalibrated; general references do not validate the whole parameter set.",
+            "Source confirmation means the declaration was reviewed, not that a real farm measurement exists."
+          ],
+          "observed_end": null,
+          "applicable_end": null,
+          "observed_start": null,
+          "applicable_start": null
+        }
+      },
+      "profile_id": "iowa-engineering-v3-20261114",
+      "limitations": [
+        "Engineering benchmark only: generic crop names stand for synthetic cultivar proxies, not registered varieties.",
+        "Actual pilot region and locally calibrated agronomy remain unchosen.",
+        "Historical POWER weather replay and optional perturbations are not future weather forecasts.",
+        "Independent candidates start at wilting point with newly explored roots also dry; no continuous cross-season soil-water simulation.",
+        "Risk is a weighted exposure and irrigation-dependence index, not a predicted yield-loss probability.",
+        "Soil scores describe assumed crop contributions, not measured carbon, nitrogen or soil health.",
+        "Capacities, farm soil measurements, history, baseline and permission to use engineering assumptions must be supplied explicitly.",
+        "Fixed positive scales are declared management reference values for engineering comparison, not computed single-objective optima.",
+        "UTC daily weather aggregates are explicitly used as local-date proxies in this engineering benchmark; accurate local agricultural days require hourly reaggregation or a validated local-day release.",
+        "Terrain screening uses declared slope/aspect/position and mechanical access. Depressions are excluded by this uncalibrated benchmark rule; no DEM or drainage observation is inferred."
+      ],
+      "profile_sha256": "7c26cee908448f73ca5477d37ce8e2192c386d358b035a22d35fdcfd21355be4",
+      "spatial_checks": [
+        {
+          "field_id": "1c1c559e-e891-4163-93a5-6c086b4e891d",
+          "limit_km": 25.0,
+          "max_distance_km": 0.1994860818059902
+        }
+      ],
+      "weather_sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+      "benchmark_scope": "benchmark_not_locally_calibrated",
+      "weather_calendar": {
+        "basis": "historical_replay",
+        "ready": true,
+        "issues": [],
+        "warnings": [
+          "not_future_forecast",
+          "regional_background_not_field_station",
+          "utc_aggregate_not_local_day"
+        ],
+        "release_id": "power-iowa-2025-v1",
+        "source_end": "2025-12-31",
+        "source_kind": "reanalysis_and_satellite_inputs",
+        "source_start": "2025-01-01",
+        "invalid_dates": [],
+        "calendar_policy": "utc_daily_proxy_v1",
+        "manifest_sha256": "338f370fe488c70efee00a0b72947bfce65280a0035ce1967e7bbd15cb98e735",
+        "source_time_standard": "UTC",
+        "agricultural_timezone": "America/Chicago"
+      },
+      "parameter_origins": {
+        "scales": [
+          "engineering"
+        ],
+        "crops.oat": [
+          "engineering"
+        ],
+        "crops.pea": [
+          "engineering"
+        ],
+        "crops.maize": [
+          "engineering"
+        ],
+        "family_gaps": [
+          "engineering"
+        ],
+        "weather_center": [
+          "engineering"
+        ],
+        "default_weights": [
+          "engineering"
+        ],
+        "sowing_step_days": [
+          "engineering"
+        ],
+        "history_catalogue": [
+          "engineering"
+        ],
+        "transition_scores": [
+          "engineering"
+        ],
+        "weather_radius_km": [
+          "engineering"
+        ],
+        "weather_day_policy": [
+          "engineering"
+        ],
+        "compatible_history_profile_ids": [
+          "engineering"
+        ]
+      },
+      "weather_release_id": "power-iowa-2025-v1",
+      "weather_content_sha256": "40adf081c6787919914baa792984f66bb8e3eea99f1edd0b76f5f2535691b693"
+    }
+  }
+}
