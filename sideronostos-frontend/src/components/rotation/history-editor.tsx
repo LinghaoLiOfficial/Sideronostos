@@ -1,7 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { Field, HistoryEvent } from "@/lib/api/field-shift-types";
-import type { ProfileV2 } from "@/lib/api/rotation-types";
+export type HistoryCatalogue = {
+  id: string;
+  crops: { id: string; name: string }[];
+  history_catalogue: Record<string, unknown>;
+};
 import { updateField } from "@/lib/api/field-shift";
 import { errorMessage } from "../field-shift/model";
 import { fieldInput } from "./planning-model";
@@ -13,7 +17,7 @@ export function HistoryEditor({
   onDirtyChange,
 }: {
   field: Field;
-  profile: ProfileV2;
+  profile: HistoryCatalogue;
   onSaved: (field: Field) => void;
   onDirtyChange: (fieldId: string, dirty: boolean) => void;
 }) {

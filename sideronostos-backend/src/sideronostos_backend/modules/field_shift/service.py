@@ -43,13 +43,17 @@ def _validate_field(body: FieldInput) -> None:
         )
 
     from ..rotation_optimizer.profiles import get_profile as rotation_profile
+    from ..rotation_optimizer.v3.profiles import get_profile as daily_profile
 
     for event in body.history_events:
         try:
-            catalogue = rotation_profile(event.profile_id).history_catalogue
+            try:
+                known_history = set(rotation_profile(event.profile_id).history_catalogue)
+            except ValueError:
+                known_history = set(daily_profile(event.profile_id).history_catalogue)
         except ValueError as error:
             raise HTTPException(422, str(error)) from error
-        if event.crop_id not in catalogue:
+        if event.crop_id not in known_history:
             raise HTTPException(422, "Unknown crop in precise history catalogue")
 
 
