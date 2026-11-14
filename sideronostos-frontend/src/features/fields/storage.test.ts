@@ -42,6 +42,59 @@ describe("workspace storage v2", () => {
     expect(workspace.fields.every((field) => field.properties.farmId === farm.properties.id)).toBe(true)
   })
 
+  it("deletes a farm, its fields, and field observations in one operation", async () => {
+    const storage = await import("@/features/fields/storage")
+    const first = createDemoFarm()
+    const second = createDemoFarm(2)
+    const observation = {
+      id: "observation-1",
+      fieldId: first.fields[0].properties.id,
+      metric: "Soil moisture",
+      value: 0.2,
+      unit: "m³/m³",
+      observedAt: "2026-11-06",
+      sourceProduct: "SMAP",
+      evidenceKind: "synthetic" as const,
+      spatialSupport: "regional-background" as const,
+      nativeResolutionMeters: 36000,
+      uncertainty: null,
+    }
+    const preservedObservation = { ...observation, id: "observation-2", fieldId: second.fields[0].properties.id }
+    await storage.replaceStoredWorkspace([first.farm, second.farm], [...first.fields, ...second.fields])
+    await storage.putObservations([observation, preservedObservation])
+
+    await expect(storage.deleteStoredFarm(first.farm.properties.id)).resolves.toEqual({ fieldCount: 4 })
+    const workspace = await storage.getStoredWorkspace()
+    expect(workspace.farms.map((farm) => farm.properties.id)).toEqual([second.farm.properties.id])
+    expect(workspace.fields.map((field) => field.properties.id).sort()).toEqual(second.fields.map((field) => field.properties.id).sort())
+    await expect(storage.getFieldObservations(first.fields[0].properties.id)).resolves.toEqual([])
+    await expect(storage.getFieldObservations(second.fields[0].properties.id)).resolves.toEqual([preservedObservation])
+  })
+
+  it("deletes a farm that has no associated fields", async () => {
+    const storage = await import("@/features/fields/storage")
+    const { farm } = createDemoFarm()
+    await storage.replaceStoredWorkspace([farm], [])
+
+    await expect(storage.deleteStoredFarm(farm.properties.id)).resolves.toEqual({ fieldCount: 0 })
+    await expect(storage.getStoredWorkspace()).resolves.toEqual({ farms: [], fields: [] })
+  })
+
+  it("keeps the workspace intact when the delete transaction fails", async () => {
+    const storage = await import("@/features/fields/storage")
+    const { farm, fields } = createDemoFarm()
+    await storage.replaceStoredWorkspace([farm], fields)
+    const deleteSpy = vi.spyOn(IDBObjectStore.prototype, "delete").mockImplementationOnce(() => {
+      throw new Error("simulated IndexedDB failure")
+    })
+
+    await expect(storage.deleteStoredFarm(farm.properties.id)).rejects.toThrow("simulated IndexedDB failure")
+    deleteSpy.mockRestore()
+    const workspace = await storage.getStoredWorkspace()
+    expect(workspace.farms.map((storedFarm) => storedFarm.properties.id)).toEqual([farm.properties.id])
+    expect(workspace.fields.map((field) => field.properties.id).sort()).toEqual(fields.map((field) => field.properties.id).sort())
+  })
+
   it("defaults legacy v2 farms to equal-area strips", async () => {
     const storage = await import("@/features/fields/storage")
     const { farm, fields } = createDemoFarm()

@@ -12,8 +12,10 @@ from fastapi import HTTPException
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .adapters.cog import raster_tile as cog_tile
 from .adapters.smap_l3 import point_fact, raster_tile
 from .models import RegionSelection, ScienceRelease
+from .nasa_release import NASA_BUNDLE_PRODUCT, sha256_file
 from .schemas import GEOD, SelectionInput, validate_geometry
 from .settings import get_agri_data_settings
 
@@ -71,6 +73,62 @@ def _source(release: ScienceRelease) -> dict[str, Any]:
 
 
 class AgriDataService:
+    async def nasa_releases(self, session: AsyncSession, user_id: str) -> list[dict[str, Any]]:
+        rows = (
+            await session.scalars(
+                select(ScienceRelease)
+                .where(
+                    ScienceRelease.status == "published",
+                    ScienceRelease.product == NASA_BUNDLE_PRODUCT,
+                    _scope(user_id),
+                )
+                .order_by(ScienceRelease.published_at.desc())
+            )
+        ).all()
+        return [self.nasa_release_view(row) for row in rows]
+
+    @staticmethod
+    def nasa_release_view(row: ScienceRelease, *, include_weather: bool = False) -> dict[str, Any]:
+        data = row.data
+        result = {
+            key: data[key]
+            for key in (
+                "schema",
+                "product",
+                "recipe",
+                "start",
+                "end",
+                "bounds",
+                "crs",
+                "center",
+                "applicability",
+                "model_usable",
+                "complete_days",
+                "expected_days",
+                "products",
+                "layers",
+                "evidence_only",
+                "limitations",
+            )
+        }
+        result.update(
+            id=row.id,
+            manifest_sha256=row.manifest_sha256,
+            published_at=row.published_at.isoformat() if row.published_at else None,
+            status=row.status,
+        )
+        if include_weather:
+            result["weather"] = data["weather"]
+        return result
+
+    async def nasa_release(
+        self, session: AsyncSession, user_id: str, release_id: str, *, include_weather: bool = False
+    ) -> dict[str, Any]:
+        row = await self.get_release(session, user_id, release_id)
+        if row.product != NASA_BUNDLE_PRODUCT:
+            raise HTTPException(422, "Release is not a NASA rotation bundle")
+        return self.nasa_release_view(row, include_weather=include_weather)
+
     async def create_selection(
         self, session: AsyncSession, user_id: str, body: SelectionInput
     ) -> dict[str, Any]:
@@ -132,7 +190,7 @@ class AgriDataService:
                 )
             )
         ).all()
-        return [
+        smap = [
             {
                 "id": f"{row.id}:{orbit.lower()}",
                 "release_id": row.id,
@@ -146,14 +204,84 @@ class AgriDataService:
             for row in rows
             for orbit in row.data["passes"]
         ]
+        bundles = (
+            await session.scalars(
+                select(ScienceRelease).where(
+                    ScienceRelease.status == "published",
+                    ScienceRelease.product == NASA_BUNDLE_PRODUCT,
+                    _scope(user_id),
+                )
+            )
+        ).all()
+        nasa = [
+            {
+                "id": f"{row.id}:{layer['id']}",
+                "release_id": row.id,
+                "title": layer["id"].replace("-", " "),
+                "pass": "HISTORICAL",
+                "start": row.data["start"],
+                "end": row.data["end"],
+                "unit": layer.get("unit", "unknown"),
+                "source": {
+                    "release_id": row.id,
+                    "product": layer["product"],
+                    "product_version": row.data["products"]
+                    .get(str(layer["product"]).split("_")[0].lower(), {})
+                    .get("product_version"),
+                    "sha256": layer["sha256"],
+                    "recipe": layer.get("recipe", row.data["recipe"]),
+                },
+            }
+            for row in bundles
+            for layer in row.data["layers"]
+        ]
+        return [*smap, *nasa]
 
     async def layer_manifest(
         self, session: AsyncSession, user_id: str, layer_id: str
     ) -> dict[str, Any]:
         release_id, separator, orbit = layer_id.rpartition(":")
-        if not separator or orbit not in ("am", "pm"):
+        if not separator:
             raise HTTPException(404, "Layer not found")
         row = await self.get_release(session, user_id, release_id)
+        if row.product == NASA_BUNDLE_PRODUCT:
+            layer = next((item for item in row.data["layers"] if item["id"] == orbit), None)
+            if layer is None:
+                raise HTTPException(404, "Layer not found")
+            legend = layer.get("legend", {})
+            return {
+                "id": layer_id,
+                "type": "raster",
+                "tile_size": 256,
+                "minzoom": 0,
+                "maxzoom": 14,
+                "tiles": [f"/agri-data/layers/{layer_id}/tiles/{{z}}/{{x}}/{{y}}"],
+                "bounds": layer["bounds"],
+                "start": row.data["start"],
+                "end": row.data["end"],
+                "pass": "HISTORICAL",
+                "unit": layer.get("unit", "unknown"),
+                "legend": {
+                    "min": float(legend.get("min", layer.get("display_min", 0))),
+                    "max": float(legend.get("max", layer.get("display_max", 1))),
+                    "colors": legend.get("colors", ["#375c3e", "#d9c26f", "#46919e", "#24547d"]),
+                    "missing": "transparent",
+                },
+                "resampling": "bilinear_visualization_only",
+                "spatial_support": layer.get("spatial_support", "native_product_grid"),
+                "limitations": [
+                    "Visualization only; resampling does not increase native information content.",
+                    *row.data["limitations"],
+                ],
+                "source": {
+                    "release_id": row.id,
+                    "product": layer["product"],
+                    "sha256": layer["sha256"],
+                    "recipe": layer.get("recipe", row.data["recipe"]),
+                },
+            }
+        if orbit not in ("am", "pm"):
+            raise HTTPException(404, "Layer not found")
         if row.product != "SPL3SMP_E" or orbit.upper() not in row.data["passes"]:
             raise HTTPException(404, "Layer not found")
         return {
@@ -185,6 +313,26 @@ class AgriDataService:
     ) -> bytes:
         manifest = await self.layer_manifest(session, user_id, layer_id)
         row = await self.get_release(session, user_id, manifest["source"]["release_id"])
+
+        if row.product == NASA_BUNDLE_PRODUCT:
+            layer_key = layer_id.rpartition(":")[2]
+            layer = next(item for item in row.data["layers"] if item["id"] == layer_key)
+            root = get_agri_data_settings().asset_root.resolve()
+            path = (root / row.id / layer["asset"]).resolve()
+            if not path.is_relative_to(root) or sha256_file(path) != layer["sha256"]:
+                raise HTTPException(503, "Layer asset is unavailable or invalid")
+            try:
+                return await asyncio.to_thread(
+                    cog_tile,
+                    path,
+                    z,
+                    x,
+                    y,
+                    manifest["legend"]["min"],
+                    manifest["legend"]["max"],
+                )
+            except (ValueError, OSError, RuntimeError):
+                raise HTTPException(503, "Layer asset is unavailable or invalid") from None
 
         def render() -> bytes:
             return raster_tile(_asset(row, manifest["pass"]), z, x, y)

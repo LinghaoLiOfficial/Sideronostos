@@ -86,6 +86,13 @@ export type CropV2 = {
   sow_end_mmdd: string;
   gdd_required: number;
   turnaround_days: number;
+  base_c: number;
+  upper_c: number;
+  max_growing_days: number;
+  kc: [number, number, number];
+  stage_fractions: [number, number, number, number];
+  cost_usd_ha: number;
+  labor_days_ha: number;
   parameter_origins: Record<string, string>;
 };
 export type ProfileV2 = {
@@ -105,6 +112,11 @@ export type ProfileV2 = {
     { title: string; url: string | null; kind: string; limitations?: string[] }
   >;
   parameter_origins: Record<string, string>;
+  sowing_step_days: number;
+};
+export type RotationProfileCatalogue = {
+  items: ProfileV2[];
+  default_profile_id: string;
 };
 export type RotationInput = {
   idempotency_key: string;
@@ -125,6 +137,74 @@ export type RotationInput = {
   scenario: { temperature_change_c: number; rainfall_change_pct: number };
   baseline: { field_id: string; crop_id: string; sow_date: string }[];
   accept_benchmark_assumptions: boolean;
+  data_release_id?: string | null;
+  horizon_mode?: "1y" | "2y" | "3y" | null;
+  max_options?: number;
+  solver_time_limit_seconds?: number;
+};
+export type RotationPreflightInput = Pick<
+  RotationInput,
+  | "profile_id"
+  | "start"
+  | "end"
+  | "allowed_crop_ids"
+  | "sow_windows"
+  | "scenario"
+  | "data_release_id"
+  | "horizon_mode"
+> & {
+  fields: Array<{
+    id: string;
+    expected_version: number;
+    require_crop: boolean;
+  }>;
+};
+export type CapacityViolation = {
+  dimension: "candidates" | "transition_edges";
+  count: number;
+  limit: number;
+  truncated: boolean;
+  factors: {
+    field_count: number;
+    crop_count: number;
+    year_count: number;
+    sampling_step_days: number;
+  };
+  message: string;
+  suggestion: string;
+};
+export type RotationPreflight = {
+  recipe: string;
+  profile_id: string;
+  profile_sha256: string;
+  sampling_step_days: number;
+  candidate_count: number;
+  candidate_count_truncated: boolean;
+  rejected_candidate_count: number;
+  transition_edge_count: number | null;
+  transition_edge_count_truncated: boolean;
+  limits: { max_candidates: number; max_transition_edges: number };
+  within_capacity: boolean;
+  violations: CapacityViolation[];
+};
+export type NasaDataRelease = {
+  id: string;
+  manifest_sha256: string;
+  status: string;
+  start: string;
+  end: string;
+  bounds: [number, number, number, number];
+  crs: string;
+  center: [number, number];
+  applicability: string;
+  model_usable: boolean;
+  complete_days: number;
+  expected_days: number;
+  products: Record<string, { model_usable: boolean; evidence_only?: boolean; valid_days?: number; expected_days?: number; product_version?: string; availability?: unknown }>;
+  layers: Array<{ id: string; product: string; asset: string; unit: string; bounds: [number, number, number, number]; time?: string; resolution?: string; native_resolution?: string; spatial_support?: string }>;
+  evidence_only: string[];
+  limitations: string[];
+  published_at: string | null;
 };
 export type Metrics = ResourceLimit & {
   cover_ha_days: number;
@@ -182,9 +262,18 @@ export type RunResult = {
   solver_attempts?: SolverResult[];
   weather_basis?: string;
   candidate_count?: number;
+  transition_edge_count?: number;
+  capacity?: RotationPreflight;
   sampling_step_days?: number;
   rejected_by_reason?: Record<string, number>;
   limitations?: string[];
+  scenario_recipe?: string;
+  data_release_id?: string | null;
+  solver_time_limit_seconds?: number;
+  solver_total_runtime_seconds?: number;
+  options_requested?: number;
+  options_generated?: number;
+  evidence_only?: string[];
 };
 export type RunV2 = {
   id: string;
@@ -204,6 +293,9 @@ export type RunV2 = {
     limitations: string[];
     sources: ProfileV2["sources"];
     parameter_origins: Record<string, string>;
+    data_release_id?: string | null;
+    data_release_sha256?: string | null;
+    data_release?: NasaDataRelease | null;
   };
   result: RunResult | null;
 };

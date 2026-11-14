@@ -89,6 +89,10 @@ function Header({
           <Sprout size={16} />
           轮作规划
         </Link>
+        <Link href="/field-shift/nasa-rotation">
+          <Layers size={16} />
+          NASA 回测
+        </Link>
       </nav>
       <Link
         className={styles.account}
@@ -228,7 +232,10 @@ function OwnerWorkspace({
     staleTime: 300000,
   });
   const selectedField = fields.data?.items.find((f) => f.id === requestedField),
-    profile = profiles.data?.items[0];
+    profile =
+      profiles.data?.items.find(
+        (item) => item.id === profiles.data?.default_profile_id,
+      ) ?? profiles.data?.items[0];
   const selection = useQuery({
     queryKey: ["rotation", owner.id, "selection", selectionId],
     queryFn: () => api.getSelection(selectionId!),

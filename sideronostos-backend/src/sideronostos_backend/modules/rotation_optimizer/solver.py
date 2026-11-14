@@ -33,10 +33,15 @@ def solve(
     time_limit: float = 30,
     cancelled: Callable[[], bool] | None = None,
     exclude: list[str] | None = None,
+    exclude_sets: list[list[str]] | None = None,
+    max_transition_edges: int | None = None,
 ) -> dict[str, Any]:
     if not math.isfinite(time_limit) or not 0 < time_limit <= 120:
         raise ValueError("Invalid solver time limit")
     if exclude is not None and not set(exclude) <= {c.id for c in problem.candidates}:
+        raise ValueError("Excluded selection contains unknown candidate")
+    excluded = ([exclude] if exclude is not None else []) + (exclude_sets or [])
+    if any(not set(selection) <= {c.id for c in problem.candidates} for selection in excluded):
         raise ValueError("Excluded selection contains unknown candidate")
     base: dict[str, Any] = {
         "status": "failed",
@@ -52,6 +57,7 @@ def solve(
         "optimality_scope": "generated_candidate_set",
         "time_limit_seconds": time_limit,
         "excluded_combination": exclude,
+        "excluded_combinations": excluded,
     }
     if cancelled and cancelled():
         return {**base, "status": "cancelled"}
@@ -59,17 +65,19 @@ def solve(
         with gp.Env(empty=True) as env:
             env.setParam("OutputFlag", 0)
             env.start()
-            model, variables = build_model(problem, env)
+            model, variables, transition_edges = build_model(
+                problem, env, max_transition_edges=max_transition_edges
+            )
             with model:
                 model.Params.TimeLimit = time_limit
                 model.Params.Threads = 1
                 model.Params.Seed = 0
                 model.Params.MIPGap = 1e-6
-                if exclude is not None:
-                    ids = set(exclude)
+                for index, selection in enumerate(excluded):
+                    ids = set(selection)
                     model.addConstr(
                         gp.quicksum(1 - v if k in ids else v for k, v in variables.items()) >= 1,
-                        name="exclude_prior_combination",
+                        name=f"exclude_prior_combination:{index}",
                     )
 
                 def callback(m: gp.Model, where: int) -> None:
@@ -86,6 +94,7 @@ def solve(
                     runtime_seconds=model.Runtime,
                     variable_count=model.NumVars,
                     constraint_count=model.NumConstrs,
+                    transition_edge_count=transition_edges,
                     mip_gap_tolerance=1e-6,
                 )
                 if status == "infeasible":

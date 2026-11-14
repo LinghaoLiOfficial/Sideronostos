@@ -7,22 +7,22 @@ export PYTHONPATH := $(CURDIR)/src$(if $(PYTHONPATH),:$(PYTHONPATH))
 unexport VIRTUAL_ENV
 
 dev:
-	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full
+	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full --extra nasa
 	uv run python -m sideronostos_backend.dev dev
 dev-workflow:
-	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full
+	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full --extra nasa
 	APP_PROFILE=workflow uv run python -m sideronostos_backend.dev dev
 dev-ai:
-	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full
+	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full --extra nasa
 	APP_PROFILE=ai uv run python -m sideronostos_backend.dev dev
 dev-identity:
-	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full
+	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full --extra nasa
 	APP_PROFILE=identity uv run python -m sideronostos_backend.dev dev
 dev-saas:
-	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full
+	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full --extra nasa
 	APP_PROFILE=saas uv run python -m sideronostos_backend.dev dev
 dev-full:
-	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full
+	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full --extra nasa
 	APP_PROFILE=full uv run python -m sideronostos_backend.dev dev
 gradio:
 	uv run python -m sideronostos_backend.gradio_app
@@ -39,7 +39,7 @@ infra-status:
 infra-reset:
 	uv run python -m sideronostos_backend.dev infra-reset
 check:
-	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full
+	uv sync --extra workflow --extra ai --extra identity --extra saas --extra full --extra nasa
 	uv run python -m ruff format .
 	uv run python -m ruff check .
 	uv run python -m mypy src

@@ -64,6 +64,51 @@ def replay_weather(
     return result
 
 
+def historical_weather(
+    source: dict[str, Any],
+    start: date,
+    end: date,
+    *,
+    temperature_change_c: float = 0,
+    rainfall_change_pct: float = 0,
+) -> dict[date, dict[str, Any]]:
+    """Select an observed historical window and apply a labelled sensitivity scenario."""
+    delta = finite_number(temperature_change_c, "temperature change")
+    rain_change = finite_number(rainfall_change_pct, "rainfall change")
+    if not -3 <= delta <= 5 or not -50 <= rain_change <= 50 or end < start:
+        raise ValueError("Invalid historical scenario")
+    indexed = {date.fromisoformat(row["date"]): row for row in source["days"]}
+    result: dict[date, dict[str, Any]] = {}
+    for offset in range((end - start).days + 1):
+        day = start + timedelta(days=offset)
+        old = indexed.get(day)
+        if old is None:
+            result[day] = {"date": day.isoformat(), "missing": ["historical_day"]}
+            continue
+        row = dict(old)
+        row.update(
+            weather_basis="scenario" if delta or rain_change else "observed_historical",
+            scenario_recipe="add-temperature-scale-rainfall-recompute-et0-v1",
+        )
+        for name in ("tmin_c", "tmax_c", "tdew_c"):
+            if row.get(name) is not None:
+                row[name] += delta
+        if row.get("rain_mm") is not None:
+            row["rain_mm"] *= 1 + rain_change / 100
+        names = ("tmin_c", "tmax_c", "tdew_c", "wind_2m_ms", "pressure_kpa", "shortwave")
+        row["et0_mm"] = None
+        if all(row.get(name) is not None for name in names):
+            row["et0_mm"] = fao56_et0(
+                day=day,
+                latitude=source["latitude"],
+                elevation_m=source["elevation_m"],
+                **{name: row[name] for name in names},
+                shortwave_unit=source["units"]["ALLSKY_SFC_SW_DWN"],
+            )
+        result[day] = row
+    return result
+
+
 def stage_kc(crop: CropV2, fraction: float) -> float:
     initial, development, middle, late = crop.stage_fractions
     k0, km, ke = crop.kc

@@ -9,6 +9,9 @@ class RotationSettings(EnvironmentSettings):
     model_config = EnvironmentSettings.model_config | {"env_prefix": "ROTATION_"}
     solve_seconds: float = Field(default=30, gt=0, le=60)
     max_pending_per_owner: int = Field(default=3, ge=1, le=10)
+    max_candidates: int = Field(default=2000, ge=1, le=100000)
+    max_transition_edges: int = Field(default=50000, ge=1, le=2000000)
+    default_profile_id: str = Field(default="iowa-benchmark-20261114-v2", min_length=1)
 
 
 @lru_cache

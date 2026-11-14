@@ -1,13 +1,19 @@
 """CPU-only execution from a frozen snapshot. No network, database or LLM calls."""
 
 from collections.abc import Callable
+from time import monotonic
 from typing import Any
 
-from .candidates import make_candidate, replay_weather
-from .prepare import generate_candidates
-from .profiles import ProfileV2
+from .candidates import make_candidate
+from .capacity import (
+    LEGACY_MAX_CANDIDATES,
+    LEGACY_MAX_TRANSITION_EDGES,
+    CapacityLimits,
+    capacity_report,
+    prepare_snapshot_candidates,
+)
 from .requests import RunRequest
-from .schemas import Candidate, PlanningField, Problem
+from .schemas import Candidate, Problem
 from .scientific_verify import verify_scientific_candidates
 from .solver import solve
 from .verify import verify_selection
@@ -47,20 +53,29 @@ def execute_snapshot(
     snapshot: dict[str, Any], *, time_limit: float = 30, cancelled: Callable[[], bool] | None = None
 ) -> dict[str, Any]:
     request = RunRequest.model_validate(snapshot["request"])
-    profile = ProfileV2.model_validate(snapshot["profile"])
-    fields = [PlanningField.model_validate(f) for f in snapshot["planning_fields"]]
-    weather = replay_weather(
-        snapshot["weather"], request.start, request.end, **request.scenario.model_dump()
+    raw_limits = snapshot.get("capacity") or {
+        "max_candidates": LEGACY_MAX_CANDIDATES,
+        "max_transition_edges": LEGACY_MAX_TRANSITION_EDGES,
+    }
+    limits = CapacityLimits(
+        max_candidates=int(raw_limits["max_candidates"]),
+        max_transition_edges=int(raw_limits["max_transition_edges"]),
     )
-    prepared = generate_candidates(
+    profile, fields, weather, prepared = prepare_snapshot_candidates(snapshot, limits)
+    capacity = capacity_report(
         profile=profile,
         fields=fields,
-        start=request.start,
-        end=request.end,
-        weather=weather,
-        allowed_crop_ids=request.allowed_crop_ids,
-        sow_windows=request.sow_windows,
+        prepared=prepared,
+        request=snapshot["request"],
+        limits=limits,
     )
+    capacity["profile_sha256"] = snapshot.get("provenance", {}).get("profile_sha256")
+    if not capacity["within_capacity"]:
+        return {
+            "status": "failed",
+            "error_code": "rotation_capacity_exceeded",
+            "capacity": capacity,
+        }
     problem = Problem(
         start=request.start,
         end=request.end,
@@ -72,14 +87,27 @@ def execute_snapshot(
         weights=request.weights or profile.default_weights,
         references=profile.references,
     )
-    first = solve(problem, time_limit=time_limit, cancelled=cancelled)
-    results = [first]
-    if first.get("selected_ids") and first["status"] not in ("cancelled", "failed"):
-        results.append(
-            solve(
-                problem, time_limit=time_limit, cancelled=cancelled, exclude=first["selected_ids"]
-            )
+    effective_limit = min(request.solver_time_limit_seconds, time_limit)
+    results: list[dict[str, Any]] = []
+    excluded: list[list[str]] = []
+    deadline = monotonic() + effective_limit
+    for _ in range(request.max_options):
+        remaining = deadline - monotonic()
+        if results and remaining <= 0.05:
+            break
+        result = solve(
+            problem,
+            time_limit=max(0.05, remaining),
+            cancelled=cancelled,
+            exclude_sets=excluded,
+            max_transition_edges=limits.max_transition_edges,
         )
+        results.append(result)
+        selected_ids = result.get("selected_ids") or []
+        if not selected_ids or result["status"] in ("cancelled", "failed", "infeasible"):
+            break
+        excluded.append(selected_ids)
+    first = results[0]
     options = []
     for index, result in enumerate(results):
         if result["solution_count"] and result["status"] not in ("cancelled", "failed"):
@@ -145,15 +173,38 @@ def execute_snapshot(
         "baseline": baseline,
         "solver_attempts": results,
         "candidate_count": len(problem.candidates),
+        "transition_edge_count": capacity["transition_edge_count"],
+        "capacity": capacity,
         "candidate_recipe": prepared["recipe"],
         "sampling_step_days": prepared["sampling_step_days"],
         "rejected_by_reason": prepared["rejected_by_reason"],
         "rejected_candidates": prepared["rejected"],
         "problem": problem.model_dump(mode="json"),
         "candidate_traces": prepared["traces"],
-        "weather_basis": "scenario"
-        if request.scenario.temperature_change_c or request.scenario.rainfall_change_pct
-        else "historical_replay",
+        "weather_basis": (
+            "scenario"
+            if request.scenario.temperature_change_c or request.scenario.rainfall_change_pct
+            else "observed_historical"
+            if request.data_release_id
+            else "historical_replay"
+        ),
+        "scenario_recipe": (
+            "add-temperature-scale-rainfall-recompute-et0-v1"
+            if request.data_release_id
+            else "month-day-repeat-feb28-v1"
+        ),
+        "data_release_id": request.data_release_id,
+        "solver_time_limit_seconds": effective_limit,
+        "solver_total_runtime_seconds": sum(
+            float(result.get("runtime_seconds", 0)) for result in results
+        ),
+        "options_requested": request.max_options,
+        "options_generated": len(options),
+        "evidence_only": snapshot.get("provenance", {})
+        .get("data_release", {})
+        .get("evidence_only", [])
+        if snapshot.get("provenance", {}).get("data_release")
+        else [],
         "limitations": profile.limitations,
         "objective_definition": {
             "weights": problem.weights.model_dump(),

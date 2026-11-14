@@ -560,6 +560,23 @@ export function RunResults({
           <Download size={14} />
           导出完整依据
         </button>
+        <button
+          disabled={actionBusy}
+          onClick={() =>
+            void perform(async () => {
+              const blob = await api.exportRunCsv(run.id);
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = `rotation-${run.id}.csv`;
+              link.click();
+              URL.revokeObjectURL(url);
+            })
+          }
+        >
+          <Download size={14} />
+          导出种植表 CSV
+        </button>
         <button onClick={() => window.print()}>
           <Printer size={14} />
           打印摘要

@@ -71,6 +71,28 @@ export async function replaceStoredWorkspace(farms: FarmFeature[], fields: Field
   await transaction.done
 }
 
+export async function deleteStoredFarm(farmId: string) {
+  const db = await database
+  const transaction = db.transaction(["farms", "fields", "observations"], "readwrite")
+  try {
+    const fieldsStore = transaction.objectStore("fields")
+    const observationsStore = transaction.objectStore("observations")
+    const farmFields = await fieldsStore.index("by-farm").getAll(farmId)
+    const observations = await Promise.all(farmFields.map((field) => observationsStore.index("by-field").getAll(field.properties.id)))
+    await Promise.all([
+      transaction.objectStore("farms").delete(farmId),
+      ...farmFields.map((field) => fieldsStore.delete(field.properties.id)),
+      ...observations.flat().map((observation) => observationsStore.delete(observation.id)),
+    ])
+    await transaction.done
+    return { fieldCount: farmFields.length }
+  } catch (error) {
+    try { transaction.abort() } catch { /* The transaction may already have aborted. */ }
+    await transaction.done.catch(() => undefined)
+    throw error
+  }
+}
+
 export async function getFieldObservations(fieldId: string) {
   return (await database).getAllFromIndex("observations", "by-field", fieldId)
 }

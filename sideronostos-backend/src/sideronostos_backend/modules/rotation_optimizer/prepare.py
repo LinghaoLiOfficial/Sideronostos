@@ -19,8 +19,9 @@ def generate_candidates(
     end: date,
     weather: dict[date, dict[str, Any]],
     allowed_crop_ids: list[str],
-    max_candidates: int = 240,
+    max_candidates: int | None = None,
     sow_windows: dict[str, tuple[str, str]] | None = None,
+    truncate_on_limit: bool = False,
 ) -> dict[str, Any]:
     crops = {crop.id: crop for crop in profile.crops}
     if not allowed_crop_ids or not set(allowed_crop_ids) <= crops.keys():
@@ -69,11 +70,28 @@ def generate_candidates(
                         else:
                             candidates.append(candidate)
                             traces[candidate.id] = generated["trace"]
-                            if len(candidates) > max_candidates:
+                            if (
+                                max_candidates is not None
+                                and len(candidates) > max_candidates
+                                and not truncate_on_limit
+                            ):
                                 raise ValueError(
                                     "Generated candidate limit exceeded; "
                                     "reduce fields, crops or dates"
                                 )
+                            if max_candidates is not None and len(candidates) > max_candidates:
+                                return {
+                                    "candidates": candidates,
+                                    "traces": traces,
+                                    "rejected": rejected,
+                                    "rejected_by_reason": dict(
+                                        Counter(row["reason"] for row in rejected)
+                                    ),
+                                    "sampling_step_days": profile.sowing_step_days,
+                                    "recipe": CANDIDATE_RECIPE,
+                                    "optimality_scope": "generated_candidate_set",
+                                    "candidate_count_truncated": True,
+                                }
                     day += timedelta(days=profile.sowing_step_days)
     return {
         "candidates": candidates,
@@ -83,4 +101,5 @@ def generate_candidates(
         "sampling_step_days": profile.sowing_step_days,
         "recipe": CANDIDATE_RECIPE,
         "optimality_scope": "generated_candidate_set",
+        "candidate_count_truncated": False,
     }

@@ -17,6 +17,7 @@ from ..database.session import create_engine, create_session_factory
 from .adapters.power import parse_power
 from .adapters.smap_l3 import prepare_smap
 from .models import ScienceRelease
+from .nasa_release import build_nasa_release, copy_release_assets
 from .settings import get_agri_data_settings
 
 
@@ -88,6 +89,16 @@ async def main_async(args: argparse.Namespace) -> None:
         )
         data["matching_policy"] = "point background lookup within 1000 m of requested coordinate"
         print(json.dumps(await publish(args.release, "NASA_POWER_DAILY", data)))
+    elif args.command == "publish-nasa-release":
+        manifest, assets = build_nasa_release(args.source)
+        destination = get_agri_data_settings().asset_root / args.release
+        destination.mkdir(parents=True, exist_ok=True)
+        copy_release_assets(assets, destination)
+        result = await publish(args.release, manifest["product"], manifest)
+        (destination / "manifest.json").write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+        )
+        print(json.dumps(result))
     else:
         manifest = json.loads((args.source / "manifest.json").read_text())
         if manifest["product"] != "SPL3SMP_E" or manifest["product_version"] != "006":
@@ -133,6 +144,9 @@ def main() -> None:
             action.add_argument("--longitude", type=float, required=True)
             action.add_argument("--start", type=date.fromisoformat, required=True)
             action.add_argument("--end", type=date.fromisoformat, required=True)
+    nasa = sub.add_parser("publish-nasa-release")
+    nasa.add_argument("--source", type=Path, required=True)
+    nasa.add_argument("--release", required=True)
     asyncio.run(main_async(parser.parse_args()))
 
 

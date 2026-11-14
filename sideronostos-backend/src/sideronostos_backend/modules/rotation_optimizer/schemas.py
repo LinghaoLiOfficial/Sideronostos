@@ -84,7 +84,7 @@ class Problem(Contract):
     start: date
     end: date
     fields: list[PlanningField] = Field(min_length=1, max_length=10)
-    candidates: list[Candidate] = Field(max_length=240)
+    candidates: list[Candidate]
     family_gaps: dict[str, Annotated[int, Field(ge=0)]]
     field_limits: dict[str, dict[int, ResourceLimit]] = Field(default_factory=dict)
     farm_limits: dict[int, ResourceLimit] = Field(default_factory=dict)

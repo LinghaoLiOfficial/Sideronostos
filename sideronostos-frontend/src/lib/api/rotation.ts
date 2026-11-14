@@ -1,4 +1,4 @@
-import { apiRequest } from "./client";
+import { apiBlob, apiRequest } from "./client";
 import type {
   AssistantContext,
   AssistantMessage,
@@ -10,11 +10,14 @@ import type {
   Fact,
   Geometry,
   LayerManifest,
+  NasaDataRelease,
   PlanSummaryV2,
-  ProfileV2,
   RegionFacts,
   RegionSelection,
   RotationInput,
+  RotationPreflight,
+  RotationPreflightInput,
+  RotationProfileCatalogue,
   RunV2,
   SavedV2,
   ScienceLayer,
@@ -50,7 +53,16 @@ export const listLayers = () =>
 export const getLayerManifest = (value: string) =>
   apiRequest<LayerManifest>(`/agri-data/layers/${id(value)}/manifest`);
 export const listRotationProfiles = () =>
-  apiRequest<{ items: ProfileV2[] }>("/rotation-optimizer/profiles");
+  apiRequest<RotationProfileCatalogue>("/rotation-optimizer/profiles");
+export const preflightRotation = (body: RotationPreflightInput) =>
+  apiRequest<RotationPreflight>("/rotation-optimizer/preflight", {
+    method: "POST",
+    body,
+  });
+export const listNasaDataReleases = () =>
+  apiRequest<{ items: NasaDataRelease[] }>("/rotation-optimizer/data-releases");
+export const getNasaDataRelease = (value: string) =>
+  apiRequest<NasaDataRelease>(`/rotation-optimizer/data-releases/${id(value)}`);
 export const createRun = (body: RotationInput) =>
   apiRequest<RunV2>("/rotation-optimizer/runs", { method: "POST", body });
 export const listRuns = () =>
@@ -69,6 +81,8 @@ export const exportRun = (value: string) =>
   apiRequest<RunV2 & { input_snapshot: unknown }>(
     `/rotation-optimizer/runs/${id(value)}/export`,
   );
+export const exportRunCsv = (value: string) =>
+  apiBlob(`/rotation-optimizer/runs/${id(value)}/export.csv`);
 export const listRotationPlans = () =>
   apiRequest<{ items: PlanSummaryV2[] }>("/rotation-optimizer/plans");
 export const getRotationPlan = (value: string) =>

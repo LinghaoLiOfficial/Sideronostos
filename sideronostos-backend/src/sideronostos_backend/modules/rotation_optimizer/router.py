@@ -1,15 +1,19 @@
+import csv
+import io
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import Field, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..agri_data.service import AgriDataService
 from ..auth.dependencies import AuthPrincipal, require_verified_user
 from ..database.session import get_session
 from .profiles import list_profiles
-from .requests import RunRequest
+from .requests import PreflightRequest, RunRequest
 from .schemas import Contract
 from .service import RotationService
+from .settings import get_rotation_settings
 
 router = APIRouter(prefix="/rotation-optimizer", tags=["rotation-optimizer"])
 User = Annotated[AuthPrincipal, Depends(require_verified_user)]
@@ -32,7 +36,41 @@ class CompareRequest(Contract):
 
 @router.get("/profiles")
 async def profiles(user: User) -> dict[str, Any]:
-    return {"items": list_profiles()}
+    return {
+        "items": list_profiles(),
+        "default_profile_id": get_rotation_settings().default_profile_id,
+    }
+
+
+@router.get("/data-releases")
+async def data_releases(user: User, session: Session) -> dict[str, Any]:
+    return {"items": await AgriDataService().nasa_releases(session, user.id)}
+
+
+@router.get("/data-releases/{release_id}")
+async def data_release(release_id: str, user: User, session: Session) -> dict[str, Any]:
+    return await AgriDataService().nasa_release(session, user.id, release_id)
+
+
+@router.post("/preflight")
+async def preflight(body: PreflightRequest, user: User, session: Session) -> dict[str, Any]:
+    return await RotationService().preflight(session, user.id, body)
+
+
+@router.get("/data-releases/{release_id}/availability")
+async def data_release_availability(
+    release_id: str, user: User, session: Session
+) -> dict[str, Any]:
+    release = await AgriDataService().nasa_release(session, user.id, release_id)
+    return {
+        "id": release["id"],
+        "model_usable": release["model_usable"],
+        "start": release["start"],
+        "end": release["end"],
+        "bounds": release["bounds"],
+        "products": release["products"],
+        "evidence_only": release["evidence_only"],
+    }
 
 
 @router.post("/runs", status_code=202)
@@ -53,6 +91,48 @@ async def get(run_id: str, user: User, session: Session) -> dict[str, Any]:
 @router.get("/runs/{run_id}/export")
 async def export(run_id: str, user: User, session: Session) -> dict[str, Any]:
     return await RotationService().get_run(session, user.id, run_id, evidence=True)
+
+
+@router.get("/runs/{run_id}/export.csv")
+async def export_csv(run_id: str, user: User, session: Session) -> Response:
+    run = await RotationService().get_run(session, user.id, run_id, evidence=True)
+    stream = io.StringIO()
+    columns = (
+        "run_id",
+        "option_id",
+        "field_id",
+        "crop_id",
+        "family",
+        "sow_date",
+        "harvest_date",
+        "occupied_until",
+        "water_gap_mm",
+        "data_release_id",
+        "data_release_sha256",
+        "warning",
+    )
+    writer = csv.DictWriter(stream, fieldnames=columns)
+    writer.writeheader()
+    result = run.get("result") or {}
+    for option in [*(result.get("options") or []), result.get("baseline")]:
+        if not option:
+            continue
+        for season in option.get("seasons", []):
+            writer.writerow(
+                {
+                    **{key: season.get(key) for key in columns if key in season},
+                    "run_id": run["id"],
+                    "option_id": option["id"],
+                    "data_release_id": run["provenance"].get("data_release_id"),
+                    "data_release_sha256": run["provenance"].get("data_release_sha256"),
+                    "warning": "Historical engineering benchmark; not future planting advice",
+                }
+            )
+    return Response(
+        stream.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="rotation-{run_id}.csv"'},
+    )
 
 
 @router.post("/runs/{run_id}/cancel")

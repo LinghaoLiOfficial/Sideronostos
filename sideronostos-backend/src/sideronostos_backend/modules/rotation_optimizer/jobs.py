@@ -59,7 +59,8 @@ async def run_job(
             await asyncio.sleep(0.5)
 
     watch = asyncio.create_task(monitor())
-    limit = get_rotation_settings().solve_seconds
+    request_limit = float(snapshot.get("request", {}).get("solver_time_limit_seconds", 30))
+    limit = min(get_rotation_settings().solve_seconds, request_limit)
     try:
         result = await asyncio.wait_for(
             asyncio.to_thread(execute_snapshot, snapshot, time_limit=limit, cancelled=stop.is_set),

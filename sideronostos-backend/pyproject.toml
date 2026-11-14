@@ -25,9 +25,25 @@ observability = [
 knowledge = ["jieba>=0.42,<1", "pgvector>=0.4,<0.5", "pymupdf>=1.26,<2"]
 science = ["numpy>=2.2,<3", "h5py>=3.14,<4", "pyproj>=3.7,<4", "shapely>=2.1,<3"]
 optimizer = ["gurobipy>=13,<14"]
+nasa = [
+  "earthaccess>=0.19,<0.20",
+  "h5py>=3.14,<4",
+  "h5netcdf>=1.6,<2",
+  "httpx>=0.28,<1",
+  "netCDF4>=1.7,<2",
+  "numpy>=2.2,<3",
+  "pillow>=11,<13",
+  "pydap>=3.5,<4",
+  "pyproj>=3.7,<4",
+  "rasterio>=1.4,<2",
+  "shapely>=2.1,<3",
+  "xarray>=2025.1,<2027",
+]
 assistant = ["sideronostos-backend[knowledge,science,optimizer]"]
 [project.scripts]
 sideronostos_backend = "sideronostos_backend.app:app"
+sideronostos_nasa = "sideronostos_backend.modules.agri_data.acquisition.cli:main"
+sideronostos_agri_data = "sideronostos_backend.modules.agri_data.cli:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

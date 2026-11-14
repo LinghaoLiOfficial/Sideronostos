@@ -6,11 +6,14 @@ from typing import Any
 import gurobipy as gp
 from gurobipy import GRB
 
+from .capacity import compatible_arcs
 from .coefficients import resources
 from .schemas import Problem
 
 
-def build_model(problem: Problem, env: gp.Env) -> tuple[gp.Model, dict[str, Any]]:
+def build_model(
+    problem: Problem, env: gp.Env, *, max_transition_edges: int | None = None
+) -> tuple[gp.Model, dict[str, Any], int]:
     model = gp.Model("rotation-v2", env=env)
     x = {c.id: model.addVar(vtype=GRB.BINARY, name=f"x:{c.id}") for c in problem.candidates}
     field_map = {f.id: f for f in problem.fields}
@@ -24,14 +27,9 @@ def build_model(problem: Problem, env: gp.Env) -> tuple[gp.Model, dict[str, Any]
             model.addConstr(u == 1, name=f"required_crop:{f.id}")
         starts = {c.id: model.addVar(vtype=GRB.BINARY) for c in cs}
         ends = {c.id: model.addVar(vtype=GRB.BINARY) for c in cs}
-        arcs = [
-            (a, b)
-            for a in cs
-            for b in cs
-            if a.occupied_until < b.sow_date and a.crop_id != b.crop_id
-        ]
+        arcs = compatible_arcs(cs)
         edges_count += len(arcs)
-        if edges_count > 1200:
+        if max_transition_edges is not None and edges_count > max_transition_edges:
             model.dispose()
             raise ValueError("candidate_graph_too_large: narrow windows or increase sampling step")
         y = {(a.id, b.id): model.addVar(vtype=GRB.BINARY) for a, b in arcs}
@@ -102,4 +100,4 @@ def build_model(problem: Problem, env: gp.Env) -> tuple[gp.Model, dict[str, Any]
         GRB.MAXIMIZE,
     )
     model.update()
-    return model, x
+    return model, x, edges_count

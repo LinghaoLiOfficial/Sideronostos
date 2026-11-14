@@ -19,6 +19,12 @@ class FieldChoice(Contract):
     history_reviewed: bool
 
 
+class CapacityFieldChoice(Contract):
+    id: Identifier
+    expected_version: int = Field(strict=True, ge=1)
+    require_crop: bool = True
+
+
 class Scenario(Contract):
     temperature_change_c: float = Field(default=0, ge=-3, le=5)
     rainfall_change_pct: float = Field(default=0, ge=-50, le=50)
@@ -44,11 +50,22 @@ class RunRequest(Contract):
     scenario: Scenario = Field(default_factory=Scenario)
     baseline: list[BaselineSeason] = Field(default_factory=list, max_length=60)
     accept_benchmark_assumptions: bool
+    data_release_id: Identifier | None = None
+    horizon_mode: Literal["1y", "2y", "3y"] | None = None
+    max_options: int = Field(default=2, ge=1, le=5)
+    solver_time_limit_seconds: float = Field(default=30, ge=5, le=60)
 
     @model_validator(mode="after")
     def complete_request(self) -> Self:
         if not 0 <= (self.end - self.start).days <= 1095 or not 2000 <= self.start.year <= 2197:
             raise ValueError("Planning horizon must be ordered and at most three years")
+        if (self.data_release_id is None) != (self.horizon_mode is None):
+            raise ValueError("NASA data release and horizon mode must be selected together")
+        if self.horizon_mode:
+            horizon_years = int(self.horizon_mode[0])
+            expected_end = date(self.start.year + horizon_years - 1, 12, 31)
+            if self.start.month != 1 or self.start.day != 1 or self.end != expected_end:
+                raise ValueError("NASA historical horizons must contain complete calendar years")
         for first, last in self.sow_windows.values():
             try:
                 # A recurring window must be valid in every planning year, including non-leap years.
@@ -85,6 +102,45 @@ class RunRequest(Contract):
             raise ValueError("Duplicate baseline season")
         if self.weights and any(v > 5 for v in self.weights.model_dump().values()):
             raise ValueError("Preference weights must be between zero and five")
+        return self
+
+
+class PreflightRequest(Contract):
+    profile_id: Identifier
+    fields: list[CapacityFieldChoice] = Field(min_length=1, max_length=10)
+    start: date
+    end: date
+    allowed_crop_ids: list[Identifier] = Field(min_length=1, max_length=20)
+    sow_windows: dict[str, tuple[str, str]] = Field(default_factory=dict)
+    scenario: Scenario = Field(default_factory=Scenario)
+    data_release_id: Identifier | None = None
+    horizon_mode: Literal["1y", "2y", "3y"] | None = None
+
+    @model_validator(mode="after")
+    def complete_preflight(self) -> Self:
+        if not 0 <= (self.end - self.start).days <= 1095 or not 2000 <= self.start.year <= 2197:
+            raise ValueError("Planning horizon must be ordered and at most three years")
+        if (self.data_release_id is None) != (self.horizon_mode is None):
+            raise ValueError("NASA data release and horizon mode must be selected together")
+        if self.horizon_mode:
+            horizon_years = int(self.horizon_mode[0])
+            expected_end = date(self.start.year + horizon_years - 1, 12, 31)
+            if self.start.month != 1 or self.start.day != 1 or self.end != expected_end:
+                raise ValueError("NASA historical horizons must contain complete calendar years")
+        for first, last in self.sow_windows.values():
+            try:
+                dates = [date.fromisoformat(f"2001-{value}") for value in (first, last)]
+                if first > last or any(
+                    parsed.strftime("%m-%d") != value
+                    for parsed, value in zip(dates, (first, last), strict=True)
+                ):
+                    raise ValueError("Unordered or noncanonical calendar window")
+            except ValueError as error:
+                raise ValueError("Sowing windows require ordered valid MM-DD dates") from error
+        if len({field.id for field in self.fields}) != len(self.fields) or len(
+            set(self.allowed_crop_ids)
+        ) != len(self.allowed_crop_ids):
+            raise ValueError("Duplicate field or crop selection")
         return self
 
 

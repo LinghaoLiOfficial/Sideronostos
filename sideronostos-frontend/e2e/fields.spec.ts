@@ -33,11 +33,11 @@ test("generates and confirms a complete farm partition", async ({ page }, testIn
   await page.reload()
   if (mobile) {
     await page.getByRole("button", { name: "Farms", exact: true }).click()
-    await page.getByRole("button", { name: /Demo farm 1/ }).click()
+    await page.getByRole("button", { name: /^Demo farm 1 / }).click()
     await page.getByRole("button", { name: "Close panel" }).click()
     await page.getByRole("button", { name: "Details", exact: true }).click()
   } else {
-    await page.getByRole("button", { name: /Demo farm 1/ }).click()
+    await page.getByRole("button", { name: /^Demo farm 1 / }).click()
   }
   await expect(page.getByRole("button", { name: "Regular grid" })).toHaveAttribute("aria-pressed", "true")
   await expect(page.getByRole("button", { name: "Map axes" })).toHaveAttribute("aria-pressed", "true")
@@ -79,7 +79,51 @@ test("renders mobile controls without horizontal overflow", async ({ page }) => 
   expect(overflow).toBe(false)
 })
 
-test("imports and exports farm GeoJSON and controls NASA layers", async ({ page }) => {
+test("shows NASA analysis with spatial layers and responsive charts", async ({ page }, testInfo) => {
+  await page.goto("/fields")
+  await page.getByRole("tab", { name: /NASA/ }).click()
+  await expect(page.getByRole("heading", { name: "NASA data analysis" })).toBeVisible()
+  await expect(page.getByText("2022-01-01 — 2024-12-31")).toBeVisible()
+  await expect(page.getByRole("img", { name: /Precipitation and reference ET/ })).toBeVisible()
+  await expect(page.getByTestId("nasa-analysis-map")).toBeVisible()
+  await page.getByRole("button", { name: "SRTM terrain" }).click()
+  await expect(page.getByText(/SRTM elevation image/)).toBeVisible()
+  if (testInfo.project.name === "mobile") {
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
+    expect(overflow).toBe(false)
+  }
+  await page.getByRole("tab", { name: "Map" }).click()
+  await expect(page.getByRole("heading", { name: "Farm partition map" })).toBeVisible()
+})
+
+test("confirms farm deletion and preserves data when cancelled", async ({ page }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile"
+  await page.goto("/fields")
+  await loadDemoFarm(page, mobile)
+
+  const deleteButton = page.getByRole("button", { name: "Delete Demo farm 1" })
+  await expect(deleteButton).toBeVisible()
+  await deleteButton.click()
+  const dialog = page.getByRole("dialog")
+  await expect(dialog).toContainText("Demo farm 1")
+  await expect(dialog).toContainText("4 associated fields")
+  await dialog.getByRole("button", { name: "Cancel" }).click()
+  await expect(dialog).toHaveCount(0)
+  await expect(page.getByText("Demo farm 1").last()).toBeVisible()
+  await expect(page.getByText("Field 1").last()).toBeVisible()
+
+  await page.getByRole("button", { name: "Add demo farm" }).click()
+  await expect(page.getByText("Demo farm 2").last()).toBeVisible()
+  await page.getByRole("button", { name: /^Demo farm 1 / }).click()
+  await deleteButton.click()
+  await dialog.getByRole("button", { name: "Delete farm" }).click()
+  await expect(page.getByText("Demo farm 1", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("Demo farm 2").last()).toBeVisible()
+  await expect(page.getByText("Field 4").last()).toBeVisible()
+  await expect(page.getByRole("status")).toContainText("Demo farm 1 and its 4 fields were deleted")
+})
+
+test("imports and exports farm GeoJSON without removed SMAP layers", async ({ page }) => {
   const mobile = test.info().project.name === "mobile"
   await page.goto("/fields")
   if (mobile) await page.getByRole("button", { name: "Farms", exact: true }).click()
@@ -103,12 +147,7 @@ test("imports and exports farm GeoJSON and controls NASA layers", async ({ page 
   await page.getByRole("button", { name: "Export", exact: true }).click()
   expect((await download).suggestedFilename()).toBe("field-shift-farms-and-fields.geojson")
 
-  if (mobile) {
-    await page.getByRole("button", { name: "Close panel" }).click()
-    await page.getByRole("button", { name: "Layers", exact: true }).click()
-  }
-  await page.getByRole("button", { name: "Hide SMAP soil moisture · day" }).click()
-  await expect(page.getByRole("button", { name: "Show SMAP soil moisture · day" })).toBeVisible()
-  await page.getByRole("button", { name: "Show SMAP soil moisture · day" }).click()
-  await expect(page.getByAltText("SMAP soil moisture · day legend").last()).toBeVisible()
+  await expect(page.getByText("SMAP soil moisture · day", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("SMAP soil moisture · night", { exact: true })).toHaveCount(0)
+  if (mobile) await expect(page.getByRole("button", { name: "Layers", exact: true })).toHaveCount(0)
 })
