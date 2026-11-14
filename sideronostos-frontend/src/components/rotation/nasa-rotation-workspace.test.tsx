@@ -35,7 +35,7 @@ const profile = {
   id: "iowa-profile", name: "Iowa", sha256: "b".repeat(64), scope: "benchmark",
   crops: [{ id: "maize", name: "玉米", family: "Poaceae", sow_start_mmdd: "04-15", sow_end_mmdd: "05-15", gdd_required: 1200, turnaround_days: 7, base_c: 10, upper_c: 30, max_growing_days: 180, kc: [.3, 1.2, .6], stage_fractions: [.2, .3, .3, .2], cost_usd_ha: 900, labor_days_ha: 4, parameter_origins: {} }],
   limitations: [], weather_release_id: "weather", weather_center: [-93.5, 42], weather_radius_km: 5,
-  history_catalogue: {}, default_weights: { cover: 2, diversity: 1, water: 1, cost: .5 }, sources: {}, parameter_origins: {},
+  history_catalogue: {}, default_weights: { cover: 2, diversity: 1, water: 1, cost: .5 }, sources: {}, parameter_origins: {}, sowing_step_days: 7,
 } as ProfileV2;
 const field = {
   id: "field-1", version: 1, name: "North field", area_ha: 32, latitude: 42, longitude: -93.5,

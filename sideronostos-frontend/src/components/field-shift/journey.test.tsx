@@ -114,3 +114,15 @@ describe("farmer journey", () => {
     }
   });
 });
+
+it("keeps a newer managed-field draft across local-to-server identity assignment", async () => {
+  const props = { profiles: [profile], userId: "owner", onSave: vi.fn(), draftKey: "managed:stable-local-id", geometryLocked: true };
+  const first = render(<FieldForm {...props} field={{ ...field, id: "local:stable-local-id" }} />);
+  fireEvent.change(screen.getByLabelText("地块名称"), { target: { value: "未提交的更新名称" } });
+  first.unmount();
+  const dirty = vi.fn();
+  render(<FieldForm {...props} field={{ ...field, id: "server-id" }} onDirtyChange={dirty} />);
+  expect(screen.getByLabelText("地块名称")).toHaveValue("未提交的更新名称");
+  expect(dirty).toHaveBeenCalledWith(true);
+  expect(screen.getByLabelText("经度")).toHaveAttribute("readonly");
+});
