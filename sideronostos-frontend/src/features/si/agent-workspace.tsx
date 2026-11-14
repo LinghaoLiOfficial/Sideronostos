@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen, Globe2, Leaf, LoaderCircle, Menu, Plus, Radio, RotateCcw, X } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { BotComposer } from "@/components/bot/BotComposer";
+import { BotAvatar } from "@/components/bot/Bot";
+import { botCatalog, type CatalogBot } from "@/lib/bot-catalog";
 import { getCurrentUser, type AuthUser } from "@/lib/api/client";
 import { setLocale, useLocale } from "@/lib/i18n/locale";
 import type { AssistantMessage, Citation, Fact } from "@/lib/api/rotation-types";
@@ -22,9 +24,11 @@ const labels = {
   en: { title: "Your assistants", history: "Conversations", newChat: "New chat", empty: "No conversations yet", choose: "Choose an assistant to start a conversation.", start: "Start a conversation", loading: "Loading conversations…", pending: "Working on your request…", error: "Something went wrong. Your draft is safe.", failed: "This reply could not be completed.", mock: "Local prices and crop varieties are mock examples, not live local data.", source: "View source", older: "Load earlier messages", signIn: "Sign in to use your assistants", login: "Sign in", back: "Back to fields", retry: "Try again" },
   zh: { title: "你的助手", history: "对话记录", newChat: "新建对话", empty: "还没有对话", choose: "选择一位助手，开始对话。", start: "开始对话", loading: "正在加载对话…", pending: "正在处理你的请求…", error: "发生错误。草稿已保留。", failed: "这条回复未能完成。", mock: "价格与品种数据为模拟数据，并非实时本地数据。", source: "查看依据", older: "加载更早的消息", signIn: "登录后使用助手", login: "登录", back: "返回地块", retry: "重试" },
 };
-function name(domain: AgentDomain, zh: boolean) {
-  const item = domains.find((entry) => entry.id === domain);
-  return item ? (zh ? item.zh : item.en) : domain;
+function defaultBot(domain: AgentDomain): CatalogBot {
+  return botCatalog.find((bot) => bot.presetId === domain) ?? botCatalog[0];
+}
+function conversationBot(item: AgentConversation): CatalogBot {
+  return botCatalog.find((bot) => bot.id === item.bot_id && bot.presetId === item.preset) ?? defaultBot(item.preset);
 }
 function sourceView(source: Fact | Citation) {
   return "excerpt" in source
@@ -39,7 +43,9 @@ export function AgentWorkspace() {
   const [user, setUser] = useState<AuthUser | null | undefined>();
   const [items, setItems] = useState<AgentConversation[]>([]);
   const [domain, setDomain] = useState<AgentDomain>("field_management");
-  const visibleItems = items.filter((item) => item.preset === domain);
+  const [selectedBotId, setSelectedBotId] = useState(defaultBot("field_management").id);
+  const selectedBot = botCatalog.find((bot) => bot.id === selectedBotId) ?? defaultBot(domain);
+  const visibleItems = items.filter((item) => conversationBot(item).id === selectedBot.id);
   const [id, setId] = useState<string | null>(null);
   const [page, setPage] = useState<AgentConversationPage | null>(null);
   const [draft, setDraft] = useState("");
@@ -72,6 +78,7 @@ export function AgentWorkspace() {
           active.current = first.id;
           setId(first.id);
           setDomain(first.preset);
+          setSelectedBotId(conversationBot(first).id);
         }
       } catch (cause) {
         if (!live) return;
@@ -96,17 +103,23 @@ export function AgentWorkspace() {
     retryId.current = null;
     retryText.current = null;
     setDomain(next);
+    setSelectedBotId(defaultBot(next).id);
     setId(null);
     setPage(null);
     setDraft("");
     setError(null);
     setMenu(false);
   }
+  function chooseBot(bot: CatalogBot) {
+    chooseDomain(bot.presetId as AgentDomain);
+    setSelectedBotId(bot.id);
+  }
   function chooseChat(item: AgentConversation) {
     active.current = item.id;
     retryId.current = null;
     retryText.current = null;
     setDomain(item.preset);
+    setSelectedBotId(conversationBot(item).id);
     setId(item.id);
     setPage(null);
     setDraft("");
@@ -119,7 +132,7 @@ export function AgentWorkspace() {
     setBusy(true);
     setError(null);
     try {
-      const chat = await api.createConversation({ preset: domain, language: zh ? "zh" : "en", detail: "brief" });
+      const chat = await api.createConversation({ preset: domain, bot_id: selectedBot.id, language: zh ? "zh" : "en", detail: "brief" });
       setItems((previous) => [chat, ...previous]);
       active.current = chat.id;
       justCreated.current = chat.id;
@@ -201,19 +214,25 @@ export function AgentWorkspace() {
           return <button key={entry.id} type="button" aria-pressed={domain === entry.id} onClick={() => chooseDomain(entry.id)} className={(domain === entry.id ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground") + " flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left focus-visible:outline-2 focus-visible:outline-primary"}><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"><Icon size={18} aria-hidden="true" /></span><span><span className="block font-medium">{zh ? entry.zh : entry.en}</span>{entry.id === "local_agriculture" && <span className="block text-xs leading-5 text-muted-foreground">{l.mock}</span>}</span></button>;
         })}</div>
         <div className="flex items-center justify-between border-t border-border px-5 py-3"><h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{l.history}</h2><button type="button" onClick={() => void create()} disabled={busy} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-primary hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50"><Plus size={16} aria-hidden="true" />{l.newChat}</button></div>
-        <nav aria-label={l.history} className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{visibleItems.length === 0 ? <p className="px-3 py-4 text-sm text-muted-foreground">{l.empty}</p> : visibleItems.map((item) => <button key={item.id} type="button" onClick={() => chooseChat(item)} aria-current={id === item.id ? "page" : undefined} className={(id === item.id ? "bg-muted font-medium" : "text-muted-foreground hover:bg-muted/70") + " mb-1 flex w-full flex-col rounded-lg px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-primary"}><span>{name(item.preset, zh)}</span><time className="text-xs text-muted-foreground" dateTime={item.updated_at}>{new Intl.DateTimeFormat(zh ? "zh-CN" : "en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(item.updated_at))}</time></button>)}</nav>
+        <nav aria-label={l.history} className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{visibleItems.length === 0 ? <p className="px-3 py-4 text-sm text-muted-foreground">{l.empty}</p> : visibleItems.map((item) => <button key={item.id} type="button" onClick={() => chooseChat(item)} aria-current={id === item.id ? "page" : undefined} className={(id === item.id ? "bg-muted font-medium" : "text-muted-foreground hover:bg-muted/70") + " mb-1 flex w-full flex-col rounded-lg px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-primary"}><span>{conversationBot(item).name[locale]}</span><time className="text-xs text-muted-foreground" dateTime={item.updated_at}>{new Intl.DateTimeFormat(zh ? "zh-CN" : "en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(item.updated_at))}</time></button>)}</nav>
         <Link href="/fields" className="flex items-center gap-2 border-t border-border px-5 py-4 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft size={16} />{l.back}</Link>
       </aside>
-      <section className="flex min-h-0 min-w-0 flex-col" aria-label={name(domain, zh)}>
-        <div className="flex h-16 shrink-0 items-center border-b border-border px-5 sm:px-8"><h2 className="text-lg font-semibold">{name(domain, zh)}</h2></div>
+      <section className="flex min-h-0 min-w-0 flex-col" aria-label={selectedBot.name[locale]}>
+        <div className="shrink-0 border-b border-border px-4 py-3 sm:px-8">
+          <h2 className="text-lg font-semibold">{selectedBot.name[locale]}</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">{selectedBot.capability[locale]}</p>
+          <nav aria-label={zh ? "Bot 身份" : "Bot identities"} className="mt-3 flex gap-2 overflow-x-auto pb-1">
+            {botCatalog.map((bot) => <button key={bot.id} type="button" aria-label={bot.name[locale]} aria-pressed={selectedBot.id === bot.id} onClick={() => chooseBot(bot)} className={(selectedBot.id === bot.id ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:bg-muted") + " flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-primary"}><BotAvatar variant={bot.avatar} small /><span>{bot.name[locale]}</span></button>)}
+          </nav>
+        </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8" aria-live="polite"><div className="mx-auto flex min-h-full max-w-3xl flex-col">
           {page?.next_before_sequence && <button type="button" className="mx-auto mb-6 text-sm text-primary" onClick={() => void older()} disabled={busy}>{l.older}</button>}
-          {!page?.messages.length && !outgoing && <div className="my-auto py-12 text-center"><div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-primary/15 text-primary"><Leaf size={28} /></div><h3 className="text-2xl font-semibold">{l.start}</h3><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">{zh ? domains.find((item) => item.id === domain)?.zhHint : domains.find((item) => item.id === domain)?.enHint}</p></div>}
+          {!page?.messages.length && !outgoing && <div className="my-auto py-12 text-center"><div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-primary/15 text-primary"><BotAvatar variant={selectedBot.avatar} /></div><h3 className="text-2xl font-semibold">{l.start}</h3><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">{selectedBot.capability[locale]}</p></div>}
           <div className="space-y-6">{page?.messages.map((message) => <div key={message.id} className="space-y-3"><div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground">{message.text}</div><div className="max-w-[95%] rounded-2xl rounded-bl-sm bg-muted px-4 py-3 text-sm leading-7 sm:max-w-[85%]">{message.status === "pending" ? <span className="flex items-center gap-2 text-muted-foreground"><LoaderCircle size={15} className="animate-spin" />{l.pending}</span> : message.status === "failed" || message.status === "interrupted" ? <span role="alert">{l.failed}</span> : message.response ? <>{message.response.paragraphs.map((paragraph, index) => <p key={index} className="mb-2 last:mb-0">{paragraph.text}</p>)}{[...new Set(message.response.paragraphs.flatMap((paragraph) => paragraph.evidence_ids))].map((evidence) => <button key={evidence} type="button" onClick={() => void openSource(message, evidence)} className="mr-2 mt-2 rounded-md border border-border px-2 py-1 text-xs text-primary">{l.source} {evidence}</button>)}{message.facts.length > 0 && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer">{zh ? "查看当时的数据" : "View data used"}</summary><dl>{message.facts.map((fact) => <div key={fact.id}><dt className="inline font-medium">{fact.label}: </dt><dd className="inline">{fact.display}</dd></div>)}</dl></details>}{message.response.actions.includes("open_planner") && <Link href="/field-shift/rotation" className="mt-3 block text-xs text-primary underline">{zh ? "打开轮作规划" : "Open rotation planner"}</Link>}</> : null}</div></div>)}{outgoing && <div className="ml-auto w-fit max-w-[85%] rounded-2xl bg-primary/70 px-4 py-3 text-sm text-primary-foreground">{outgoing}</div>}</div><div ref={end} />
         </div></div>
         {error && <div role="alert" className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2 text-sm text-destructive"><span>{error === "failed" ? l.failed : l.error}</span>{!user && <button type="button" className="shrink-0 underline" onClick={() => { setError(null); setLoading(true); setReload((value) => value + 1); }}>{l.retry}</button>}</div>}
         {source && <section aria-label={zh ? "依据详情" : "Source details"} className="mx-auto mb-2 w-[calc(100%-2rem)] max-w-3xl rounded-lg border border-border bg-card p-4 text-sm"><div className="flex justify-between gap-2"><h3 className="font-semibold">{source.title}</h3><button type="button" aria-label={zh ? "关闭依据" : "Close source"} onClick={() => setSource(null)}><X size={16} /></button></div><p className="mt-2 text-muted-foreground">{source.text}</p></section>}
-        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{id && user && <AgentActions key={id} conversationId={id} ensureConversation={create} domain={domain} language={zh ? "zh" : "en"} userId={user.id} />}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + name(domain, zh) + "留言" : "Message " + name(domain, zh)} placeholder={zh ? "说说你想了解或完成什么…" : "Ask a question or describe a task…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
+        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{id && user && <AgentActions key={id} conversationId={id} ensureConversation={create} domain={domain} botId={selectedBot.id} language={zh ? "zh" : "en"} userId={user.id} />}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + selectedBot.name[locale] + "留言" : "Message " + selectedBot.name[locale]} placeholder={zh ? "说说你想了解或完成什么…" : "Ask a question or describe a task…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
       </section>
     </main>}
   </div>;

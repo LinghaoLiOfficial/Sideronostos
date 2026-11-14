@@ -47,10 +47,37 @@ it("creates a conversation in the chosen domain and keeps it selectable in histo
   await user.click(screen.getByRole("button", { name: /Remote sensing/ }));
   await user.click(screen.getByRole("button", { name: "New chat" }));
   await waitFor(() => expect(api.createConversation).toHaveBeenCalledWith({
-    preset: "remote_sensing", language: "en", detail: "brief",
+    preset: "remote_sensing", bot_id: "remote-water", language: "en", detail: "brief",
   }));
-  expect(await screen.findByRole("heading", { name: "Remote sensing" })).toBeInTheDocument();
-  expect(within(screen.getByRole("navigation", { name: "Conversations" })).getByRole("button", { name: /Remote sensing/ })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Water specialist" })).toBeInTheDocument();
+  expect(within(screen.getByRole("navigation", { name: "Conversations" })).getByRole("button", { name: /Water specialist/ })).toBeInTheDocument();
+});
+
+it("creates a conversation for the selected specialist identity", async () => {
+  const user = userEvent.setup();
+  api.listConversations.mockResolvedValue({ items: [] });
+  api.createConversation.mockResolvedValue({ id: "soil-1", bot_id: "remote-soil", preset: "remote_sensing", language: "en", detail: "brief", kb_release_id: "kb", created_at: "2026-11-14T08:00:00Z", updated_at: "2026-11-14T08:00:00Z" });
+  render(<AgentWorkspace />);
+  await screen.findByRole("heading", { name: "Your assistants" });
+  await user.click(screen.getByRole("button", { name: "Soil specialist" }));
+  await user.click(screen.getByRole("button", { name: "New chat" }));
+  await waitFor(() => expect(api.createConversation).toHaveBeenCalledWith({ preset: "remote_sensing", bot_id: "remote-soil", language: "en", detail: "brief" }));
+  expect(screen.getByRole("heading", { name: "Soil specialist" })).toBeInTheDocument();
+});
+
+it("keeps history separate for water and soil specialists in the same module", async () => {
+  const user = userEvent.setup();
+  const water = { id: "water-1", bot_id: "remote-water", preset: "remote_sensing", language: "en", detail: "brief", kb_release_id: "kb", created_at: "2026-11-14T08:00:00Z", updated_at: "2026-11-14T08:00:00Z" };
+  const soil = { ...water, id: "soil-1", bot_id: "remote-soil", created_at: "2026-11-13T08:00:00Z", updated_at: "2026-11-13T08:00:00Z" };
+  api.listConversations.mockResolvedValue({ items: [water, soil] });
+  api.getConversation.mockImplementation(async (id: string) => ({ ...(id === water.id ? water : soil), messages: [], next_before_sequence: null }));
+  render(<AgentWorkspace />);
+  const history = await screen.findByRole("navigation", { name: "Conversations" });
+  await waitFor(() => expect(within(history).getAllByRole("button")).toHaveLength(1));
+  expect(within(history).getByRole("button", { name: /Water specialist/ })).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Soil specialist" }));
+  expect(within(history).getByRole("button", { name: /Soil specialist/ })).toBeInTheDocument();
+  expect(within(history).queryByRole("button", { name: /Water specialist/ })).not.toBeInTheDocument();
 });
 
 it("shows only the selected domain's conversation history", async () => {
@@ -62,10 +89,10 @@ it("shows only the selected domain's conversation history", async () => {
   render(<AgentWorkspace />);
   const history = await screen.findByRole("navigation", { name: "Conversations" });
   await waitFor(() => expect(within(history).getAllByRole("button")).toHaveLength(1));
-  expect(within(history).getByRole("button", { name: /Remote sensing/ })).toBeInTheDocument();
+  expect(within(history).getByRole("button", { name: /Water specialist/ })).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: /Field management/ }));
-  expect(within(history).getByRole("button", { name: /Field management/ })).toBeInTheDocument();
-  expect(within(history).queryByRole("button", { name: /Remote sensing/ })).not.toBeInTheDocument();
+  expect(within(history).getByRole("button", { name: /Field guide/ })).toBeInTheDocument();
+  expect(within(history).queryByRole("button", { name: /Water specialist/ })).not.toBeInTheDocument();
 });
 
 it("restores an existing conversation and submits its message to that conversation", async () => {
@@ -87,7 +114,7 @@ it("restores an existing conversation and submits its message to that conversati
     facts: [], error_code: null, created_at: "2026-11-14T08:00:00Z", completed_at: "2026-11-14T08:00:01Z",
   });
   render(<AgentWorkspace />);
-  const composer = await screen.findByRole("textbox", { name: "Message Field management" });
+  const composer = await screen.findByRole("textbox", { name: "Message Field guide" });
   await user.type(composer, "How is my field?");
   await user.click(screen.getByRole("button", { name: "Send message" }));
   await waitFor(() => expect(api.sendMessage).toHaveBeenCalledWith("field-1", expect.objectContaining({ text: "How is my field?" })));
@@ -145,7 +172,7 @@ it("keeps the first reply when an empty-chat load finishes late", async () => {
     facts: [], error_code: null, created_at: "2026-11-14T08:00:00Z", completed_at: "2026-11-14T08:00:01Z",
   });
   render(<AgentWorkspace />);
-  const composer = await screen.findByRole("textbox", { name: "Message Field management" });
+  const composer = await screen.findByRole("textbox", { name: "Message Field guide" });
   await user.type(composer, "Tell me about my field");
   await user.click(screen.getByRole("button", { name: "Send message" }));
   expect(await screen.findByText("Here is your field.")).toBeInTheDocument();
@@ -173,7 +200,7 @@ it("uses a new idempotency key when a failed message is edited", async () => {
     facts: [], error_code: null, created_at: "2026-11-14T08:00:00Z", completed_at: "2026-11-14T08:00:01Z",
   });
   render(<AgentWorkspace />);
-  const composer = await screen.findByRole("textbox", { name: "Message Field management" });
+  const composer = await screen.findByRole("textbox", { name: "Message Field guide" });
   await user.type(composer, "Original text");
   await user.click(screen.getByRole("button", { name: "Send message" }));
   await screen.findByRole("alert");

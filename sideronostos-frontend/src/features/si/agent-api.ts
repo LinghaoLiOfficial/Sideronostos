@@ -5,6 +5,7 @@ export type AgentDomain = "field_management" | "remote_sensing" | "local_agricul
 export type AgentConversation = {
   id: string;
   preset: AgentDomain;
+  bot_id: string;
   language: "en" | "zh";
   detail: "brief" | "detailed";
   kb_release_id: string;
@@ -32,7 +33,7 @@ const path = (conversation: string) => `/farm-assistant/conversations/${encodeUR
 export const listConversations = () =>
   apiRequest<{ items: AgentConversation[] }>("/farm-assistant/conversations");
 
-export const createConversation = (body: { preset: AgentDomain; language: "en" | "zh"; detail: "brief" | "detailed" }) =>
+export const createConversation = (body: { preset: AgentDomain; bot_id?: string; language: "en" | "zh"; detail: "brief" | "detailed" }) =>
   apiRequest<AgentConversation>("/farm-assistant/conversations", { method: "POST", body });
 
 export const getConversation = (conversation: string, before?: number) =>

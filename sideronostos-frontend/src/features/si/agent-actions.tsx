@@ -13,6 +13,7 @@ type Props = {
   conversationId: string | null;
   ensureConversation: () => Promise<string | null>;
   domain: AgentDomain;
+  botId?: string;
   language: "en" | "zh";
   userId: string;
 };
@@ -39,7 +40,7 @@ function resultHref(outcome: AgentActionOutcome): string | null {
   return null;
 }
 
-export function AgentActions({ conversationId, ensureConversation, domain, language, userId }: Props) {
+export function AgentActions({ conversationId, ensureConversation, domain, botId, language, userId }: Props) {
   const c = copy[language];
   const [action, setAction] = useState<AgentActionName | null>(null);
   const [outcome, setOutcome] = useState<AgentActionOutcome | null>(null);
@@ -116,7 +117,7 @@ export function AgentActions({ conversationId, ensureConversation, domain, langu
     } else if (action === "remote_sensing.layer") args.layer_id = values.layer_id;
     else {
       args.selection_id = values.selection_id?.trim();
-      args.metric = values.metric || "surface_soil_moisture";
+      args.metric = values.metric && metrics.includes(values.metric) ? values.metric : metrics[0];
       if (values.start && values.end) { args.start = values.start; args.end = values.end; }
     }
     setBusy(true);
@@ -131,7 +132,8 @@ export function AgentActions({ conversationId, ensureConversation, domain, langu
   function update(key: string, value: string) { setValues((previous) => ({ ...previous, [key]: value })); }
   const common = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-primary";
   const field = (key: string, label: string, type = "text", required = true) => <label className="block text-sm"><span className="mb-1 block font-medium">{label}</span><input className={common} aria-label={label} type={type} step={type === "number" ? "any" : undefined} required={required} value={values[key] ?? ""} onChange={(event) => update(key, event.target.value)} /></label>;
-  const available = domain === "field_management" || domain === "remote_sensing" ? actions[domain] : [];
+  const available = domain === "field_management" ? actions.field_management : domain === "remote_sensing" ? botId === "remote-weather" ? ["remote_sensing.fact" as AgentActionName] : actions.remote_sensing : [];
+  const metrics = botId === "remote-soil" ? ["surface_soil_moisture"] : botId === "remote-weather" ? ["rainfall_total", "reference_et0_total"] : ["surface_soil_moisture", "rainfall_total", "reference_et0_total"];
   if (available.length === 0) return null;
   const href = outcome ? resultHref(outcome) : null;
   return <section aria-label={c.choose} className="mx-auto mb-3 max-h-[min(45dvh,26rem)] w-full max-w-3xl overflow-y-auto rounded-xl border border-border bg-card p-3 text-sm sm:p-4">
@@ -142,7 +144,7 @@ export function AgentActions({ conversationId, ensureConversation, domain, langu
     {action && outcome && (outcome.status === "needs_input" || (outcome.status === "failed" && outcome.pending)) && <form className="mt-4 grid gap-3 sm:grid-cols-2" onSubmit={(event) => { event.preventDefault(); void advance(); }}>
       {action === "field.create" && <>{field("name", c.name)}{field("area_ha", c.area, "number")}{field("latitude", c.lat, "number")}{field("longitude", c.lon, "number")}<label className="block text-sm"><span className="mb-1 block font-medium">{c.soil}</span><select className={common} value={values.soil_texture || "unknown"} onChange={(event) => update("soil_texture", event.target.value)}><option value="unknown">{c.unknown}</option><option value="sand">{c.sand}</option><option value="loam">{c.loam}</option><option value="clay">{c.clay}</option></select></label><label className="block text-sm"><span className="mb-1 block font-medium">{c.profile}</span><select className={common} aria-label={c.profile} required value={values.profile_id ?? ""} onChange={(event) => update("profile_id", event.target.value)}><option value="">—</option>{profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select></label><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={values.irrigation_available === "true"} onChange={(event) => update("irrigation_available", String(event.target.checked))} />{c.irrigation}</label></>}
       {action === "remote_sensing.layer" && <label className="block text-sm"><span className="mb-1 block font-medium">{c.published}</span><select className={common} aria-label={c.published} required value={values.layer_id ?? ""} onChange={(event) => update("layer_id", event.target.value)}><option value="">—</option>{layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.title}</option>)}</select>{layers.length === 0 && <span className="mt-1 block text-muted-foreground">{c.noLayers}</span>}</label>}
-      {action === "remote_sensing.fact" && <>{field("selection_id", c.selection)}<label className="block text-sm"><span className="mb-1 block font-medium">{c.metric}</span><select className={common} value={values.metric || "surface_soil_moisture"} onChange={(event) => update("metric", event.target.value)}><option value="surface_soil_moisture">{c.moisture}</option><option value="rainfall_total">{c.rainfall}</option><option value="reference_et0_total">{c.et0}</option></select></label>{field("start", c.start, "date", false)}{field("end", c.end, "date", false)}</>}
+      {action === "remote_sensing.fact" && <>{field("selection_id", c.selection)}<label className="block text-sm"><span className="mb-1 block font-medium">{c.metric}</span><select className={common} value={values.metric && metrics.includes(values.metric) ? values.metric : metrics[0]} onChange={(event) => update("metric", event.target.value)}>{metrics.map((metric) => <option key={metric} value={metric}>{metric === "surface_soil_moisture" ? c.moisture : metric === "rainfall_total" ? c.rainfall : c.et0}</option>)}</select></label>{field("start", c.start, "date", false)}{field("end", c.end, "date", false)}</>}
       <div className="sm:col-span-2"><button type="submit" disabled={busy || (action === "remote_sensing.layer" && layers.length === 0)} className="rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground disabled:opacity-50">{c.continue}</button></div>
     </form>}
   </section>;

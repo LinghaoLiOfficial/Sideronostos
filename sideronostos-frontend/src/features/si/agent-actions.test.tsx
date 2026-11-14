@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AgentActions } from "./agent-actions";
 
@@ -67,4 +67,23 @@ it("restores the newest pending action from the owned server history", async () 
   render(<AgentActions conversationId="chat-4" ensureConversation={async () => "chat-4"} domain="remote_sensing" language="en" userId="owner-1" />);
   expect(await screen.findByRole("combobox", { name: "Published layer" })).toBeInTheDocument();
   expect(localStorage.getItem("agrisata-action:owner-1:chat-4")).toBe("saved-key");
+});
+
+it("offers each remote specialist only its supported actions and observations", async () => {
+  const user = userEvent.setup();
+  api.postAction.mockResolvedValue({ status: "needs_input", action: "remote_sensing.fact", text: "Please provide a selection.", missing_fields: ["selection_id"], pending: { arguments: {} }, result: null, href: null });
+  const common = { conversationId: "chat-5", ensureConversation: async () => "chat-5", domain: "remote_sensing" as const, language: "en" as const, userId: "owner-1" };
+  const weather = render(<AgentActions {...common} botId="remote-weather" />);
+  expect(screen.queryByRole("button", { name: "Open published layer" })).not.toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Find published observation" }));
+  const weatherMetrics = screen.getByRole("combobox", { name: "Observation" });
+  expect(within(weatherMetrics).queryByRole("option", { name: "Surface soil moisture" })).not.toBeInTheDocument();
+  expect(within(weatherMetrics).getByRole("option", { name: "Rainfall total" })).toBeInTheDocument();
+  weather.unmount();
+  localStorage.clear();
+  render(<AgentActions {...common} botId="remote-soil" />);
+  await user.click(screen.getByRole("button", { name: "Find published observation" }));
+  const soilMetrics = screen.getByRole("combobox", { name: "Observation" });
+  expect(within(soilMetrics).getByRole("option", { name: "Surface soil moisture" })).toBeInTheDocument();
+  expect(within(soilMetrics).queryByRole("option", { name: "Rainfall total" })).not.toBeInTheDocument();
 });
