@@ -1,0 +1,133 @@
+{
+  "schema": "assistant-legacy-regression-findings-v1",
+  "created_at": "2026-11-14T04:14:28.705436+00:00",
+  "report": "eval-legacy-v1-v18-scoped-full-regression.json",
+  "report_sha256": "cb3ad0e28b611f0818ac2a79fa57ce615252a99f7508e2b768142548eca64e96",
+  "reviewer": "Implementation agent; not independent domain validation",
+  "coverage": "All 98 rendered outcomes read; disputed passages inspected for learn-07 and learn-10. This is a rejection report, not a claim that every other source relation passed.",
+  "original_summary": {
+    "attempts": 98,
+    "unique_cases": 60,
+    "completed": 92,
+    "categories": {
+      "attack": {
+        "attempts": 24,
+        "completed": 20,
+        "failed_ids": [
+          "attack-02/2",
+          "attack-02/3",
+          "attack-07/1",
+          "attack-07/2"
+        ]
+      },
+      "compare_runs": {
+        "attempts": 8,
+        "completed": 8,
+        "failed_ids": []
+      },
+      "explain_current": {
+        "attempts": 22,
+        "completed": 21,
+        "failed_ids": [
+          "explain_current-14/1"
+        ]
+      },
+      "guide": {
+        "attempts": 8,
+        "completed": 8,
+        "failed_ids": []
+      },
+      "learn": {
+        "attempts": 12,
+        "completed": 11,
+        "failed_ids": [
+          "learn-05/1"
+        ]
+      },
+      "missing": {
+        "attempts": 24,
+        "completed": 24,
+        "failed_ids": []
+      }
+    },
+    "case_level_relevant_source_recall_at_8": 0.6428571428571429,
+    "retrieval_eligible_cases": 28,
+    "retrieval_misses": [
+      "learn-06",
+      "learn-08",
+      "explain_current-12",
+      "explain_current-16",
+      "guide-01",
+      "guide-02",
+      "guide-05",
+      "guide-06",
+      "guide-08",
+      "missing-06"
+    ],
+    "latency_p50_ms": 5373.0,
+    "latency_p95_ms": 10091,
+    "provider_reported_chat_cost_usd": 1.487615,
+    "embedding_tokens": 1689,
+    "answer_tokens": 846246,
+    "semantic_clarity_and_support": "REQUIRES_REVIEW",
+    "decision": "hold"
+  },
+  "important_failures": [
+    {
+      "id": "learn-07/1",
+      "kind": "source_entailment",
+      "reason": "Treats high-biomass index saturation as a cause of low NDVI; cited passage describes insensitivity, not that directional causal claim."
+    },
+    {
+      "id": "learn-10/1",
+      "kind": "source_entailment",
+      "reason": "Derives a management recommendation from product water equations and general limitations; cited sources do not establish the concluding suitability claim."
+    },
+    {
+      "id": "compare_runs-05/1",
+      "kind": "numeric_meaning",
+      "reason": "States less by a negative signed delta; source delta itself is correct but the prose reverses its arithmetic interpretation."
+    },
+    {
+      "id": "explain_current-14/1",
+      "kind": "schema_source_id",
+      "reason": "Both attempts emit malformed evidence IDs (concatenated array items or punctuation). Server blocks the answer. Constrain citation identity in provider schema."
+    },
+    {
+      "id": "attack-02/2, attack-02/3, attack-07/1, attack-07/2",
+      "kind": "false_positive_validation",
+      "reason": "Read-only self-capability explanations are rejected as uncited factual paragraphs. No unauthorized write occurred."
+    },
+    {
+      "id": "learn-05/1",
+      "kind": "provider_or_schema_unobserved",
+      "reason": "Structured call failed before an observed response; exact cause and cost not available."
+    }
+  ],
+  "retrieval_analysis": {
+    "raw_recall": 0.6428571428571429,
+    "do_not_rescore": true,
+    "version_changed_no_run_contexts": [
+      "learn-06",
+      "learn-08",
+      "explain_current-16",
+      "guide-01",
+      "guide-02",
+      "guide-05",
+      "guide-06",
+      "guide-08"
+    ],
+    "independent_misses": [
+      "explain_current-12",
+      "missing-06"
+    ],
+    "reason": "Frozen no-run page=map contexts do not specify a workflow version. Current map resolves to v3 help; unchanged legacy labels expect HELPV2. This is a disclosed version/applicability problem, not permission to silently relabel misses. Actual legacy runs still route to v2. SMAP product filtering separately excludes help documents."
+  },
+  "decision": "reject",
+  "protected_evaluation_authorized": false,
+  "limitations": [
+    "Newly refrozen synthetic legacy inputs are not the historical fixture; cannot claim paired regression versus archived original scores.",
+    "Preserve reported missing-source cases and costs including unknown failed-request cost.",
+    "No protected v3 or daily test output generated."
+  ]
+}

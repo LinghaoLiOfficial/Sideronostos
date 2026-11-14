@@ -9,7 +9,7 @@ import re
 from typing import Any
 
 from .daily_evidence import daily_option_state, daily_verified, is_daily_run
-from .intents import excluded_product_sources
+from .intents import compares_current_alternatives, excluded_product_sources
 from .schemas import fact_is_renderable
 
 METRIC_WORDS = {
@@ -40,13 +40,7 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
     )
     calendar = bool(re.search(r"日期|日历|收获|播种|calendar|harvest|sow", text))
     compare = context.get("comparison")
-    both_options = not compare and bool(
-        re.search(
-            r"两个方案|两种方案|各个方案|这些方案|备选方案|"
-            r"(?:two|both|all|these) options|alternatives",
-            text,
-        )
-    )
+    both_options = compares_current_alternatives(question, context)
     compare_request = bool(
         compare
         or (

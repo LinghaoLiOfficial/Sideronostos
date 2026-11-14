@@ -1,0 +1,53 @@
+{
+  "schema": "legacy-derived-fixture-provenance-v1",
+  "created_at": "2026-11-14T03:58:59.205890+00:00",
+  "source_v1_sha256": "165b6c278e0e88482fe836194e57d4a37b838a84e1549fa6b5252fa17c5fb569",
+  "origin": "prepare.py generated North/South benchmark contexts in rollback-only transaction using public published science and actual solver runs; synthetic history explicitly specified",
+  "private_data": "No real farmer pilot, credentials or account email in inspected model projections",
+  "mapping_policy": "Copy each context_fixture exactly; no question, expectation, result value or reference changed",
+  "protected_outputs_generated": false,
+  "versions": [
+    {
+      "version": 1,
+      "cases": 60,
+      "case_sha256": "41985bfa558fb7a58108b44bd0440e050c7d3d5b5ebc4888acf7ae1fec7a6134",
+      "fixture_sha256": "165b6c278e0e88482fe836194e57d4a37b838a84e1549fa6b5252fa17c5fb569",
+      "fixture_file": "../data/knowledge/eval-fixtures-v1-refrozen-20261114.json",
+      "all_projected_fields_synthetic": true,
+      "no_email_or_key_in_projection": true,
+      "owner_gate_results": {
+        "run": true,
+        "field": true,
+        "selection": true
+      }
+    },
+    {
+      "version": 2,
+      "cases": 20,
+      "case_sha256": "1982a654fbda9dd680246f6bd0a11e7801fe4ce4b8b005870cfe1ecb0d333afa",
+      "fixture_sha256": "c97aaa8361514ccd112c8ac3a4ba58e41770335c0825cffc16110c0b1fa6c797",
+      "fixture_file": "../data/knowledge/eval-fixtures-v2-refrozen-20261114.json",
+      "all_projected_fields_synthetic": true,
+      "no_email_or_key_in_projection": true,
+      "owner_gate_results": {
+        "run": true,
+        "field": true,
+        "selection": true
+      }
+    },
+    {
+      "version": 3,
+      "cases": 20,
+      "case_sha256": "a6b6514e1d5768a9fda7f431a112704ec44e8651b8d6afc0a5b68310630b095c",
+      "fixture_sha256": "ea648915056b84d0ad915a78687c5eb7ab0f57ed085f0f75c64fed9e4121a07c",
+      "fixture_file": "../data/knowledge/eval-fixtures-v3-refrozen-20261114.json",
+      "all_projected_fields_synthetic": true,
+      "no_email_or_key_in_projection": true,
+      "owner_gate_results": {
+        "run": true,
+        "field": true,
+        "selection": true
+      }
+    }
+  ]
+}

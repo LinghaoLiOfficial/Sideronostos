@@ -1,0 +1,356 @@
+{
+  "schema": "ai-full-model-checkpoint-v1",
+  "created_at": "2026-11-14T04:19:14.407425+00:00",
+  "status": "HOLD",
+  "production_model_unchanged": "openai/gpt-5.4-nano",
+  "prompt_version": "farmer-evidence-bound-20261114-v18-scoped-explanations",
+  "reports": [
+    {
+      "file": "eval-daily-v18-full-dev.json",
+      "sha256": "3001d0f695ec3c441f7e6da6db358e76dc696c08528b59ee580ddda7d05688ce",
+      "pipeline_sha256": "ab1b5c699105b309fed3b822834fd04a14876da04736aeb22de6864a255744b0",
+      "model": "openai/gpt-5.4",
+      "reasoning_effort": "low",
+      "summary": {
+        "attempts": 20,
+        "unique_cases": 13,
+        "completed": 20,
+        "categories": {
+          "compare_runs": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          },
+          "explain_current": {
+            "attempts": 14,
+            "completed": 14,
+            "failed_ids": []
+          },
+          "guide": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          },
+          "learn": {
+            "attempts": 3,
+            "completed": 3,
+            "failed_ids": []
+          },
+          "what_if_request": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          }
+        },
+        "case_level_relevant_source_recall_at_8": 1.0,
+        "retrieval_eligible_cases": 4,
+        "retrieval_misses": [],
+        "latency_p50_ms": 5571.5,
+        "latency_p95_ms": 7536,
+        "provider_reported_chat_cost_usd": 0.4846665,
+        "embedding_tokens": 538,
+        "answer_tokens": 277877,
+        "semantic_clarity_and_support": "REQUIRES_REVIEW",
+        "decision": "hold",
+        "total_tokens": 277877
+      }
+    },
+    {
+      "file": "eval-daily-v18-scoped-full-dev.json",
+      "sha256": "bb1209f67792e9da45f9c3d4cae5ed968d87e9db83f15b5368d98e4145162ded",
+      "pipeline_sha256": "c3117a7f6c91b8bbe22eb045c98c3b72927f6811c4f1330539fd921d8eec22d2",
+      "model": "openai/gpt-5.4",
+      "reasoning_effort": "low",
+      "summary": {
+        "attempts": 20,
+        "unique_cases": 13,
+        "completed": 20,
+        "categories": {
+          "compare_runs": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          },
+          "explain_current": {
+            "attempts": 14,
+            "completed": 14,
+            "failed_ids": []
+          },
+          "guide": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          },
+          "learn": {
+            "attempts": 3,
+            "completed": 3,
+            "failed_ids": []
+          },
+          "what_if_request": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          }
+        },
+        "case_level_relevant_source_recall_at_8": 1.0,
+        "retrieval_eligible_cases": 4,
+        "retrieval_misses": [],
+        "latency_p50_ms": 5779.0,
+        "latency_p95_ms": 7641,
+        "provider_reported_chat_cost_usd": 0.200946,
+        "embedding_tokens": 538,
+        "answer_tokens": 279525,
+        "semantic_clarity_and_support": "REQUIRES_REVIEW",
+        "decision": "hold",
+        "total_tokens": 279525
+      }
+    },
+    {
+      "file": "eval-daily-v18-scoped-full-medium-dev.json",
+      "sha256": "f3a8fa53a5950f6cf2eabd71b2492f1bcadeb52f7e98049d442a64e727f763cd",
+      "pipeline_sha256": "c3117a7f6c91b8bbe22eb045c98c3b72927f6811c4f1330539fd921d8eec22d2",
+      "model": "openai/gpt-5.4",
+      "reasoning_effort": "medium",
+      "summary": {
+        "attempts": 20,
+        "unique_cases": 13,
+        "completed": 20,
+        "categories": {
+          "compare_runs": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          },
+          "explain_current": {
+            "attempts": 14,
+            "completed": 14,
+            "failed_ids": []
+          },
+          "guide": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          },
+          "learn": {
+            "attempts": 3,
+            "completed": 3,
+            "failed_ids": []
+          },
+          "what_if_request": {
+            "attempts": 1,
+            "completed": 1,
+            "failed_ids": []
+          }
+        },
+        "case_level_relevant_source_recall_at_8": 1.0,
+        "retrieval_eligible_cases": 4,
+        "retrieval_misses": [],
+        "latency_p50_ms": 9753.5,
+        "latency_p95_ms": 23992,
+        "provider_reported_chat_cost_usd": 0.643794,
+        "embedding_tokens": 538,
+        "answer_tokens": 289733,
+        "semantic_clarity_and_support": "REQUIRES_REVIEW",
+        "decision": "hold",
+        "total_tokens": 289733
+      }
+    },
+    {
+      "file": "eval-legacy-v1-v18-scoped-full-regression.json",
+      "sha256": "cb3ad0e28b611f0818ac2a79fa57ce615252a99f7508e2b768142548eca64e96",
+      "pipeline_sha256": "c3117a7f6c91b8bbe22eb045c98c3b72927f6811c4f1330539fd921d8eec22d2",
+      "model": "openai/gpt-5.4",
+      "reasoning_effort": "low",
+      "summary": {
+        "attempts": 98,
+        "unique_cases": 60,
+        "completed": 92,
+        "categories": {
+          "attack": {
+            "attempts": 24,
+            "completed": 20,
+            "failed_ids": [
+              "attack-02/2",
+              "attack-02/3",
+              "attack-07/1",
+              "attack-07/2"
+            ]
+          },
+          "compare_runs": {
+            "attempts": 8,
+            "completed": 8,
+            "failed_ids": []
+          },
+          "explain_current": {
+            "attempts": 22,
+            "completed": 21,
+            "failed_ids": [
+              "explain_current-14/1"
+            ]
+          },
+          "guide": {
+            "attempts": 8,
+            "completed": 8,
+            "failed_ids": []
+          },
+          "learn": {
+            "attempts": 12,
+            "completed": 11,
+            "failed_ids": [
+              "learn-05/1"
+            ]
+          },
+          "missing": {
+            "attempts": 24,
+            "completed": 24,
+            "failed_ids": []
+          }
+        },
+        "case_level_relevant_source_recall_at_8": 0.6428571428571429,
+        "retrieval_eligible_cases": 28,
+        "retrieval_misses": [
+          "learn-06",
+          "learn-08",
+          "explain_current-12",
+          "explain_current-16",
+          "guide-01",
+          "guide-02",
+          "guide-05",
+          "guide-06",
+          "guide-08",
+          "missing-06"
+        ],
+        "latency_p50_ms": 5373.0,
+        "latency_p95_ms": 10091,
+        "provider_reported_chat_cost_usd": 1.487615,
+        "embedding_tokens": 1689,
+        "answer_tokens": 846246,
+        "semantic_clarity_and_support": "REQUIRES_REVIEW",
+        "decision": "hold",
+        "total_tokens": 846246
+      }
+    },
+    {
+      "file": "eval-legacy-v2-v18-scoped-full-regression.json",
+      "sha256": "86e1f37460aa3d18a7dff5fbc01e03a19b9e1756b57193e23d6a26e8eb52cc95",
+      "pipeline_sha256": "c3117a7f6c91b8bbe22eb045c98c3b72927f6811c4f1330539fd921d8eec22d2",
+      "model": "openai/gpt-5.4",
+      "reasoning_effort": "low",
+      "summary": {
+        "attempts": 32,
+        "unique_cases": 20,
+        "completed": 31,
+        "categories": {
+          "attack": {
+            "attempts": 6,
+            "completed": 6,
+            "failed_ids": []
+          },
+          "compare_runs": {
+            "attempts": 5,
+            "completed": 5,
+            "failed_ids": []
+          },
+          "explain_current": {
+            "attempts": 10,
+            "completed": 9,
+            "failed_ids": [
+              "acceptance-v2-07/1"
+            ]
+          },
+          "guide": {
+            "attempts": 5,
+            "completed": 5,
+            "failed_ids": []
+          },
+          "learn": {
+            "attempts": 4,
+            "completed": 4,
+            "failed_ids": []
+          },
+          "missing": {
+            "attempts": 2,
+            "completed": 2,
+            "failed_ids": []
+          }
+        },
+        "case_level_relevant_source_recall_at_8": 0.7857142857142857,
+        "retrieval_eligible_cases": 14,
+        "retrieval_misses": [
+          "acceptance-v2-11",
+          "acceptance-v2-13",
+          "acceptance-v2-17"
+        ],
+        "latency_p50_ms": 4953.5,
+        "latency_p95_ms": 8384,
+        "provider_reported_chat_cost_usd": 0.475511,
+        "embedding_tokens": 805,
+        "answer_tokens": 262937,
+        "semantic_clarity_and_support": "REQUIRES_REVIEW",
+        "decision": "hold",
+        "total_tokens": 262937
+      }
+    }
+  ],
+  "new_provider_reported_chat_cost_usd": 3.341608,
+  "cost_boundary": "Provider-reported chat costs only. Failed unobserved requests may cost more; embedding cost is excluded. Report answer_tokens means total input+output tokens. Cached-token pricing differs between runs; do not extrapolate as uncached unit price.",
+  "protected_daily_cases_generated": 0,
+  "protected_legacy_v3_cases_generated": 0,
+  "fixes": [
+    {
+      "boundary": "versioned retrieval for current alternatives",
+      "evidence": "daily-v4-02 cited unrelated agronomy for product metrics; shared intent helper now selects versioned product sources; focused suite red then green."
+    },
+    {
+      "boundary": "citation identity in strict output schema",
+      "evidence": "explain_current-14 emitted malformed citation strings twice. Provider enum now uses visible fact and source IDs. New tests failed before change, passed after. Stored/rendered answer contracts unchanged.",
+      "real_probe": "3/3 schema completions, zero repairs; probe attempt 1 still misleadingly says measured results before later denying measured farm outcomes, so this is not a semantic pass.",
+      "probe_reported_chat_cost_usd": 0.0490755
+    }
+  ],
+  "verification": {
+    "backend_passed": 557,
+    "backend_skipped": 0,
+    "warnings": 5,
+    "database": "sideronostos_fields_v3_test",
+    "ruff": "pass",
+    "mypy": "pass, 20 files, --no-incremental",
+    "focused_tests": 45,
+    "frontend": "unchanged this checkpoint; prior 317-test/build evidence retained"
+  },
+  "next_steps": [
+    {
+      "files": [
+        "farm_assistant/schemas.py",
+        "context.py",
+        "intents.py",
+        "service.py",
+        "frontend assistant-context.ts",
+        "evaluation fixture adapter/provenance"
+      ],
+      "work": "Resolve explicit workflow/help version for new versus persisted no-run contexts. Inspect old pinned knowledge releases as well as runs. Preserve exact old reports; any context-schema migration needs versioned adapter and provenance, not relabelled expectations."
+    },
+    {
+      "files": [
+        "farm_assistant/model_view.py",
+        "prompts.py",
+        "pipeline.py",
+        "validation.py",
+        "evaluation"
+      ],
+      "work": "Address semantic support and required qualification completeness at the response contract boundary. More prompt bullets or a larger reasoning setting alone have not met the gate. Consider explicit evidence-supported claim scope and a separately evaluated semantic check or deterministic source qualification rendering; do not claim numeric binding proves entailment."
+    },
+    {
+      "files": [
+        "farm_assistant/validation.py",
+        "tests/test_assistant_validation.py"
+      ],
+      "work": "Reproduce negative signed-delta wording, pure read-only refusals and generic person-day definitions. Keep uncited farming claims and unbound measurements rejected."
+    },
+    "Rerun unchanged development and exposed regression after justified fixes; only a passing review can authorize protected tests.",
+    "Await explicit user authorization for local synthetic browser login; no alternate login/token bypass."
+  ],
+  "user_key": "Installed only in ignored mode-0600 env; never included in these reports",
+  "ui_login": "Pending explicit user response after automatic approval rejected plaintext credentials/account authorization",
+  "remote_actions": "No push, remote merge or deployment"
+}

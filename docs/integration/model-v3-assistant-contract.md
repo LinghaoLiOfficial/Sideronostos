@@ -109,3 +109,19 @@ v18 improved bounded gap explanations but still omitted required qualifications 
 cases. Keep HOLD, preserve the 90% rubric/zero-error gates, and finish exposed regressions before
 protected evaluation. See `ai-development-recovery-checkpoint.json` for exact report hashes,
 provider-reported costs and remaining failures. No independent farmer review is claimed.
+
+
+## Full-model regression and source identity
+
+`ai-full-model-checkpoint.json` supersedes the previous model-comparison status. Full low and
+medium candidates still fail the unchanged coverage/support gate. Legacy refreeze regressions
+also expose no-run workflow-version ambiguity and source misses; exact original labels remain
+unchanged, and no protected test has run.
+
+Comparing current alternatives now retrieves version-matched metric definitions. The provider
+schema restricts evidence IDs to visible facts/passages, including nonnumeric status facts;
+an empty evidence context permits only an empty citation list. Numeric placeholders remain
+limited to renderable facts. This prevents malformed/hidden citation identities at decoding
+but does not establish semantic entailment, measurement status or complete qualifications.
+Three real repeats pass decoding, not overall semantics. The application model configuration
+remains unchanged pending an accepted candidate and final live UI evidence.

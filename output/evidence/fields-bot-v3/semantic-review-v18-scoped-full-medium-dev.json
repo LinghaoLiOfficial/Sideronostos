@@ -1,0 +1,124 @@
+{
+  "schema": "assistant-development-semantic-review-v1",
+  "created_at": "2026-11-14T04:19:14.407425+00:00",
+  "report": "eval-daily-v18-scoped-full-medium-dev.json",
+  "report_sha256": "f3a8fa53a5950f6cf2eabd71b2492f1bcadeb52f7e98049d442a64e727f763cd",
+  "pipeline": {
+    "git_head": "f9eb4635846b6a75fa39b2bc8941bb303df2b09f",
+    "source_sha256": "c3117a7f6c91b8bbe22eb045c98c3b72927f6811c4f1330539fd921d8eec22d2",
+    "prompt_version": "farmer-evidence-bound-20261114-v18-scoped-explanations",
+    "model": "openai/gpt-5.4",
+    "provider_host": "openrouter.ai",
+    "configuration": {
+      "temperature": 0.0,
+      "omit_temperature": true,
+      "reasoning_effort": "medium",
+      "max_tokens": 4000,
+      "read_timeout_seconds": 30.0,
+      "max_retries": 0
+    },
+    "response_format": "strict_json_schema",
+    "software": {
+      "langchain-openai": "1.6.6",
+      "openai": "3.22.1",
+      "pydantic": "2.13.5",
+      "pgvector": "0.4.2",
+      "gurobipy": "13.0.3"
+    }
+  },
+  "case_sha256": "913f3fe3ac7868b9314a3ce1ac1befc383291f77593bbaf7ff9b9168289ada53",
+  "fixtures_sha256": "f67a50f3cf5d80302a6db3ff1eb340e2c32dc4378137eed5511a632ce5d9474f",
+  "reviewer": "Implementation agent manual review; not independent agronomist or farmer validation",
+  "method": "Read all 20 rendered answers against unchanged 13 development-case properties, inspect cited retrieved passages for disputed scientific/product claims, use original deterministic gates and repeat-level conservative aggregation. Any repeat failure fails that case.",
+  "cases": [
+    {
+      "case_id": "daily-v4-01",
+      "outcome": "pass",
+      "reason": "Both repeats explain all six meanings and historical replay versus forecast; second repeat is unnecessarily long."
+    },
+    {
+      "case_id": "daily-v4-02",
+      "outcome": "pass",
+      "reason": "Compares A/B raw metrics with correct directions and no invented deltas; cites versioned help after retrieval scope change."
+    },
+    {
+      "case_id": "daily-v4-03",
+      "outcome": "pass",
+      "reason": "Both repeats distinguish 30 total versus 12 shown constraint rows, missing whole-period volume, date-bound example, and unconfirmed remedy; no readiness claim."
+    },
+    {
+      "case_id": "daily-v4-04",
+      "outcome": "pass",
+      "reason": "Both repeats explain unavailable profit as not calculated, not zero; no invented comparison or unrelated calculation."
+    },
+    {
+      "case_id": "daily-v4-05",
+      "outcome": "pass",
+      "reason": "Sync versus readiness separated; required soil/history/operating inputs and provenance/confirmation given; unknowns not zero."
+    },
+    {
+      "case_id": "daily-v4-06",
+      "outcome": "pass",
+      "reason": "Both repeats state independent initialization at wilting point, dry new root layers, and no continuous carryover."
+    },
+    {
+      "case_id": "daily-v4-07",
+      "outcome": "pass",
+      "reason": "Both repeats explain failed preparation, 2 recorded errors, 9 irrigation exclusions and unavailable baseline; no fabricated alternative."
+    },
+    {
+      "case_id": "daily-v4-08",
+      "outcome": "pass",
+      "reason": "Refuses to calculate/save in chat, retains old-run meaning, points to explicit form checks/recalculation/save."
+    },
+    {
+      "case_id": "daily-v4-09",
+      "outcome": "fail",
+      "reason": "09/1 omits historical-weather qualification. 09/2 covers historical conditions and area weighting; repeat aggregation fails the case."
+    },
+    {
+      "case_id": "daily-v4-10",
+      "outcome": "fail",
+      "reason": "10/2 limits optimality to this model setup but omits generated-candidate scope; 10/1 contains it. Repeat aggregation fails."
+    },
+    {
+      "case_id": "daily-v4-11",
+      "outcome": "needs_review",
+      "reason": "No drought/disease substitution; S21 and S44 support the main caution. It also cites K4/S14 bibliography titles, an unnecessary citation that has not been established as supporting evidence."
+    },
+    {
+      "case_id": "daily-v4-12",
+      "outcome": "pass",
+      "reason": "Asks to select a specific option and sets needs_clarification without selecting another option."
+    },
+    {
+      "case_id": "daily-v4-25",
+      "outcome": "pass",
+      "reason": "Explains timeout without solution and declines water savings without suggesting a nonexistent option."
+    }
+  ],
+  "summary": {
+    "semantic_case_passes": 10,
+    "semantic_cases": 13,
+    "failed_cases": 2,
+    "needs_review_cases": 1,
+    "semantic_pass_rate_lower_bound": 0.7692307692307693,
+    "relevant_source_recall_at_8": 1.0,
+    "schema_completions": 20,
+    "schema_attempts": 20,
+    "provider_reported_chat_cost_usd": 0.643794,
+    "total_tokens": 289733,
+    "embedding_tokens": 538,
+    "latency_p50_ms": 9753.5,
+    "latency_p95_ms": 23992
+  },
+  "decision": "reject",
+  "protected_evaluation_authorized": false,
+  "limitations": [
+    "No source labels, frozen questions or expected properties changed.",
+    "No wrong-field or unbound numeric value observed in these answers; deterministic acceptance does not establish every semantic relation.",
+    "Repeated stochastic outputs vary even with identical configuration.",
+    "Production remains Nano; this full-model configuration was process-local only.",
+    "Medium reasoning is not promoted: more latency and reported cost did not meet the unchanged coverage gate."
+  ]
+}

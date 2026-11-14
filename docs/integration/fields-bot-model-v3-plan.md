@@ -644,3 +644,39 @@ Evidence: `provider-and-knowledge-recovery.json`, `ai-dev-input-provenance.json`
 because the old exact archives were unavailable; historical scores remain historical.
 Goal remains ACTIVE: semantic completion, exposed regressions, protected evaluation and final
 live UI chat still remain. No push, remote merge or deployment.
+
+
+## Checkpoint 14 — full-model regression and citation decoding (2026-11-14)
+
+Full GPT-5.4 low was evaluated against the unchanged daily dev cases, then against both
+exposed legacy sets. A shared current-alternatives detector now limits product-metric
+comparison retrieval to version-matched product sources. This fixes the observed irrelevant
+agronomy citation for daily alternative tradeoffs without pinning a case or paper.
+
+Daily scoped low completed 20/20 requests and retrieved 4/4 annotated sources, but the manual
+case review is only 10/13: weather/area qualifications were omitted and one vegetation answer
+cited bibliography/tutorial listings instead of supporting passages. Medium reasoning also
+completed 20/20 and reached 4/4 retrieval, but still omitted qualifications; it costs more and
+has higher latency. Neither configuration is promoted. Production settings remain Nano.
+
+Legacy v1/v2 completed 92/98 and 31/32 requests, with raw relevant-source recall 18/28 and
+11/14. Reports retain every miss and failure. No-run historical contexts lack a workflow
+version and can retrieve current help while labels require old help; other misses and actual
+semantic errors also remain. These are disclosed synthetic refreezes, not paired comparisons
+with the unavailable historical fixtures. All old questions, labels and scores remain intact.
+
+A legacy comparison twice emitted malformed citation IDs. Two failing tests preceded strict
+citation enums limited to visible sources/facts in the provider schema. The same exposed
+case then completed three real requests with no repairs. One answer still used the phrase
+"measured results" before denying measured farm outcomes, so the probe proves decoding only.
+Stored messages and frontend answer contracts are unchanged. Backend regression is now
+557 passed, zero skipped, five existing warnings; Ruff and no-cache mypy (20 files) pass.
+
+Evidence: five new full-model reports, separate daily/legacy rejection reviews,
+`citation-schema-real-probe.json`, and `ai-full-model-checkpoint.json`. The latter records
+reported chat cost, unknown failed-request cost, schema hash boundaries and file-level next
+steps. More prompt bullets or reasoning alone have not met the quality gate; further work
+must address explicit workflow identity, source entailment and required scope completeness.
+Protected daily/legacy test outputs remain ungenerated. Browser login still awaits explicit
+account authorization after the earlier automatic approval rejection. Goal remains ACTIVE;
+no push, merge or deployment.

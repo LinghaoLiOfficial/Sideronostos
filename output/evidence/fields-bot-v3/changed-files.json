@@ -1,23 +1,23 @@
 {
-  "recorded_at": "2026-11-14T03:55:19.397117+00:00",
+  "recorded_at": "2026-11-14T04:21:26.492457+00:00",
   "baseline": "8c498cf3863571fb78485c0494816a1058d7739e",
   "branch": "codex/fields-bot-model-v3",
-  "snapshot": "Baseline-to-working-tree inventory before checkpoint 13 local commit; includes evidence and this inventory, no remote operations",
-  "count": 247,
+  "snapshot": "Baseline-to-working-tree inventory before checkpoint 14 local commit; no remote operations",
+  "count": 262,
   "groups": {
     "assistant-evidence": 13,
     "backend-support": 2,
     "daily-model": 20,
     "daily-planning-ui": 10,
     "documentation": 12,
-    "evidence": 94,
+    "evidence": 108,
     "farm-persistence": 7,
     "field-details": 3,
     "frontend-support": 4,
     "knowledge": 2,
     "map-workspace": 15,
     "optimizer-integration": 4,
-    "regression": 42,
+    "regression": 43,
     "routing-auth": 5,
     "science-data": 2,
     "shared-planning-context": 12
@@ -96,6 +96,12 @@
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
     },
     {
+      "path": "output/evidence/fields-bot-v3/ai-full-model-checkpoint.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/ai-hardening-verification.json",
       "change": "A",
       "area": "evidence",
@@ -168,6 +174,12 @@
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
     },
     {
+      "path": "output/evidence/fields-bot-v3/citation-schema-real-probe.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/diagnostic-ui-and-comparison.json",
       "change": "A",
       "area": "evidence",
@@ -204,16 +216,46 @@
       "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
     },
     {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v18-full-dev.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/eval-daily-v18-mini-dev.json",
       "change": "A",
       "area": "evidence",
       "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
     },
     {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v18-scoped-full-dev.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v18-scoped-full-medium-dev.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/eval-fixtures-v1-refrozen-20261114.json.gz",
       "change": "A",
       "area": "evidence",
       "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-fixtures-v2-refrozen-20261114.json.gz",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-fixtures-v3-refrozen-20261114.json.gz",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
     },
     {
       "path": "output/evidence/fields-bot-v3/eval-fixtures-v4-daily.json.gz",
@@ -226,6 +268,18 @@
       "change": "A",
       "area": "evidence",
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-legacy-v1-v18-scoped-full-regression.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-legacy-v2-v18-scoped-full-regression.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
     },
     {
       "path": "output/evidence/fields-bot-v3/farm-migration.json",
@@ -256,6 +310,12 @@
       "change": "A",
       "area": "evidence",
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/legacy-derived-fixture-provenance.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
     },
     {
       "path": "output/evidence/fields-bot-v3/legacy-refreeze-provenance.json",
@@ -354,10 +414,34 @@
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
     },
     {
+      "path": "output/evidence/fields-bot-v3/semantic-findings-v18-full-legacy-v1.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/semantic-findings-v18-full-legacy-v2.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/semantic-review-v17-nano-dev.json",
       "change": "A",
       "area": "evidence",
       "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/semantic-review-v18-scoped-full-dev.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/semantic-review-v18-scoped-full-medium-dev.json",
+      "area": "evidence",
+      "role": "Immutable evaluation/provenance or verification evidence",
+      "change": "A"
     },
     {
       "path": "output/evidence/fields-bot-v3/v3-real-weather-execution.json",
@@ -970,6 +1054,12 @@
       "change": "A",
       "area": "regression",
       "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_assistant_generation_schema.py",
+      "area": "regression",
+      "role": "Assistant source contract or regression test",
+      "change": "M"
     },
     {
       "path": "sideronostos-backend/tests/test_assistant_model_view.py",

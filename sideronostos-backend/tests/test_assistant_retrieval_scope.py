@@ -52,3 +52,20 @@ def test_vegetation_diagnosis_queries_bridge_to_literature_without_source_pinnin
         assert expanded.startswith(question)
         assert "remote sensing" in expanded and "stress diagnosis" in expanded
     assert intents.retrieval_query("哪里导出我的方案？") == "哪里导出我的方案？"
+
+
+def test_comparing_current_alternatives_retrieves_versioned_metric_definitions():
+    daily = {"run": {"request": {"model_version": "rotation-milp-v3.0"}}}
+    legacy = {"run": {"request": {"model_version": "rotation-milp-v2.0"}}}
+    for question in [
+        "How do both options trade off water use, estimated profit and soil contribution?",
+        "比较这些备选方案的土壤贡献和用水",
+    ]:
+        assert intents.retrieval_sources(question, "explain_current", daily) == [
+            "HELPV3",
+            "MODELV3",
+            "DATAV3",
+        ]
+        assert intents.retrieval_sources(question, "explain_current", legacy) == ["HELPV2"]
+    assert intents.retrieval_sources("豆科前茬会影响后茬吗？", "learn", daily) is None
+    assert intents.retrieval_sources("Compare two options for disease control", "learn", {}) is None

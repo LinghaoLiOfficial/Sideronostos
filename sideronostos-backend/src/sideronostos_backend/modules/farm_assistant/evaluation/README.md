@@ -1,27 +1,33 @@
-# Current evaluation status — 2026-11-14 credential recovery
+# Current evaluation status — 2026-11-14 full-model checkpoint
 
-The new local credential cleared the embedding block. The isolated release
-`field-shift-knowledge-20261114-v5-daily` is published with 4,911/4,911 vectors.
-Six real development batches are archived under `output/evidence/fields-bot-v3`:
-Nano baseline, projection, validation, retrieval; Mini v17; Mini v18.
-Case/fixture hashes are unchanged. Retrieval reaches 4/4 annotated cases, but semantic
-acceptance remains HOLD. Nano substituted disease severity for drought severity even with
-the correct passage. Mini improved wording but still omits required qualifications; v18 is
-not approved. Production model settings remain Nano; Mini is a process-local candidate.
+The replacement local credential works. The isolated release
+`field-shift-knowledge-20261114-v5-daily` has 4,911/4,911 vectors. Production remains Nano.
+Eleven immutable real evaluation batches now exist: the earlier six Nano/Mini batches,
+Full low before/after scoped alternative retrieval, Full medium daily development, and
+Full low exposed legacy v1/v2 regressions. All remain unpromoted.
 
-Read `ai-development-recovery-checkpoint.json` before continuing. It records exact hashes,
-remaining failures, costs, and the original runner's misleading `answer_tokens` label
-(which counts input+output tokens). No protected cases have been generated. Development
-plus exposed regression must pass the unchanged rubric before a `promote_to_held_out` review.
+Read `output/evidence/fields-bot-v3/ai-full-model-checkpoint.json` and its linked reviews.
+Scoped Full low daily results have 20/20 schema completions and 4/4 source recall, but
+only 10/13 cases pass the conservative manual semantic review. Medium reasoning still omits
+required qualifications. Legacy raw recall is 18/28 and 11/14; no-run workflow version drift,
+real source-support errors, false validation rejections and provider failures are disclosed.
+Do not change old labels to erase misses. `answer_tokens` in original reports is total
+input+output tokens. Costs exclude unreported failed requests and embedding charges.
 
-The old rotation-v2 reports/fixtures referenced below were absent from this checkout and
-bounded prior-workspace searches. A new synthetic legacy v1 freeze is archived as
-`eval-fixtures-v1-refrozen-20261114.json.gz`, with provenance in
-`legacy-refreeze-provenance.json`. It is not a paired re-score on the old inputs. Preserve
-all historical scores and original case expectations. No real farmer pilot data is used.
+Current-alternative comparisons use versioned product sources. Citation IDs are now constrained
+to visible facts and passages in the provider schema. Three real repeats of the malformed-ID
+regression complete without repairs, but one retains contradictory measured/estimated wording;
+this is a decoding check, not semantic acceptance. Full backend tests: 557 passed, zero skipped.
 
-The remaining sections retain the historical preparation/replay record; their earlier
-provider-blocked and pre-generation descriptions are superseded by this status.
+No protected daily or legacy-v3 test output has been generated. Development and exposed
+regression must meet the unchanged rubric before a `promote_to_held_out` decision. UI login
+awaits the previously requested explicit test-account authorization; do not bypass it.
+The old archived fixture files were unavailable, so the current legacy inputs are explicitly
+labelled synthetic refreezes, with provenance and exact mapping audits. Original historical
+scores and questions are preserved. No independent agronomist or farmer review is claimed.
+
+The sections below preserve historical preparation/replay notes. Current status above and
+the latest checkpoint supersede earlier access-blocked or no-generation statements.
 
 # Rotation evaluation: real runs and offline replay
 

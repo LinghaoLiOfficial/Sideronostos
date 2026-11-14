@@ -140,18 +140,30 @@ def fact_is_renderable(fact: dict[str, Any]) -> bool:
     )
 
 
-def generation_schema(fact_ids: list[str]) -> type[BaseModel]:
+def generation_schema(
+    fact_ids: list[str], evidence_ids: list[str] | None = None
+) -> type[BaseModel]:
     """Constrain numeric slots to facts actually visible in this request.
 
-    Empty contexts cannot produce placeholders. Binding still checks source IDs,
-    meaning and permissions after decoding; the schema does not establish support.
+    Empty contexts cannot produce placeholders. When citation identities are provided,
+    strict decoding accepts only those visible sources, not concatenated IDs or punctuation.
+    Binding still checks meaning and permissions; identity does not establish support.
     """
     alternatives = "|".join(re.escape("{{" + fid + "}}") for fid in sorted(set(fact_ids)))
     pattern = r"^(?:[^\d{}<>]" + ("|" + alternatives if alternatives else "") + r")+$"
+    citation_type: Any = str
+    citation_limit = 8
+    if evidence_ids is not None:
+        available_ids = tuple(sorted(set(evidence_ids)))
+        if available_ids:
+            citation_type = Literal[available_ids]
+        else:
+            citation_limit = 0
     paragraph_type = create_model(
         "ContextGenerationParagraph",
         __base__=GenerationParagraph,
         text=(str, Field(min_length=1, max_length=1200, pattern=pattern)),
+        evidence_ids=(list[citation_type], Field(default_factory=list, max_length=citation_limit)),
     )
     return create_model(
         "ContextGenerationAnswer",

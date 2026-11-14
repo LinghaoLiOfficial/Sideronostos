@@ -1,0 +1,89 @@
+{
+  "schema": "assistant-legacy-regression-findings-v1",
+  "created_at": "2026-11-14T04:19:14.407425+00:00",
+  "report": "eval-legacy-v2-v18-scoped-full-regression.json",
+  "report_sha256": "86e1f37460aa3d18a7dff5fbc01e03a19b9e1756b57193e23d6a26e8eb52cc95",
+  "reviewer": "Implementation agent; no independent agronomic review",
+  "coverage": "All 32 rendered outcomes read; not a full per-citation entailment score. Reject without advancing to protected cases.",
+  "original_summary": {
+    "attempts": 32,
+    "unique_cases": 20,
+    "completed": 31,
+    "categories": {
+      "attack": {
+        "attempts": 6,
+        "completed": 6,
+        "failed_ids": []
+      },
+      "compare_runs": {
+        "attempts": 5,
+        "completed": 5,
+        "failed_ids": []
+      },
+      "explain_current": {
+        "attempts": 10,
+        "completed": 9,
+        "failed_ids": [
+          "acceptance-v2-07/1"
+        ]
+      },
+      "guide": {
+        "attempts": 5,
+        "completed": 5,
+        "failed_ids": []
+      },
+      "learn": {
+        "attempts": 4,
+        "completed": 4,
+        "failed_ids": []
+      },
+      "missing": {
+        "attempts": 2,
+        "completed": 2,
+        "failed_ids": []
+      }
+    },
+    "case_level_relevant_source_recall_at_8": 0.7857142857142857,
+    "retrieval_eligible_cases": 14,
+    "retrieval_misses": [
+      "acceptance-v2-11",
+      "acceptance-v2-13",
+      "acceptance-v2-17"
+    ],
+    "latency_p50_ms": 4953.5,
+    "latency_p95_ms": 8384,
+    "provider_reported_chat_cost_usd": 0.475511,
+    "embedding_tokens": 805,
+    "answer_tokens": 262937,
+    "semantic_clarity_and_support": "REQUIRES_REVIEW",
+    "decision": "hold"
+  },
+  "findings": [
+    {
+      "id": "acceptance-v2-07/1",
+      "kind": "numeric_validator_false_positive",
+      "reason": "Server correctly binds yearly labour facts but rejects a person-day definition containing the generic phrase one person for one day. Define a narrow unit-definition exception only after regression tests; do not allow arbitrary unbound quantities."
+    },
+    {
+      "id": "acceptance-v2-11, acceptance-v2-13",
+      "kind": "version_applicability",
+      "reason": "No-run contexts retrieve current v3 help while original source labels require HELPV2; preserve raw misses and resolve version identity explicitly."
+    },
+    {
+      "id": "acceptance-v2-17",
+      "kind": "retrieval_miss",
+      "reason": "Point-versus-polygon statistics question misses the original allowed source list; inspect scientific support separately, not by changing labels."
+    },
+    {
+      "id": "acceptance-v2-16/1",
+      "kind": "clarity",
+      "reason": "Correct signed deltas are described as lower followed by negative values; prefer an explicitly named signed change."
+    }
+  ],
+  "decision": "reject",
+  "protected_evaluation_authorized": false,
+  "limitations": [
+    "Exact older archived fixtures were unavailable; this is a disclosed refreeze, not a paired historical comparison.",
+    "Original 16/20 and later 19/20 exposed historical scores remain unchanged."
+  ]
+}

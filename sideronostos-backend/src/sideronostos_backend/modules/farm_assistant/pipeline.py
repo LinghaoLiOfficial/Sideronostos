@@ -115,7 +115,8 @@ async def generate_answer(
     visible_knowledge_ids = {k["id"] for k in view["knowledge"]}
     visible_knowledge = [k for k in evidence["knowledge"] if k["id"] in visible_knowledge_ids]
     output_schema = generation_schema(
-        [fact["id"] for fact in view["facts"] if fact["render_reference"]]
+        [fact["id"] for fact in view["facts"] if fact["render_reference"]],
+        sorted(visible_ids | visible_knowledge_ids),
     )
     for attempt in range(2):
         # The service's enclosing deadline includes both calls. Transport failures
