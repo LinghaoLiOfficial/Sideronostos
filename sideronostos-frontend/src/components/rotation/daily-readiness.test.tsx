@@ -1,4 +1,5 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { render } from "@/test/render-zh";
+import { cleanup, screen, within } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
 import type { DailyReadiness, ReadinessItem } from "@/lib/api/daily-types";
 import { DailyReadinessPanel } from "./daily-readiness";

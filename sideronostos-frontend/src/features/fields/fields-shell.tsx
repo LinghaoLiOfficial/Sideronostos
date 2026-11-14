@@ -1,30 +1,29 @@
 "use client"
 
+import { useI18n } from "@/lib/i18n/provider";
+import { LanguageSwitch } from "@/components/language-switch";
 import Link from "next/link"
 import type { ReactNode } from "react"
 import type { AuthUser } from "@/lib/api/client"
-import { Satellite } from "lucide-react"
 
 import { BrandLogo } from "@/components/brand-logo"
 
 export function FieldsShell({ children, user, fieldId, plannerHref }: { children: ReactNode; user?: AuthUser | null; fieldId?: string; plannerHref?: string }) {
+  const { t } = useI18n();
+
   return (
     <div className="fields-app flex h-dvh min-h-0 flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-sidebar px-4 sm:px-6">
+      <header className="grid shrink-0 grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 border-b border-border bg-sidebar px-3 py-2 sm:flex sm:min-h-16 sm:justify-between sm:px-6">
         <div className="flex min-w-0 items-center gap-4">
-          <Link href="/refer-1" aria-label="Agrisata home" className="flex shrink-0 items-center">
-            <BrandLogo priority className="w-28 sm:w-40" />
-          </Link>
-          <span className="hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
-          <div className="hidden min-w-0 sm:block">
-            <p className="truncate text-sm font-medium">Field intelligence</p>
-            <p className="hidden truncate text-[11px] text-muted-foreground sm:block">World map and farm partition workspace</p>
-          </div>
+          <Link href="/fields" aria-label={t("Agrisata home")} className="flex shrink-0 items-center"><BrandLogo priority className="w-24 sm:w-36" /></Link>
+          <div className="hidden min-w-0 lg:block"><p className="text-sm font-medium">{t("Field intelligence")}</p><p className="text-[11px] text-muted-foreground">{t("World map and farm partition workspace")}</p></div>
         </div>
-        <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
-          <nav aria-label="农场工作区导航" className="flex min-w-0 items-center gap-3 text-foreground"><Link href={fieldId ? `/field-shift?field=${encodeURIComponent(fieldId)}` : "/field-shift"} className="hidden sm:inline">地块资料</Link><Link href={plannerHref ?? (fieldId ? `/field-shift/rotation?field=${encodeURIComponent(fieldId)}` : "/field-shift/rotation")}>轮作规划</Link><Link className="max-w-24 truncate" href={user ? "/personal/account" : `/login?next=${encodeURIComponent(typeof window === "undefined" ? "/fields" : window.location.pathname + window.location.search)}`}>{user?.display_name ?? "登录"}</Link></nav><Satellite className="hidden size-4 text-primary sm:block" aria-hidden="true" />
-          <span className="hidden 2xl:inline">NASA Earth observations</span>
-        </div>
+        <nav aria-label={t("农场工作区导航")} className="order-3 col-span-2 flex min-w-0 items-center justify-between gap-3 text-xs sm:order-none sm:ml-auto">
+          <Link className="inline-flex min-h-10 items-center" href={fieldId ? `/field-shift?field=${encodeURIComponent(fieldId)}` : "/field-shift"}>{t("地块资料")}</Link>
+          <Link className="inline-flex min-h-10 items-center" href={plannerHref ?? (fieldId ? `/field-shift/rotation?field=${encodeURIComponent(fieldId)}` : "/field-shift/rotation")}>{t("轮作规划")}</Link>
+          <Link className="inline-flex min-h-10 max-w-28 items-center truncate" href={user ? "/personal/account" : `/login?next=${encodeURIComponent(typeof window === "undefined" ? "/fields" : window.location.pathname + window.location.search)}`}>{user?.display_name ?? t("登录")}</Link>
+        </nav>
+        <LanguageSwitch className="col-start-2 row-start-1" />
       </header>
       <div className="flex min-h-0 flex-1 flex-col">{children}</div>
     </div>

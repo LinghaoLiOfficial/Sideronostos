@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useI18n } from "@/lib/i18n/provider"
 import { cn } from "cn"
 import { useSurfaceAppearance } from "./surface"
 import { Dialog as DialogPrimitive } from "radix-ui"
@@ -56,6 +57,7 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  const { t } = useI18n()
   const { tone: surface, material } = useSurfaceAppearance()
   return (
     <DialogPortal>
@@ -81,7 +83,7 @@ function DialogContent({
             >
               <XIcon
               />
-              <span className="sr-only">关闭</span>
+              <span className="sr-only">{t("关闭")}</span>
             </Button>
           </DialogPrimitive.Close>
         )}
@@ -108,6 +110,7 @@ function DialogFooter({
 }: React.ComponentProps<"div"> & {
   showCloseButton?: boolean
 }) {
+  const { t } = useI18n()
   return (
     <div
       data-slot="dialog-footer"
@@ -120,7 +123,7 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">关闭</Button>
+          <Button variant="outline">{t("关闭")}</Button>
         </DialogPrimitive.Close>
       )}
     </div>

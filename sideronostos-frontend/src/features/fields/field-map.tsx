@@ -1,5 +1,6 @@
 "use client"
 
+import { useI18n } from "@/lib/i18n/provider";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import type { Feature, Geometry as GeoGeometry, Polygon } from "geojson"
 import {
@@ -108,6 +109,8 @@ function toDrawFeature(field: FieldFeature): GeoJSONStoreFeatures {
 
 
 function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
+  const { t } = useI18n();
+
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
@@ -160,9 +163,9 @@ function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
             setQuery(event.target.value)
             setResults([])
           }}
-          placeholder={MAPTILER_KEY ? "Search a place or farm" : "地点搜索暂不可用"}
+          placeholder={MAPTILER_KEY ? t("Search a place or farm") : t("地点搜索暂不可用")}
           disabled={!MAPTILER_KEY}
-          aria-label="Search places"
+          aria-label={t("Search places")}
           className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm text-neutral-900 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
         />
         {loading && <span className="mr-3 size-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary" />}
@@ -208,7 +211,35 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
   },
   ref,
 ) {
+  const { t } = useI18n();
+
   const mapRef = useRef<MapRef>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
+  // MapLibre creates native control DOM outside React. Update only its control
+  // labels when the language or control state changes; preserve the drawn map.
+  useEffect(() => {
+    const container = mapRef.current?.getContainer();
+    if (!container) return;
+    const updateLabels = () => {
+      const labels: [string, string][] = [
+        [".maplibregl-ctrl-zoom-in", "Zoom in"],
+        [".maplibregl-ctrl-zoom-out", "Zoom out"],
+        [".maplibregl-ctrl-fullscreen", "Enter fullscreen"],
+        [".maplibregl-ctrl-shrink", "Exit fullscreen"],
+        [".maplibregl-ctrl-geolocate", "Find my location"],
+        [".maplibregl-ctrl-geolocate:disabled", "Location not available"],
+        [".maplibregl-ctrl-attrib-button", "Toggle attribution"],
+      ];
+      for (const [selector, label] of labels) container.querySelectorAll(selector).forEach(button => {
+        button.setAttribute("title", t(label)); button.setAttribute("aria-label", t(label));
+      });
+      container.querySelector("canvas")?.setAttribute("aria-label", t("Farm map"));
+    };
+    updateLabels();
+    const observer = new MutationObserver(updateLabels);
+    observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "disabled"] });
+    return () => observer.disconnect();
+  }, [t, mapLoaded]);
   const drawRef = useRef<TerraDraw | null>(null)
   const selectedIdRef = useRef<string | null>(selectedFieldId)
   const fieldsRef = useRef(fields)
@@ -360,6 +391,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
   }))
 
   function handleMapLoad() {
+    setMapLoaded(true)
     const map = mapRef.current?.getMap()
     if (!map) return
     const draw = new TerraDraw({
@@ -500,7 +532,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           if (!queryModeRef.current || queryState.current.busy) return
           const point: [number, number] = [event.lngLat.lng, event.lngLat.lat]
           if (queryModeRef.current === "point") void onQuery?.("point", { type: "Point", coordinates: point })
-          else setQueryVertices(old => { if (old.length >= 200) { onError("临时选区最多 200 个顶点。"); return old } return [...old, point] })
+          else setQueryVertices(old => { if (old.length >= 200) { onError(t("临时选区最多 200 个顶点。")); return old } return [...old, point] })
         }}
         onMoveEnd={handleMoveEnd}
         onMouseMove={(event) => onCoordinateChange([event.lngLat.lng, event.lngLat.lat])}
@@ -560,7 +592,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       </Map>
 
       <SearchBox mapRef={mapRef} />
-      {queryMode && <div className="absolute left-3 right-14 top-16 z-20 max-w-sm rounded border bg-background p-3 shadow-lg" role="region" aria-label="临时提问选区工具"><p className="text-sm font-medium">{queryMode === "polygon" ? `临时提问区域 · ${queryVertices.length} 个顶点` : "点击地图选择提问位置"}</p><p className="my-1 text-xs">农场与经营地块边界保持锁定。</p><div className="flex flex-wrap gap-2">{queryMode === "polygon" && <><Button size="sm" disabled={queryBusy || queryVertices.length < 3} onClick={() => void finishQuery()}>确认提问区域</Button><Button size="sm" variant="outline" disabled={queryBusy || !queryVertices.length} onClick={() => setQueryVertices(v => v.slice(0, -1))}>撤回顶点</Button></>}<Button size="sm" variant="ghost" disabled={queryBusy} onClick={leaveQuery}>结束提问选区</Button></div></div>}
+      {queryMode && <div className="absolute left-3 right-14 top-16 z-20 max-w-sm rounded border bg-background p-3 shadow-lg" role="region" aria-label={t("临时提问选区工具")}><p className="text-sm font-medium">{queryMode === "polygon" ? t("临时提问区域 · {0} 个顶点", { "0": queryVertices.length }) : t("点击地图选择提问位置")}</p><p className="my-1 text-xs">{t("农场与经营地块边界保持锁定。")}</p><div className="flex flex-wrap gap-2">{queryMode === "polygon" && <><Button size="sm" disabled={queryBusy || queryVertices.length < 3} onClick={() => void finishQuery()}>{t("确认提问区域")}</Button><Button size="sm" variant="outline" disabled={queryBusy || !queryVertices.length} onClick={() => setQueryVertices(v => v.slice(0, -1))}>{t("撤回顶点")}</Button></>}<Button size="sm" variant="ghost" disabled={queryBusy} onClick={leaveQuery}>{t("结束提问选区")}</Button></div></div>}
 
 
       <div className={cn("absolute left-3 top-16 z-10 flex flex-col gap-1 border border-black/10 bg-white p-1 text-neutral-900 shadow-lg", queryMode && "hidden")}>
@@ -568,8 +600,8 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           type="button"
           size="icon"
           variant={drawMode === "select" ? "default" : "ghost"}
-          title="Select and edit fields"
-          aria-label="Select and edit fields"
+          title={t("Select and edit fields")}
+          aria-label={t("Select and edit fields")}
           onClick={() => {
             leaveQuery()
             drawRef.current?.setMode("select")
@@ -584,8 +616,8 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           type="button"
           size="icon"
           variant={drawMode === "polygon" ? "default" : "ghost"}
-          title="Draw farm boundary"
-          aria-label="Draw farm boundary"
+          title={t("Draw farm boundary")}
+          aria-label={t("Draw farm boundary")}
           onClick={() => {
             leaveQuery()
             drawingFarmRef.current = true
@@ -602,8 +634,8 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           type="button"
           size="icon"
           variant="ghost"
-          title="World view"
-          aria-label="World view"
+          title={t("World view")}
+          aria-label={t("World view")}
           onClick={() => mapRef.current?.flyTo({ center: [8, 22], zoom: 1.5, duration: 800 })}
           className="size-9 rounded-sm"
         >
@@ -613,9 +645,9 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
 
       <div className="absolute bottom-20 xl:bottom-8 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-2 border border-black/10 bg-white/95 px-3 py-2 text-xs text-neutral-700 shadow-lg backdrop-blur md:flex">
         {drawMode === "polygon" ? (
-          <><Crosshair className="size-4 text-primary" /> Draw the farm boundary; click the first point to finish</>
+          <><Crosshair className="size-4 text-primary" /> {t(" Draw the farm boundary; click the first point to finish")}</>
         ) : (
-          <><LocateFixed className="size-4 text-primary" /> Select a candidate field to inspect or edit shared boundaries</>
+          <><LocateFixed className="size-4 text-primary" /> {t(" Select a candidate field to inspect or edit shared boundaries")}</>
         )}
       </div>
 
@@ -624,8 +656,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           "absolute right-3 top-3 z-10 hidden border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow md:block",
           "max-w-56",
         )}>
-          备用底图 · 卫星底图与地点搜索暂不可用，仍可通过边界文件或坐标选区。
-        </div>
+          {t("备用底图 · 卫星底图与地点搜索暂不可用，仍可通过边界文件或坐标选区。")}</div>
       )}
     </div>
   )
