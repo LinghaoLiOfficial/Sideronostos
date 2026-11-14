@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "@/lib/i18n/provider";
 import type {
   DailyCapacity,
   EvidenceSource,
@@ -33,6 +34,8 @@ export function EvidenceValue({
   defaultSource?: string;
   onChange: (value: RecordedValue) => void;
 }) {
+  const { t } = useI18n();
+
   const current = value ?? unknownRecord(unit);
   const origin = current.source_ids.length
     ? current.source_ids
@@ -56,19 +59,19 @@ export function EvidenceValue({
   return (
     <div className={styles.evidenceValue}>
       <label>
-        {label}
+        {t(label)}
         {!["1", "category", "text"].includes(unit) && ` · ${unit}`}
         {options || kind === "boolean" ? (
           <select value={shown} onChange={(e) => change(e.target.value)}>
-            <option value="">尚不清楚</option>
+            <option value="">{t("尚不清楚")}</option>
             {(
               options ?? [
-                ["true", "是"],
-                ["false", "否"],
+                ["true", t("是")],
+                ["false", t("否")],
               ]
             ).map(([id, name]) => (
               <option value={id} key={id}>
-                {name}
+                {t(name)}
               </option>
             ))}
           </select>
@@ -82,9 +85,8 @@ export function EvidenceValue({
         )}
       </label>
       <label className={styles.help}>
-        该值的来源
-        <select
-          aria-label={`${label}来源`}
+        {t("该值的来源")}<select
+          aria-label={t("{0}来源", { "0": t(label) })}
           value={current.source_ids[0] ?? ""}
           onChange={(e) =>
             onChange({
@@ -93,22 +95,21 @@ export function EvidenceValue({
             })
           }
         >
-          <option value="">尚未关联来源</option>
+          <option value="">{t("尚未关联来源")}</option>
           {Object.values(sources).map((s) => (
             <option key={s.id} value={s.id}>
-              {sourceKindLabels[s.kind]} · {s.title || "未命名资料"}
+              {t(sourceKindLabels[s.kind])} · {s.title || t("未命名资料")}
             </option>
           ))}
         </select>
       </label>
       {current.source_ids.some(
         (id) => sources[id]?.kind === "engineering_assumption",
-      ) && <small>工程假设，未经田间校准</small>}
+      ) && <small>{t("工程假设，未经田间校准")}</small>}
       {current.value === null && (
         <label className={styles.help}>
-          缺少原因
-          <input
-            aria-label={`${label}缺少原因`}
+          {t("缺少原因")}<input
+            aria-label={t("{0}缺少原因", { "0": t(label) })}
             value={current.missing_reason ?? ""}
             onChange={(e) =>
               onChange({ ...current, missing_reason: e.target.value })
@@ -134,6 +135,8 @@ export function CapacityEditor({
   defaultSource?: string;
   onChange: (value: DailyCapacity) => void;
 }) {
+  const { t } = useI18n();
+
   const costUnit = {
     "m3/day": "USD/m3",
     "h/day": "USD/h",
@@ -142,9 +145,9 @@ export function CapacityEditor({
   }[unit];
   return (
     <fieldset className={styles.resources}>
-      <legend>{label}</legend>
+      <legend>{t(label)}</legend>
       <EvidenceValue
-        label="可用上限"
+        label={t("可用上限")}
         unit={unit}
         value={value.amount}
         sources={sources}
@@ -152,8 +155,7 @@ export function CapacityEditor({
         onChange={(amount) => onChange({ ...value, amount })}
       />
       <label>
-        不足时能否补救？
-        <select
+        {t("不足时能否补救？")}<select
           value={value.remediable === null ? "" : String(value.remediable)}
           onChange={(e) =>
             onChange({
@@ -166,9 +168,9 @@ export function CapacityEditor({
             })
           }
         >
-          <option value="">尚未确认</option>
-          <option value="false">不能补救（硬上限）</option>
-          <option value="true">可补救，需明确成本与条件</option>
+          <option value="">{t("尚未确认")}</option>
+          <option value="false">{t("不能补救（硬上限）")}</option>
+          <option value="true">{t("可补救，需明确成本与条件")}</option>
         </select>
       </label>
       {value.remediable && (
@@ -176,8 +178,8 @@ export function CapacityEditor({
           <EvidenceValue
             label={
               unit === "m3/day"
-                ? "每单位净水缺口的补救成本"
-                : "每单位缺口的补救成本"
+                ? t("每单位净水缺口的补救成本")
+                : t("每单位缺口的补救成本")
             }
             unit={costUnit}
             value={value.gap_unit_cost ?? undefined}
@@ -186,7 +188,7 @@ export function CapacityEditor({
             onChange={(gap_unit_cost) => onChange({ ...value, gap_unit_cost })}
           />
           <EvidenceValue
-            label="补救条件"
+            label={t("补救条件")}
             kind="text"
             unit="text"
             value={value.remedy ?? undefined}
@@ -216,6 +218,8 @@ export function SourcesEditor({
   onDefaultSource: (id: string) => void;
   onChange: (value: Record<string, EvidenceSource>) => void;
 }) {
+  const { t } = useI18n();
+
   const patch = (id: string, value: Partial<EvidenceSource>) =>
     onChange({
       ...sources,
@@ -223,43 +227,38 @@ export function SourcesEditor({
     });
   return (
     <section className={styles.formBlock}>
-      <h2>资料来源与确认</h2>
+      <h2>{t("资料来源与确认")}</h2>
       <p className={styles.help}>
-        记录土壤检测、经营台账或参考资料。来源的适用时间需覆盖规划期；来源类型和确认状态会进入计算快照。
-      </p>
+        {t("记录土壤检测、经营台账或参考资料。来源的适用时间需覆盖规划期；来源类型和确认状态会进入计算快照。")}</p>
       {Object.values(sources).map((s) => (
         <details className={styles.details} key={s.id}>
           <summary>
-            {s.title || "待补充的资料来源"} · {sourceKindLabels[s.kind]} ·{" "}
-            {s.confirmed ? "已确认" : "待确认"}
+            {s.title || t("待补充的资料来源")} · {t(sourceKindLabels[s.kind])} ·{" "}
+            {s.confirmed ? t("已确认") : t("待确认")}
           </summary>
           {s.id === "engineering-fixture" ? (
             <p>
               {s.limitations.join(" ")}{" "}
-              工程演示来源保留其原始标签；实际资料请另建来源。
-            </p>
+              {t("工程演示来源保留其原始标签；实际资料请另建来源。")}</p>
           ) : (
             <>
               <div className={styles.twoColumns}>
                 <label>
-                  资料名称
-                  <input
+                  {t("资料名称")}<input
                     value={s.title}
                     maxLength={300}
                     onChange={(e) => patch(s.id, { title: e.target.value })}
                   />
                 </label>
                 <label>
-                  记录位置或参考链接
-                  <input
+                  {t("记录位置或参考链接")}<input
                     value={s.locator}
                     maxLength={1000}
                     onChange={(e) => patch(s.id, { locator: e.target.value })}
                   />
                 </label>
                 <label>
-                  来源类型
-                  <select
+                  {t("来源类型")}<select
                     value={s.kind}
                     onChange={(e) =>
                       patch(s.id, {
@@ -270,14 +269,13 @@ export function SourcesEditor({
                   >
                     {Object.entries(sourceKindLabels).map(([id, label]) => (
                       <option value={id} key={id}>
-                        {label}
+                        {t(label)}
                       </option>
                     ))}
                   </select>
                 </label>
                 <label>
-                  资料质量
-                  <select
+                  {t("资料质量")}<select
                     value={s.quality}
                     onChange={(e) =>
                       patch(s.id, {
@@ -286,15 +284,14 @@ export function SourcesEditor({
                       })
                     }
                   >
-                    <option value="confirmed">已确认</option>
-                    <option value="estimated">估计值</option>
-                    <option value="missing">缺失</option>
-                    <option value="rejected">不适用</option>
+                    <option value="confirmed">{t("已确认")}</option>
+                    <option value="estimated">{t("估计值")}</option>
+                    <option value="missing">{t("缺失")}</option>
+                    <option value="rejected">{t("不适用")}</option>
                   </select>
                 </label>
                 <label>
-                  适用开始
-                  <input
+                  {t("适用开始")}<input
                     type="date"
                     value={s.applicable_start ?? ""}
                     onChange={(e) =>
@@ -306,8 +303,7 @@ export function SourcesEditor({
                   />
                 </label>
                 <label>
-                  适用结束
-                  <input
+                  {t("适用结束")}<input
                     type="date"
                     value={s.applicable_end ?? ""}
                     onChange={(e) =>
@@ -319,8 +315,7 @@ export function SourcesEditor({
                   />
                 </label>
                 <label>
-                  观测 / 记录开始（可选）
-                  <input
+                  {t("观测 / 记录开始（可选）")}<input
                     type="date"
                     value={s.observed_start ?? ""}
                     onChange={(e) =>
@@ -332,8 +327,7 @@ export function SourcesEditor({
                   />
                 </label>
                 <label>
-                  观测 / 记录结束（可选）
-                  <input
+                  {t("观测 / 记录结束（可选）")}<input
                     type="date"
                     value={s.observed_end ?? ""}
                     onChange={(e) =>
@@ -346,8 +340,7 @@ export function SourcesEditor({
                 </label>
               </div>
               <label>
-                适用范围与限制
-                <textarea
+                {t("适用范围与限制")}<textarea
                   value={s.limitations.join("\n")}
                   onChange={(e) =>
                     patch(s.id, {
@@ -363,8 +356,7 @@ export function SourcesEditor({
                   checked={s.confirmed}
                   onChange={(e) => patch(s.id, { confirmed: e.target.checked })}
                 />
-                我已核对这份资料的来源、时间和限制
-              </label>
+                {t("我已核对这份资料的来源、时间和限制")}</label>
             </>
           )}
         </details>
@@ -391,20 +383,18 @@ export function SourcesEditor({
           onDefaultSource(id);
         }}
       >
-        添加资料来源
-      </button>
+        {t("添加资料来源")}</button>
       <label>
-        接下来填写的数据来自
-        <select
+        {t("接下来填写的数据来自")}<select
           value={defaultSource}
           onChange={(e) => onDefaultSource(e.target.value)}
         >
-          <option value="">逐项指定</option>
+          <option value="">{t("逐项指定")}</option>
           {Object.values(sources)
             .filter((s) => s.id !== "engineering-fixture")
             .map((s) => (
               <option key={s.id} value={s.id}>
-                {s.title || "待补充的资料来源"}
+                {s.title || t("待补充的资料来源")}
               </option>
             ))}
         </select>

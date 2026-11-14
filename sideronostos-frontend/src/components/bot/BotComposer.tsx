@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/provider";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { ArrowUp, LoaderCircle, Mic, Square, X } from "lucide-react";
 import {
@@ -39,11 +40,13 @@ export function BotComposer({
   active,
   label,
   placeholder = "想聊点什么？",
-  language = "zh-CN",
+  language = "en-US",
   pending = false,
   inputRef,
   maxLength = 2000,
 }: BotComposerProps) {
+  const { t } = useI18n();
+
   const ownInput = useRef<HTMLTextAreaElement>(null);
   const input = inputRef ?? ownInput;
   const id = useId();
@@ -72,7 +75,7 @@ export function BotComposer({
         if (!mounted || !live.current.active) return;
         const base = insertion.current;
         if (live.current.value !== base.value) {
-          setNotice("输入已更新，请重新说一次。");
+          setNotice(t("输入已更新，请重新说一次。"));
           return;
         }
         const before = base.value.slice(0, base.start),
@@ -85,7 +88,7 @@ export function BotComposer({
         let inserted = transcript.slice(0, available);
         if (/[\uD800-\uDBFF]$/.test(inserted)) inserted = inserted.slice(0, -1);
         if (inserted.length < transcript.length)
-          setNotice("输入框已满，部分语音未加入。请检查后再发送。");
+          setNotice(t("输入框已满，部分语音未加入。请检查后再发送。"));
         live.current.onChange(before + inserted + after);
         input.current?.focus({ preventScroll: true });
       },
@@ -146,7 +149,7 @@ export function BotComposer({
       window.removeEventListener("pagehide", cancel);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [language, input]);
+  }, [language, input, t]);
   useEffect(() => {
     if (
       !active ||
@@ -177,14 +180,14 @@ export function BotComposer({
   }
   const recording = speech.phase !== "idle";
   const status = cancelZone
-    ? "松开取消"
+    ? t("松开取消")
     : speech.phase === "starting"
-      ? "正在开启麦克风…"
+      ? t("正在开启麦克风…")
       : speech.phase === "finishing"
-        ? "正在转成文字…"
+        ? t("正在转成文字…")
         : holding
-          ? "松开转文字 · 上滑取消"
-          : "正在听 · 点击停止转文字";
+          ? t("松开转文字 · 上滑取消")
+          : t("正在听 · 点击停止转文字");
   return (
     <div
       className={styles.root}
@@ -210,12 +213,12 @@ export function BotComposer({
             <i />
           </span>
           <div>
-            <p role="status">{status}</p>
+            <p role="status">{t(status)}</p>
             <span className={styles.preview}>
-              {speech.preview || "语音只会填入输入框，由你确认发送"}
+              {speech.preview || t("语音只会填入输入框，由你确认发送")}
             </span>
           </div>
-          <button type="button" onClick={cancel} aria-label="取消语音输入">
+          <button type="button" onClick={cancel} aria-label={t("取消语音输入")}>
             <X size={16} />
           </button>
         </div>
@@ -233,12 +236,12 @@ export function BotComposer({
       >
         <textarea
           ref={input}
-          aria-label={label}
+          aria-label={t(label)}
           aria-describedby={`${id}-hint`}
           value={value}
           maxLength={maxLength}
           rows={2}
-          placeholder={placeholder}
+          placeholder={t(placeholder)}
           readOnly={recording}
           onChange={(event) => onChange(event.target.value)}
           onPointerDown={(event) => {
@@ -280,7 +283,7 @@ export function BotComposer({
           <button
             type="button"
             className={styles.mic}
-            aria-label={recording ? "停止语音并转成文字" : "开始语音输入"}
+            aria-label={recording ? t("停止语音并转成文字") : t("开始语音输入")}
             aria-pressed={recording}
             disabled={speech.phase === "finishing"}
             onClick={() => (recording ? controller.current?.finish() : start())}
@@ -291,18 +294,17 @@ export function BotComposer({
             type="submit"
             className={styles.send}
             disabled={pending || recording || !value.trim()}
-            aria-label="发送消息"
+            aria-label={t("发送消息")}
           >
             {pending ? <LoaderCircle size={18} /> : <ArrowUp size={20} />}
           </button>
         </div>
       </form>
       <p id={`${id}-hint`} className={styles.hint}>
-        按住输入框说话 · 语音由浏览器服务转写
-      </p>
+        {t("按住输入框说话 · 语音由浏览器服务转写")}</p>
       {(speech.error || notice) && (
         <p role="alert" className={styles.error}>
-          {speech.error || notice}
+          {t(speech.error || notice || "")}
         </p>
       )}
     </div>

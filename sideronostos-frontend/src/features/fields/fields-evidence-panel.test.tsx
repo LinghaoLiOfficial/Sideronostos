@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { afterEach, expect, it, vi } from "vitest";
 import type { FieldsContext } from "./use-fields-context";
 import { FieldsEvidencePanel } from "./fields-evidence-panel";

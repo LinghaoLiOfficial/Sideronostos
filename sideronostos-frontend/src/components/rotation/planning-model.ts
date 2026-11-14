@@ -298,7 +298,7 @@ export function fieldInput(field: Field) {
 export const formatValue = (value: number | null | undefined, digits = 1) =>
   value == null
     ? "—"
-    : new Intl.NumberFormat("zh-CN", { maximumFractionDigits: digits }).format(
+    : new Intl.NumberFormat("en-US", { maximumFractionDigits: digits }).format(
         value,
       );
 export const runStatus: Record<string, string> = {

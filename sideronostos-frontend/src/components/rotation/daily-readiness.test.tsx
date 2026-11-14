@@ -1,11 +1,13 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, screen, within } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { afterEach, expect, it } from "vitest";
 import type { DailyReadiness, ReadinessItem } from "@/lib/api/daily-types";
 import { DailyReadinessPanel } from "./daily-readiness";
 afterEach(cleanup);
 it("groups repeated parameter checks into actionable sections while retaining every audit row", () => {
   const item = {
-    status: "blocked",
+    status: "blocked" as const,
+    missing_reason: null, warnings: [], blocks: [],
     value: null,
     unit: "1",
     expected_unit: "1",
@@ -15,8 +17,9 @@ it("groups repeated parameter checks into actionable sections while retaining ev
     engineering_assumption: true,
   } as unknown as ReadinessItem;
   const report = {
+    schema: "rotation-readiness-v3.0", stage: "data_preflight", blocked_features: [], fingerprint: "readiness-test", farm_versions: [],
     ready: false,
-    weather: { warnings: [] },
+    weather: { ready: false, issues: [], warnings: [] },
     items: [
       ...Array.from({ length: 300 }, (_, index) => ({
         ...item,
@@ -39,14 +42,16 @@ it("groups repeated parameter checks into actionable sections while retaining ev
 });
 it("explains catalogue and equipment gaps and links each group to the place that can fix it", () => {
   const base = {
-    status: "blocked",
+    status: "blocked" as const,
+    value: null, missing_reason: null, warnings: [], engineering_assumption: false, blocks: [],
     sources: [],
     unit: "validation",
     expected_unit: "validation",
   };
   const report = {
+    schema: "rotation-readiness-v3.0", stage: "data_preflight", blocked_features: [], fingerprint: "readiness-test", farm_versions: [],
     ready: false,
-    weather: { warnings: [] },
+    weather: { ready: false, issues: [], warnings: [] },
     items: [
       {
         ...base,

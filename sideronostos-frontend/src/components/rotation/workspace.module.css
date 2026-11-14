@@ -1225,3 +1225,10 @@
   border: 1px solid var(--border);
   border-radius: 8px;
 }
+
+@media (max-width: 600px) {
+  .header { height: auto; min-height: 88px; padding-block: 10px; flex-wrap: wrap; gap: 8px; }
+  .header nav { order: 3; flex-basis: 100%; }
+  .header nav a { min-height: 40px; flex: 1; justify-content: center; }
+  .header > label { margin-left: auto; }
+}

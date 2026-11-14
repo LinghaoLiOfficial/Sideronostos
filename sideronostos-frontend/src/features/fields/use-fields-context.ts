@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "@/lib/i18n/provider";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import * as api from "@/lib/api/rotation";
@@ -16,6 +17,7 @@ export function useFieldsContext(
   field: FieldFeature | null,
   formDirty: boolean,
 ) {
+  const { t } = useI18n();
   const navigation = useWorkspaceNavigation("/fields"),
     { search } = navigation,
     client = useQueryClient();
@@ -172,15 +174,15 @@ export function useFieldsContext(
     Boolean(search.get("selection") && !science.selection.data);
   const contextLabel = [
     hasRun
-      ? `历史计算：${run.data!.field_snapshots.map((f) => f.name).join("、")}`
-      : (field?.properties.name ?? "未选择经营地块"),
+      ? t("历史计算：{fields}", { fields: run.data!.field_snapshots.map((f) => f.name).join(", ") })
+      : (field?.properties.name ?? t("未选择经营地块")),
     science.selection.data
-      ? `临时选区 ${science.selection.data.center.map((v) => v.toFixed(4)).join(", ")}`
-      : "未选临时区域",
+      ? t("临时选区 {coordinates}", { coordinates: science.selection.data.center.map((v) => v.toFixed(4)).join(", ") })
+      : t("未选临时区域"),
     window.dates
       ? `${window.dates.start}—${window.dates.end}`
-      : "全部已发布观测",
-    dirty ? "资料有未保存修改" : "",
+      : t("全部已发布观测"),
+    dirty ? t("资料有未保存修改") : "",
   ]
     .filter(Boolean)
     .join(" · ");

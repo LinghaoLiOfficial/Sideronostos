@@ -1,11 +1,6 @@
 import type { ReactNode } from "react";
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-} from "@testing-library/react";
+import { act, cleanup, fireEvent, screen } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { afterEach, expect, it, vi } from "vitest";
 import type { LayerManifest } from "@/lib/api/rotation-types";
 import { ScienceRaster } from "./science-raster";

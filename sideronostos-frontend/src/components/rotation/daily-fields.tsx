@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "@/lib/i18n/provider";
 import Link from "next/link";
 import type { Field } from "@/lib/api/field-shift-types";
 import type {
@@ -32,6 +33,8 @@ export function DailyFieldEditor({
   onSaved: (field: Field) => void;
   onHistoryDirty: (id: string, dirty: boolean) => void;
 }) {
+  const { t } = useI18n();
+
   const catalogue = {
     id: profile.id,
     history_catalogue: profile.history_catalogue,
@@ -42,7 +45,7 @@ export function DailyFieldEditor({
   };
   const groups = [
     [
-      "土壤与地形",
+      t("土壤与地形"),
       FIELD_PARAMETERS.filter((k) =>
         [
           "field_capacity",
@@ -59,7 +62,7 @@ export function DailyFieldEditor({
       ),
     ],
     [
-      "前茬、经营条件与水分假设",
+      t("前茬、经营条件与水分假设"),
       FIELD_PARAMETERS.filter(
         (k) =>
           ![
@@ -80,15 +83,13 @@ export function DailyFieldEditor({
   return (
     <details className={styles.dailyPanel} open>
       <summary>
-        {field.name} · {formatValue(field.area_ha, 3)} ha · 地块版本{" "}
+        {field.name} · {formatValue(field.area_ha, 3)} {t(" ha · 地块版本")}{" "}
         {field.version}
       </summary>
       <p>
-        土壤类型：{field.soil_texture} · 灌溉设施：
-        {field.irrigation_available ? "已记录为有" : "已记录为无"} ·{" "}
+        {t("土壤类型：")}{t(`soil.${field.soil_texture}`)} {t(" · 灌溉设施：")}{field.irrigation_available ? t("已记录为有") : t("已记录为无")} ·{" "}
         <Link href={`/fields?field=${encodeURIComponent(field.id)}`}>
-          返回地图修改基本资料
-        </Link>
+          {t("返回地图修改基本资料")}</Link>
       </p>
       <HistoryEditor
         key={`${field.id}:${field.version}`}
@@ -99,7 +100,7 @@ export function DailyFieldEditor({
       />
       {groups.map(([title, keys]) => (
         <details className={styles.details} key={title}>
-          <summary>{title}</summary>
+          <summary>{t(title)}</summary>
           <div className={styles.dailyGrid}>
             {keys.map((key) => (
               <EvidenceValue
@@ -120,29 +121,27 @@ export function DailyFieldEditor({
         </details>
       ))}
       <p className={styles.help}>
-        初始水分采用每个候选独立从萎蔫点开始的保守假设；当前没有跨季连续土壤水量模拟。此前未种植必须有依据，未知历史不能当作空地。
-      </p>
+        {t("初始水分采用每个候选独立从萎蔫点开始的保守假设；当前没有跨季连续土壤水量模拟。此前未种植必须有依据，未知历史不能当作空地。")}</p>
       <label>
-        本地块所属水源
-        <select
+        {t("本地块所属水源")}<select
           disabled={!field.irrigation_available}
           value={conditions.water_system_id ?? ""}
           onChange={(e) =>
             onChange({ ...conditions, water_system_id: e.target.value || null })
           }
         >
-          <option value="">无 / 尚未选择</option>
+          <option value="">{t("无 / 尚未选择")}</option>
           {Object.entries(draft.farm_resources[field.farm_id!]?.daily ?? {})
             .filter(([, r]) => r.kind === "water")
             .map(([id], index) => (
               <option key={id} value={id}>
-                水源 {index + 1} · {id.slice(-8)}
+                {t("水源 ")}{index + 1} · {id.slice(-8)}
               </option>
             ))}
         </select>
       </label>
       <fieldset className={styles.unstyledFieldset}>
-        <legend>禁止种植的作物</legend>
+        <legend>{t("禁止种植的作物")}</legend>
         <div className={styles.cropChoices}>
           {Object.entries(profile.crops).map(([id, crop]) => (
             <label className={styles.checkLabel} key={id}>
@@ -158,14 +157,13 @@ export function DailyFieldEditor({
                   })
                 }
               />
-              {crop.name}
+              {t(crop.name)}
             </label>
           ))}
         </div>
       </fieldset>
       <label>
-        裸地天数上限
-        <select
+        {t("裸地天数上限")}<select
           value={
             conditions.bare_limit
               ? "limit"
@@ -182,14 +180,14 @@ export function DailyFieldEditor({
             })
           }
         >
-          <option value="">尚未核对</option>
-          <option value="limit">有明确上限</option>
-          <option value="none">本次不设上限，说明原因</option>
+          <option value="">{t("尚未核对")}</option>
+          <option value="limit">{t("有明确上限")}</option>
+          <option value="none">{t("本次不设上限，说明原因")}</option>
         </select>
       </label>
       {conditions.bare_limit && (
         <CapacityEditor
-          label="本地块裸地天数"
+          label={t("本地块裸地天数")}
           unit="day"
           value={conditions.bare_limit}
           sources={draft.sources}
@@ -199,8 +197,7 @@ export function DailyFieldEditor({
       )}
       {conditions.bare_limit_disabled !== null && (
         <label>
-          不设上限的原因
-          <input
+          {t("不设上限的原因")}<input
             value={conditions.bare_limit_disabled}
             onChange={(e) =>
               onChange({ ...conditions, bare_limit_disabled: e.target.value })

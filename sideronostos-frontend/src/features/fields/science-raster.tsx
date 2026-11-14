@@ -1,5 +1,6 @@
 "use client";
 /* eslint-disable react-hooks/set-state-in-effect -- Register an external map protocol before publishing its source. */
+import { useI18n } from "@/lib/i18n/provider";
 import { useEffect, useState } from "react";
 import { addProtocol, removeProtocol } from "maplibre-gl";
 import { Layer, Source } from "react-map-gl/maplibre";
@@ -26,6 +27,8 @@ function RasterAttempt({
   layer: LayerManifest;
   retry: () => void;
 }) {
+  const { t } = useI18n();
+
   const [protocol] = useState(
     () => `fieldscience${crypto.randomUUID().replaceAll("-", "")}`,
   );
@@ -85,11 +88,9 @@ function RasterAttempt({
           className="absolute left-1/2 top-20 z-20 w-[min(90%,24rem)] -translate-x-1/2 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950 shadow"
         >
           <p>
-            科学图层加载失败，地图中的空白不代表没有有效观测。可重试或在科学资料面板关闭此图层。
-          </p>
+            {t("科学图层加载失败，地图中的空白不代表没有有效观测。可重试或在科学资料面板关闭此图层。")}</p>
           <button type="button" className="mt-2 underline" onClick={retry}>
-            重试科学图层
-          </button>
+            {t("重试科学图层")}</button>
         </div>
       )}
     </>
