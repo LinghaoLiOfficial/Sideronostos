@@ -127,11 +127,7 @@ SCHEMAS: dict[ActionName, type[BaseModel]] = {
 
 def _field_href(identifier: str) -> str:
     UUID(identifier)  # The field service uses UUID identifiers; reject invented routes.
-    return "/field-shift?" + urlencode({"field": identifier, "step": "field"})
-
-
-def _map_href(key: str, identifier: str) -> str:
-    return "/field-shift/map?" + urlencode({key: identifier})
+    return "/si/fields?" + urlencode({"field": identifier, "step": "field"})
 
 
 def _as_dict(value: Any) -> dict[str, Any]:
@@ -243,9 +239,13 @@ class AgentActionService:
                 return ActionOutcome(
                     status="succeeded",
                     action=request.action,
-                    text="图层已打开。" if language == "zh" else "Layer ready to open.",
+                    text=(
+                        "已载入图层资料；地图发布页仍在准备中。"
+                        if language == "zh"
+                        else "Layer data is ready here; the published map page is being prepared."
+                    ),
                     result=result,
-                    href=_map_href("layer", body.layer_id),
+                    href=None,
                 )
             assert isinstance(body, FactArguments)
             data = await self.agri.facts(
@@ -275,15 +275,12 @@ class AgentActionService:
                     else "No published fact is available for this selection.",
                     result={"unavailable": data.get("unavailable", [])},
                 )
-            query = {"selection": body.selection_id}
-            if body.start and body.end:
-                query.update(obsStart=body.start.isoformat(), obsEnd=body.end.isoformat())
             return ActionOutcome(
                 status="succeeded",
                 action=request.action,
                 text="已找到观测资料。" if language == "zh" else "Published observation found.",
                 result=fact,
-                href="/field-shift/map?" + urlencode(query),
+                href=None,
             )
         except HTTPException as error:
             return ActionOutcome(

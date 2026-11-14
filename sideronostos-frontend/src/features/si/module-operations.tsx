@@ -6,6 +6,7 @@ import { ChevronDown, LoaderCircle } from "lucide-react";
 import * as api from "./agent-api";
 import type { ModuleOperation, ModuleOperationOutcome } from "./agent-api";
 import { CompletionReceipt } from "./completion-receipt";
+import { publishedHref } from "./published-href";
 
 type Props = { conversationId: string; language: "en" | "zh" };
 const labels = {
@@ -23,11 +24,7 @@ function resultSummary(result: unknown, language: "en" | "zh"): string | null {
 }
 
 function localHref(value: unknown): string | null {
-  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) return null;
-  try {
-    const parsed = new URL(value, "https://app.invalid");
-    return parsed.origin === "https://app.invalid" ? `${parsed.pathname}${parsed.search}${parsed.hash}` : null;
-  } catch { return null; }
+  return publishedHref(value);
 }
 
 function requiredValue(schema: unknown): unknown {

@@ -32,7 +32,7 @@ it("continues a field creation with the same key and opens only the confirmed re
   await waitFor(() => expect(api.postAction).toHaveBeenCalledTimes(2));
   expect(api.postAction.mock.calls[0][1].idempotency_key).toBe(api.postAction.mock.calls[1][1].idempotency_key);
   expect(api.postAction.mock.calls[1][1].arguments).toEqual(expect.objectContaining({ name: "North plot", area_ha: 2, latitude: 35, longitude: -90, profile_id: "demo", history: [] }));
-  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift?field=4c4d54e7-9450-4f31-ae48-5893098d690e&step=field");
+  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/si/fields?field=4c4d54e7-9450-4f31-ae48-5893098d690e&step=field");
 });
 
 it("offers published layers and preserves an unfinished action after refresh", async () => {
@@ -42,7 +42,7 @@ it("offers published layers and preserves an unfinished action after refresh", a
   api.getAction.mockResolvedValue({ status: "needs_input", action: "remote_sensing.layer", text: "Please provide: layer_id.", missing_fields: ["layer_id"], pending: { arguments: {} }, result: null, href: null });
   const props = { conversationId: "chat-2", ensureConversation: async () => "chat-2", domain: "remote_sensing" as const, language: "en" as const, userId: "owner-1" };
   const first = render(<AgentActions {...props} />);
-  await user.click(screen.getByRole("button", { name: "Open published layer" }));
+  await user.click(screen.getByRole("button", { name: "Check published layer" }));
   expect(await screen.findByRole("combobox", { name: "Published layer" })).toBeInTheDocument();
   const key = api.postAction.mock.calls[0][1].idempotency_key;
   first.unmount();
@@ -56,7 +56,7 @@ it("never renders an unconfirmed action URL", async () => {
   rotation.listLayers.mockResolvedValue({ items: [] });
   api.postAction.mockResolvedValue({ status: "unavailable", action: "remote_sensing.layer", text: "No layer available.", missing_fields: [], pending: null, result: null, href: "/evil" });
   render(<AgentActions conversationId="chat-3" ensureConversation={async () => "chat-3"} domain="remote_sensing" language="en" userId="owner-1" />);
-  await user.click(screen.getByRole("button", { name: "Open published layer" }));
+  await user.click(screen.getByRole("button", { name: "Check published layer" }));
   expect(await screen.findByText("No layer available.")).toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Open result" })).not.toBeInTheDocument();
 });
@@ -74,7 +74,7 @@ it("offers each remote specialist only its supported actions and observations", 
   api.postAction.mockResolvedValue({ status: "needs_input", action: "remote_sensing.fact", text: "Please provide a selection.", missing_fields: ["selection_id"], pending: { arguments: {} }, result: null, href: null });
   const common = { conversationId: "chat-5", ensureConversation: async () => "chat-5", domain: "remote_sensing" as const, language: "en" as const, userId: "owner-1" };
   const weather = render(<AgentActions {...common} botId="remote-weather" />);
-  expect(screen.queryByRole("button", { name: "Open published layer" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Check published layer" })).not.toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Find published observation" }));
   const weatherMetrics = screen.getByRole("combobox", { name: "Observation" });
   expect(within(weatherMetrics).queryByRole("option", { name: "Surface soil moisture" })).not.toBeInTheDocument();
@@ -96,7 +96,7 @@ it("limits the soil specialist's published layer choices to SMAP", async () => {
   ] });
   api.postAction.mockResolvedValue({ status: "needs_input", action: "remote_sensing.layer", text: "Choose a layer.", missing_fields: ["layer_id"], pending: { arguments: {} }, result: null, href: null });
   render(<AgentActions conversationId="chat-soil" ensureConversation={async () => "chat-soil"} domain="remote_sensing" botId="remote-soil" language="en" userId="owner-1" />);
-  await user.click(screen.getByRole("button", { name: "Open published layer" }));
+  await user.click(screen.getByRole("button", { name: "Check published layer" }));
   const layers = await screen.findByRole("combobox", { name: "Published layer" });
   expect(within(layers).getByRole("option", { name: "Soil moisture" })).toBeInTheDocument();
   expect(within(layers).queryByRole("option", { name: "Rainfall" })).not.toBeInTheDocument();

@@ -17,7 +17,7 @@ it("shows the confirmed result link and the private screenshot from the real res
     preview_url: "/farm-assistant/conversations/chat-1/previews/workflow-1",
     missing_inputs: [], summary: null,
   }} />);
-  expect(screen.getByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/field-shift?field=field-1&step=field");
+  expect(screen.getByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/si/fields?field=field-1&step=field");
   expect(await screen.findByRole("img", { name: "Saved field result page" })).toHaveAttribute("src", "blob:field-preview");
   expect(api.apiBlob).toHaveBeenCalledWith("/farm-assistant/conversations/chat-1/previews/workflow-1");
 });
@@ -43,8 +43,7 @@ it("opens a generic business result and its protected viewer", async () => {
     href: "/field-shift", result_page_url: "/si/multi-agent/results/workflow-3?conversation=chat-1",
     preview_url: "/farm-assistant/conversations/chat-1/previews/workflow-3", missing_inputs: [], summary: null,
   }} />);
-  expect(screen.getByRole("link", { name: "Open result page" })).toHaveAttribute("href", "/field-shift");
-  expect(screen.getByRole("link", { name: "View task details" })).toHaveAttribute("href", "/si/multi-agent/results/workflow-3?conversation=chat-1");
+  expect(screen.getByRole("link", { name: "Open result page" })).toHaveAttribute("href", "/si/multi-agent/results/workflow-3?conversation=chat-1");
   expect(await screen.findByRole("img", { name: "Task result page" })).toHaveAttribute("src", "blob:tool-preview");
 });
 
@@ -66,6 +65,6 @@ it("refreshes a pending business job before showing its verified result", async 
   expect(screen.queryByRole("img", { name: "Task result page" })).not.toBeInTheDocument();
   await act(async () => { await vi.advanceTimersByTimeAsync(3000); });
   expect(api.apiRequest).toHaveBeenCalledWith("/farm-assistant/conversations/chat-1/workflows/workflow-4/refresh");
-  expect(screen.getByRole("link", { name: "Open result page" })).toHaveAttribute("href", "/field-shift/rotation?run=job-1");
+  expect(screen.getByRole("link", { name: "Open result page" })).toHaveAttribute("href", "/si/multi-agent/results/workflow-4?conversation=chat-1");
   expect(screen.getByRole("img", { name: "Task result page" })).toHaveAttribute("src", "blob:job-preview");
 });

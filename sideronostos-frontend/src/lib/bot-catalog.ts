@@ -20,13 +20,21 @@ export type CatalogBot = {
   fallback: Record<Locale, string>;
 };
 
+export const modulePalette = {
+  general: { bot: "#5a9b79", highlight: "#73bb8d" },
+  "field-management": { bot: "#4d9b75", highlight: "#73bb8d" },
+  "remote-sensing": { bot: "#3a91a7", highlight: "#62b9c6" },
+  "local-knowledge": { bot: "#ca9a4e", highlight: "#d6ad6b" },
+  "rotation-recommendation": { bot: "#8671d9", highlight: "#b6a1e6" },
+} as const satisfies Record<SiBotModule, { bot: string; highlight: string }>;
+
 export const botCatalog: readonly CatalogBot[] = [
   {
     id: "general-guide",
     module: "general",
     presetId: "general",
     avatar: "field",
-    color: "#5a9b79",
+    color: modulePalette.general.bot,
     name: { en: "Farm assistant", "zh-CN": "农场综合助手" },
     shortName: { en: "Farm", "zh-CN": "综合" },
     capability: { en: "Fields, observations, and rotation across your farm", "zh-CN": "跨地块、观测和轮作的农场帮助" },
@@ -37,7 +45,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "field-management",
     presetId: "field_management",
     avatar: "field",
-    color: "#4d9b75",
+    color: modulePalette["field-management"].bot,
     name: { en: "Field guide", "zh-CN": "地块助手" },
     shortName: { en: "Fields", "zh-CN": "地块" },
     capability: { en: "Saved field details and management context", "zh-CN": "地块资料与管理信息" },
@@ -48,7 +56,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "remote-sensing",
     presetId: "remote_sensing",
     avatar: "water",
-    color: "#4b96b8",
+    color: modulePalette["remote-sensing"].bot,
     name: { en: "Water specialist", "zh-CN": "水分助手" },
     shortName: { en: "Water", "zh-CN": "水分" },
     capability: { en: "Water observations and their data limits", "zh-CN": "水分观测与数据局限" },
@@ -59,7 +67,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "remote-sensing",
     presetId: "remote_sensing",
     avatar: "soil",
-    color: "#ab8765",
+    color: modulePalette["remote-sensing"].bot,
     name: { en: "Soil specialist", "zh-CN": "土壤助手" },
     shortName: { en: "Soil", "zh-CN": "土壤" },
     capability: { en: "Soil observations and their data limits", "zh-CN": "土壤观测与数据局限" },
@@ -70,7 +78,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "remote-sensing",
     presetId: "remote_sensing",
     avatar: "weather",
-    color: "#728db9",
+    color: modulePalette["remote-sensing"].bot,
     name: { en: "Weather specialist", "zh-CN": "天气助手" },
     shortName: { en: "Weather", "zh-CN": "天气" },
     capability: { en: "Weather observations and their data limits", "zh-CN": "天气观测与数据局限" },
@@ -81,7 +89,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "local-knowledge",
     presetId: "local_agriculture",
     avatar: "knowledge",
-    color: "#ca9a4e",
+    color: modulePalette["local-knowledge"].bot,
     name: { en: "Local knowledge", "zh-CN": "本地知识助手" },
     shortName: { en: "Local", "zh-CN": "本地" },
     capability: { en: "Sourced local rules and agricultural knowledge", "zh-CN": "有来源的本地规则与农业知识" },
@@ -92,7 +100,7 @@ export const botCatalog: readonly CatalogBot[] = [
     module: "rotation-recommendation",
     presetId: "rotation",
     avatar: "rotation",
-    color: "#8671d9",
+    color: modulePalette["rotation-recommendation"].bot,
     name: { en: "Rotation guide", "zh-CN": "轮作助手" },
     shortName: { en: "Rotation", "zh-CN": "轮作" },
     capability: { en: "Rotation plans and farm trade-offs", "zh-CN": "轮作方案与经营取舍" },

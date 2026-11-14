@@ -7,7 +7,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { Minus } from "lucide-react";
+import { BookOpen, CloudSun, Droplets, Layers3, Minus, Orbit, Sprout } from "lucide-react";
 import type { BotAvatarVariant, BotIdentity, BotMode } from "@/lib/bot";
 import type { Locale } from "@/lib/i18n/locale";
 import { useI18n } from "@/lib/i18n/provider";
@@ -24,16 +24,20 @@ export type BotProps = {
 };
 
 export function BotAvatar({ small = false, variant }: { small?: boolean; variant?: BotAvatarVariant }) {
+  const Icon = variant === "water" ? Droplets : variant === "soil" ? Layers3 : variant === "weather" ? CloudSun : variant === "knowledge" ? BookOpen : variant === "rotation" ? Orbit : Sprout;
   return (
     <span
       aria-hidden="true"
       className={`${styles.avatar} ${small ? styles.smallAvatar : ""}`}
       data-avatar={variant}
     >
-      <span className={styles.eyes}>
-        <i />
-        <i />
+      <span className={styles.avatarOrbit} />
+      <span className={styles.avatarSprout} />
+      <span className={styles.avatarEyes}>
+        <i className={styles.avatarEye} /><i className={styles.avatarEye} />
       </span>
+      <span className={styles.avatarSmile} />
+      <Icon className={styles.avatarSymbol} strokeWidth={1.8} />
     </span>
   );
 }
@@ -155,7 +159,7 @@ export function Bot({
       }, 400);
   }
   const color = {
-    "--bot-accent": identity.color ?? "#7962ce",
+    "--bot-accent": identity.color ?? "#4d9b75",
   } as CSSProperties;
   const launcherLabel = open
     ? locale === "en"

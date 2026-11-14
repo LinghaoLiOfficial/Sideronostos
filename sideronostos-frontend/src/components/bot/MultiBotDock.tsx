@@ -1,7 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { ChevronDown } from "lucide-react";
+import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { ChevronDown, GripVertical } from "lucide-react";
 import { Bot, BotAvatar } from "./Bot";
 import { MultiBotChat } from "./MultiBotChat";
 import { botsForModule, type CatalogBot, type SiBotModule } from "@/lib/bot-catalog";
@@ -17,6 +17,40 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
   const root = useRef<HTMLDivElement>(null);
   const restoreId = useRef<string | null>(null);
   const buttons = useRef(new Map<string, HTMLButtonElement>());
+  const [position, setPosition] = useState({ right: 26, bottom: 33 });
+  const drag = useRef<{ x: number; y: number; right: number; bottom: number } | null>(null);
+
+  const clampPosition = useCallback((right: number, bottom: number) => {
+    const width = root.current?.querySelector<HTMLElement>("[data-bot-cluster]")?.offsetWidth ?? 180;
+    const height = root.current?.querySelector<HTMLElement>("[data-bot-cluster]")?.offsetHeight ?? 72;
+    return {
+      right: Math.max(12, Math.min(right, window.innerWidth - width - 12)),
+      bottom: Math.max(12, Math.min(bottom, window.innerHeight - height - 12)),
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    let frame = 0;
+    try {
+      const saved = JSON.parse(localStorage.getItem(`agrisata-bot-dock:${module}`) || "null");
+      if (saved && Number.isFinite(saved.right) && Number.isFinite(saved.bottom)) {
+        frame = requestAnimationFrame(() => setPosition(clampPosition(saved.right, saved.bottom)));
+      }
+    } catch { /* An invalid saved position is ignored. */ }
+    return () => cancelAnimationFrame(frame);
+  }, [module, clampPosition]);
+
+  useLayoutEffect(() => {
+    const onResize = () => setPosition((current) => clampPosition(current.right, current.bottom));
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [clampPosition]);
+
+  function place(right: number, bottom: number) {
+    const next = clampPosition(right, bottom);
+    setPosition(next);
+    localStorage.setItem(`agrisata-bot-dock:${module}`, JSON.stringify(next));
+  }
 
   useLayoutEffect(() => {
     if (selected) {
@@ -42,6 +76,7 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
       <div
         className={styles.cluster}
         data-bot-cluster
+        style={{ "--dock-right": `${position.right}px`, "--dock-bottom": `${position.bottom}px` } as CSSProperties}
         hidden={selected !== null}
         onPointerEnter={(event) => {
           if (event.pointerType === "mouse" && window.matchMedia?.("(hover: hover) and (pointer: fine)").matches) setExpanded(true);
@@ -65,6 +100,33 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
       >
         <button
           type="button"
+          className={styles.dragHandle}
+          aria-label={locale === "en" ? "Move assistants" : "移动助手"}
+          title={locale === "en" ? "Drag to move. Arrow keys also work." : "拖动位置，也可使用方向键。"}
+          onPointerDown={(event) => {
+            if (event.button !== 0) return;
+            drag.current = { x: event.clientX, y: event.clientY, ...position };
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerMove={(event) => {
+            if (drag.current && event.currentTarget.hasPointerCapture(event.pointerId)) {
+              place(drag.current.right + drag.current.x - event.clientX, drag.current.bottom + drag.current.y - event.clientY);
+            }
+          }}
+          onPointerUp={(event) => { drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }}
+          onPointerCancel={() => { drag.current = null; }}
+          onKeyDown={(event) => {
+            const delta = event.shiftKey ? 40 : 12;
+            if (event.key === "ArrowLeft") place(position.right + delta, position.bottom);
+            else if (event.key === "ArrowRight") place(position.right - delta, position.bottom);
+            else if (event.key === "ArrowUp") place(position.right, position.bottom + delta);
+            else if (event.key === "ArrowDown") place(position.right, position.bottom - delta);
+            else return;
+            event.preventDefault();
+          }}
+        ><GripVertical size={17} aria-hidden="true" /></button>
+        <button
+          type="button"
           className={styles.toggle}
           aria-label={countLabel}
           aria-expanded={expanded}
@@ -84,6 +146,16 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
               style={{ "--bot-accent": bot.color } as CSSProperties}
               aria-label={locale === "en" ? `Open ${bot.name.en}` : `打开${bot.name["zh-CN"]}`}
               title={bot.name[locale]}
+              onPointerMove={(event) => {
+                if (event.pointerType !== "mouse" || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+                const bounds = event.currentTarget.getBoundingClientRect();
+                event.currentTarget.style.setProperty("--gaze-x", `${Math.max(-2, Math.min(2, (event.clientX - bounds.left - bounds.width / 2) / 12))}px`);
+                event.currentTarget.style.setProperty("--gaze-y", `${Math.max(-2, Math.min(2, (event.clientY - bounds.top - bounds.height / 2) / 12))}px`);
+              }}
+              onPointerLeave={(event) => {
+                event.currentTarget.style.removeProperty("--gaze-x");
+                event.currentTarget.style.removeProperty("--gaze-y");
+              }}
               onClick={() => { setExpanded(false); setSelected(bot); }}
             >
               <BotAvatar variant={bot.avatar} small />
@@ -93,7 +165,7 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
         </div>
       </div>
       {selected && (
-        <div className={styles.botHost}>
+        <div className={styles.botHost} style={{ "--dock-right": `${position.right}px`, "--dock-bottom": `${position.bottom}px` } as CSSProperties}>
           <Bot
             identity={{ id: selected.id, name: selected.name[locale], description: selected.capability[locale], color: selected.color, avatar: selected.avatar }}
             locale={locale}

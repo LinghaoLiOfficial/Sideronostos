@@ -52,7 +52,7 @@ export function FarmerTasks(props: FarmerTasksProps) {
       </div>
     </> : <><h3 className="mb-3 font-medium">{tr(language, "What would you like to do?", "你想做什么？")}</h3><div className="flex flex-wrap gap-2">
       {options.map((task) => <button key={task.id} type="button" onClick={() => setSelected(task.id)} className="min-h-10 rounded-lg border border-border bg-background px-3 py-2 text-left hover:border-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary">{tr(language, task.en, task.zh)}</button>)}
-      {botId === "rotation-guide" && <Link href="/field-shift/rotation" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 hover:border-primary hover:bg-muted">{tr(language, "Plan the next seasons", "规划接下来的种植季")}<ArrowUpRight size={14} aria-hidden="true" /></Link>}
+      {botId === "rotation-guide" && <Link href="/si/fields?step=planning" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 hover:border-primary hover:bg-muted">{tr(language, "Plan the next seasons", "规划接下来的种植季")}<ArrowUpRight size={14} aria-hidden="true" /></Link>}
     </div></>}
   </section>;
 }

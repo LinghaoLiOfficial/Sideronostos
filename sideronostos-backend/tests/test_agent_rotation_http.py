@@ -97,7 +97,7 @@ async def test_rotation_bot_confirms_real_run_waits_for_worker_and_exports_csv(
         final = completed.json()
         assert final["status"] == "completed"
         assert final["preview_url"] and final["result_page_url"]
-        assert final["href"] == f"/field-shift/rotation?run={run_id}&option=option-1"
+        assert final["href"] == final["result_page_url"]
         captured = []
 
         async def capture(target, authorization):
@@ -109,7 +109,7 @@ async def test_rotation_bot_confirms_real_run_waits_for_worker_and_exports_csv(
         )
         preview = await client.get(final["preview_url"])
         assert preview.status_code == 200
-        assert captured == [f"/field-shift/rotation?run={run_id}&option=option-1"]
+        assert captured == [final["result_page_url"]]
         result_data = await client.get(
             f"/farm-assistant/conversations/{conversation_id}/results/{task['id']}"
         )

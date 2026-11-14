@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode, type InputHTMLAttributes } from "react";
 import Link from "next/link";
+import { publishedHref } from "../published-href";
 import * as agent from "../agent-api";
 import type { FarmerTasksProps } from "../farmer-tasks";
 import { CompletionReceipt } from "../completion-receipt";
@@ -54,7 +55,7 @@ export function LoadingState({ state, language }: { state: { loading: boolean; e
   return null;
 }
 export function NoFields({ language }: { language: "en" | "zh" }) {
-  return <div className="space-y-2"><p>{tr(language, "Save a field first so I can use its location.", "先保存一个地块，我就能使用它的位置。")}</p><Link className={linkStyle} href="/field-shift?field=new&step=field">{tr(language, "Add your first field", "添加第一个地块")}</Link></div>;
+  return <div className="space-y-2"><p>{tr(language, "Save a field first so I can use its location.", "先保存一个地块，我就能使用它的位置。")}</p><Link className={linkStyle} href="/si/fields?field=new&step=field">{tr(language, "Add your first field", "添加第一个地块")}</Link></div>;
 }
 
 type Command = { kind: "action"; action: agent.AgentActionName; arguments: Record<string, unknown> } |
@@ -136,11 +137,10 @@ export function TaskFeedback({ execution, language, success, linkLabel, children
   const pendingText = stopping
     ? tr(language, "Stopping this calculation. Open its progress to confirm when it has stopped.", "正在停止此计算，打开进度可确认是否已停止。")
     : tr(language, "Your calculation is underway. Open its progress to see when it is ready.", "计算已开始，打开进度可查看结果。");
-  let href: string | null = null;
-  if (outcome?.href && /^\/field-shift(?:[/?]|$)/.test(outcome.href) && !outcome.href.includes("\\")) href = outcome.href;
+  const href = publishedHref(outcome?.href);
   return <div ref={result} className="space-y-3">
     {execution.busy && <p role="status">{tr(language, "Working on it…", "正在处理…")}</p>}
     {(execution.error || execution.uncertain) && !execution.busy && <div role="alert" className="space-y-2"><p>{execution.error || tr(language, "This request still needs confirmation. Check again before starting another one.", "上次请求仍需确认，请先确认结果。")}</p><button className={secondary} onClick={() => void execution.retry()}>{tr(language, "Check again", "再次确认")}</button></div>}
-    {outcome?.status === "succeeded" && href ? <CompletionReceipt href={href} message={success} language={language} linkLabel={linkLabel} fileName="agrisata-task-result.png" captureKey={JSON.stringify(outcome.result)}>{children}</CompletionReceipt> : outcome && <div role="status" className="space-y-2 rounded-lg bg-muted p-3"><p>{outcome.status === "pending" ? pendingText : outcome.status === "needs_input" ? tr(language, "Some details still need attention. Check the form and try again.", "还有资料需要补充，请检查表单后重试。") : outcome.status === "unavailable" ? tr(language, "No published observation is available for this place and period. Try another period or check the map's available dates.", "该地点和时段暂无已发布观测，请更换时段或查看地图可用日期。") : tr(language, "This task could not be completed. Your input is kept. Check the relevant workspace before retrying.", "任务未能完成，输入已保留。请先在工作区检查记录，再重试。")}</p>{href && outcome.status === "pending" && <Link href={href} className={linkStyle}>{tr(language, "View progress", "查看进度")}</Link>}</div>}
+    {outcome?.status === "succeeded" && href ? <CompletionReceipt href={href} message={success} language={language} linkLabel={linkLabel} fileName="agrisata-task-result.png" captureKey={JSON.stringify(outcome.result)}>{children}</CompletionReceipt> : outcome && <div role="status" className="space-y-2 rounded-lg bg-muted p-3"><p>{outcome.status === "succeeded" ? success : outcome.status === "pending" ? pendingText : outcome.status === "needs_input" ? tr(language, "Some details still need attention. Check the form and try again.", "还有资料需要补充，请检查表单后重试。") : outcome.status === "unavailable" ? tr(language, "No published observation is available for this place and period. Try another period.", "该地点和时段暂无已发布观测，请更换时段。") : tr(language, "This task could not be completed. Your input is kept. Check the relevant workspace before retrying.", "任务未能完成，输入已保留。请先在工作区检查记录，再重试。")}</p>{outcome.status === "succeeded" && children}{href && outcome.status === "pending" && <Link href={href} className={linkStyle}>{tr(language, "View progress", "查看进度")}</Link>}</div>}
   </div>;
 }

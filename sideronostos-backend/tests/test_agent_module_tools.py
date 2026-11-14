@@ -70,7 +70,7 @@ async def test_module_tools_are_catalogued_by_domain_and_execute_only_registered
     )
     assert result.status_code == 200
     assert result.data == {"id": "field-1", "name": "North field"}
-    assert result.href == "/field-shift?field=field-1&step=field"
+    assert result.href == "/si/fields?field=field-1&step=field"
 
 
 @pytest.mark.asyncio
@@ -171,15 +171,15 @@ def test_offline_tool_planner_honors_action_clauses_and_negation():
     ).operation_id == ("create_rotation_optimizer_runs_post")
 
 
-def test_rotation_preview_accepts_only_a_single_internal_result_identifier():
-    from sideronostos_backend.modules.farm_assistant.preview import _capture_path
+def test_preview_accepts_owned_si_results_and_rejects_legacy_or_external_urls():
+    from sideronostos_backend.modules.farm_assistant.preview import _capture_path, field_result_path
 
     identifier = "00000000-0000-4000-8000-000000000001"
-    assert _capture_path(f"/field-shift/rotation?run={identifier}").endswith(identifier)
-    assert _capture_path(f"/field-shift/rotation?plan={identifier}").endswith(identifier)
-    assert _capture_path(f"/field-shift/rotation?run={identifier}&option=option-1").endswith(
-        "option-1"
+    assert _capture_path(f"/si/fields?field={identifier}&step=field").endswith("step=field")
+    assert field_result_path(f"/field-shift?field={identifier}&step=field") == (
+        f"/si/fields?field={identifier}&step=field"
     )
+    assert _capture_path(f"/si/multi-agent/results/{identifier}?conversation={identifier}").endswith(identifier)
     for invalid in (
         f"https://example.test/field-shift/rotation?run={identifier}",
         f"//example.test/field-shift/rotation?run={identifier}",

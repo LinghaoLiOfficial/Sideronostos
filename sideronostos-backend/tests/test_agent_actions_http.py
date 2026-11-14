@@ -260,7 +260,7 @@ async def test_three_turn_field_chat_requires_confirmation_and_creates_once(api,
     third = await ask(3, "Yes, create the field.")
     task = third["response"]["task"]
     assert task["status"] == "completed"
-    assert task["href"].startswith("/field-shift?field=")
+    assert task["href"].startswith("/si/fields?field=")
     assert task["preview_url"]
     async with factory() as session:
         assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 1
@@ -351,7 +351,7 @@ async def test_chat_can_run_a_registered_read_tool_and_restore_its_outcome(api):
     task = response.json()["response"]["task"]
     assert task["status"] == "completed"
     assert task["operation_id"] == "list_fields_field_shift_fields_get"
-    assert task["href"] == "/field-shift"
+    assert task["href"] == "/si/fields"
     loaded = await client.get(f"/farm-assistant/conversations/{conversation_id}")
     assert loaded.json()["messages"][-1]["response"]["task"] == task
     async with factory() as session:
@@ -510,7 +510,7 @@ async def test_general_chat_executes_registered_write_only_after_confirmation(ap
     result = approved.json()["response"]["task"]
     assert result["status"] == "completed"
     assert result["operation_id"] == "create_field_field_shift_fields_post"
-    assert result["href"].startswith("/field-shift?field=")
+    assert result["href"].startswith("/si/fields?field=")
     async with factory() as session:
         assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 1
 
@@ -577,7 +577,7 @@ async def test_module_operations_are_catalogued_by_conversation_and_executed_ide
     assert result.json()["status"] == "succeeded"
     assert "list_profiles_field_shift_profiles_get" not in result.json()["text"]
     assert result.json()["result"]["items"]
-    assert result.json()["href"] == "/field-shift"
+    assert result.json()["href"] == "/si/fields"
     history = await client.get(path + "/history")
     assert history.status_code == 200
     assert history.json()["items"][0]["outcome"] == result.json()
@@ -1008,7 +1008,7 @@ async def test_accepted_module_job_reports_progress_without_claiming_completion(
     assert result.status_code == 200
     assert result.json()["status"] == "pending"
     assert result.json()["status_code"] == 202
-    assert result.json()["href"] == "/field-shift/rotation?run=job-1"
+    assert result.json()["href"] is None
     assert (await client.post(path, json=request)).json() == result.json()
 
 
@@ -1045,7 +1045,7 @@ async def test_field_action_resumes_persists_and_retries_once(api):
     result = second.json()
     assert result["status"] == "succeeded"
     field_id = result["result"]["id"]
-    assert result["href"] == f"/field-shift?field={field_id}&step=field"
+    assert result["href"] == f"/si/fields?field={field_id}&step=field"
     replay = await client.post(
         path, json={"action": "field.create", "arguments": rest, "idempotency_key": "field-key-1"}
     )
@@ -1127,7 +1127,7 @@ async def test_remote_layer_and_fact_only_report_confirmed_owner_data(api):
     )
     assert layer.status_code == 200
     assert layer.json()["status"] == "succeeded"
-    assert layer.json()["href"] == "/field-shift/map?layer=agent-test-smap%3Aam"
+    assert layer.json()["href"] is None
     fact = await client.post(
         path,
         json={
@@ -1145,10 +1145,7 @@ async def test_remote_layer_and_fact_only_report_confirmed_owner_data(api):
     assert fact.status_code == 200
     assert fact.json()["status"] == "succeeded"
     assert fact.json()["result"]["value"] == 4.0
-    assert (
-        fact.json()["href"]
-        == f"/field-shift/map?selection={selection_id}&obsStart=2025-01-01&obsEnd=2025-01-01"
-    )
+    assert fact.json()["href"] is None
     identity["id"] = str(uuid4())
     assert (await client.get(path + "/fact-key-1")).status_code == 404
 

@@ -21,7 +21,7 @@ it("restores the last completed result link after reopening a conversation", asy
   }] });
   render(<ModuleOperations conversationId="chat-restored" language="en" />);
   await userEvent.setup().click(await screen.findByText(/Farm tasks/));
-  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift?field=field-7&step=field");
+  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
   expect(screen.getByText("North field")).toBeInTheDocument();
 });
 
@@ -50,7 +50,7 @@ it("collects required API inputs, reports missing information, and opens a compl
   expect(api.postModuleOperation.mock.calls[1][1]).toEqual(expect.objectContaining({
     operation_id: "get_field", path_params: { field_id: "field-7" },
   }));
-  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift?field=field-7&step=field");
+  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
 });
 
 it("does not render an unsafe result URL", async () => {
@@ -86,7 +86,8 @@ it("shows a progress link for an accepted job without a completion screenshot", 
   render(<ModuleOperations conversationId="chat-3" language="en" />);
   await user.click(await screen.findByText(/Farm tasks/));
   await user.click(screen.getByRole("button", { name: "Continue task" }));
-  expect(await screen.findByRole("link", { name: "View progress" })).toHaveAttribute("href", "/field-shift/rotation?run=run-1");
+  expect(await screen.findByText("Your task is underway.")).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "View progress" })).not.toBeInTheDocument();
   expect(screen.queryByRole("img", { name: "Completed task screenshot" })).not.toBeInTheDocument();
 });
 
@@ -118,5 +119,5 @@ it("collects a field task through labelled inputs and keeps complex JSON optiona
   await waitFor(() => expect(api.postModuleOperation).toHaveBeenCalledWith("chat-field", expect.objectContaining({
     body: { name: "Creek field", area_ha: 4, irrigation_available: true, history: [] },
   })));
-  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/field-shift?field=field-9&step=field");
+  expect(await screen.findByRole("link", { name: "Open result" })).toHaveAttribute("href", "/si/fields?field=field-9&step=field");
 });

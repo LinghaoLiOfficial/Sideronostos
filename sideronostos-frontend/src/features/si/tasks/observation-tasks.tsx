@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { listFields } from "@/lib/api/field-shift";
 import { createSelection, listLayers } from "@/lib/api/rotation";
 import type { Geometry } from "@/lib/api/rotation-types";
-import { Input, linkStyle, LoadingState, NoFields, primary, secondary, Select, TaskFeedback, tr, useDraft, useLoad, useTaskExecution, type TaskProps } from "./shared";
+import { Input, LoadingState, NoFields, primary, secondary, Select, TaskFeedback, tr, useDraft, useLoad, useTaskExecution, type TaskProps } from "./shared";
 
 const metrics = {
   surface_soil_moisture: ["Surface soil moisture", "表层土壤湿度"],
@@ -69,7 +68,6 @@ export function Observations(props: TaskProps) {
       {fact?.limitations?.map((limit) => <p key={limit} className="mt-1 text-xs text-muted-foreground">{limit}</p>)}
     </TaskFeedback>
     {confirmed && <button className={secondary} onClick={execution.clear}>{tr(language, "Check another observation", "查询其他观测")}</button>}
-    <Link className={linkStyle} href="/field-shift/map">{tr(language, "Explore a different place on the map", "在地图上查看其他位置")}</Link>
   </div>;
 }
 
@@ -82,9 +80,9 @@ export function ObservationMaps(props: TaskProps) {
   return <div className="space-y-3"><LoadingState state={layers} language={language} />
     {layers.data && !available.length && <p role="status">{tr(language, "No observation maps have been published for this specialist yet. You can still check a saved field for available readings.", "这位助手暂无已发布观测地图，仍可查询已保存地块的可用读数。")}</p>}
     {Boolean(available.length) && execution.outcome?.status !== "succeeded" && <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); void execution.run({ kind: "action", action: "remote_sensing.layer", arguments: { layer_id: layer } }); }}><fieldset disabled={execution.busy || execution.uncertain} className="space-y-3">
-      <Select label={tr(language, "Observation map", "观测地图")} required value={layer} onChange={(e) => setLayer(e.target.value)}><option value="">{tr(language, "Choose a published map", "选择已发布地图")}</option>{available.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.start} – {item.end}</option>)}</Select><button className={primary}>{tr(language, "Open this map", "打开此地图")}</button>
+      <Select label={tr(language, "Observation map", "观测地图")} required value={layer} onChange={(e) => setLayer(e.target.value)}><option value="">{tr(language, "Choose a published map", "选择已发布地图")}</option>{available.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.start} – {item.end}</option>)}</Select><button className={primary}>{tr(language, "Check map data", "查看图层资料")}</button>
     </fieldset></form>}
-    <TaskFeedback execution={execution} language={language} success={tr(language, "The published observation map is ready to open.", "已发布观测地图可以打开了。")} linkLabel={tr(language, "View observation map", "查看观测地图")} />
+    <TaskFeedback execution={execution} language={language} success={tr(language, "The published observation data is ready here. The map page is still being prepared.", "已发布观测数据可在此查看；地图发布页仍在准备中。")} linkLabel={tr(language, "View observation map", "查看观测地图")} />
     {execution.outcome?.status === "succeeded" && <button className={secondary} onClick={execution.clear}>{tr(language, "Choose another map", "选择其他地图")}</button>}
   </div>;
 }

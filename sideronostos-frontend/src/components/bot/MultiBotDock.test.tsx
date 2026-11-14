@@ -50,6 +50,52 @@ it("keeps stable catalog identities across the four module routes", () => {
   expect(botsForModule("field-management").map((bot) => bot.id)).toEqual(["field-guide"]);
   expect(botsForModule("local-knowledge").map((bot) => bot.id)).toEqual(["local-knowledge-guide"]);
   expect(botsForModule("rotation-recommendation").map((bot) => bot.id)).toEqual(["rotation-guide"]);
+  expect(new Set(botsForModule("remote-sensing").map((bot) => bot.color)).size).toBe(1);
+});
+
+it("gives each specialist the same responsive face with a small domain crest", () => {
+  render(<MultiBotDock module="remote-sensing" locale="en" />);
+  const buttons = ["Water specialist", "Soil specialist", "Weather specialist"].map((name) => screen.getByRole("button", { name: `Open ${name}` }));
+  for (const button of buttons) {
+    expect(button.querySelectorAll("i[class*='avatarEye']")).toHaveLength(2);
+    expect(button.querySelector("svg")).toBeInTheDocument();
+  }
+  fireEvent.pointerMove(buttons[0], { pointerType: "mouse", clientX: 30, clientY: 30 });
+  expect(buttons[0].style.getPropertyValue("--gaze-x")).not.toBe("");
+  fireEvent.pointerLeave(buttons[0]);
+  expect(buttons[0].style.getPropertyValue("--gaze-x")).toBe("");
+});
+
+it("moves the compact dock by keyboard and pointer without opening a chat", () => {
+  render(<MultiBotDock module="remote-sensing" locale="en" />);
+  const cluster = document.querySelector<HTMLElement>("[data-bot-cluster]")!;
+  const handle = screen.getByRole("button", { name: "Move assistants" });
+  fireEvent.keyDown(handle, { key: "ArrowLeft" });
+  expect(cluster.style.getPropertyValue("--dock-right")).toBe("38px");
+  expect(localStorage.getItem("agrisata-bot-dock:remote-sensing")).toContain('"right":38');
+  Object.defineProperty(handle, "setPointerCapture", { value: vi.fn() });
+  Object.defineProperty(handle, "hasPointerCapture", { value: () => true });
+  Object.defineProperty(handle, "releasePointerCapture", { value: vi.fn() });
+  fireEvent.pointerDown(handle, { button: 0, pointerId: 1, clientX: 100, clientY: 100 });
+  fireEvent.pointerMove(handle, { pointerId: 1, clientX: 80, clientY: 70 });
+  fireEvent.pointerUp(handle, { pointerId: 1 });
+  expect(cluster.style.getPropertyValue("--dock-right")).toBe("58px");
+  expect(cluster.style.getPropertyValue("--dock-bottom")).toBe("63px");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Open Water specialist" }));
+  expect(document.querySelector<HTMLElement>("[class*='botHost']")?.style.getPropertyValue("--dock-right")).toBe("58px");
+});
+
+it("clamps a saved dock position when the viewport becomes smaller", async () => {
+  localStorage.setItem("agrisata-bot-dock:remote-sensing", JSON.stringify({ right: 5000, bottom: 5000 }));
+  render(<MultiBotDock module="remote-sensing" locale="en" />);
+  const cluster = document.querySelector<HTMLElement>("[data-bot-cluster]")!;
+  await waitFor(() => expect(cluster.style.getPropertyValue("--dock-right")).not.toBe("5000px"));
+  vi.stubGlobal("innerWidth", 420);
+  vi.stubGlobal("innerHeight", 600);
+  fireEvent.resize(window);
+  expect(parseInt(cluster.style.getPropertyValue("--dock-right"), 10)).toBeLessThan(420);
+  expect(parseInt(cluster.style.getPropertyValue("--dock-bottom"), 10)).toBeLessThan(600);
 });
 
 it("loads only the chosen bot's authenticated conversation and restores focus on collapse", async () => {
@@ -108,7 +154,7 @@ it("opens named farm records from a fresh specialist conversation", async () => 
   await user.click(await screen.findByRole("button", { name: "Farm tasks" }));
   expect(api.createConversation).toHaveBeenCalledWith({ preset: "field_management", bot_id: "field-guide", language: "en", detail: "brief" });
   await user.click(await screen.findByRole("button", { name: "My fields" }));
-  expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/field-shift?field=north&step=field");
+  expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/si/fields?field=north&step=field");
 });
 
 it("opens cited web search results from the source panel", async () => {

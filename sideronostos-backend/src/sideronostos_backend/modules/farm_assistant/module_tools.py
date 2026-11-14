@@ -520,24 +520,12 @@ class ModuleToolExecutor:
         return ModuleToolResult(response.status_code, data, content_type, href)
 
     @staticmethod
-    def _result_href(tool: ModuleTool, path_params: dict[str, Any], data: Any) -> str:
+    def _result_href(tool: ModuleTool, path_params: dict[str, Any], data: Any) -> str | None:
         result = data if isinstance(data, dict) else {}
         identifier = result.get("id") or path_params.get("field_id") or path_params.get("run_id")
         if tool.domain == "field_management":
             query = f"?field={quote(str(identifier), safe='')}&step=field" if identifier else ""
-            return "/field-shift" + query
-        if tool.domain == "remote_sensing":
-            if "selection_id" in path_params or "selection" in tool.path:
-                value = path_params.get("selection_id") or identifier
-                query = f"?selection={quote(str(value), safe='')}" if value else ""
-                return "/field-shift/map" + query
-            layer_id = path_params.get("layer_id") or result.get("id")
-            query = f"?layer={quote(str(layer_id), safe='')}" if layer_id else ""
-            return "/field-shift/map" + query
-        if tool.domain == "rotation":
-            if "/plans" in tool.path:
-                query = f"?plan={quote(str(identifier), safe='')}" if identifier else ""
-                return "/field-shift/rotation" + query
-            query = f"?run={quote(str(identifier), safe='')}" if identifier else ""
-            return "/field-shift/rotation" + query
-        return "/si/local-knowledge"
+            return "/si/fields" + query
+        # The remaining published module pages are placeholders. The orchestrator
+        # links their owned operation records until real result pages exist.
+        return None

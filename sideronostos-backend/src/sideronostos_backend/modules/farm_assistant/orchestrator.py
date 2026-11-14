@@ -300,6 +300,12 @@ def _reply(
 ) -> dict[str, Any]:
     status = flow.status
     href = (outcome or {}).get("href")
+    result_page = f"/si/multi-agent/results/{flow.id}?conversation={flow.conversation_id}"
+    if isinstance(href, str) and href.startswith("/field-shift?field="):
+        href = "/si/fields?" + href.split("?", 1)[1]
+    # Only the field workspace is published. Other operations use the owned result page.
+    if not isinstance(href, str) or not (href == "/si/fields" or href.startswith("/si/fields?")):
+        href = result_page if status in {"completed", "pending"} else None
     task = {
         "id": flow.id,
         "status": status,
@@ -309,7 +315,7 @@ def _reply(
         "summary": flow.arguments["payload"] if status == "awaiting_confirmation" else None,
         "href": href,
         "result_page_url": (
-            f"/si/multi-agent/results/{flow.id}?conversation={flow.conversation_id}"
+            result_page
             if status == "completed"
             else None
         ),
@@ -794,12 +800,8 @@ async def refresh_module_workflow(
                 ),
                 None,
             )
-            if (
-                isinstance(selected, str)
-                and re.fullmatch(r"[A-Za-z0-9_-]{1,80}", selected)
-                and outcome.get("href") == f"/field-shift/rotation?run={run_id}"
-            ):
-                outcome["href"] += f"&option={selected}"
+            if isinstance(selected, str) and re.fullmatch(r"[A-Za-z0-9_-]{1,80}", selected):
+                outcome["selected_option_id"] = selected
         elif business_status in {"failed", "cancelled", "timeout_no_solution"}:
             flow.status = "failed"
         outcome.update(

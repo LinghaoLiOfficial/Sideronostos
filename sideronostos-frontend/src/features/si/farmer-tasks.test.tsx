@@ -38,7 +38,7 @@ afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.un
 it("lets a farmer choose a saved field by name and opens its actual page", async () => {
   render(<FarmerTasks {...props} />);
   await userEvent.click(screen.getByRole("button", { name: "My fields" }));
-  expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/field-shift?field=field-7&step=field");
+  expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
   expect(screen.queryByText(/GET \/|POST \/|analysis_id/)).not.toBeInTheDocument();
 });
 
@@ -59,7 +59,7 @@ it("preserves field input and retries an uncertain creation with the same key", 
   render(<FarmerTasks {...props} />);
   expect(await screen.findByLabelText("Field name")).toHaveValue("East field");
   await user.click(screen.getByRole("button", { name: /Check again/ }));
-  expect(await screen.findByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/field-shift?field=field-new&step=field");
+  expect(await screen.findByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/si/fields?field=field-new&step=field");
   const writes = calls.filter((c) => c.body.action === "field.create");
   expect(writes).toHaveLength(2);
   expect(writes[0].body.idempotency_key).toBe(writes[1].body.idempotency_key);
@@ -83,7 +83,8 @@ it.each([
   await user.type(screen.getByLabelText("From"), "2026-01-01");
   await user.type(screen.getByLabelText("To"), "2026-01-07");
   await user.click(screen.getByRole("button", { name: "Check observations" }));
-  expect(await screen.findByRole("link", { name: "Open observation map" })).toHaveAttribute("href", "/field-shift/map?selection=selection-2");
+  expect(await screen.findByText("0 mm")).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Open observation map" })).not.toBeInTheDocument();
   expect(screen.getByText("0 mm")).toBeInTheDocument();
   expect(calls.find((c) => c.path === "/agri-data/selections")?.body).toMatchObject({ geometry: { type: "Point", coordinates: [-90, 35] } });
   expect(calls.find((c) => c.body.action === "remote_sensing.fact")?.body.arguments).toMatchObject({ selection_id: "selection-2", metric, start: "2026-01-01", end: "2026-01-07" });
@@ -93,7 +94,7 @@ it("explains the no-field state with a working way to add one", async () => {
   emptyFields = true;
   render(<FarmerTasks {...props} botId="remote-soil" />);
   await userEvent.click(screen.getByRole("button", { name: "Check soil moisture" }));
-  expect(await screen.findByRole("link", { name: "Add your first field" })).toHaveAttribute("href", "/field-shift?field=new&step=field");
+  expect(await screen.findByRole("link", { name: "Add your first field" })).toHaveAttribute("href", "/si/fields?field=new&step=field");
   expect(screen.queryByRole("textbox", { name: /ID/ })).not.toBeInTheDocument();
 });
 
@@ -101,7 +102,7 @@ it("distinguishes running calculations from completed plans and offers progress"
   render(<FarmerTasks {...props} botId="rotation-guide" />);
   await userEvent.click(screen.getByRole("button", { name: "My calculations" }));
   expect(await screen.findByText("Calculating")).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "View progress" })).toHaveAttribute("href", "/field-shift/rotation?run=run-1");
+  expect(screen.getByRole("button", { name: "View and manage calculation" })).toBeInTheDocument();
   expect(screen.queryByText("Task completed")).not.toBeInTheDocument();
 });
 
@@ -141,7 +142,7 @@ it("edits the selected owned field with its version and preserves its planting h
   const area = await screen.findByLabelText("Area (ha)");
   await user.clear(area); await user.type(area, "5");
   await user.click(screen.getByRole("button", { name: "Save changes" }));
-  expect(await screen.findByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/field-shift?field=field-7&step=field");
+  expect(await screen.findByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
   expect(writes[0]).toMatchObject({ path_params: { field_id: "field-7" }, body: { area_ha: 5, expected_version: 3, history } });
   await user.click(screen.getByRole("button", { name: "Back to my fields" }));
   await user.click(await screen.findByRole("button", { name: "Edit details" }));
@@ -166,14 +167,14 @@ it("requires an explicit stop confirmation and never presents an accepted cancel
   const user = userEvent.setup();
   render(<FarmerTasks {...props} botId="rotation-guide" />);
   await user.click(screen.getByRole("button", { name: "My calculations" }));
-  await user.click(await screen.findByRole("button", { name: "Manage this calculation" }));
+  await user.click(await screen.findByRole("button", { name: "View and manage calculation" }));
   await user.click(screen.getByRole("button", { name: "Cancel calculation" }));
   expect(writes).toBe(0);
   await user.click(screen.getByRole("button", { name: "Keep calculating" }));
   expect(writes).toBe(0);
   await user.click(screen.getByRole("button", { name: "Cancel calculation" }));
   await user.click(screen.getByRole("button", { name: "Stop calculation" }));
-  expect(await screen.findByRole("link", { name: "View progress" })).toHaveAttribute("href", "/field-shift/rotation?run=run-1");
+  expect(await screen.findByText(/Stopping this calculation/)).toBeInTheDocument();
   expect(writes).toBe(1);
   expect(screen.getByText(/Stopping this calculation/)).toBeInTheDocument();
   expect(screen.queryByText("Task completed")).not.toBeInTheDocument();

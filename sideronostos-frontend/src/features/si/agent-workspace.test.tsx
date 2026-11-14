@@ -51,7 +51,7 @@ it("creates a conversation in the chosen domain and keeps it selectable in histo
     expect(within(identities).getByRole("group", { name }).parentElement).toBe(rail);
   }
   expect(within(identities).getByRole("button", { name: "Field guide" })).toBeInTheDocument();
-  expect(within(identities).getAllByRole("button")).toHaveLength(6);
+  expect(within(identities).getAllByRole("button")).toHaveLength(7);
   await user.click(within(identities).getByRole("button", { name: "Water specialist" }));
   await user.click(screen.getByRole("button", { name: "New chat" }));
   await waitFor(() => expect(api.createConversation).toHaveBeenCalledWith({
@@ -92,6 +92,9 @@ it("keeps multiple chat sessions available for the same assistant", async () => 
   await user.click(create);
 
   await waitFor(() => expect(within(history).getAllByRole("button", { name: /Field guide/ })).toHaveLength(2));
+  const titles = within(history).getAllByRole("button").map((button) => button.querySelector("span")?.textContent);
+  expect(new Set(titles).size).toBe(2);
+  expect(titles.every((title) => title?.startsWith("Field guide · Nov 14 · "))).toBe(true);
   expect(api.createConversation).toHaveBeenCalledTimes(2);
   expect(api.createConversation).toHaveBeenNthCalledWith(2, {
     preset: "field_management", bot_id: "field-guide", language: "en", detail: "brief",

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { apiBlob, apiRequest } from "@/lib/api/client";
 import type { AssistantTask } from "@/lib/api/rotation-types";
+import { publishedHref } from "./published-href";
 
 function displayValue(value: unknown, zh: boolean): string {
   if (typeof value === "boolean") return value ? (zh ? "是" : "Yes") : (zh ? "否" : "No");
@@ -24,6 +25,8 @@ function summaryEntries(summary: Record<string, unknown>): [string, unknown][] {
 
 export function TaskResultCard({ task, language }: { task: AssistantTask; language: "en" | "zh" }) {
   const [currentTask, setCurrentTask] = useState(task);
+  // A server refresh can replace a pending task with its confirmed outcome.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setCurrentTask(task); }, [task]);
   useEffect(() => {
     if (currentTask.status !== "pending" || !currentTask.refresh_url) return;
@@ -58,15 +61,17 @@ export function TaskResultCard({ task, language }: { task: AssistantTask; langua
     <p className="text-xs font-semibold uppercase text-muted-foreground">{zh ? "还需补充" : "More details needed"}</p>
     <p className="mt-1 text-sm">{shown.missing_inputs.map((item) => item.replaceAll("_", " ")).join(", ")}</p>
   </section>;
-  if (shown.status === "pending") return <section className="mt-3 rounded-lg border border-border bg-card p-3" role="status">{zh ? "任务正在处理，可通过结果链接查看进度。" : "Task in progress. Open the result link to check progress."}{shown.href && <Link className="ml-2 font-semibold text-primary underline" href={shown.href}>{zh ? "查看进度" : "View progress"}</Link>}</section>;
-  if (shown.status !== "completed" || !shown.href) return null;
-  const fieldResult = shown.href.startsWith("/field-shift?field=");
+  const detailHref = publishedHref(shown.result_page_url);
+  const href = publishedHref(shown.href, detailHref);
+  if (shown.status === "pending") return <section className="mt-3 rounded-lg border border-border bg-card p-3" role="status">{zh ? "任务正在处理，可通过结果链接查看进度。" : "Task in progress. Open the result link to check progress."}{href && <Link className="ml-2 font-semibold text-primary underline" href={href}>{zh ? "查看进度" : "View progress"}</Link>}</section>;
+  if (shown.status !== "completed" || !href) return null;
+  const fieldResult = href.startsWith("/si/fields?field=");
   return <section className="mt-3 rounded-lg border border-border bg-card p-3" aria-label={zh ? "任务结果" : "Task result"}>
     <p className="text-xs font-semibold uppercase text-muted-foreground">{fieldResult ? (zh ? "已保存的结果" : "Saved result") : (zh ? "任务结果" : "Task result")}</p>
     {shown.title && <p className="mt-1 font-semibold">{shown.title}</p>}
-    <Link className="mt-2 inline-block font-semibold text-primary underline" href={shown.href}>{fieldResult ? (zh ? "打开已保存地块" : "Open saved field") : (zh ? "打开结果页面" : "Open result page")}</Link>
-    {shown.result_page_url && <Link className="ml-3 inline-block text-sm text-primary underline" href={shown.result_page_url}>{zh ? "查看任务记录" : "View task details"}</Link>}
+    <Link className="mt-2 inline-block font-semibold text-primary underline" href={href}>{fieldResult ? (zh ? "打开已保存地块" : "Open saved field") : (zh ? "打开结果页面" : "Open result page")}</Link>
+    {detailHref && href !== detailHref && <Link className="ml-3 inline-block text-sm text-primary underline" href={detailHref}>{zh ? "查看任务记录" : "View task details"}</Link>}
     {preview && <figure className="mt-3"><Image unoptimized src={preview} alt={fieldResult ? (zh ? "已保存地块的结果页面" : "Saved field result page") : (zh ? "任务结果页面" : "Task result page")} width={720} height={450} className="max-h-64 w-auto max-w-full rounded border border-border object-contain" /><figcaption className="mt-1 text-xs text-muted-foreground">{zh ? "真实结果页面截图" : "Screenshot of the real result page"}</figcaption></figure>}
-    {previewError && <p role="status" className="mt-2 text-xs text-muted-foreground">{zh ? "预览暂时不可用；地块已保存，可用上方链接打开。" : "Preview unavailable. Your field is saved; use the link above."}</p>}
+    {previewError && <p role="status" className="mt-2 text-xs text-muted-foreground">{zh ? "预览暂时不可用；任务已完成，可用上方链接打开。" : "Preview unavailable. The task is complete; use the link above."}</p>}
   </section>;
 }

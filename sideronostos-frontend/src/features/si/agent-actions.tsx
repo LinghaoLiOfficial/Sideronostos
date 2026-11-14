@@ -8,6 +8,7 @@ import type { ScienceLayer } from "@/lib/api/rotation-types";
 import * as api from "./agent-api";
 import type { AgentActionName, AgentActionOutcome, AgentDomain } from "./agent-api";
 import { CompletionReceipt } from "./completion-receipt";
+import { publishedHref } from "./published-href";
 
 type Props = {
   conversationId: string | null;
@@ -19,8 +20,8 @@ type Props = {
 };
 
 const copy = {
-  en: { create: "Create field", layer: "Open published layer", fact: "Find published observation", continue: "Continue action", open: "Open result", name: "Field name", area: "Area (ha)", lat: "Latitude", lon: "Longitude", soil: "Soil texture", irrigation: "Irrigation available", profile: "Profile", published: "Published layer", selection: "Map selection ID", metric: "Observation", start: "Start date", end: "End date", noLayers: "No published layers are available.", error: "The action could not be loaded. Try again.", choose: "Choose an action", pending: "Working on the action…", unknown: "Unknown", sand: "Sand", loam: "Loam", clay: "Clay", moisture: "Surface soil moisture", rainfall: "Rainfall total", et0: "Reference ET₀ total" },
-  zh: { create: "创建地块", layer: "打开已发布图层", fact: "查询已发布观测", continue: "继续操作", open: "打开结果", name: "地块名称", area: "面积（公顷）", lat: "纬度", lon: "经度", soil: "土壤质地", irrigation: "有灌溉条件", profile: "资料配置", published: "已发布图层", selection: "地图选区 ID", metric: "观测指标", start: "开始日期", end: "结束日期", noLayers: "暂无已发布图层。", error: "操作未能加载，请重试。", choose: "选择操作", pending: "正在处理操作…", unknown: "未知", sand: "砂土", loam: "壤土", clay: "黏土", moisture: "表层土壤湿度", rainfall: "总降雨量", et0: "参考蒸散量总计" },
+  en: { create: "Create field", layer: "Check published layer", fact: "Find published observation", continue: "Continue action", open: "Open result", name: "Field name", area: "Area (ha)", lat: "Latitude", lon: "Longitude", soil: "Soil texture", irrigation: "Irrigation available", profile: "Profile", published: "Published layer", selection: "Map selection ID", metric: "Observation", start: "Start date", end: "End date", noLayers: "No published layers are available.", error: "The action could not be loaded. Try again.", choose: "Choose an action", pending: "Working on the action…", unknown: "Unknown", sand: "Sand", loam: "Loam", clay: "Clay", moisture: "Surface soil moisture", rainfall: "Rainfall total", et0: "Reference ET₀ total" },
+  zh: { create: "创建地块", layer: "查看已发布图层", fact: "查询已发布观测", continue: "继续操作", open: "打开结果", name: "地块名称", area: "面积（公顷）", lat: "纬度", lon: "经度", soil: "土壤质地", irrigation: "有灌溉条件", profile: "资料配置", published: "已发布图层", selection: "地图选区 ID", metric: "观测指标", start: "开始日期", end: "结束日期", noLayers: "暂无已发布图层。", error: "操作未能加载，请重试。", choose: "选择操作", pending: "正在处理操作…", unknown: "未知", sand: "砂土", loam: "壤土", clay: "黏土", moisture: "表层土壤湿度", rainfall: "总降雨量", et0: "参考蒸散量总计" },
 };
 
 const actions: Record<"field_management" | "remote_sensing", AgentActionName[]> = {
@@ -29,15 +30,7 @@ const actions: Record<"field_management" | "remote_sensing", AgentActionName[]> 
 };
 
 function resultHref(outcome: AgentActionOutcome): string | null {
-  const href = outcome.status === "succeeded" ? outcome.href : null;
-  if (!href || !href.startsWith("/field-shift") || href.startsWith("//")) return null;
-  try {
-    const parsed = new URL(href, "https://local.invalid");
-    if (parsed.origin !== "https://local.invalid") return null;
-    if (outcome.action === "field.create" && parsed.pathname === "/field-shift" && parsed.searchParams.has("field")) return href;
-    if (outcome.action !== "field.create" && parsed.pathname === "/field-shift/map" && (parsed.searchParams.has("layer") || parsed.searchParams.has("selection"))) return href;
-  } catch { /* Invalid URLs never become links. */ }
-  return null;
+  return outcome.status === "succeeded" && outcome.action === "field.create" ? publishedHref(outcome.href) : null;
 }
 
 export function AgentActions({ conversationId, ensureConversation, domain, botId, language, userId }: Props) {

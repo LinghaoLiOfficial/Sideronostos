@@ -121,7 +121,7 @@ async def test_missing_field_inputs_resume_to_one_owned_field_and_real_link():
     )
     assert second.status == "succeeded"
     assert second.result["owner"] == "farmer-1"
-    assert second.href == f"/field-shift?field={second.result['id']}&step=field"
+    assert second.href == f"/si/fields?field={second.result['id']}&step=field"
     assert len(fields.items) == 1
 
     replay = await service.advance(
@@ -177,7 +177,7 @@ async def test_invalid_field_payload_and_foreign_pending_never_write():
 
 
 @pytest.mark.asyncio
-async def test_supported_layer_and_fact_have_scoped_map_links_and_real_source():
+async def test_supported_layer_and_fact_keep_real_source_without_unpublished_map_links():
     service = AgentActionService(
         field_service=FieldService(), agri_service=AgriService(), journal=Journal()
     )
@@ -188,7 +188,7 @@ async def test_supported_layer_and_fact_have_scoped_map_links_and_real_source():
         ActionRequest(action="remote_sensing.layer", arguments={"layer_id": "release-1:am"}),
     )
     assert layer.status == "succeeded"
-    assert layer.href == "/field-shift/map?layer=release-1%3Aam"
+    assert layer.href is None
     assert layer.result["source"]["release_id"] == "release-1"
     fact = await service.advance(
         None,
@@ -204,7 +204,7 @@ async def test_supported_layer_and_fact_have_scoped_map_links_and_real_source():
         ),
     )
     assert fact.status == "succeeded"
-    assert fact.href == "/field-shift/map?selection=selection-1"
+    assert fact.href is None
     assert fact.result["source"]["release_id"] == "release-1"
     denied = await service.advance(
         None,
