@@ -19,6 +19,7 @@ from sideronostos_backend.modules.auth.dependencies import AuthPrincipal, requir
 from sideronostos_backend.modules.database.base import Base
 from sideronostos_backend.modules.database.session import get_session
 from sideronostos_backend.modules.field_shift.models import FarmRecord, FieldRecord
+from sideronostos_backend.modules.field_shift.router import router as field_router
 from sideronostos_backend.modules.rotation_optimizer.router import router
 
 pytestmark = pytest.mark.asyncio
@@ -76,7 +77,12 @@ async def api():
             )
         )
         await s.commit()
-    app = create_app(modules=(ModuleSpec(name="rotation_optimizer", routers=(router,)),))
+    app = create_app(
+        modules=(
+            ModuleSpec(name="rotation_optimizer", routers=(router,)),
+            ModuleSpec(name="field_shift", routers=(field_router,)),
+        )
+    )
 
     async def principal():
         return AuthPrincipal(identity["id"], "test@example.test", "Test farmer", datetime.now(UTC))
