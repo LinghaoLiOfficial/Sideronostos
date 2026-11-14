@@ -83,13 +83,30 @@
   border-radius: 17px;
   background: #242a2f;
   cursor: pointer;
-  transition: transform 180ms ease, margin-left 180ms ease, box-shadow 180ms ease;
+  transition: transform 180ms ease, margin-left 180ms ease, width 180ms ease, height 180ms ease;
 }
 .botButton:first-child { margin-left: 0; }
 .root[data-expanded="true"] .botButton + .botButton { margin-left: 5px; }
+.root[data-expanded="true"] .botButton { width: 74px; height: 68px; align-content: start; }
 .botButton:hover, .botButton:focus-visible { transform: translateY(-4px); z-index: 2; }
 .botButton :global(span[data-avatar]) { width: 39px; height: 38px; box-shadow: none; }
 .botButton :global(span[data-avatar] i) { animation: none; }
+.avatarLabel {
+  position: absolute;
+  inset: auto 2px 5px;
+  overflow: hidden;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease, visibility 0s 120ms;
+}
+.root[data-expanded="true"] .avatarLabel { opacity: 1; visibility: visible; transition-delay: 70ms, 0s; }
 .botButton::after {
   content: "";
   position: absolute;
@@ -124,9 +141,10 @@
   .label { display: none; }
   .avatars { max-width: min(68vw, 320px); }
   .botButton { width: 46px; height: 46px; }
+  .root[data-expanded="true"] .botButton { width: 68px; height: 66px; }
   .botHost :global(section[data-bot-panel]) { height: min(340px, calc(100dvh - 170px)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .chevron, .botButton { transition: none; }
+  .chevron, .botButton, .avatarLabel { transition: none; }
   .botButton:hover, .botButton:focus-visible { transform: none; }
 }

@@ -86,6 +86,7 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
               onClick={() => { setExpanded(false); setSelected(bot); }}
             >
               <BotAvatar variant={bot.avatar} small />
+              <span className={styles.avatarLabel} aria-hidden={!expanded}>{bot.shortName[locale]}</span>
             </button>
           ))}
         </div>

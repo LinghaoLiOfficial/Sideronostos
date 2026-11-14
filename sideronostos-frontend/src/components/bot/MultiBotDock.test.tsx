@@ -63,6 +63,17 @@ it("keeps the touch toggle open when tap focuses it before clicking", () => {
   expect(container.querySelector("[data-multi-bot-dock]")).toHaveAttribute("data-expanded", "true");
 });
 
+it("reveals readable specialist names when the remote cluster expands", () => {
+  const { rerender } = render(<MultiBotDock module="remote-sensing" locale="en" />);
+  expect(screen.getByText("Water")).toHaveAttribute("aria-hidden", "true");
+  fireEvent.click(screen.getByRole("button", { name: "3 specialists. Expand" }));
+  expect(screen.getByText("Water")).toHaveAttribute("aria-hidden", "false");
+  expect(screen.getByText("Soil")).toHaveAttribute("aria-hidden", "false");
+  expect(screen.getByText("Weather")).toHaveAttribute("aria-hidden", "false");
+  rerender(<MultiBotDock module="remote-sensing" locale="zh-CN" />);
+  expect(screen.getByText("水分")).toHaveAttribute("aria-hidden", "false");
+});
+
 it("restores focus to the selected bot after Escape collapses chat", () => {
   render(<MultiBotDock module="remote-sensing" locale="en" />);
   fireEvent.click(screen.getByRole("button", { name: "Open Water specialist" }));

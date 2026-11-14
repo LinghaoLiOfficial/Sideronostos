@@ -220,7 +220,7 @@
   align-items: center;
   padding: 17px 15px 15px;
   flex-shrink: 0;
-  background: linear-gradient(120deg, #f7f5fb, #fff);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--bot-accent, #7962ce) 10%, white), #fff);
 }
 .heading {
   flex: 1;
