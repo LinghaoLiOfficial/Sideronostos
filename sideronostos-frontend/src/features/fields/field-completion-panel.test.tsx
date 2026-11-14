@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor, cleanup, act } from "@testing-library/react"
+import { fireEvent, screen, waitFor, cleanup, act } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { afterEach, expect, it, vi } from "vitest"
 import { FieldCompletionPanel } from "./field-completion-panel"

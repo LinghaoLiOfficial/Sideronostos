@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "@/lib/i18n/provider";
 import { useEffect, useRef, useState } from "react";
 import type { Field, HistoryEvent } from "@/lib/api/field-shift-types";
 export type HistoryCatalogue = {
@@ -21,6 +22,8 @@ export function HistoryEditor({
   onSaved: (field: Field) => void;
   onDirtyChange: (fieldId: string, dirty: boolean) => void;
 }) {
+  const { t } = useI18n();
+
   const [entries, setEntries] = useState<HistoryEvent[]>(
       () => field.history_events ?? [],
     ),
@@ -64,16 +67,14 @@ export function HistoryEditor({
     profile.crops.find((c) => c.id === id)?.name ?? id;
   return (
     <details className={styles.historyEditor}>
-      <summary>查看 / 补充前茬记录</summary>
+      <summary>{t("查看 / 补充前茬记录")}</summary>
       <p className={styles.help}>
-        只填写你知道的精度。仅知年份时，模型保守地按年末结束核对间隔；补充月或日后会保存为新的地块版本。
-      </p>
+        {t("只填写你知道的精度。仅知年份时，模型保守地按年末结束核对间隔；补充月或日后会保存为新的地块版本。")}</p>
       {field.history.length > 0 && (
         <ul>
           {field.history.map((item) => (
             <li key={item.year}>
-              {item.year} 年 · {name(item.crop_id)} · 仅年份
-              {!entries.some((e) => e.linked_legacy_year === item.year) && (
+              {item.year} {t(" 年 · ")}{name(item.crop_id)} {t(" · 仅年份")}{!entries.some((e) => e.linked_legacy_year === item.year) && (
                 <button
                   type="button"
                   className={styles.linkButton}
@@ -92,26 +93,24 @@ export function HistoryEditor({
                     ])
                   }
                 >
-                  补充此条
-                </button>
+                  {t("补充此条")}</button>
               )}
             </li>
           ))}
         </ul>
       )}
       {!entries.length && !field.history.length && (
-        <p>没有历史记录；请确认是新开垦地，或先补充已知前茬。</p>
+        <p>{t("没有历史记录；请确认是新开垦地，或先补充已知前茬。")}</p>
       )}
       {entries.map((entry, index) => (
         <fieldset key={entry.id} disabled={busy} className={styles.historyRow}>
           <legend>
             {entry.linked_legacy_year
-              ? `补充 ${entry.linked_legacy_year} 年记录`
-              : `前茬记录 ${index + 1}`}
+              ? t("补充 {0} 年记录", { "0": entry.linked_legacy_year })
+              : t("前茬记录 {0}", { "0": index + 1 })}
           </legend>
           <label>
-            作物
-            <select
+            {t("作物")}<select
               value={entry.crop_id}
               onChange={(e) => change(index, { crop_id: e.target.value })}
             >
@@ -123,8 +122,7 @@ export function HistoryEditor({
             </select>
           </label>
           <label>
-            结束时间精度
-            <select
+            {t("结束时间精度")}<select
               value={entry.precision}
               onChange={(e) =>
                 change(index, {
@@ -138,14 +136,13 @@ export function HistoryEditor({
                 })
               }
             >
-              <option value="year">只知道年份</option>
-              <option value="month">知道月份</option>
-              <option value="day">知道日期</option>
+              <option value="year">{t("只知道年份")}</option>
+              <option value="month">{t("知道月份")}</option>
+              <option value="day">{t("知道日期")}</option>
             </select>
           </label>
           <label>
-            结束年份
-            <input
+            {t("结束年份")}<input
               type="number"
               min="1900"
               max="2200"
@@ -158,8 +155,7 @@ export function HistoryEditor({
           </label>
           {entry.precision !== "year" && (
             <label>
-              月份
-              <input
+              {t("月份")}<input
                 type="number"
                 min="1"
                 max="12"
@@ -172,8 +168,7 @@ export function HistoryEditor({
           )}
           {entry.precision === "day" && (
             <label>
-              日
-              <input
+              {t("日")}<input
                 type="number"
                 min="1"
                 max="31"
@@ -191,8 +186,7 @@ export function HistoryEditor({
               setEntries((old) => old.filter((_, i) => i !== index))
             }
           >
-            移除此补充
-          </button>
+            {t("移除此补充")}</button>
         </fieldset>
       ))}
       <div className={styles.actions}>
@@ -212,8 +206,7 @@ export function HistoryEditor({
             ])
           }
         >
-          新增前茬
-        </button>
+          {t("新增前茬")}</button>
         {dirty && (
           <button
             type="button"
@@ -223,20 +216,19 @@ export function HistoryEditor({
               setError(null);
             }}
           >
-            放弃前茬修改
-          </button>
+            {t("放弃前茬修改")}</button>
         )}
         <button
           type="button"
           disabled={busy || !dirty}
           onClick={() => void save()}
         >
-          {busy ? "正在保存…" : "保存前茬记录"}
+          {busy ? t("正在保存…") : t("保存前茬记录")}
         </button>
       </div>
       {error && (
         <p className={styles.error} role="alert">
-          {error}
+          {t(error)}
         </p>
       )}
     </details>

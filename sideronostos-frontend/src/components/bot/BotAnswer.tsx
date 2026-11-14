@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/provider";
 import { useEffect, useState } from "react";
 import type { BotAnswerData, BotFact } from "@/lib/bot";
 import styles from "./answer.module.css";
@@ -24,6 +25,8 @@ export function BotAnswer({
   onProgress,
   onSource,
 }: Props) {
+  const { t } = useI18n();
+
   const paragraphs = answer.paragraphs.map((p) => Array.from(p.text));
   const fullText = answer.paragraphs.map((p) => p.text).join("\n");
   const total = paragraphs.reduce((sum, p) => sum + p.length, 0);
@@ -90,19 +93,18 @@ export function BotAnswer({
           type="button"
           onClick={() => setVisible(total)}
         >
-          显示完整回答
-        </button>
+          {t("显示完整回答")}</button>
       ) : (
         (ids.length > 0 || facts.length > 0) && (
           <details className={styles.evidenceDisclosure}>
-            <summary>依据与数据</summary>
+            <summary>{t("依据与数据")}</summary>
             {ids.length > 0 && (
               <div className={styles.citations}>
                 {ids.map((id, index) => (
                   <button
                     key={id}
                     type="button"
-                    aria-label={`查看依据 ${id}`}
+                    aria-label={t("查看依据 {0}", { "0": id })}
                     onClick={() => onSource(id)}
                   >
                     {index + 1}
@@ -112,11 +114,11 @@ export function BotAnswer({
             )}
             {facts.length > 0 && (
               <details className={styles.facts}>
-                <summary>查看当时的数据 · {facts.length} 项</summary>
+                <summary>{t("查看当时的数据 · ")}{facts.length} {t(" 项")}</summary>
                 <dl>
                   {facts.map((fact) => (
                     <div key={fact.id}>
-                      <dt>{fact.label}</dt>
+                      <dt>{t(fact.label)}</dt>
                       <dd>{fact.display}</dd>
                     </div>
                   ))}

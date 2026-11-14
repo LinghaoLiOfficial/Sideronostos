@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/provider";
 import {
   useEffect,
   useId,
@@ -41,6 +42,8 @@ export function Bot({
   children,
   headerActions,
 }: BotProps) {
+  const { t } = useI18n();
+
   const id = useId();
   const panel = useRef<HTMLElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -156,7 +159,7 @@ export function Bot({
         className={styles.launcher}
         style={color}
         aria-label={
-          open ? `${identity.name}，对话已展开` : `打开${identity.name}`
+          open ? t("{0}，对话已展开", { "0": identity.name }) : t("打开{0}", { "0": identity.name })
         }
         aria-expanded={open}
         aria-controls={id}
@@ -199,7 +202,7 @@ export function Bot({
         <BotAvatar />
         <span className={styles.petLabel}>
           {identity.name}
-          <span>点我聊聊</span>
+          <span>{t("点我聊聊")}</span>
         </span>
       </button>
       <section
@@ -231,13 +234,13 @@ export function Bot({
           <BotAvatar small />
           <div className={styles.heading}>
             <h2 id={`${id}-title`}>{identity.name}</h2>
-            <p id={`${id}-description`}>{identity.description}</p>
+            <p id={`${id}-description`}>{t(identity.description)}</p>
           </div>
           <div className={styles.headerActions}>{headerActions}</div>
           <button
             type="button"
             className={styles.iconButton}
-            aria-label={`收起${identity.name}`}
+            aria-label={t("收起{0}", { "0": identity.name })}
             onClick={collapse}
           >
             <Minus size={19} />
