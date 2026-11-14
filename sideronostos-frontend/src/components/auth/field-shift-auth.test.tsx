@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import LoginPage from "@/app/login/page";
 import RegisterPage from "@/app/register/page";
 import VerifyEmailPage from "@/app/verify-email/page";
-import { safeNextPath, registrationNextPath } from "./utils";
+import { safeNextPath, registrationNextPath, isFieldShiftDestination } from "./utils";
 
 const mocks = vi.hoisted(() => ({ query: "", getCurrentUser: vi.fn(), signUp: vi.fn(), verifyEmail: vi.fn(), resendVerification: vi.fn(), signIn: vi.fn(), push: vi.fn(), replace: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: mocks.push, replace: mocks.replace }), useSearchParams: () => new URLSearchParams(mocks.query) }));
@@ -47,4 +47,11 @@ describe("Field Shift account entry", () => {
     expect(registrationNextPath("/field-shift?field=abc&name=%E8%A5%BF%E7%94%B0#plan")).toBe("/field-shift?field=abc&name=%E8%A5%BF%E7%94%B0#plan");
     expect(registrationNextPath("/personal/account#security")).toBe("/personal/account#security");
   });
+});
+
+it("preserves the unified fields map through registration and uses farming account copy", () => {
+  expect(registrationNextPath("/fields?field=f1&selection=a1#data")).toBe("/fields?field=f1&selection=a1#data");
+  expect(isFieldShiftDestination("/fields?field=f1")).toBe(true);
+  expect(isFieldShiftDestination("/field-shift/rotation")).toBe(true);
+  expect(isFieldShiftDestination("/fields-unrelated")).toBe(false);
 });

@@ -42,3 +42,10 @@
 .fields-app .bg-white {
   color: var(--fields-map-control-text);
 }
+
+/* Keep the assistant above the map, clear of map controls and the mobile data tray. */
+.fields-assistant { position: absolute; inset: 0 42px 40px 0; pointer-events: none; z-index: 30; }
+.fields-assistant > * { pointer-events: auto; }
+.fields-app [aria-label="地块资料与同步"] input,
+.fields-app [aria-label="地块资料与同步"] select { min-width: 0; max-width: 100%; }
+@media (max-width: 700px) { .fields-assistant { right: 38px; bottom: 40px; } }

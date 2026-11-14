@@ -69,6 +69,7 @@ def verification_client(monkeypatch):
         "/field-shift?field=abc&plan=def#comparison",
         "/workspace/files/abc",
         "/personal/account",
+        "/fields?field=owned-1&selection=area-1#data",
     ],
 )
 def test_email_preserves_escaped_safe_destination(verification_client, route, destination):

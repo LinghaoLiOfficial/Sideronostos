@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import dynamic from "next/dynamic"
 
 const FieldsWorkspace = dynamic(
@@ -15,5 +16,5 @@ const FieldsWorkspace = dynamic(
 )
 
 export default function FieldsPage() {
-  return <FieldsWorkspace />
+  return <Suspense fallback={<p role="status">正在读取工作区…</p>}><FieldsWorkspace /></Suspense>
 }
