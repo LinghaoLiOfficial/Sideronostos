@@ -86,6 +86,42 @@
     transform 380ms var(--bot-spring),
     border-radius 380ms var(--bot-spring);
 }
+.avatar[data-avatar="field"] {
+  border-radius: 48% 52% 57% 43% / 43% 48% 52% 57%;
+  transform: rotate(-13deg);
+}
+.avatar[data-avatar="water"] {
+  border-radius: 54% 46% 50% 50% / 39% 42% 58% 61%;
+  transform: rotate(8deg);
+}
+.avatar[data-avatar="soil"] {
+  border-radius: 42% 58% 53% 47% / 55% 48% 52% 45%;
+  transform: rotate(-5deg);
+}
+.avatar[data-avatar="weather"] {
+  border-radius: 55% 45% 40% 60% / 46% 56% 44% 54%;
+  transform: rotate(11deg);
+}
+.avatar[data-avatar="knowledge"] {
+  border-radius: 43% 57% 44% 56% / 48% 51% 49% 52%;
+  transform: rotate(4deg);
+}
+.avatar[data-avatar="rotation"] {
+  border-radius: 53% 47% 55% 45% / 54% 43% 57% 46%;
+  transform: rotate(-9deg);
+}
+.avatar[data-avatar="water"] .eyes i:first-child,
+.avatar[data-avatar="knowledge"] .eyes i:first-child {
+  height: 12px;
+  transform: rotate(12deg);
+}
+.avatar[data-avatar="soil"] .eyes i:last-child,
+.avatar[data-avatar="rotation"] .eyes i:last-child {
+  transform: rotate(16deg);
+}
+.avatar[data-avatar="weather"] .eyes {
+  transform: translate(2px, -2px) rotate(-10deg);
+}
 .eyes {
   display: flex;
   gap: 9px;
