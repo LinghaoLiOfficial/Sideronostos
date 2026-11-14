@@ -2,7 +2,7 @@ import csv
 import io
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Response
 from pydantic import Field, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +14,9 @@ from .requests import PreflightRequest, RunRequest
 from .schemas import Contract
 from .service import RotationService
 from .settings import get_rotation_settings
+from .v3.inputs import PlanningDraft
+from .v3.profiles import list_profiles as list_v3_profiles
+from .v3.service import readiness as v3_readiness
 
 router = APIRouter(prefix="/rotation-optimizer", tags=["rotation-optimizer"])
 User = Annotated[AuthPrincipal, Depends(require_verified_user)]
@@ -71,6 +74,23 @@ async def data_release_availability(
         "products": release["products"],
         "evidence_only": release["evidence_only"],
     }
+
+
+@router.get("/v3/profiles")
+async def daily_profiles(user: User) -> dict[str, Any]:
+    return {"items": list_v3_profiles()}
+
+
+@router.post("/v3/readiness")
+async def daily_readiness(
+    body: PlanningDraft,
+    user: User,
+    session: Session,
+    workspace_owner: Annotated[str | None, Header(alias="X-Workspace-Owner")] = None,
+) -> dict[str, Any]:
+    if workspace_owner is not None and workspace_owner != user.id:
+        raise HTTPException(409, "Workspace account changed; reload the current account")
+    return await v3_readiness(session, user.id, body)
 
 
 @router.post("/runs", status_code=202)

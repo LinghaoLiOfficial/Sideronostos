@@ -1,0 +1,473 @@
+{
+  "id": "iowa-engineering-v3-20261114",
+  "name": "Iowa daily v3 engineering benchmark / 工程基准",
+  "scope": "benchmark_not_locally_calibrated",
+  "region_id": "iowa-engineering",
+  "region": "Iowa benchmark centre only; no real pilot region chosen",
+  "timezone": "America/Chicago",
+  "weather_release_id": "power-iowa-2025-v1",
+  "weather_center": [
+    -93.5,
+    42
+  ],
+  "weather_radius_km": 25,
+  "crops": {
+    "maize": {
+      "name": "Maize / 玉米（110-day hybrid example）",
+      "species_id": "zea-mays",
+      "family": "Poaceae",
+      "sow_windows": [
+        [
+          "04-20",
+          "05-18"
+        ]
+      ],
+      "phenology": {
+        "base_c": 10,
+        "upper_c": 30,
+        "gdd_recipe": "draft_one_sided_v1",
+        "max_growing_days": 200,
+        "turnaround_days": 14,
+        "maturity_gdd": 1483.3333333333333
+      },
+      "canopy": {
+        "kc": [
+          0.3,
+          1.2,
+          0.6
+        ],
+        "stage_fractions": [
+          0.2,
+          0.3,
+          0.3,
+          0.2
+        ],
+        "root_initial_m": 0.15,
+        "root_max_m": 1.2,
+        "depletion_fraction": [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "cover_start_fraction": 0.15,
+        "residue_cover_days": 7
+      },
+      "soil": {
+        "ph_min": 5.5,
+        "ph_max": 8.0,
+        "min_depth_m": 0.4,
+        "max_salinity_ds_m": 2.0,
+        "allowed_drainage": [
+          "moderate",
+          "well"
+        ],
+        "max_slope_deg": 12.0
+      },
+      "climate": {
+        "heat_c": 35.0,
+        "frost_c": 0.0,
+        "excess_rain_mm": 40.0,
+        "max_heat_fraction": 0.25,
+        "max_frost_fraction": 0.15,
+        "max_excess_fraction": 0.2,
+        "min_daylight_h": 8.0,
+        "max_daylight_h": 18.0
+      },
+      "seed_kg_ha": 25.0,
+      "yield_kg_ha": 9000.0,
+      "economics": {
+        "price_usd_kg": 0.2,
+        "cost_usd_ha": 1200.0
+      },
+      "soil_components": {
+        "nitrogen": 0.1,
+        "organic_matter": 0.6,
+        "roots": 0.7,
+        "erosion": 0.6
+      },
+      "soil_weights": {
+        "nitrogen": 0.25,
+        "organic_matter": 0.25,
+        "roots": 0.25,
+        "erosion": 0.25
+      },
+      "risk_weights": {
+        "heat": 0.25,
+        "frost": 0.25,
+        "irrigation_dependence": 0.25,
+        "excess_rain": 0.25
+      },
+      "operations": [
+        {
+          "machine": "tractor",
+          "anchor": "sow",
+          "offset_days": 0,
+          "hours_ha": 1.0
+        },
+        {
+          "machine": "harvester",
+          "anchor": "harvest",
+          "offset_days": 0,
+          "hours_ha": 1.5
+        }
+      ]
+    },
+    "oat": {
+      "name": "Spring oat / 春燕麦（benchmark）",
+      "species_id": "avena-sativa",
+      "family": "Poaceae",
+      "sow_windows": [
+        [
+          "04-01",
+          "04-29"
+        ]
+      ],
+      "phenology": {
+        "base_c": 0,
+        "upper_c": 30,
+        "gdd_recipe": "bounded_both_v1",
+        "max_growing_days": 150,
+        "turnaround_days": 14,
+        "maturity_gdd": 1200
+      },
+      "canopy": {
+        "kc": [
+          0.3,
+          1.15,
+          0.25
+        ],
+        "stage_fractions": [
+          0.2,
+          0.3,
+          0.3,
+          0.2
+        ],
+        "root_initial_m": 0.15,
+        "root_max_m": 1.0,
+        "depletion_fraction": [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "cover_start_fraction": 0.15,
+        "residue_cover_days": 7
+      },
+      "soil": {
+        "ph_min": 5.5,
+        "ph_max": 8.0,
+        "min_depth_m": 0.4,
+        "max_salinity_ds_m": 2.0,
+        "allowed_drainage": [
+          "moderate",
+          "well"
+        ],
+        "max_slope_deg": 12.0
+      },
+      "climate": {
+        "heat_c": 35.0,
+        "frost_c": 0.0,
+        "excess_rain_mm": 40.0,
+        "max_heat_fraction": 0.25,
+        "max_frost_fraction": 0.15,
+        "max_excess_fraction": 0.2,
+        "min_daylight_h": 8.0,
+        "max_daylight_h": 18.0
+      },
+      "seed_kg_ha": 90.0,
+      "yield_kg_ha": 3000.0,
+      "economics": {
+        "price_usd_kg": 0.3,
+        "cost_usd_ha": 650.0
+      },
+      "soil_components": {
+        "nitrogen": 0.1,
+        "organic_matter": 0.6,
+        "roots": 0.4,
+        "erosion": 0.6
+      },
+      "soil_weights": {
+        "nitrogen": 0.25,
+        "organic_matter": 0.25,
+        "roots": 0.25,
+        "erosion": 0.25
+      },
+      "risk_weights": {
+        "heat": 0.25,
+        "frost": 0.25,
+        "irrigation_dependence": 0.25,
+        "excess_rain": 0.25
+      },
+      "operations": [
+        {
+          "machine": "tractor",
+          "anchor": "sow",
+          "offset_days": 0,
+          "hours_ha": 1.0
+        },
+        {
+          "machine": "harvester",
+          "anchor": "harvest",
+          "offset_days": 0,
+          "hours_ha": 1.5
+        }
+      ]
+    },
+    "pea": {
+      "name": "Dry field pea / 干籽豌豆（benchmark）",
+      "species_id": "pisum-sativum",
+      "family": "Fabaceae",
+      "sow_windows": [
+        [
+          "04-05",
+          "05-03"
+        ]
+      ],
+      "phenology": {
+        "base_c": 0,
+        "upper_c": 30,
+        "gdd_recipe": "bounded_both_v1",
+        "max_growing_days": 140,
+        "turnaround_days": 14,
+        "maturity_gdd": 1000
+      },
+      "canopy": {
+        "kc": [
+          0.5,
+          1.15,
+          0.3
+        ],
+        "stage_fractions": [
+          0.2,
+          0.3,
+          0.3,
+          0.2
+        ],
+        "root_initial_m": 0.15,
+        "root_max_m": 0.6,
+        "depletion_fraction": [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "cover_start_fraction": 0.15,
+        "residue_cover_days": 7
+      },
+      "soil": {
+        "ph_min": 5.5,
+        "ph_max": 8.0,
+        "min_depth_m": 0.4,
+        "max_salinity_ds_m": 2.0,
+        "allowed_drainage": [
+          "moderate",
+          "well"
+        ],
+        "max_slope_deg": 12.0
+      },
+      "climate": {
+        "heat_c": 35.0,
+        "frost_c": 0.0,
+        "excess_rain_mm": 40.0,
+        "max_heat_fraction": 0.25,
+        "max_frost_fraction": 0.15,
+        "max_excess_fraction": 0.2,
+        "min_daylight_h": 8.0,
+        "max_daylight_h": 18.0
+      },
+      "seed_kg_ha": 180.0,
+      "yield_kg_ha": 2500.0,
+      "economics": {
+        "price_usd_kg": 0.4,
+        "cost_usd_ha": 700.0
+      },
+      "soil_components": {
+        "nitrogen": 0.8,
+        "organic_matter": 0.6,
+        "roots": 0.4,
+        "erosion": 0.6
+      },
+      "soil_weights": {
+        "nitrogen": 0.25,
+        "organic_matter": 0.25,
+        "roots": 0.25,
+        "erosion": 0.25
+      },
+      "risk_weights": {
+        "heat": 0.25,
+        "frost": 0.25,
+        "irrigation_dependence": 0.25,
+        "excess_rain": 0.25
+      },
+      "operations": [
+        {
+          "machine": "tractor",
+          "anchor": "sow",
+          "offset_days": 0,
+          "hours_ha": 1.0
+        },
+        {
+          "machine": "harvester",
+          "anchor": "harvest",
+          "offset_days": 0,
+          "hours_ha": 1.5
+        }
+      ]
+    }
+  },
+  "history_catalogue": {
+    "maize": {
+      "species_id": "zea-mays",
+      "family": "Poaceae",
+      "turnaround_days": 14
+    },
+    "oat": {
+      "species_id": "avena-sativa",
+      "family": "Poaceae",
+      "turnaround_days": 14
+    },
+    "pea": {
+      "species_id": "pisum-sativum",
+      "family": "Fabaceae",
+      "turnaround_days": 14
+    },
+    "wheat": {
+      "species_id": "triticum-aestivum",
+      "family": "Poaceae",
+      "turnaround_days": 14
+    },
+    "soybean": {
+      "species_id": "glycine-max",
+      "family": "Fabaceae",
+      "turnaround_days": 14
+    },
+    "sorghum": {
+      "species_id": "sorghum-bicolor",
+      "family": "Poaceae",
+      "turnaround_days": 14
+    },
+    "barley": {
+      "species_id": "hordeum-vulgare",
+      "family": "Poaceae",
+      "turnaround_days": 14
+    },
+    "clover": {
+      "species_id": "trifolium",
+      "family": "Fabaceae",
+      "turnaround_days": 14
+    },
+    "alfalfa": {
+      "species_id": "medicago-sativa",
+      "family": "Fabaceae",
+      "turnaround_days": 14
+    }
+  },
+  "compatible_history_profile_ids": [
+    "iowa-benchmark-20261112-v1"
+  ],
+  "family_gaps": {
+    "Poaceae": 365,
+    "Fabaceae": 365
+  },
+  "sowing_step_days": 14,
+  "default_weights": {
+    "profit": 0.25,
+    "water": 0.2,
+    "rotation": 0.1,
+    "soil": 0.15,
+    "risk": 0.15,
+    "bare": 0.15
+  },
+  "scales": {
+    "profit": 100000.0,
+    "water": 100000.0,
+    "rotation": 10.0,
+    "soil": 100.0,
+    "risk": 100.0,
+    "bare": 36500.0
+  },
+  "transition_scores": {
+    "maize": {
+      "oat": 0.2,
+      "pea": 1.0
+    },
+    "oat": {
+      "maize": 0.2,
+      "pea": 1.0
+    },
+    "pea": {
+      "maize": 1.0,
+      "oat": 1.0
+    }
+  },
+  "parameter_origins": {
+    "weather_center": [
+      "engineering"
+    ],
+    "weather_radius_km": [
+      "engineering"
+    ],
+    "history_catalogue": [
+      "engineering"
+    ],
+    "compatible_history_profile_ids": [
+      "engineering"
+    ],
+    "family_gaps": [
+      "engineering"
+    ],
+    "sowing_step_days": [
+      "engineering"
+    ],
+    "default_weights": [
+      "engineering"
+    ],
+    "scales": [
+      "engineering"
+    ],
+    "transition_scores": [
+      "engineering"
+    ],
+    "crops.maize": [
+      "engineering"
+    ],
+    "crops.oat": [
+      "engineering"
+    ],
+    "crops.pea": [
+      "engineering"
+    ],
+    "weather_day_policy": [
+      "engineering"
+    ]
+  },
+  "sources": {
+    "engineering": {
+      "id": "engineering",
+      "kind": "engineering_assumption",
+      "title": "Declared v3 integration benchmark assumptions; not agronomic recommendations",
+      "locator": "repository:rotation_optimizer/v3/data/profiles/iowa-engineering-v3-20261114.json",
+      "region_id": "iowa-engineering",
+      "quality": "estimated",
+      "confirmed": true,
+      "limitations": [
+        "All thresholds, cultivar proxies, yield, price, costs, component scores, reference scales and machinery hours are engineering assumptions.",
+        "Transferred v2 GDD and Kc values remain uncalibrated; general references do not validate the whole parameter set.",
+        "Source confirmation means the declaration was reviewed, not that a real farm measurement exists."
+      ]
+    }
+  },
+  "limitations": [
+    "Engineering benchmark only: generic crop names stand for synthetic cultivar proxies, not registered varieties.",
+    "Actual pilot region and locally calibrated agronomy remain unchosen.",
+    "Historical POWER weather replay and optional perturbations are not future weather forecasts.",
+    "Independent candidates start at wilting point with newly explored roots also dry; no continuous cross-season soil-water simulation.",
+    "Risk is a weighted exposure and irrigation-dependence index, not a predicted yield-loss probability.",
+    "Soil scores describe assumed crop contributions, not measured carbon, nitrogen or soil health.",
+    "Capacities, farm soil measurements, history, baseline and permission to use engineering assumptions must be supplied explicitly.",
+    "Fixed positive scales are declared management reference values for engineering comparison, not computed single-objective optima.",
+    "UTC daily weather aggregates are explicitly used as local-date proxies in this engineering benchmark; accurate local agricultural days require hourly reaggregation or a validated local-day release."
+  ],
+  "weather_day_policy": "utc_daily_proxy_v1"
+}

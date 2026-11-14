@@ -107,3 +107,14 @@ def test_cross_farm_resource_links_and_unknown_machine_demands_fail_closed():
     body["candidates"][0]["machine_hours_ha"] = {"unknown": {day(0): 1}}
     with pytest.raises(ValueError):
         model().Problem.model_validate(body)
+
+
+def test_a_field_cannot_draw_from_two_implicit_water_resources():
+    from copy import deepcopy
+
+    body = problem()
+    extra = deepcopy(body["daily_resources"][0])
+    extra["id"] = "second-water"
+    body["daily_resources"].append(extra)
+    with pytest.raises(ValueError, match="water"):
+        model().Problem.model_validate(body)
