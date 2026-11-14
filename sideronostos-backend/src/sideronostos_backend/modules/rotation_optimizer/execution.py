@@ -52,6 +52,10 @@ def option_snapshot(
 def execute_snapshot(
     snapshot: dict[str, Any], *, time_limit: float = 30, cancelled: Callable[[], bool] | None = None
 ) -> dict[str, Any]:
+    if snapshot.get("schema") == "rotation-input-v3.0":
+        from .v3.execution import execute_snapshot as execute_v3
+
+        return execute_v3(snapshot, time_limit=time_limit, cancelled=cancelled)
     request = RunRequest.model_validate(snapshot["request"])
     raw_limits = snapshot.get("capacity") or {
         "max_candidates": LEGACY_MAX_CANDIDATES,
