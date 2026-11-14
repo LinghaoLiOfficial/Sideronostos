@@ -1,5 +1,5 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, expect, it, vi } from "vitest";
+import { cleanup, act, renderHook, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import type { Field } from "@/lib/api/field-shift-types";
 import type { ServerFarmHeader } from "@/lib/api/farms";
@@ -131,3 +131,5 @@ it("does not navigate an unmounted account after submission completes", async ()
   expect(props.onRun).not.toHaveBeenCalled();
   expect(readPendingDaily("bob")).toBeNull();
 });
+
+afterEach(cleanup);

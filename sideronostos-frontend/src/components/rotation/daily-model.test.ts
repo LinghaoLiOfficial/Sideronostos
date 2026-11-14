@@ -11,6 +11,7 @@ import {
   applyEngineeringFixture,
   prepareDailyRequest,
   dailyChanges,
+  dailyDraftSchema,
   annualPeriods,
   saveDailyDraft,
   readDailyDraft,
@@ -194,4 +195,53 @@ it("does not clear another tab's newer pending request when an older submission 
   expect(readPendingDaily("alice")).toEqual(body);
   clearPendingDaily("alice", body.idempotency_key);
   expect(readPendingDaily("alice")).toBeNull();
+});
+
+it("does not report JSON key ordering from a persisted API snapshot as an edit", () => {
+  const run = JSON.parse(
+    readFileSync(
+      "src/components/rotation/__fixtures__/rainfed-failure-ui.json",
+      "utf8",
+    ),
+  );
+  const raw = { ...run.request };
+  delete raw.idempotency_key;
+  const restored = dailyDraftSchema.parse(raw);
+  expect(dailyChanges(run.request, restored)).toEqual([]);
+  restored.scenario.rainfall_change_pct = 10;
+  expect(dailyChanges(run.request, restored)).toEqual(["scenario"]);
+});
+
+it("treats omitted optional API null defaults as unchanged without erasing unknown numeric values", () => {
+  const run = JSON.parse(
+    readFileSync(
+      "src/components/rotation/__fixtures__/rainfed-failure-ui.json",
+      "utf8",
+    ),
+  );
+  const raw = { ...run.request };
+  delete raw.idempotency_key;
+  const draft = dailyDraftSchema.parse(raw);
+  Object.values(draft.field_conditions).forEach((c) =>
+    Object.values(c.values).forEach((v) => {
+      if (v) delete v.missing_reason;
+    }),
+  );
+  Object.values(draft.sources).forEach((s) => {
+    delete s.observed_start;
+    delete s.observed_end;
+  });
+  Object.values(draft.farm_resources).forEach((f) =>
+    Object.values(f.daily).forEach((r) => {
+      if (r.kind === "machine") {
+        delete r.water_basis;
+        delete r.irrigation_efficiency;
+      }
+    }),
+  );
+  expect(dailyChanges(run.request, draft)).toEqual([]);
+  const condition = Object.values(draft.field_conditions)[0];
+  condition.values.slope_deg!.value = null;
+  condition.values.slope_deg!.missing_reason = "Unknown";
+  expect(dailyChanges(run.request, draft)).toEqual(["field_limits"]);
 });

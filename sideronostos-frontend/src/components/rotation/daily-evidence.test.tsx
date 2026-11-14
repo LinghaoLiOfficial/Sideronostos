@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen, fireEvent } from "@testing-library/react";
 import type { EvidenceSource, RecordedValue } from "@/lib/api/daily-types";
 import { EvidenceValue, SourcesEditor } from "./daily-evidence";
 const source: EvidenceSource = {
@@ -74,3 +74,5 @@ describe("sourced farmer inputs", () => {
     });
   });
 });
+
+afterEach(cleanup);

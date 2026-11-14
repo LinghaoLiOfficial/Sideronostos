@@ -10,6 +10,7 @@ import { FIELD_PARAMETERS } from "@/lib/api/daily-types";
 import { blankCapacity, fieldParameters } from "./daily-model";
 import { CapacityEditor, EvidenceValue } from "./daily-evidence";
 import { HistoryEditor } from "./history-editor";
+import { formatValue } from "./planning-model";
 import styles from "./workspace.module.css";
 
 export function DailyFieldEditor({
@@ -79,7 +80,8 @@ export function DailyFieldEditor({
   return (
     <details className={styles.dailyPanel} open>
       <summary>
-        {field.name} · {field.area_ha} ha · 地块版本 {field.version}
+        {field.name} · {formatValue(field.area_ha, 3)} ha · 地块版本{" "}
+        {field.version}
       </summary>
       <p>
         土壤类型：{field.soil_texture} · 灌溉设施：

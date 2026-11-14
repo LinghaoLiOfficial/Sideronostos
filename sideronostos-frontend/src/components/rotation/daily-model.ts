@@ -665,6 +665,32 @@ export function prepareDailyRequest(
   // Missing scientific values deliberately reach readiness; they cannot reach a job until the server approves them.
   return pendingSchema.parse({ ...parsed.data, idempotency_key });
 }
+// These optional fields have the same absent/null meaning in the API contract.
+// Required values (including a numeric zero versus unknown null) are never discarded.
+const optionalNullDefaults = new Set([
+  "missing_reason",
+  "machine_type",
+  "water_basis",
+  "irrigation_efficiency",
+  "observed_start",
+  "observed_end",
+  "applicable_start",
+  "applicable_end",
+]);
+// PostgreSQL JSONB and API validation may reorder object keys; that is not an input edit.
+function stableInput(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stableInput);
+  if (value !== null && typeof value === "object")
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(
+          ([key, child]) => child !== null || !optionalNullDefaults.has(key),
+        )
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, child]) => [key, stableInput(child)]),
+    );
+  return value;
+}
 export function dailyChanges(
   before: DailyDraft | DailyInput,
   after: DailyDraft | DailyInput,
@@ -685,7 +711,9 @@ export function dailyChanges(
   return groups
     .filter(([, keys]) =>
       keys.some(
-        (key) => JSON.stringify(before[key]) !== JSON.stringify(after[key]),
+        (key) =>
+          JSON.stringify(stableInput(before[key])) !==
+          JSON.stringify(stableInput(after[key])),
       ),
     )
     .map(([group]) => group);

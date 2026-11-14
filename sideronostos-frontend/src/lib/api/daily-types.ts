@@ -256,6 +256,9 @@ export type DailyOption = {
   preference_id?: string;
   non_dominated_among_generated?: boolean;
 };
+export type DailyPreparationIssue =
+  | string
+  | { code: string; field_id?: string; crop_id?: string; sow_date?: string };
 export type DailyResult = {
   schema: "rotation-result-v3.0";
   model_version: typeof DAILY_MODEL;
@@ -273,7 +276,8 @@ export type DailyResult = {
   rejected_by_reason?: Record<string, number>;
   preparation?: {
     stage: string;
-    errors: string[];
+    errors: DailyPreparationIssue[];
+    rejected_by_reason?: Record<string, number>;
     readiness?: DailyReadiness;
     [key: string]: unknown;
   };

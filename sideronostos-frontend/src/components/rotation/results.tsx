@@ -28,6 +28,16 @@ import {
   runStatus,
 } from "./planning-model";
 import styles from "./workspace.module.css";
+import { RotationTimeline as Timeline } from "./rotation-timeline";
+import {
+  isDailyRun,
+  isDailySaved,
+  type AnyRotationRun,
+  type AnySavedPlan,
+  type DailyRun,
+  type DailyOption,
+} from "@/lib/api/daily-types";
+import { DailyRunResults, DailySavedPlan } from "./daily-results";
 
 const metricLabels: Record<keyof Metrics, string> = {
   water_m3: "用水估计 · m³",
@@ -130,111 +140,21 @@ export function ComparisonSummary({
     </>
   );
 }
-const crops: Record<string, string> = {
-  maize: "玉米",
-  pea: "豌豆",
-  oat: "燕麦",
-};
-export const allOptions = (run: RunV2) => [
-  ...(run.result?.options ?? []),
-  ...(run.result?.baseline ? [run.result.baseline] : []),
-];
+export function allOptions(run: RunV2): OptionV2[];
+export function allOptions(run: DailyRun): DailyOption[];
+export function allOptions(run: AnyRotationRun): (OptionV2 | DailyOption)[];
+export function allOptions(run: AnyRotationRun): (OptionV2 | DailyOption)[] {
+  return [
+    ...(run.result?.options ?? []),
+    ...(run.result?.baseline ? [run.result.baseline] : []),
+  ];
+}
 const optionName = (option: OptionV2, index?: number) =>
   option.id === "baseline"
     ? "原本种法 / 基准"
     : index !== undefined
       ? `轮作方案 ${index + 1}`
       : option.id.replace("option-", "轮作方案 ");
-const day = (s: string) => Date.parse(s + "T00:00:00Z") / 86400000;
-function Timeline({
-  option,
-  fields,
-  start,
-  end,
-}: {
-  option: OptionV2;
-  fields: Field[];
-  start: string;
-  end: string;
-}) {
-  const total = day(end) - day(start) + 1;
-  return (
-    <section className={styles.timeline} aria-label="按地块查看播种与收获">
-      <div className={styles.timelineLegend}>
-        <span>
-          <i className={styles.growingKey} />
-          生长期
-        </span>
-        <span>
-          <i className={styles.turnaroundKey} />
-          换茬占用
-        </span>
-        <span>
-          <i className={styles.idleKey} />
-          空闲 / 休耕
-        </span>
-      </div>
-      <div className={styles.timelineDates}>
-        <span>{start}</span>
-        <span>{end}</span>
-      </div>
-      {fields.map((field) => {
-        const seasons = option.seasons
-          .filter((s) => s.field_id === field.id)
-          .sort((a, b) => a.sow_date.localeCompare(b.sow_date));
-        return (
-          <div className={styles.timelineField} key={field.id}>
-            <h3>
-              {field.name} <small>{field.area_ha} ha</small>
-            </h3>
-            <div className={styles.timelineTrack} aria-hidden="true">
-              {seasons.map((s) => (
-                <div
-                  key={s.id}
-                  className={styles.seasonSpan}
-                  style={{
-                    left: `${((day(s.sow_date) - day(start)) / total) * 100}%`,
-                    width: `${((day(s.occupied_until) - day(s.sow_date) + 1) / total) * 100}%`,
-                  }}
-                  title={`${crops[s.crop_id] ?? s.crop_id} ${s.sow_date} — ${s.occupied_until}`}
-                >
-                  <span
-                    className={styles.growing}
-                    style={{
-                      width: `${(s.growing_days / (s.growing_days + s.turnaround_days)) * 100}%`,
-                    }}
-                  />
-                  <span className={styles.turnaround} />
-                </div>
-              ))}
-            </div>
-            {seasons.length ? (
-              <ul className={styles.seasonList}>
-                {seasons.map((s) => (
-                  <li key={s.id}>
-                    <strong>{crops[s.crop_id] ?? s.crop_id}</strong>
-                    <span>
-                      {s.sow_date} 播种 → {s.harvest_date} 预计成熟
-                    </span>
-                    <small>
-                      生长 {s.growing_days} 天 · 换茬占用至 {s.occupied_until}（
-                      {s.turnaround_days} 天）
-                    </small>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.help}>此地块在整个规划期休耕。</p>
-            )}
-          </div>
-        );
-      })}
-      <p className={styles.help}>
-        收获日期由积温阈值与历史天气情景计算，需按当地品种、天气和田间成熟情况核对。
-      </p>
-    </section>
-  );
-}
 export function OptionDetail({
   option,
   fields,
@@ -414,7 +334,7 @@ type Props = {
   compareOptionId: string | null;
   onCompare: (run: string | null, option: string | null) => void;
 };
-export function RunResults({
+function LegacyRunResults({
   owner,
   run,
   changes,
@@ -820,25 +740,38 @@ export function RunResults({
     </section>
   );
 }
-function PrintBasis({ request, provenance }: {
+function PrintBasis({
+  request,
+  provenance,
+}: {
   request: RunV2["request"];
   provenance: RunV2["provenance"];
 }) {
   return (
-    <section className={styles.printBasis} aria-label="打印方案的数据依据与适用限制">
+    <section
+      className={styles.printBasis}
+      aria-label="打印方案的数据依据与适用限制"
+    >
       <h2>数据依据与适用限制</h2>
       <p>
-        参数版本：{provenance.profile_id}<br />
+        参数版本：{provenance.profile_id}
+        <br />
         天气资料版本：{provenance.weather_release_id}
       </p>
       <p>
-        使用历史天气重放，不是未来天气预报。温度调整 {n(request.scenario.temperature_change_c)} °C；
-        降雨调整 {n(request.scenario.rainfall_change_pct)}%。
+        使用历史天气重放，不是未来天气预报。温度调整{" "}
+        {n(request.scenario.temperature_change_c)} °C； 降雨调整{" "}
+        {n(request.scenario.rainfall_change_pct)}%。
       </p>
       {provenance.benchmark_scope === "benchmark_not_locally_calibrated" && (
-        <p>这是研发验收参数，尚未经当地农艺校准。成本、劳力、播期与同科间隔包含示范假设；不构成实际种植或灌溉处方。</p>
+        <p>
+          这是研发验收参数，尚未经当地农艺校准。成本、劳力、播期与同科间隔包含示范假设；不构成实际种植或灌溉处方。
+        </p>
       )}
-      <p>模型不预测产量、利润或实际节水。完整条件、参数假设和来源哈希保留在已保存的计划与 JSON 导出中。</p>
+      <p>
+        模型不预测产量、利润或实际节水。完整条件、参数假设和来源哈希保留在已保存的计划与
+        JSON 导出中。
+      </p>
       <h3>参考资料</h3>
       <ul>
         {Object.entries(provenance.sources)
@@ -846,14 +779,16 @@ function PrintBasis({ request, provenance }: {
           .map(([id, source]) => (
             <li key={id}>
               {source.title}
-              {source.url && <span className={styles.printSourceUrl}>{source.url}</span>}
+              {source.url && (
+                <span className={styles.printSourceUrl}>{source.url}</span>
+              )}
             </li>
           ))}
       </ul>
     </section>
   );
 }
-export function SavedPlan({ plan }: { plan: SavedV2 }) {
+function LegacySavedPlan({ plan }: { plan: SavedV2 }) {
   return (
     <section className={styles.resultsSection}>
       <p className={styles.eyebrow}>SAVED PLAN</p>
@@ -899,5 +834,27 @@ export function SavedPlan({ plan }: { plan: SavedV2 }) {
         </pre>
       </details>
     </section>
+  );
+}
+
+type UnifiedResultsProps = Omit<
+  Props,
+  "run" | "onExplain" | "onUpdate" | "onSaved"
+> & {
+  run: AnyRotationRun;
+  onExplain: (option: OptionV2 | DailyOption) => void;
+  onUpdate: (run: AnyRotationRun) => void;
+  onSaved: (plan: AnySavedPlan) => void;
+};
+export function RunResults(props: UnifiedResultsProps) {
+  if (isDailyRun(props.run))
+    return <DailyRunResults {...props} run={props.run} />;
+  return <LegacyRunResults {...props} run={props.run} />;
+}
+export function SavedPlan({ plan }: { plan: AnySavedPlan }) {
+  return isDailySaved(plan) ? (
+    <DailySavedPlan plan={plan} />
+  ) : (
+    <LegacySavedPlan plan={plan} />
   );
 }
