@@ -94,11 +94,23 @@ class FieldShiftService:
     async def get_field(self, session: AsyncSession, user_id: str, field_id: str) -> Field:
         return _field(await self._field_record(session, user_id, field_id))
 
-    async def create_field(self, session: AsyncSession, user_id: str, body: FieldInput) -> Field:
+    async def create_field(
+        self,
+        session: AsyncSession,
+        user_id: str,
+        body: FieldInput,
+        *,
+        field_id: str | None = None,
+        commit: bool = True,
+    ) -> Field:
         _validate_field(body)
-        record = FieldRecord(owner_user_id=user_id, data=body.model_dump(mode="json"))
+        values = {"id": field_id} if field_id is not None else {}
+        record = FieldRecord(owner_user_id=user_id, data=body.model_dump(mode="json"), **values)
         session.add(record)
-        await session.commit()
+        if commit:
+            await session.commit()
+        else:
+            await session.flush()
         await session.refresh(record)
         return _field(record)
 

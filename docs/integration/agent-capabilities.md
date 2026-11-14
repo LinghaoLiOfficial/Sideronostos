@@ -1,15 +1,15 @@
 # Farmer agent action capability inventory
 
-This inventory describes the backend on `main` at `bce7d46` and the action core in
-`farm_assistant/agent_actions.py`. A route is not an agent tool merely because it
-exists. All private API routes require a verified user; their services scope reads
-and writes to the authenticated `user.id`.
+This inventory describes the backend on `main` at `bce7d46`, the conversation
+domain slice at `b14daba`, and this action integration. A route is not an agent
+tool merely because it exists. All private API routes require a verified user;
+their services scope reads and writes to the authenticated `user.id`.
 
 | User-facing capability | Existing API | Agent core |
 | --- | --- | --- |
 | List field profiles and demo assumptions | `GET /field-shift/profiles` | Pending |
 | List owned fields | `GET /field-shift/fields` | Pending |
-| Create an owned field | `POST /field-shift/fields` | `field.create` core; integration pending |
+| Create an owned field | `POST /field-shift/fields` | `field.create` HTTP action |
 | Read an owned field | `GET /field-shift/fields/{id}` | Pending |
 | Edit an owned field with expected version | `PATCH /field-shift/fields/{id}` | Pending |
 | Read or refresh field environment | `GET /field-shift/fields/{id}/environment` | Pending |
@@ -17,9 +17,9 @@ and writes to the authenticated `user.id`.
 | List, save, and read field plans | `GET /field-shift/plans`, `POST /field-shift/plans`, `GET /field-shift/plans/{id}` | Pending |
 | Create a remote sensing selection | `POST /agri-data/selections` | Pending; write needs idempotency |
 | Read owned selection | `GET /agri-data/selections/{id}` | Pending |
-| Request a specific published selection fact | `GET /agri-data/selections/{id}/facts` | `remote_sensing.fact` core; integration pending |
+| Request a specific published selection fact | `GET /agri-data/selections/{id}/facts` | `remote_sensing.fact` HTTP action |
 | List published layers | `GET /agri-data/layers` | Pending |
-| Request a specific published layer manifest | `GET /agri-data/layers/{id}/manifest` | `remote_sensing.layer` core; integration pending |
+| Request a specific published layer manifest | `GET /agri-data/layers/{id}/manifest` | `remote_sensing.layer` HTTP action |
 | View authenticated layer tile | `GET /agri-data/layers/{id}/tiles/{z}/{x}/{y}` | Opened by the existing map, not an agent tool |
 | Rotation profiles, releases, availability, preflight | `GET /rotation-optimizer/profiles`, `GET /rotation-optimizer/data-releases`, `GET /rotation-optimizer/data-releases/{id}`, `GET /rotation-optimizer/data-releases/{id}/availability`, `POST /rotation-optimizer/preflight` | Pending |
 | Rotation run create, list, read, export, cancel, retry | `POST /rotation-optimizer/runs`, `GET /rotation-optimizer/runs`, `GET /rotation-optimizer/runs/{id}`, `GET /rotation-optimizer/runs/{id}/export`, `GET /rotation-optimizer/runs/{id}/export.csv`, `POST /rotation-optimizer/runs/{id}/cancel`, `POST /rotation-optimizer/runs/{id}/retry` | Pending; writes require explicit intent and idempotency |
@@ -40,17 +40,20 @@ not authoritative. The `needs_input` outcome includes missing field names and a
 serializable pending state for the next turn. Validation failures retain that
 state so corrected inputs can resume.
 
-For `field.create`, pass a persistent `ActionJournal` implementation that
-serializes requests by `(owner_user_id, conversation_id, idempotency_key)`,
-records the payload hash and outcome, and rejects key reuse with different
-inputs. The core refuses a write when this journal or a key is absent. Its
-service call is the existing `FieldShiftService.create_field`, which commits
-internally. A crash after that commit and before the journal records the
-outcome can produce a duplicate on retry. Closing that gap requires a database
-transaction/idempotency migration in the integration slice; this branch does
-not claim crash-safe exactly-once writes or expose an HTTP action endpoint.
-The journal should retain a timestamped audit record of attempted, succeeded,
-failed, and replayed writes without logging secrets or raw model prose.
+The authenticated HTTP boundary is
+`POST /farm-assistant/conversations/{conversation_id}/actions` with
+`{action, arguments, idempotency_key}`. Repeat the same key and action with
+new required arguments to resume. `GET .../actions` lists the 50 newest
+persisted action outcomes, including pending prompts; `GET .../actions/{key}`
+retrieves one outcome. The server ignores any client-supplied pending state.
+The database journal serializes operations by locking the owned conversation,
+stores the merged arguments, payload hash, outcome, and timestamped audit
+events, and rejects key reuse with different inputs after success. Field
+creation uses the existing `FieldShiftService` validation with its commit
+deferred; the field row and action result commit in one transaction. The
+deterministic field ID also ties the write to the owner, conversation, and key.
+Real PostgreSQL tests cover concurrent duplicate requests and rollback before
+commit. No model-generated HTTP path or URL is executed.
 
 Successful field creation links to `/field-shift?field=<UUID>&step=field`.
 Published layer manifests link to `/field-shift/map?layer=<id>`. Available
@@ -62,10 +65,11 @@ returned. No arbitrary URL is accepted from an LLM.
 
 ## Integration gates still open
 
-- Persist action state and audit in the owned assistant conversation; wire a
-  typed endpoint or message path to this core and authenticate it.
-- Add a durable idempotency ledger and close the field-service commit gap.
-- Exercise field creation and remote sensing through the actual authenticated
-  browser journey, including refresh, duplicate retry, owner isolation, and
-  links opening the correct result.
+- Integrate guided action controls with the conversation UI. Free-text intent
+  routing is not implemented; chat prose alone cannot trigger a write.
+- Verify the authenticated browser journey across refresh, duplicate retry,
+  owner isolation, and result link navigation. PostgreSQL HTTP tests cover the
+  backend portions, but are not a browser test.
+- Add other existing operations one typed tool at a time after reviewing write
+  permissions and idempotency semantics.
 - Preserve existing assistant source/semantic evaluations and worker/DB gates.

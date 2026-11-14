@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth.dependencies import AuthPrincipal, require_verified_user
 from ..database.session import get_session
+from .action_execution import AssistantActionService
+from .agent_actions import ActionOutcome, ActionRequest
 from .models import AssistantMessage
 from .presets import enabled_presets
 from .schemas import ConversationCreate, MessageCreate, PreferenceInput
@@ -51,6 +53,28 @@ async def conversation(
     return await AssistantService().get_conversation(
         session, user.id, conversation_id, before_sequence=before_sequence
     )
+
+
+@router.post("/conversations/{conversation_id}/actions", response_model=ActionOutcome)
+async def execute_action(
+    conversation_id: str, body: ActionRequest, user: User, session: Session
+) -> ActionOutcome:
+    return await AssistantActionService().advance(session, user.id, conversation_id, body)
+
+
+@router.get("/conversations/{conversation_id}/actions")
+async def list_actions(conversation_id: str, user: User, session: Session) -> dict[str, Any]:
+    return {"items": await AssistantActionService().list(session, user.id, conversation_id)}
+
+
+@router.get(
+    "/conversations/{conversation_id}/actions/{idempotency_key}",
+    response_model=ActionOutcome,
+)
+async def get_action(
+    conversation_id: str, idempotency_key: str, user: User, session: Session
+) -> ActionOutcome:
+    return await AssistantActionService().get(session, user.id, conversation_id, idempotency_key)
 
 
 @router.put("/conversations/{conversation_id}/preferences")
