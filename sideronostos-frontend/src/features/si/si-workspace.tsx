@@ -54,9 +54,9 @@ export function SiWorkspace() {
     setOpeningFields(true);
     try {
       await getCurrentUser();
-      router.push("/si/chat");
+      router.push("/si/multi-agent");
     } catch {
-      router.push("/login?next=%2Fsi%2Fchat&authRequired=1");
+      router.push("/login?next=%2Fsi%2Fmulti-agent&authRequired=1");
     } finally {
       setOpeningFields(false);
     }

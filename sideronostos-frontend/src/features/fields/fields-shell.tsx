@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import type { ReactNode } from "react"
-import { Satellite } from "lucide-react"
+import { MessageCircle, Satellite } from "lucide-react"
 
 import { BrandLogo } from "@/components/brand-logo"
 
@@ -20,9 +20,10 @@ export function FieldsShell({ children }: { children: ReactNode }) {
             <p className="hidden truncate text-[11px] text-muted-foreground sm:block">World map and farm partition workspace</p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
-          <Satellite className="size-4 text-primary" aria-hidden="true" />
-          <span className="hidden sm:inline">NASA Earth observations</span>
+        <div className="flex shrink-0 items-center gap-3 text-xs text-muted-foreground">
+          <Link href="/si/multi-agent" className="inline-flex min-h-10 items-center gap-2 rounded-md px-2 font-medium text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"><MessageCircle className="size-4 text-primary" aria-hidden="true" /><span className="hidden sm:inline">Farmer assistants</span><span className="sr-only sm:hidden">Farmer assistants</span></Link>
+          <Satellite className="hidden size-4 text-primary md:block" aria-hidden="true" />
+          <span className="hidden md:inline">NASA Earth observations</span>
         </div>
       </header>
       <div className="flex min-h-0 flex-1 flex-col">{children}</div>

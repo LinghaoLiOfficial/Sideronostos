@@ -44,6 +44,7 @@ export function BotComposer({
   inputRef,
   maxLength = 2000,
 }: BotComposerProps) {
+  const english = language.toLowerCase().startsWith("en");
   const ownInput = useRef<HTMLTextAreaElement>(null);
   const input = inputRef ?? ownInput;
   const id = useId();
@@ -72,7 +73,7 @@ export function BotComposer({
         if (!mounted || !live.current.active) return;
         const base = insertion.current;
         if (live.current.value !== base.value) {
-          setNotice("输入已更新，请重新说一次。");
+          setNotice(english ? "The draft changed. Please dictate again." : "输入已更新，请重新说一次。");
           return;
         }
         const before = base.value.slice(0, base.start),
@@ -146,7 +147,7 @@ export function BotComposer({
       window.removeEventListener("pagehide", cancel);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [language, input]);
+  }, [language, input, english]);
   useEffect(() => {
     if (
       !active ||
@@ -177,14 +178,14 @@ export function BotComposer({
   }
   const recording = speech.phase !== "idle";
   const status = cancelZone
-    ? "松开取消"
+    ? (english ? "Release to cancel" : "松开取消")
     : speech.phase === "starting"
-      ? "正在开启麦克风…"
+      ? (english ? "Starting microphone…" : "正在开启麦克风…")
       : speech.phase === "finishing"
-        ? "正在转成文字…"
+        ? (english ? "Turning speech into text…" : "正在转成文字…")
         : holding
-          ? "松开转文字 · 上滑取消"
-          : "正在听 · 点击停止转文字";
+          ? (english ? "Release to insert text · swipe up to cancel" : "松开转文字 · 上滑取消")
+          : (english ? "Listening · tap to insert text" : "正在听 · 点击停止转文字");
   return (
     <div
       className={styles.root}
@@ -212,10 +213,10 @@ export function BotComposer({
           <div>
             <p role="status">{status}</p>
             <span className={styles.preview}>
-              {speech.preview || "语音只会填入输入框，由你确认发送"}
+              {speech.preview || (english ? "Speech fills the draft. You choose when to send." : "语音只会填入输入框，由你确认发送")}
             </span>
           </div>
-          <button type="button" onClick={cancel} aria-label="取消语音输入">
+          <button type="button" onClick={cancel} aria-label={english ? "Cancel voice input" : "取消语音输入"}>
             <X size={16} />
           </button>
         </div>
@@ -280,7 +281,7 @@ export function BotComposer({
           <button
             type="button"
             className={styles.mic}
-            aria-label={recording ? "停止语音并转成文字" : "开始语音输入"}
+            aria-label={recording ? (english ? "Stop voice and insert text" : "停止语音并转成文字") : (english ? "Start voice input" : "开始语音输入")}
             aria-pressed={recording}
             disabled={speech.phase === "finishing"}
             onClick={() => (recording ? controller.current?.finish() : start())}
@@ -291,14 +292,14 @@ export function BotComposer({
             type="submit"
             className={styles.send}
             disabled={pending || recording || !value.trim()}
-            aria-label="发送消息"
+            aria-label={english ? "Send message" : "发送消息"}
           >
             {pending ? <LoaderCircle size={18} /> : <ArrowUp size={20} />}
           </button>
         </div>
       </form>
       <p id={`${id}-hint`} className={styles.hint}>
-        按住输入框说话 · 语音由浏览器服务转写
+        {english ? "Hold the composer to dictate · your browser transcribes speech" : "按住输入框说话 · 语音由浏览器服务转写"}
       </p>
       {(speech.error || notice) && (
         <p role="alert" className={styles.error}>

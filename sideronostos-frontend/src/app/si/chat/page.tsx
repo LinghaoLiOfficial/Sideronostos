@@ -1,7 +1,5 @@
-export const metadata = {
-  title: "SI Chat · Agrisata",
-};
+import { redirect } from "next/navigation";
 
 export default function SiChatPage() {
-  return <main className="min-h-dvh bg-black" />;
+  redirect("/si/multi-agent");
 }
