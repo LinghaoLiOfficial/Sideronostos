@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "pnpm install --frozen-lockfile",
+    "predev": "node scripts/fetch-si-media.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/fetch-si-media.mjs",
+    "media:sync": "node scripts/fetch-si-media.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

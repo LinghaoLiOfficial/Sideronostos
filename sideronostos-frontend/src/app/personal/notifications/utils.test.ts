@@ -34,9 +34,9 @@ describe("shouldLoadInvitationDetails", () => {
 describe("getNotificationRowBackground", () => {
   it("uses explicit colors and lets highlights override unread and selected states", () => {
     expect(getNotificationRowBackground(false, false, false)).toBe("transparent");
-    expect(getNotificationRowBackground(true, false, false)).toBe("#40235a");
-    expect(getNotificationRowBackground(false, true, false)).toBe("#5c2b52");
-    expect(getNotificationRowBackground(true, false, true)).toBe("#512746");
-    expect(getNotificationRowBackground(true, true, true)).toBe("#69315e");
+    expect(getNotificationRowBackground(true, false, false)).toBe("#243426");
+    expect(getNotificationRowBackground(false, true, false)).toBe("#334a37");
+    expect(getNotificationRowBackground(true, false, true)).toBe("#304331");
+    expect(getNotificationRowBackground(true, true, true)).toBe("#3c5640");
   });
 });

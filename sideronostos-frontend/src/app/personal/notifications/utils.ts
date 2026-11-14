@@ -1,17 +1,19 @@
+import type { Locale } from "@/lib/i18n/locale";
+
 export function removeTrailingChineseFullStop(text: string) {
   return text.replace(/。+(\s*)$/u, "$1");
 }
 
-const invitationStatusLabels: Record<string, string> = {
-  pending: "待处理",
-  accepted: "已接受",
-  declined: "已拒绝",
-  expired: "已过期",
-  revoked: "已撤销",
+const invitationStatusLabels: Partial<Record<string, Record<Locale, string>>> = {
+  pending: { "zh-CN": "待处理", en: "Pending" },
+  accepted: { "zh-CN": "已接受", en: "Accepted" },
+  declined: { "zh-CN": "已拒绝", en: "Declined" },
+  expired: { "zh-CN": "已过期", en: "Expired" },
+  revoked: { "zh-CN": "已撤销", en: "Revoked" },
 };
 
-export function getInvitationStatusLabel(status: string) {
-  return invitationStatusLabels[status] ?? "状态未知";
+export function getInvitationStatusLabel(status: string, locale: Locale = "zh-CN") {
+  return invitationStatusLabels[status]?.[locale] ?? (locale === "en" ? "Unknown status" : "状态未知");
 }
 
 export function shouldLoadInvitationDetails(type: string) {
@@ -19,7 +21,7 @@ export function shouldLoadInvitationDetails(type: string) {
 }
 
 export function getNotificationRowBackground(unread: boolean, selected: boolean, highlighted: boolean) {
-  if (highlighted) return selected ? "#69315e" : "#512746";
-  if (selected) return "#5c2b52";
-  return unread ? "#40235a" : "transparent";
+  if (highlighted) return selected ? "#3c5640" : "#304331";
+  if (selected) return "#334a37";
+  return unread ? "#243426" : "transparent";
 }
