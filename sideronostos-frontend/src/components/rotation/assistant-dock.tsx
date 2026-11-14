@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable react-hooks/set-state-in-effect -- Reconcile external conversation pages and explicit open requests into the persistent chat view. */
 
+import { useI18n } from "@/lib/i18n/provider";
 import {
   useCallback,
   useEffect,
@@ -117,6 +118,8 @@ function AssistantSession({
   onAction,
   openRequest,
 }: AssistantDockProps) {
+  const { t, locale, setLocale } = useI18n();
+
   const storageKey = `field-shift:assistant:${ownerId}`;
   const [mode, setMode] = useState<BotMode>("collapsed");
   const open = mode !== "collapsed";
@@ -272,7 +275,7 @@ function AssistantSession({
   }
   async function send(event?: FormEvent, previous?: Submission) {
     event?.preventDefault();
-    if (contextPending || pending || (!text.trim() && !previous)) return;
+    if (contextPending || pending || savingPreferences || (!text.trim() && !previous)) return;
     const requestSequence = ++sequence.current;
     // Freeze at the click, before conversation creation can race a map selection.
     const body = previous?.body ?? {
@@ -280,6 +283,7 @@ function AssistantSession({
       text: text.trim(),
       context: structuredClone(context),
     };
+    const requestedPreferences = { ...preferences, language: locale };
     setOutgoing(body);
     setAnnouncement("");
     setFreshRequests((old) => new Set(old).add(body.client_message_id));
@@ -294,12 +298,18 @@ function AssistantSession({
     try {
       let chat = previous?.conversation ?? conversation;
       if (!chat) {
-        const created = await api.createConversation(preferences);
+        const created = await api.createConversation(requestedPreferences);
         if (!isCurrent()) return;
         chat = created.id;
         active.current.conversation = chat;
         setConversation(chat);
         storageWrite(storageKey, chat);
+      }
+      else {
+        // The backend freezes language with the message. Never send until it agrees
+        // with the UI choice captured at the click, including restored conversations.
+        await api.setPreferences(requestedPreferences, chat);
+        if (!isCurrent()) return;
       }
       submission ??= {
         conversation: chat,
@@ -355,7 +365,7 @@ function AssistantSession({
     setSavingPreferences(true);
     setError(null);
     try {
-      const saved = await api.setPreferences(next, chat ?? undefined);
+      const saved = await api.setPreferences({ ...next, language: locale }, chat ?? undefined);
       if (isCurrent()) setPreferences(saved);
     } catch (cause) {
       if (isCurrent()) setError(errorMessage(cause));
@@ -403,8 +413,8 @@ function AssistantSession({
     <Bot
       identity={{
         id: "rotation",
-        name: "轮作助手",
-        description: "解释数据，一起想清下一茬",
+        name: t("轮作助手"),
+        description: t("解释数据，一起想清下一茬"),
       }}
       mode={mode}
       onModeChange={(next) => {
@@ -419,7 +429,7 @@ function AssistantSession({
           <button
             type="button"
             className={styles.iconButton}
-            aria-label="历史对话"
+            aria-label={t("历史对话")}
             aria-expanded={historyOpen}
             onClick={() => {
               setHistoryOpen(!historyOpen);
@@ -431,7 +441,7 @@ function AssistantSession({
           <button
             type="button"
             className={styles.iconButton}
-            aria-label="回答偏好"
+            aria-label={t("回答偏好")}
             aria-expanded={settingsOpen}
             onClick={() => {
               setSettingsOpen(!settingsOpen);
@@ -446,29 +456,24 @@ function AssistantSession({
       <div className={styles.chatContext}>
         <span className={styles.contextDot} />
         <span>{contextLabel}</span>
-        {context.draft?.dirty && <strong>条件已修改，尚未重算</strong>}
+        {context.draft?.dirty && <strong>{t("条件已修改，尚未重算")}</strong>}
       </div>
       {settingsOpen && (
         <div className={styles.chatSettings}>
           <label>
-            语言
-            <select
+            {t("语言")}<select
               disabled={savingPreferences}
-              value={preferences.language}
+              value={locale}
               onChange={(e) =>
-                void updatePreferences({
-                  ...preferences,
-                  language: e.target.value as "zh" | "en",
-                })
+                setLocale(e.target.value as "zh" | "en")
               }
             >
-              <option value="zh">中文</option>
-              <option value="en">English</option>
+              <option value="zh">{t("中文")}</option>
+              <option value="en">{t("English")}</option>
             </select>
           </label>
           <label>
-            解释程度
-            <select
+            {t("解释程度")}<select
               disabled={savingPreferences}
               value={preferences.detail}
               onChange={(e) =>
@@ -478,8 +483,8 @@ function AssistantSession({
                 })
               }
             >
-              <option value="brief">简明易懂</option>
-              <option value="detailed">展开说明</option>
+              <option value="brief">{t("简明易懂")}</option>
+              <option value="detailed">{t("展开说明")}</option>
             </select>
           </label>
         </div>
@@ -492,13 +497,11 @@ function AssistantSession({
             onClick={() => selectConversation(null)}
           >
             <Plus size={16} />
-            开始新对话
-          </button>
-          {history.isPending && <p role="status">正在读取对话…</p>}
+            {t("开始新对话")}</button>
+          {history.isPending && <p role="status">{t("正在读取对话…")}</p>}
           {history.error && (
             <button onClick={() => void history.refetch()}>
-              读取失败，重试
-            </button>
+              {t("读取失败，重试")}</button>
           )}
           {history.data?.items.map((item) => (
             <button
@@ -508,8 +511,8 @@ function AssistantSession({
               aria-current={item.id === conversation ? "true" : undefined}
               onClick={() => chooseHistory(item)}
             >
-              轮作对话 ·{" "}
-              {new Date(item.updated_at).toLocaleString("zh-CN", {
+              {t("轮作对话 ·")}{" "}
+              {new Date(item.updated_at).toLocaleString(locale === "zh" ? "zh-CN" : "en-US", {
                 month: "short",
                 day: "numeric",
                 hour: "2-digit",
@@ -530,12 +533,12 @@ function AssistantSession({
             el.scrollHeight - el.scrollTop - el.clientHeight < 64;
         }}
       >
-        {page.isPending && conversation && <p role="status">正在恢复对话…</p>}
+        {page.isPending && conversation && <p role="status">{t("正在恢复对话…")}</p>}
         {page.error && (
           <div role="alert" className={styles.error}>
-            <p>{errorMessage(page.error)}</p>
-            <button onClick={() => void page.refetch()}>重试读取</button>
-            <button onClick={() => selectConversation(null)}>开始新对话</button>
+            <p>{t(errorMessage(page.error))}</p>
+            <button onClick={() => void page.refetch()}>{t("重试读取")}</button>
+            <button onClick={() => selectConversation(null)}>{t("开始新对话")}</button>
           </div>
         )}
         {nextBefore && (
@@ -544,18 +547,17 @@ function AssistantSession({
             className={styles.textButton}
             onClick={() => void loadOlder()}
           >
-            查看更早的消息
-          </button>
+            {t("查看更早的消息")}</button>
         )}
         {!messages.length && !outgoing && !busy && !page.error && (
           <div className={styles.chatWelcome}>
-            <h2>下一茬，我们一起想。</h2>
-            <p>想知道下一茬种什么，还是想看看地里的水分？直接问我就好。</p>
+            <h2>{t("下一茬，我们一起想。")}</h2>
+            <p>{t("想知道下一茬种什么，还是想看看地里的水分？直接问我就好。")}</p>
             <div className={styles.promptChips}>
               {[
-                "轮作为什么要换不同科？",
-                "帮我读懂当前方案",
-                "这些数据能说明什么？",
+                t("轮作为什么要换不同科？"),
+                t("帮我读懂当前方案"),
+                t("这些数据能说明什么？"),
               ].map((q) => (
                 <button
                   key={q}
@@ -582,17 +584,14 @@ function AssistantSession({
               <div className={styles.reply}>
                 {stale && (
                   <p className={styles.stale}>
-                    基于之前的选择 ·{" "}
-                    {message.context_labels.fields
-                      .map((f) => f.name)
-                      .join("、") || "地图选区"}
+                    {t("基于之前的选择 ·")}{" "}
+                    {message.context_labels.fields.map((f) => f.name).join(", ") || t("地图选区")}
                   </p>
                 )}
                 {message.status === "pending" ? (
                   <p role="status" className={styles.thinking}>
                     <LoaderCircle size={16} />
-                    我看一下…
-                  </p>
+                    {t("我看一下…")}</p>
                 ) : (
                   message.response && (
                     <BotAnswer
@@ -616,13 +615,11 @@ function AssistantSession({
                       textarea.current?.focus();
                     }}
                   >
-                    重新提问
-                  </button>
+                    {t("重新提问")}</button>
                 ) : null}
                 {message.response?.retrieval_mode === "lexical_degraded" && (
                   <p className={styles.muted}>
-                    语义检索暂不可用，本次使用关键词资料。
-                  </p>
+                    {t("语义检索暂不可用，本次使用关键词资料。")}</p>
                 )}
                 <div className={styles.answerActions} hidden={revealing}>
                   {message.response?.actions
@@ -634,7 +631,7 @@ function AssistantSession({
                         disabled={stale}
                         onClick={() => onAction(action)}
                       >
-                        {actionLabels[action]}
+                        {t(actionLabels[action])}
                       </button>
                     ))}
                 </div>
@@ -651,8 +648,7 @@ function AssistantSession({
               {busy && (
                 <p role="status" className={styles.thinking}>
                   <span className={styles.thinkingDot} />
-                  我看一下…
-                </p>
+                  {t("我看一下…")}</p>
               )}
             </article>
           )}
@@ -663,7 +659,7 @@ function AssistantSession({
       {(source || sourceBusy) && (
         <section
           className={styles.sourcePanel}
-          aria-label="回答依据"
+          aria-label={t("回答依据")}
           onKeyDown={(e) => {
             if (e.key === "Escape") {
               e.preventDefault();
@@ -675,14 +671,14 @@ function AssistantSession({
           <button
             className={styles.iconButton}
             type="button"
-            aria-label="关闭依据"
+            aria-label={t("关闭依据")}
             ref={sourceClose}
             onClick={closeSource}
           >
             <X size={16} />
           </button>
           {sourceBusy ? (
-            <p>正在读取依据…</p>
+            <p>{t("正在读取依据…")}</p>
           ) : (
             source &&
             ("excerpt" in source ? (
@@ -693,12 +689,12 @@ function AssistantSession({
                 </h3>
                 <p className={styles.muted}>
                   {source.source.locator_type === "pdf_page"
-                    ? "PDF 页"
-                    : "章节"}{" "}
+                    ? t("PDF 页")
+                    : t("章节")}{" "}
                   {source.page} ·{" "}
                   {source.source.access_scope === "abstract_only"
-                    ? "仅摘要"
-                    : "已发布资料"}
+                    ? t("仅摘要")
+                    : t("已发布资料")}
                 </p>
                 <p>{source.excerpt}</p>
                 {source.source.limitations.map((item) => (
@@ -712,19 +708,18 @@ function AssistantSession({
                     target="_blank"
                     rel="noreferrer"
                   >
-                    打开原始来源 ↗
-                  </a>
+                    {t("打开原始来源 ↗")}</a>
                 )}
               </>
             ) : (
               <>
-                <h3>{source.label}</h3>
+                <h3>{t(source.label)}</h3>
                 <p>{source.display}</p>
                 {source.limitations.map((item) => (
                   <p key={item}>{item}</p>
                 ))}
                 <p className={styles.muted}>
-                  {String(source.source.kind ?? "数据快照")}
+                  {String(source.source.kind ?? t("数据快照"))}
                 </p>
                 {sourceUrl(source.source.url) && (
                   <a
@@ -732,8 +727,7 @@ function AssistantSession({
                     target="_blank"
                     rel="noreferrer"
                   >
-                    打开来源 ↗
-                  </a>
+                    {t("打开来源 ↗")}</a>
                 )}
               </>
             ))
@@ -742,49 +736,45 @@ function AssistantSession({
       )}
       {error && (
         <div className={styles.chatError} role="alert">
-          {error}
+          {t(error)}
           {retry && (
             <button
               type="button"
               disabled={pending}
               onClick={() => void send(undefined, retry)}
             >
-              重试原消息
-            </button>
+              {t("重试原消息")}</button>
           )}
         </div>
       )}
       {!error && retry && (
         <div className={styles.chatError}>
-          上次请求结果尚未确认。
-          <button
+          {t("上次请求结果尚未确认。")}<button
             type="button"
             disabled={pending}
             onClick={() => void send(undefined, retry)}
           >
-            恢复原消息
-          </button>
+            {t("恢复原消息")}</button>
         </div>
       )}
-      {contextPending && <p role="status" className={styles.chatFootnote}>正在核对地块、选区或历史方案，完成后可继续提问。</p>}
+      {contextPending && <p role="status" className={styles.chatFootnote}>{t("正在核对地块、选区或历史方案，完成后可继续提问。")}</p>}
       <BotComposer
         inputRef={textarea}
-        label="给轮作助手留言"
+        label={t("给轮作助手留言")}
         active={open}
         value={text}
         onChange={setText}
         onSend={() => void send()}
         pending={pending || contextPending}
-        language={preferences.language === "zh" ? "zh-CN" : "en-US"}
+        language={locale === "zh" ? "zh-CN" : "en-US"}
         placeholder={
-          preferences.language === "zh"
-            ? "说说你想了解什么…"
+          locale === "zh"
+            ? t("说说你想了解什么…")
             : "Ask about your next crop…"
         }
       />
       <p className={styles.chatFootnote}>
-        结合地里实际情况判断，依据可以展开查看。
-      </p>
+        {t("结合地里实际情况判断，依据可以展开查看。")}</p>
     </Bot>
   );
 }

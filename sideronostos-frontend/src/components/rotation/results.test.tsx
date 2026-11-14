@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, screen } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { OptionDetail } from "./results";
 import type { OptionV2 } from "@/lib/api/rotation-types";
 import type { Field } from "@/lib/api/field-shift-types";

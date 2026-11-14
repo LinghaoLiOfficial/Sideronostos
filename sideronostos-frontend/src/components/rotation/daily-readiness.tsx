@@ -1,3 +1,5 @@
+import { useI18n } from "@/lib/i18n/provider";
+import type { Translator } from "@/lib/i18n/translate";
 import type { Field } from "@/lib/api/field-shift-types";
 import type { DailyReadiness, FieldParameter } from "@/lib/api/daily-types";
 import { fieldParameters } from "./daily-model";
@@ -62,14 +64,14 @@ const issues: Record<string, string> = {
   water_system_missing: "尚未关联水源",
   source_not_confirmed: "来源尚未确认",
 };
-function label(path: string, fields: Field[]) {
+function label(path: string, fields: Field[], t: Translator) {
   const [kind, id, parameter] = path.split(".");
   if (kind === "fields")
-    return `${fields.find((f) => f.id === id)?.name ?? "经营地块"} · ${fieldParameters[parameter as FieldParameter]?.label ?? "资料与条件"}`;
-  if (kind === "farms") return "农场共享资源与供需";
-  if (kind === "weather") return "历史气象资料";
-  if (kind === "profile") return "地区与作物参数";
-  return "规划资料";
+    return `${fields.find((f) => f.id === id)?.name ?? t("经营地块")} · ${t(fieldParameters[parameter as FieldParameter]?.label ?? "资料与条件")}`;
+  if (kind === "farms") return t("农场共享资源与供需");
+  if (kind === "weather") return t("历史气象资料");
+  if (kind === "profile") return t("地区与作物参数");
+  return t("规划资料");
 }
 export function DailyReadinessPanel({
   report,
@@ -78,6 +80,8 @@ export function DailyReadinessPanel({
   report: DailyReadiness;
   fields: Field[];
 }) {
+  const { t } = useI18n();
+
   const blocked = report.items.filter((item) => item.status === "blocked");
   const groups = new Map<string, typeof blocked>();
   for (const item of blocked) {
@@ -94,54 +98,53 @@ export function DailyReadinessPanel({
   return (
     <section
       className={styles.dailyPanel}
-      aria-label="资料检查结果"
+      aria-label={t("资料检查结果")}
       aria-live="polite"
     >
       <h3>
         {report.ready
-          ? "资料已满足计算前置检查"
-          : `还有 ${groups.size} 组资料需要核对`}
+          ? t("资料已满足计算前置检查")
+          : t("还有 {0} 组资料需要核对", { "0": groups.size })}
       </h3>
       <p>
         {report.ready
-          ? "可以提交计算。候选适宜性和资源可行性将在计算时进一步核验；本检查不代表方案已可实施。"
-          : `共有 ${blocked.length} 条检查未通过；同一份资料可能影响多条检查。先按下列分组处理，未知值没有被替换为零。`}
+          ? t("可以提交计算。候选适宜性和资源可行性将在计算时进一步核验；本检查不代表方案已可实施。")
+          : t("共有 {0} 条检查未通过；同一份资料可能影响多条检查。先按下列分组处理，未知值没有被替换为零。", { "0": blocked.length })}
       </p>
       <ul className={styles.readinessList}>
         {[...groups].map(([key, items]) => (
           <li key={key}>
             <strong>
-              {label(key, fields)} · {items.length} 条检查
-            </strong>
+              {label(key, fields, t)} · {items.length} {t(" 条检查")}</strong>
             <p>
               {[...new Set(items.flatMap((item) => item.issues))]
                 .map(
                   (code) =>
-                    issues[code] ?? "此项未满足模型要求，请核对资料及适用范围",
+                    t(issues[code] ?? "此项未满足模型要求，请核对资料及适用范围"),
                 )
                 .join("；")}
             </p>
             <a href={`#${targets[key.split(".")[0]] ?? "daily-fields"}`}>
-              去核对资料
+              {t("去核对资料")}
             </a>
             <details>
-              <summary>展开逐项依据（{items.length} 条）</summary>
+              <summary>{t("展开逐项依据（")}{items.length} {t(" 条）")}</summary>
               <ul className={styles.readinessList}>
                 {items.map((item, index) => (
                   <li key={`${item.path}:${index}`}>
-                    <strong>{label(item.path, fields)}</strong>
-                    {item.missing_reason && <p>{item.missing_reason}</p>}
+                    <strong>{t(label(item.path, fields, t))}</strong>
+                    {item.missing_reason && <p>{t(item.missing_reason)}</p>}
                     <p>
-                      {item.path} · 预期单位 {item.expected_unit}
+                      {item.path} {t(" · 预期单位 ")}{item.expected_unit}
                     </p>
                     <p>
                       {item.issues
-                        .map((code) => issues[code] ?? code)
+                        .map((code) => t(issues[code] ?? code))
                         .join("；")}
                     </p>
                     {item.sources.map((source) => (
                       <p key={source.id}>
-                        {sourceKindLabels[source.kind]} · {source.title} ·{" "}
+                        {t(sourceKindLabels[source.kind])} · {source.title} ·{" "}
                         {source.locator}
                       </p>
                     ))}
@@ -153,20 +156,20 @@ export function DailyReadinessPanel({
         ))}
       </ul>
       <details>
-        <summary>所有输入状态与天气限制</summary>
-        <p>历史天气回放不表示未来预报。{report.weather.warnings.join("；")}</p>
+        <summary>{t("所有输入状态与天气限制")}</summary>
+        <p>{t("历史天气回放不表示未来预报。")}{report.weather.warnings.join("；")}</p>
         <ul className={styles.readinessList}>
           {report.items
             .filter((item) => item.status !== "blocked")
             .map((item, index) => (
               <li key={`${item.path}:${index}`}>
-                {label(item.path, fields)} ·{" "}
-                {item.value == null ? "未启用" : String(item.value)} {item.unit}{" "}
-                · {item.engineering_assumption ? "工程假设" : "有来源记录"}
+                {t(label(item.path, fields, t))} ·{" "}
+                {item.value == null ? t("未启用") : String(item.value)} {item.unit}{" "}
+                · {item.engineering_assumption ? t("工程假设") : t("有来源记录")}
                 {item.sources.length > 0 && (
                   <small>
                     {" "}
-                    · {item.sources.map((s) => s.title).join("、")}
+                    · {item.sources.map((s) => s.title).join(" · ")}
                   </small>
                 )}
               </li>

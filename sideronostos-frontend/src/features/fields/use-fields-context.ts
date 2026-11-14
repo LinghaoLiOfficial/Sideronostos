@@ -1,4 +1,5 @@
 "use client"
+import { useI18n } from "@/lib/i18n/provider"
 import { useEffect, useRef, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import * as api from "@/lib/api/rotation"
@@ -11,6 +12,7 @@ import { useScienceQueries } from "@/components/rotation/use-science-queries"
 import { useWorkspaceNavigation } from "@/components/rotation/use-workspace-navigation"
 
 export function useFieldsContext(ownerId: string | null, field: FieldFeature | null, formDirty: boolean) {
+  const { t } = useI18n();
   const navigation = useWorkspaceNavigation("/fields"), { search } = navigation, client = useQueryClient()
   const window = observationWindow(search.get("obsStart"), search.get("obsEnd"))
   const science = useScienceQueries(ownerId, search.get("selection"), search.get("layer") ?? "", window.dates)
@@ -62,9 +64,9 @@ export function useFieldsContext(ownerId: string | null, field: FieldFeature | n
     selection: science.selection.data ? { id: science.selection.data.id, revision: science.selection.data.revision } : null, dates: window.dates,
     runId: hasRun ? run.data!.id : null, optionId: option?.id, compareRunId: search.get("compare"), compareOptionId: search.get("compareOption"), saved: Boolean(planId), changes: dirty || stale ? ["fields"] : [] })
   const contextPending = selecting || Boolean((runId || planId) && !hasRun) || Boolean(search.get("selection") && !science.selection.data)
-  const contextLabel = [hasRun ? `历史计算：${run.data!.field_snapshots.map(f => f.name).join("、")}` : field?.properties.name ?? "未选择经营地块",
-    science.selection.data ? `临时选区 ${science.selection.data.center.map(v => v.toFixed(4)).join(", ")}` : "未选临时区域",
-    window.dates ? `${window.dates.start}—${window.dates.end}` : "全部已发布观测", dirty ? "资料有未保存修改" : ""].filter(Boolean).join(" · ")
+  const contextLabel = [hasRun ? t("历史计算：{fields}", { fields: run.data!.field_snapshots.map(f => f.name).join(", ") }) : field?.properties.name ?? t("未选择经营地块"),
+    science.selection.data ? t("临时选区 {coordinates}", { coordinates: science.selection.data.center.map(v => v.toFixed(4)).join(", ") }) : t("未选临时区域"),
+    window.dates ? `${window.dates.start}—${window.dates.end}` : t("全部已发布观测"), dirty ? t("资料有未保存修改") : ""].filter(Boolean).join(" · ")
   return { ...science, navigation: { ...navigation, navigate }, window, selectRegion, cancelSelection, selecting, error, context, contextLabel, contextPending, run, saved }
 }
 export type FieldsContext = ReturnType<typeof useFieldsContext>
