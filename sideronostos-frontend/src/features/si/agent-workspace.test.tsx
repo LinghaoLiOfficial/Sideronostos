@@ -53,6 +53,21 @@ it("creates a conversation in the chosen domain and keeps it selectable in histo
   expect(within(screen.getByRole("navigation", { name: "Conversations" })).getByRole("button", { name: /Remote sensing/ })).toBeInTheDocument();
 });
 
+it("shows only the selected domain's conversation history", async () => {
+  const user = userEvent.setup();
+  const first = { id: "remote-1", preset: "remote_sensing", language: "en", detail: "brief", kb_release_id: "kb", created_at: "2026-11-14T08:00:00Z", updated_at: "2026-11-14T08:00:00Z" };
+  const second = { ...first, id: "field-1", preset: "field_management", created_at: "2026-11-13T08:00:00Z", updated_at: "2026-11-13T08:00:00Z" };
+  api.listConversations.mockResolvedValue({ items: [first, second] });
+  api.getConversation.mockImplementation(async (id: string) => ({ ...(id === first.id ? first : second), messages: [], next_before_sequence: null }));
+  render(<AgentWorkspace />);
+  const history = await screen.findByRole("navigation", { name: "Conversations" });
+  await waitFor(() => expect(within(history).getAllByRole("button")).toHaveLength(1));
+  expect(within(history).getByRole("button", { name: /Remote sensing/ })).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: /Field management/ }));
+  expect(within(history).getByRole("button", { name: /Field management/ })).toBeInTheDocument();
+  expect(within(history).queryByRole("button", { name: /Remote sensing/ })).not.toBeInTheDocument();
+});
+
 it("restores an existing conversation and submits its message to that conversation", async () => {
   const user = userEvent.setup();
   api.listConversations.mockResolvedValue({ items: [{
