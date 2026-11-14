@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import type { ReactNode } from "react"
-<<<<<<< HEAD
 import type { AuthUser } from "@/lib/api/client"
 import { MessageCircle, Satellite } from "lucide-react"
 
