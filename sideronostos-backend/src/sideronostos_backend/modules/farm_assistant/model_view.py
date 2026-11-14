@@ -42,7 +42,8 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
     compare = context.get("comparison")
     both_options = not compare and bool(
         re.search(
-            r"两个方案|两种方案|各个方案|这些方案|备选方案|two options|alternatives|these options",
+            r"两个方案|两种方案|各个方案|这些方案|备选方案|"
+            r"(?:two|both|all|these) options|alternatives",
             text,
         )
     )
@@ -251,6 +252,11 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
         for fact in evidence["facts"]
         if ".year." in fact["key"]
     }
+    resource_dates = {
+        f["key"].removesuffix(".date"): "{{" + f["id"] + "}}"
+        for f in evidence["facts"]
+        if ".resource." in f["key"] and f["key"].endswith(".date")
+    }
     facts = []
     for fact in evidence["facts"]:
         key = fact["key"]
@@ -326,11 +332,47 @@ def model_view(question: str, context: dict[str, Any], evidence: dict[str, Any])
                 "limitations": fact.get("limitations", []),
                 "quality_status": source.get("status"),
                 "resource_kind": source.get("resource_kind"),
+                # Resource rows are individual daily/period constraints, not horizon totals.
+                # Link the already-bound date instead of exposing IDs or inventing a sum.
+                **(
+                    {
+                        "scope": "single_resource_constraint_not_plan_total",
+                        "resource_group": key.rsplit(".", 1)[0],
+                        "quantity_kind": key.rsplit(".", 1)[1],
+                        "date_reference": resource_dates.get(key.rsplit(".", 1)[0]),
+                    }
+                    if ".resource." in key
+                    else {}
+                ),
                 "input_sources": source.get("input_sources", []),
                 "data_release": source.get("release_id"),
                 "data_product": source.get("product"),
             }
         )
+    fact_lookup = {f["key"]: f for f in evidence["facts"]}
+    visible_ids = {f["id"] for f in facts}
+    overviews = []
+    for key, count in fact_lookup.items():
+        if not key.endswith(".gap_count") or count["id"] not in visible_ids:
+            continue
+        shown = fact_lookup.get(key.removesuffix(".gap_count") + ".gap_details_count")
+        if shown is None or shown["id"] not in visible_ids:
+            continue
+        overviews.append(
+            {
+                "option_role": option_roles.get(count["source"].get("option_id"), "selected plan"),
+                "count_reference": "{{" + count["id"] + "}}",
+                "shown_count_reference": "{{" + shown["id"] + "}}",
+                "details_truncated": count["value"] > shown["value"],
+                "gap_total_reference": None,
+                "scope": (
+                    "counts_of_constraints_not_water_volume; amounts_belong_to_individual_rows"
+                ),
+                "remaining_details": "result page and export",
+            }
+        )
+    if overviews:
+        summary["resource_gap_overviews"] = overviews
     # Compare annual estimates server-side; the model only sees bound references.
     # Group at the same precision as add_fact's displayed values, preserving ties.
     originals = {fact["id"]: fact for fact in evidence["facts"]}

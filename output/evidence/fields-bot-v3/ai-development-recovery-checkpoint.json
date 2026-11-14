@@ -1,0 +1,181 @@
+{
+  "schema": "assistant-recovery-development-checkpoint-v1",
+  "decision": "hold",
+  "production_model_unchanged": "openai/gpt-5.4-nano",
+  "model_override": "Mini evaluated through process-local environment only; no .env model change",
+  "official_model_reference": "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+  "reference_scope": "Structured outputs and low reasoning supported by official OpenAI model docs; actual OpenRouter access/cost measured separately",
+  "case_sha256": "913f3fe3ac7868b9314a3ce1ac1befc383291f77593bbaf7ff9b9168289ada53",
+  "fixture_sha256": "f67a50f3cf5d80302a6db3ff1eb340e2c32dc4378137eed5511a632ce5d9474f",
+  "reports": [
+    {
+      "report": "eval-daily-v17-nano-dev.json",
+      "sha256": "822e42b0db2bf649d176352443c510a5db2063443befa87ac81edd789f0107b0",
+      "model": "openai/gpt-5.4-nano",
+      "prompt": "farmer-evidence-bound-20261114-v17-daily-diagnostics",
+      "source_sha256": "cbb58507fc6bf9fdec19240d1d5b3073270dd25a315577f7a7f06c3022e3ce19",
+      "completed": 20,
+      "attempts": 20,
+      "retrieval_recall": 0.75,
+      "p50_ms": 3172.5,
+      "p95_ms": 13946,
+      "provider_reported_chat_cost_usd": 0.03453641,
+      "embedding_tokens": 529,
+      "total_tokens": 254365
+    },
+    {
+      "report": "eval-daily-v17-projection-nano-dev.json",
+      "sha256": "b2c873953c18e78ec1be28398a2a62f6fd1f5d634791da7f196ee10e4df809d7",
+      "model": "openai/gpt-5.4-nano",
+      "prompt": "farmer-evidence-bound-20261114-v17-daily-diagnostics",
+      "source_sha256": "8bd5774d0070d71e4818ab45bce4283e51d3b0e830e96f7a91133ac8045fe4ac",
+      "completed": 19,
+      "attempts": 20,
+      "retrieval_recall": 0.75,
+      "p50_ms": 3460.0,
+      "p95_ms": 5543,
+      "provider_reported_chat_cost_usd": 0.03056723,
+      "embedding_tokens": 529,
+      "total_tokens": 279580
+    },
+    {
+      "report": "eval-daily-v17-validation-nano-dev.json",
+      "sha256": "5279ad77480796adf706c303eea77a87e15efa4c1a1d8e1df3165debf05b9e69",
+      "model": "openai/gpt-5.4-nano",
+      "prompt": "farmer-evidence-bound-20261114-v17-daily-diagnostics",
+      "source_sha256": "e48375e43194e3c4d37409a15986586f8fda73682f93a23aef22b1800d50c837",
+      "completed": 20,
+      "attempts": 20,
+      "retrieval_recall": 0.75,
+      "p50_ms": 3305.5,
+      "p95_ms": 7655,
+      "provider_reported_chat_cost_usd": 0.01609251,
+      "embedding_tokens": 529,
+      "total_tokens": 334173
+    },
+    {
+      "report": "eval-daily-v17-retrieval-nano-dev.json",
+      "sha256": "f9b4978a2ae4ab1d08b18e9967c3da9ad576a8f92b5d9ad6f8b8d865db76a512",
+      "model": "openai/gpt-5.4-nano",
+      "prompt": "farmer-evidence-bound-20261114-v17-daily-diagnostics",
+      "source_sha256": "4c8c4813f02b245d031dffe3afa6021cacaaf0975bdb51942a1ef545f0de0dae",
+      "completed": 18,
+      "attempts": 20,
+      "retrieval_recall": 1.0,
+      "p50_ms": 3472.0,
+      "p95_ms": 8330,
+      "provider_reported_chat_cost_usd": 0.01478003,
+      "embedding_tokens": 538,
+      "total_tokens": 270412
+    },
+    {
+      "report": "eval-daily-v17-retrieval-mini-dev.json",
+      "sha256": "b8dbb0702575e645dae567366ddbbaf92e2cd8506986ec51111de51947fac94f",
+      "model": "openai/gpt-5.4-mini",
+      "prompt": "farmer-evidence-bound-20261114-v17-daily-diagnostics",
+      "source_sha256": "4c8c4813f02b245d031dffe3afa6021cacaaf0975bdb51942a1ef545f0de0dae",
+      "completed": 20,
+      "attempts": 20,
+      "retrieval_recall": 1.0,
+      "p50_ms": 4193.0,
+      "p95_ms": 9862,
+      "provider_reported_chat_cost_usd": 0.146637,
+      "embedding_tokens": 538,
+      "total_tokens": 343232
+    },
+    {
+      "report": "eval-daily-v18-mini-dev.json",
+      "sha256": "1420a389b92da91be19775c52988213909f371115dfc6635479f236c1ab23fdd",
+      "model": "openai/gpt-5.4-mini",
+      "prompt": "farmer-evidence-bound-20261114-v18-scoped-explanations",
+      "source_sha256": "cf225ce9eda4c82d5f5862a8b413793e188da63dbd74c1aeba1549544445ccab",
+      "completed": 20,
+      "attempts": 20,
+      "retrieval_recall": 1.0,
+      "p50_ms": 3533.0,
+      "p95_ms": 6043,
+      "provider_reported_chat_cost_usd": 0.13600125,
+      "embedding_tokens": 538,
+      "total_tokens": 276614
+    }
+  ],
+  "controlled_changes": [
+    "Recognize both/all options and link resource row amounts to their bound dates and scope",
+    "Require missing-option clarification; reject dateless resource amounts and duplicate units; preserve negated readiness proofs",
+    "Generic bilingual vegetation-diagnosis retrieval expansion, no pinned source or case IDs",
+    "Evaluate Mini with identical pipeline/configuration other than model",
+    "Prompt v18 adds explicit row-count/truncation/selection/metric/optimality decision order"
+  ],
+  "confirmed_remaining_findings": [
+    {
+      "report": "eval-daily-v17-retrieval-nano-dev.json",
+      "attempt_id": "daily-v4-11/1",
+      "finding": "Despite retrieving S21, rewrites drought severity as disease severity; unsupported extra clinical details. Retrieval success does not establish entailment."
+    },
+    {
+      "report": "eval-daily-v17-retrieval-mini-dev.json",
+      "attempt_id": "daily-v4-03/1, daily-v4-03/2",
+      "finding": "Correct per-day values but omits 12-of-30 truncation scope. v18 adds explicit decision order."
+    },
+    {
+      "report": "eval-daily-v18-mini-dev.json",
+      "attempt_id": "daily-v4-01/1, daily-v4-01/2",
+      "finding": "Does not give the requested historical-weather/not-forecast qualification; metric practical meanings remain compressed."
+    },
+    {
+      "report": "eval-daily-v18-mini-dev.json",
+      "attempt_id": "daily-v4-05/1",
+      "finding": "Phrases supply inputs as optional alongside profit, despite required daily water planning inputs."
+    },
+    {
+      "report": "eval-daily-v18-mini-dev.json",
+      "attempt_id": "daily-v4-06/1",
+      "finding": "States independent conservative initialization but omits the specific wilting-point assumption."
+    },
+    {
+      "report": "eval-daily-v18-mini-dev.json",
+      "attempt_id": "daily-v4-10/1, daily-v4-10/2",
+      "finding": "Denies guarantees but does not explicitly limit optimality to generated candidates."
+    }
+  ],
+  "review_limitations": [
+    "Implementation-agent review, not independent farmer/agronomist validation.",
+    "No all-pass semantic percentage claimed; complete source-entailment audit remains required.",
+    "answer_tokens in raw runner summary is actually total input+output tokens; this checkpoint names it total_tokens.",
+    "Legacy historical fixture files were absent; new legacy fixture is a disclosed refreeze, not a paired historical re-score."
+  ],
+  "protected_tests_run": false,
+  "backend_regression": {
+    "passed": 554,
+    "skipped": 0,
+    "warnings": "5 existing PDF/SWIG deprecations",
+    "ruff": "pass",
+    "mypy": "20 source files pass with --no-incremental; cached run had tool internal error"
+  },
+  "local_api": {
+    "port": 8040,
+    "database": "sideronostos_fields_v3_journey_test",
+    "new_key_loaded": true,
+    "health_live": 200,
+    "health_ready": 200,
+    "checks": [
+      "database",
+      "temporal",
+      "storage"
+    ],
+    "runtime_prompt": "v17 loaded before v18 source-only candidate was written"
+  },
+  "browser_login": {
+    "status": "awaiting explicit user authorization",
+    "reason": "Automatic approval review rejected plaintext test-password command and insufficient account authorization evidence. Login was not submitted.",
+    "account_provenance": "account-switch-checkpoint.json and multifield-sync-and-planning.json confirm synthetic local engineering account; no real pilot data.",
+    "user_question_pending": true
+  },
+  "next": [
+    "Resolve remaining semantic omissions without weakening frozen expectations.",
+    "Run current legacy exposed regressions and complete semantic review.",
+    "Only then authorize protected daily/v3 tests.",
+    "After account authorization and candidate acceptance, complete actual production UI assistant journey."
+  ],
+  "post_evaluation_change": "Final guard regression tightens negated-proof grammar so an unrelated negative clause cannot excuse an affirmative readiness claim. All live reports predate that narrow tightening; current source still needs its next live evaluation and is not promoted."
+}

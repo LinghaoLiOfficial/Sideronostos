@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-11-14T03:55:19.371098+00:00",
+  "backend_tests": {
+    "passed": 554,
+    "skipped": 0,
+    "warnings": 5,
+    "database": "sideronostos_fields_v3_test",
+    "provider_calls": false
+  },
+  "ruff": "All checks passed",
+  "mypy": "Success: no issues found in 20 source files (--no-incremental)",
+  "git_diff_check": "pass",
+  "semantic_acceptance": "HOLD; see separate immutable real-provider reports",
+  "key": "Ignored env only, mode 0600; no secret or share URL in repository artifacts",
+  "api_health": {
+    "live": 200,
+    "ready": 200,
+    "database": "ok",
+    "temporal": "ok",
+    "storage": "ok"
+  }
+}

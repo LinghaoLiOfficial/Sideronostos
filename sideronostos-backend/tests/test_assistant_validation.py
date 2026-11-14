@@ -416,3 +416,102 @@ def test_scientific_unit_superscripts_are_not_unbound_measurements():
         can_claim_optimal=False,
     )
     assert result["paragraphs"][0]["text"] == "水的单位是 m³，面积单位可用 m²。"
+
+
+def test_unselected_option_requires_an_actual_clarification():
+    answer = ModelAnswer.model_validate(
+        {
+            "paragraphs": [
+                {
+                    "text": "This plan is better because it follows rotation rules.",
+                    "evidence_ids": ["K1"],
+                }
+            ],
+            "needs_clarification": False,
+        }
+    )
+    with pytest.raises(ValueError, match="select.*option"):
+        bind_answer(
+            answer,
+            [],
+            [{"id": "K1"}],
+            allowed_actions=[],
+            can_claim_optimal=False,
+            answer_requirement="ask_to_select_specific_option",
+        )
+
+
+def test_denial_of_implementation_proof_is_not_a_positive_readiness_claim():
+    answer = ModelAnswer.model_validate(
+        {
+            "paragraphs": [
+                {
+                    "text": "It also doesn’t prove the farm is ready to implement.",
+                    "evidence_ids": ["F1"],
+                }
+            ]
+        }
+    )
+    bound = bind_answer(
+        answer,
+        [
+            {
+                "id": "F1",
+                "value": "diagnostic",
+                "source": {"model_version": "rotation-milp-v3.0", "implementation_ready": False},
+            }
+        ],
+        [],
+        allowed_actions=[],
+        can_claim_optimal=True,
+    )
+    assert bound["paragraphs"][0]["text"] == answer.paragraphs[0].text
+
+
+def test_daily_resource_amount_cannot_be_rendered_without_its_date():
+    facts = [
+        {
+            "id": "F1",
+            "key": "current.option-1.resource.0.gap",
+            "value": 6,
+            "display": "6 m3",
+            "unit": "m3",
+            "source": {"resource_id": "water:shared:2027-04-20"},
+        },
+        {
+            "id": "F2",
+            "key": "current.option-1.resource.0.date",
+            "value": "2027-04-20",
+            "display": "2027-04-20",
+            "unit": "",
+            "source": {"resource_id": "water:shared:2027-04-20"},
+        },
+    ]
+    for text in ["The missing water is {{F1}}.", "On {{F2}}, the gap is {{F1}} m³."]:
+        answer = ModelAnswer.model_validate({"paragraphs": [{"text": text, "evidence_ids": []}]})
+        with pytest.raises(ValueError, match="date|unit"):
+            bind_answer(answer, facts, [], allowed_actions=[], can_claim_optimal=True)
+    good = ModelAnswer.model_validate(
+        {
+            "paragraphs": [
+                {
+                    "text": (
+                        "On {{F2}}, the missing water is {{F1}} for this daily constraint, "
+                        "not the horizon total."
+                    ),
+                    "evidence_ids": [],
+                }
+            ]
+        }
+    )
+    bound = bind_answer(good, facts, [], allowed_actions=[], can_claim_optimal=True)
+    assert "2027-04-20" in bound["paragraphs"][0]["text"]
+
+
+def test_unrelated_negative_clause_cannot_hide_affirmative_readiness_proof():
+    from sideronostos_backend.modules.farm_assistant.validation import affirmed
+
+    assert affirmed("可以直接实施", "地块不缺水，而且已有证据证明农场可以直接实施。")
+    assert affirmed(
+        "ready to implement", "It cannot fail, and evidence confirms it is ready to implement."
+    )

@@ -203,6 +203,8 @@ def test_options_inside_one_run_are_not_misrouted_to_a_second_run_request():
     ]
     for question in [
         "Compare the two options from this run in plain language.",
+        "How do both options trade off water use and cost?",
+        "Compare all options from this calculation.",
         "比较这次计算的两个方案",
     ]:
         view = model_view(question, c, {"facts": facts, "knowledge": []})

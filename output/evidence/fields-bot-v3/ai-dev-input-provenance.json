@@ -1,0 +1,96 @@
+{
+  "scope": "13 development cases only; no candidate outputs",
+  "destination": "https://openrouter.ai/api/v1",
+  "provenance_record": "browser-journey-checkpoint.json",
+  "source_kind": "explicit engineering operating assumptions and public historical NASA POWER weather",
+  "fixture_sha256": "f67a50f3cf5d80302a6db3ff1eb340e2c32dc4378137eed5511a632ce5d9474f",
+  "case_count": 13,
+  "field_name": "Iowa benchmark field 1",
+  "fixture_owner_scope": "isolated engineering test account, not a real farmer pilot",
+  "evidence_boundaries": [
+    "Public NASA POWER/SMAP observations and public knowledge passages",
+    "Synthetic engineering geometry and conditions; no real-farm history",
+    "Production model_view sends a minimal projection, not raw frozen snapshots",
+    "No credential, account email, or private production record in inspected model projections"
+  ],
+  "checks": [
+    {
+      "case_id": "daily-v4-01",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-02",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-03",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-04",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-05",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-06",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-07",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-08",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-09",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-10",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-11",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-12",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    },
+    {
+      "case_id": "daily-v4-25",
+      "synthetic_field_verified": true,
+      "private_identifiers_in_owned_fields": false,
+      "email_or_secrets_found": false
+    }
+  ]
+}

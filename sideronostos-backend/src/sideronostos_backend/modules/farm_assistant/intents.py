@@ -62,6 +62,12 @@ def retrieval_query(question: str) -> str:
     This expands retrieval only; it never changes the user's question or adds facts.
     No source IDs, result expectations or evaluation-case IDs are embedded here.
     """
+    if re.search(r"植被指数|\b(?:ndvi|evi|ndmi)\b|vegetation index", question, re.I) and re.search(
+        r"病|开药|诊断|disease|diagnos|treat", question, re.I
+    ):
+        return (
+            question + " vegetation index remote sensing plant disease detection stress diagnosis"
+        )
     if re.search(r"争水|竞争.{0,6}水|水分.{0,6}竞争|耗尽.{0,6}水", question):
         crop = "legume " if re.search(r"豆科|豆类", question) else ""
         return (

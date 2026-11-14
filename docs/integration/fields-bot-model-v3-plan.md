@@ -610,3 +610,37 @@ so no further paid-provider retry was made. The staging release stays inactive; 
 and their frozen expectations are unchanged. Once access is restored, resume the documented
 embedding/publication/development/protected evaluation procedure. Do not claim overall completion,
 regional calibration, push, merge or deployment from the engineering evidence.
+
+
+## Checkpoint 13 — replacement credential, real AI development and evidence guards (2026-11-14)
+
+The user supplied a replacement key. It is installed only in ignored mode-0600 `.env.local`;
+no key/share link enters this branch. A real embedding probe and chat batches work. All
+4,911 vectors are present and the v5-daily knowledge release is active only in the isolated
+journey database. The original/default database is untouched.
+
+Real dev outputs exposed missed “both options” routing, daily gaps presented as horizon
+shortage, missing option clarification, and a false rejection of a negated English readiness
+claim. Reproduced failing tests precede each projection/validation fix. A vocabulary expansion
+raises annotated dev source recall from 3/4 to 4/4, with no case/source pinning. Separate reports
+retain each boundary change. Nano still turns drought severity into disease severity despite
+correct retrieval; Mini was then evaluated with a process-only override. V18 adds explicit
+scope decision order, improving gap explanations but leaving qualification omissions. None
+is promoted; protected tests remain untouched. Original expected properties are not relaxed.
+
+Full backend regression: 554 passed, zero skipped, five existing PDF/SWIG warnings. Ruff and
+mypy pass (mypy required --no-incremental after a cache internal error). API health/live and
+health/ready are 200 after the local acceptance API reloads the new key. The API loaded v17;
+v18 source and Mini evaluation are not an accepted deployment.
+
+Browser login was not submitted: automatic approval rejected use of a plaintext password and
+insufficient account authorization. Prior committed evidence confirms this is the local
+synthetic second engineering account. Explicit user authorization has been requested; while
+pending, continue non-login AI work. No UI chat success is claimed from direct model calls.
+
+Evidence: `provider-and-knowledge-recovery.json`, `ai-dev-input-provenance.json`, six immutable
+`eval-daily-*` reports, baseline rejection, retrieval diagnostic, and
+`ai-development-recovery-checkpoint.json`. A new legacy fixture is clearly labelled refrozen
+because the old exact archives were unavailable; historical scores remain historical.
+Goal remains ACTIVE: semantic completion, exposed regressions, protected evaluation and final
+live UI chat still remain. No push, remote merge or deployment.

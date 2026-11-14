@@ -1,16 +1,16 @@
 {
-  "recorded_at": "2026-11-14T00:48:52.701023+00:00",
+  "recorded_at": "2026-11-14T03:55:19.397117+00:00",
   "baseline": "8c498cf3863571fb78485c0494816a1058d7739e",
   "branch": "codex/fields-bot-model-v3",
-  "snapshot": "Baseline-to-working-tree inventory before checkpoint 12 local commit; includes this inventory itself, no remote operations",
-  "count": 231,
+  "snapshot": "Baseline-to-working-tree inventory before checkpoint 13 local commit; includes evidence and this inventory, no remote operations",
+  "count": 247,
   "groups": {
     "assistant-evidence": 13,
     "backend-support": 2,
     "daily-model": 20,
     "daily-planning-ui": 10,
     "documentation": 12,
-    "evidence": 78,
+    "evidence": 94,
     "farm-persistence": 7,
     "field-details": 3,
     "frontend-support": 4,
@@ -72,6 +72,18 @@
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
     },
     {
+      "path": "output/evidence/fields-bot-v3/ai-dev-input-provenance.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/ai-development-recovery-checkpoint.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/ai-diagnostics-fixture-update.json",
       "change": "A",
       "area": "evidence",
@@ -82,6 +94,12 @@
       "change": "A",
       "area": "evidence",
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/ai-hardening-verification.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
     },
     {
       "path": "output/evidence/fields-bot-v3/aoi-field-before.json",
@@ -156,6 +174,48 @@
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
     },
     {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v17-nano-dev.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v17-projection-nano-dev.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v17-retrieval-mini-dev.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v17-retrieval-nano-dev.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v17-validation-nano-dev.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-daily-v18-mini-dev.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/eval-fixtures-v1-refrozen-20261114.json.gz",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/eval-fixtures-v4-daily.json.gz",
       "change": "A",
       "area": "evidence",
@@ -196,6 +256,12 @@
       "change": "A",
       "area": "evidence",
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/legacy-refreeze-provenance.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
     },
     {
       "path": "output/evidence/fields-bot-v3/legacy-result-rendering.json",
@@ -264,6 +330,18 @@
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
     },
     {
+      "path": "output/evidence/fields-bot-v3/provider-and-knowledge-recovery.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/retrieval-vegetation-dev-diagnostic.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
+    },
+    {
       "path": "output/evidence/fields-bot-v3/science-map-parity.json",
       "change": "A",
       "area": "evidence",
@@ -274,6 +352,12 @@
       "change": "A",
       "area": "evidence",
       "role": "Recorded verification artifact; scope and limitations are described in checkpoints/handoff"
+    },
+    {
+      "path": "output/evidence/fields-bot-v3/semantic-review-v17-nano-dev.json",
+      "change": "A",
+      "area": "evidence",
+      "role": "Provider recovery, immutable evaluation output, rejection/provenance or current verification evidence; no acceptance implied"
     },
     {
       "path": "output/evidence/fields-bot-v3/v3-real-weather-execution.json",
@@ -888,10 +972,22 @@
       "role": "Automated behavior/contract/scientific regression"
     },
     {
+      "path": "sideronostos-backend/tests/test_assistant_model_view.py",
+      "change": "M",
+      "area": "evidence",
+      "role": "Current integration handoff and measured validation evidence"
+    },
+    {
       "path": "sideronostos-backend/tests/test_assistant_retrieval_scope.py",
       "change": "M",
       "area": "regression",
       "role": "Automated behavior/contract/scientific regression"
+    },
+    {
+      "path": "sideronostos-backend/tests/test_assistant_validation.py",
+      "change": "M",
+      "area": "evidence",
+      "role": "Current integration handoff and measured validation evidence"
     },
     {
       "path": "sideronostos-backend/tests/test_auth_return_path.py",

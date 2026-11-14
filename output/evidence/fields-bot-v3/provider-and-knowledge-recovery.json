@@ -1,0 +1,22 @@
+{
+  "schema": "provider-and-knowledge-recovery-v1",
+  "scope": "isolated engineering journey database only",
+  "credential": "User-provided replacement installed in ignored .env.local; value and share link excluded",
+  "env_permissions": "0o600",
+  "provider_embedding_probe": "passed with public test string; openai/text-embedding-3-small, 1536 dimensions",
+  "live_chat_probe": "daily development evaluation outputs are recorded separately, not a quality pass",
+  "release_id": "field-shift-knowledge-20261114-v5-daily",
+  "status": "published",
+  "manifest_sha256": "ec6630f4cdb0df798e80ea115eab0dcef1be2970721704f4beb6688b3d4b559d",
+  "embedding_model": "openai/text-embedding-3-small",
+  "embedding_dimensions": 1536,
+  "embedding_namespace": "7446a7464b3bd9afe531285d",
+  "counts": {
+    "sources": 47,
+    "claims": 28,
+    "chunks": 4911
+  },
+  "missing_embeddings": 0,
+  "new_public_embedding_tokens": 24093,
+  "overall_acceptance": "HOLD pending semantic quality, legacy regression and protected evaluations, then production UI chat"
+}

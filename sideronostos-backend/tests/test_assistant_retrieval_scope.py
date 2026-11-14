@@ -41,3 +41,14 @@ def test_daily_workflow_retrieves_its_own_versioned_help():
     assert intents.retrieval_sources("在哪里检查资料？", "guide", daily) == ["HELPV3"]
     assert intents.retrieval_sources("在哪里填写旧版预算？", "guide", legacy) == ["HELPV2"]
     assert intents.retrieval_sources("如何开始规划？", "guide", {"run": None}) == ["HELPV3"]
+
+
+def test_vegetation_diagnosis_queries_bridge_to_literature_without_source_pinning():
+    for question in [
+        "植被指数偏弱，可以据此确定是哪一种病并开药吗？",
+        "Can NDVI diagnose the disease in my crop?",
+    ]:
+        expanded = intents.retrieval_query(question)
+        assert expanded.startswith(question)
+        assert "remote sensing" in expanded and "stress diagnosis" in expanded
+    assert intents.retrieval_query("哪里导出我的方案？") == "哪里导出我的方案？"

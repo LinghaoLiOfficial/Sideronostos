@@ -1,0 +1,110 @@
+[
+  {
+    "query": "植被指数偏弱，可以据此确定是哪一种病并开药吗？ vegetation index remote sensing plant disease detection stress diagnosis",
+    "embedding_tokens": 40,
+    "hits": [
+      {
+        "source": "S21",
+        "page": 10,
+        "chunk_id": "e7083a44ef3174c55ca8404dcfd6cd9627021126",
+        "excerpt": "index by PCA-RF method; SDCI = scaled drought condition index; SDI = synthesized drought index; SIF = solar-induced chlorophyll fluorescence; SM = soil moisture; SMCI = soil moisture condition index; SPEI = standardized precipitation evapotranpiration index; TCI = temperature condition index; TRMM = Tropical Rainfall Measuring Mission; USDM = U.S. Drought Monitor; VCI = vegetation condition index; VegDRI = vegetation drought response index; Z-index = Palmer moisture anomaly index. Because drought is a recurrent phenomenon that is highly associated with climate variabilities [ 60 ], many indices involve the relative differences of indicators, such as the departure of the indicators from their long-term averages, to qualitatively reflect the impacts of drought; these indices include the precipitation condition index (PCI), soil moisture condition index (SMCI), VCI, TCI, and many other indices [ 61 ]. All of these indices are normalized over a given reference period. However, there is also a lack of any standardized method for converting the differential values of indices into drought severity information. Limitations on determining the impacts of nutrients, diseases and pests on"
+      },
+      {
+        "source": "S21",
+        "page": 9,
+        "chunk_id": "a53eff22ef0ee890fdc3b9a63df54e3955305474",
+        "excerpt": "for detecting meteorological droughts caused by climate variabilities, such as the standardized precipitation index (SPI), the standardized precipitation evapotranspiration index (SPEI) and the Palmer drought severity index (PDSI). Drought conditions directly affect the morphology, greenness, photosynthesis, biomass accumulation, and evapotranspiration of crops. Many vegetation-based agricultural drought indices have been developed, such as the vegetation condition index (VCI) and mean vegetation condition index (MVCI). Given that drought events cause soil moisture drying and land surface temperature (LST) changes, the temperature condition index (TCI) based on LSTs, soil moisture agricultural drought index (SMADI) [ 22 , 59 ], evaporative stress index (ESI) and hydrothermal weather index (HWI) have been proposed to determine agricultural drought conditions. The LST is a timely response indicator that can reflect crop stress before substantial visual symptoms arise [ 23 ]. The popular VHI is the combination of VCI and TCI reflecting both biophysical and environmental conditions. However, some of the indices developed for detecting drought compensate for the difference between"
+      },
+      {
+        "source": "S44",
+        "page": 4,
+        "chunk_id": "5a043d8faa609138b139124c064884185451b9ba",
+        "excerpt": "1 1 Introduction One of the primary interests of the Earth Observing System (EOS) program is to study the quantity and role of terrestrial vegetation in large-scale global processes with the goal of understanding how the Earth functions as a system. This requires an understanding of the global distribution of vegetation types as well as their biophysical and structural properties and spatial/temporal variations. Vegetation Indices (VI) are robust, empirical measures of vegetation activity at the land surface. They are designed to enhance the vegetation reflected signal from measured spectral responses by combining two (or more) wavebands, often in the red (0.6 - 0.7 µm) and NIR wavelengths (0.7-1.1 µm) regions. 1.1 The MODIS vegetation index (VI) products The MODIS VI products (MOD13) provide consistent, spatial and temporal time series comparisons of global vegetation conditions that can be used to monitor the Earth’s terrestrial photosynthetic vegetation activity in support of phenology, change detection, and biophysical interpretations. Gridded vegetation index maps depicting spatial and temporal variations in vegetation activity are derived at 16-day and monthly intervals in"
+      },
+      {
+        "source": "S14",
+        "page": 5,
+        "chunk_id": "194586163147ad7d408eec73ff3f8930ab4d557a",
+        "excerpt": "Esquivel, Diego A. 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 VIIRS/NPP Vegetation Indices 16-Day L3 Global 500m SIN Grid V002 Seasonal agricultural vulnerability in semi-arid Morocco: combining remote sensing and farmer knowledge to inform climate adaptation Alvarez, Cesar Ivan, Govind, Ajit, Bollas, Anna Munoz, Waha, Katharina, Labbaci, Adnane 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V006 Social status as a developmental process in wild vervet monkeys: beyond maternal inheritance Vilette, Chloe, Nord, Christina M., Bonnell, Tyler R., Dostie, Marcus J., McFarland, Richard, Young, Christopher, Henzi, S. Peter, Barrett, Louise 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 VIIRS/NPP Vegetation Indices 16-Day L3 Global 500m SIN Grid V002 Spatio-temporal Analysis of Forest Degradation and Its Biomass Carbon Model in Sumatra Zahira, Dhia Zalfa, Sakti, Anjar Dimara, Wikantika, Ketut 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 MODIS/Terra Net Primary Production Gap-Filled Yearly L4 Global 500m SIN Grid V061"
+      },
+      {
+        "source": "S20",
+        "page": 20,
+        "chunk_id": "6095a5206c6217602559daf6910077682f4b74c6",
+        "excerpt": "This article is protected by copyright. All rights reserved normalized difference vegetation index, leaf area index or soil moisture, for example (see Yuan et al., 2019). In contrast, prognostic models aim to represent ecosystem dynamics with numerical representations of processes using semi-empirical to fully mechanistic approaches (Bonan et al., 2003). These include the category of ‘dynamic global vegetation models’ that represent demography via establishment, growth and mortality (Sitch et al., 2013). Plant physiological responses to VPD are linked to vegetation mortality in land-surface models in one or more of several interacting ways, these include; carbon deficits via negative net primary production (NPP) or declines in growth efficiency and water stress via hydraulic failure, in addition to mortality via non-VPD related processes such as heat stress or light competition (Prentice et al., 2007; McDowell et al., 2011). Land-surface models operate on the principle of balancing water demand with water supply. The models generally compute atmospheric water demand, i.e., Edemand or VPD, by using gridded fields of observed or simulated vapor pressure (Harris et al., 2013) using"
+      },
+      {
+        "source": "S46",
+        "page": 18,
+        "chunk_id": "1b6629d0d694156f1d723b663d53d5f355f96723",
+        "excerpt": "data for multiscale studies. Adv. Space Res. 1996, 17, 107–110. [CrossRef] 32. Justice, C.O.; Vermote, E.; Townshend, J.R.G.; Defries, R.; Roy, D.P.; Hall, D.K.; Salomonson, V.V.; Privette, J.L.; Riggs, G.; Strahler, A.; et al. The moderate resolution imaging spectroradiometer (MODIS): Land remote sensing for global change research. IEEE Trans. Geosci. Remote Sens. 1998, 36, 1228–1249. [CrossRef] 33. Didan, K. MOD13Q1 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V006. NASA EOSDIS Land Processes DAAC, 2015. Available online: https://lpdaac.usgs.gov/node/844 (accessed on 20 March 2017). 34. Rouse, J.W., Jr.; Haas, R.H.; Schell, J.A.; Deering, D.W. Monitoring the Vernal Advancement and Retrogradation (Green Wave Effect) of Natural Vegetation; Progress Report RSC 1978-1; Remote Sensing Center, Texas A&M University: College Station, TX, USA, 1973. 35. Huete, A.; Didan, K.; Miura, T.; Rodriguez, E.P.; Gao, X.; Ferreira, L.G. Overview of the radiometric and biophysical performance of the MODIS vegetation indices. Remote Sens. Environ. 2002, 83, 195–213. [CrossRef] 36. Torres, R.; Snoeji, P.; Geudtner, D.; Bibby, D.; Davidson, M.; Attema, E.; Potin, P.; Rommen, B.;"
+      },
+      {
+        "source": "S34",
+        "page": 18,
+        "chunk_id": "982271475a06000d5a57834e41d1ffe6e0c08e46",
+        "excerpt": "(2018). Partitioning of evapotranspiration in remote sensing‐based models. Agricultural and Forest Meteorology, 260, 131–143. Twine, T. E., Kustas, W. P., Norman, J. M., Cook, D. R., Houser, P. R., Meyers, T. P., et al. (2000). Correcting eddy‐covariance ﬂux underestimates over a grassland. Agricultural and Forest Meteorology, 103(3), 279–300. Vergopolan, N., & Fisher, J. B. (2016). The impact of deforestation on the hydrological cycle in Amazonia as observed from remote sensing. International Journal of Remote Sensing, 37(22), 5412–5430. Verma, M., Fisher, J. B., Mallick, K., Ryu, Y., Kobayashi, H., Guillaume, A., et al. (2016). Global surface net‐radiation at 5 km from MODIS Terra. Remote Sensing, 8(739), 1–20. Vicente‐Serrano, S. M., Beguería, S., & López‐Moreno, J. I. (2010). A multiscalar drought index sensitive to global warming: The standar- dized precipitation evapotranspiration index. Journal of Climate, 23(7), 1696–1718. Vinukollu, R. K., Wood, E. F., Ferguson, C. R., & Fisher, J. B. (2011). Global estimates of evapotranspiration for climate studies using multi‐sensor remote sensing data: Evaluation of three process‐based approaches. Remote Sensing of Environment, 115,"
+      },
+      {
+        "source": "S14",
+        "page": 4,
+        "chunk_id": "49733e86b27e076841574d0767ef1b84da5d05e0",
+        "excerpt": "Downloaded source text snapshot | 2 November 2026 | Original retained separately PDF page 4 Use Remote Sensing Data to Study Vegetation Dynamics Learn how remote sensing is used to determine the unique spectral characteristics of plants. Tutorial Oct. 29, 2018 Get Started with MODIS Vegetation Indices Data Part 1: All About Accessing Data Learn how to access and use Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices data. Tutorial April 10, 2017 Get Started with MODIS Vegetation Indices Data Part 2: Using the Data Learn how to access and use Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices data. Tutorial April 10, 2017 Get Started with MODIS Vegetation Indices Data Part 3: Interpreting Quality Information Learn how to interpret Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices quality data by understanding layers, decoding bits, and using tools for quality assessment. Tutorial April 10, 2017 SHOWING 6 OF 6 Items 4 8 12 16 Get Help QUESTIONS & SUPPORT Have a question? Get help with NASA Earth science data, datasets, tools, services, and metadata on the Earthdata Forum. Experienced staff in the data user community"
+      }
+    ]
+  },
+  {
+    "query": "植被指数偏弱，可以据此确定是哪一种病并开药吗？ vegetation index plant stress drought disease diagnosis remote sensing limitations",
+    "embedding_tokens": 41,
+    "hits": [
+      {
+        "source": "S21",
+        "page": 10,
+        "chunk_id": "e7083a44ef3174c55ca8404dcfd6cd9627021126",
+        "excerpt": "index by PCA-RF method; SDCI = scaled drought condition index; SDI = synthesized drought index; SIF = solar-induced chlorophyll fluorescence; SM = soil moisture; SMCI = soil moisture condition index; SPEI = standardized precipitation evapotranpiration index; TCI = temperature condition index; TRMM = Tropical Rainfall Measuring Mission; USDM = U.S. Drought Monitor; VCI = vegetation condition index; VegDRI = vegetation drought response index; Z-index = Palmer moisture anomaly index. Because drought is a recurrent phenomenon that is highly associated with climate variabilities [ 60 ], many indices involve the relative differences of indicators, such as the departure of the indicators from their long-term averages, to qualitatively reflect the impacts of drought; these indices include the precipitation condition index (PCI), soil moisture condition index (SMCI), VCI, TCI, and many other indices [ 61 ]. All of these indices are normalized over a given reference period. However, there is also a lack of any standardized method for converting the differential values of indices into drought severity information. Limitations on determining the impacts of nutrients, diseases and pests on"
+      },
+      {
+        "source": "S21",
+        "page": 9,
+        "chunk_id": "a53eff22ef0ee890fdc3b9a63df54e3955305474",
+        "excerpt": "for detecting meteorological droughts caused by climate variabilities, such as the standardized precipitation index (SPI), the standardized precipitation evapotranspiration index (SPEI) and the Palmer drought severity index (PDSI). Drought conditions directly affect the morphology, greenness, photosynthesis, biomass accumulation, and evapotranspiration of crops. Many vegetation-based agricultural drought indices have been developed, such as the vegetation condition index (VCI) and mean vegetation condition index (MVCI). Given that drought events cause soil moisture drying and land surface temperature (LST) changes, the temperature condition index (TCI) based on LSTs, soil moisture agricultural drought index (SMADI) [ 22 , 59 ], evaporative stress index (ESI) and hydrothermal weather index (HWI) have been proposed to determine agricultural drought conditions. The LST is a timely response indicator that can reflect crop stress before substantial visual symptoms arise [ 23 ]. The popular VHI is the combination of VCI and TCI reflecting both biophysical and environmental conditions. However, some of the indices developed for detecting drought compensate for the difference between"
+      },
+      {
+        "source": "S14",
+        "page": 5,
+        "chunk_id": "194586163147ad7d408eec73ff3f8930ab4d557a",
+        "excerpt": "Esquivel, Diego A. 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 VIIRS/NPP Vegetation Indices 16-Day L3 Global 500m SIN Grid V002 Seasonal agricultural vulnerability in semi-arid Morocco: combining remote sensing and farmer knowledge to inform climate adaptation Alvarez, Cesar Ivan, Govind, Ajit, Bollas, Anna Munoz, Waha, Katharina, Labbaci, Adnane 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V006 Social status as a developmental process in wild vervet monkeys: beyond maternal inheritance Vilette, Chloe, Nord, Christina M., Bonnell, Tyler R., Dostie, Marcus J., McFarland, Richard, Young, Christopher, Henzi, S. Peter, Barrett, Louise 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 VIIRS/NPP Vegetation Indices 16-Day L3 Global 500m SIN Grid V002 Spatio-temporal Analysis of Forest Degradation and Its Biomass Carbon Model in Sumatra Zahira, Dhia Zalfa, Sakti, Anjar Dimara, Wikantika, Ketut 2026 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061 MODIS/Terra Net Primary Production Gap-Filled Yearly L4 Global 500m SIN Grid V061"
+      },
+      {
+        "source": "S46",
+        "page": 18,
+        "chunk_id": "1b6629d0d694156f1d723b663d53d5f355f96723",
+        "excerpt": "data for multiscale studies. Adv. Space Res. 1996, 17, 107–110. [CrossRef] 32. Justice, C.O.; Vermote, E.; Townshend, J.R.G.; Defries, R.; Roy, D.P.; Hall, D.K.; Salomonson, V.V.; Privette, J.L.; Riggs, G.; Strahler, A.; et al. The moderate resolution imaging spectroradiometer (MODIS): Land remote sensing for global change research. IEEE Trans. Geosci. Remote Sens. 1998, 36, 1228–1249. [CrossRef] 33. Didan, K. MOD13Q1 MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V006. NASA EOSDIS Land Processes DAAC, 2015. Available online: https://lpdaac.usgs.gov/node/844 (accessed on 20 March 2017). 34. Rouse, J.W., Jr.; Haas, R.H.; Schell, J.A.; Deering, D.W. Monitoring the Vernal Advancement and Retrogradation (Green Wave Effect) of Natural Vegetation; Progress Report RSC 1978-1; Remote Sensing Center, Texas A&M University: College Station, TX, USA, 1973. 35. Huete, A.; Didan, K.; Miura, T.; Rodriguez, E.P.; Gao, X.; Ferreira, L.G. Overview of the radiometric and biophysical performance of the MODIS vegetation indices. Remote Sens. Environ. 2002, 83, 195–213. [CrossRef] 36. Torres, R.; Snoeji, P.; Geudtner, D.; Bibby, D.; Davidson, M.; Attema, E.; Potin, P.; Rommen, B.;"
+      },
+      {
+        "source": "S20",
+        "page": 20,
+        "chunk_id": "6095a5206c6217602559daf6910077682f4b74c6",
+        "excerpt": "This article is protected by copyright. All rights reserved normalized difference vegetation index, leaf area index or soil moisture, for example (see Yuan et al., 2019). In contrast, prognostic models aim to represent ecosystem dynamics with numerical representations of processes using semi-empirical to fully mechanistic approaches (Bonan et al., 2003). These include the category of ‘dynamic global vegetation models’ that represent demography via establishment, growth and mortality (Sitch et al., 2013). Plant physiological responses to VPD are linked to vegetation mortality in land-surface models in one or more of several interacting ways, these include; carbon deficits via negative net primary production (NPP) or declines in growth efficiency and water stress via hydraulic failure, in addition to mortality via non-VPD related processes such as heat stress or light competition (Prentice et al., 2007; McDowell et al., 2011). Land-surface models operate on the principle of balancing water demand with water supply. The models generally compute atmospheric water demand, i.e., Edemand or VPD, by using gridded fields of observed or simulated vapor pressure (Harris et al., 2013) using"
+      },
+      {
+        "source": "S34",
+        "page": 18,
+        "chunk_id": "982271475a06000d5a57834e41d1ffe6e0c08e46",
+        "excerpt": "(2018). Partitioning of evapotranspiration in remote sensing‐based models. Agricultural and Forest Meteorology, 260, 131–143. Twine, T. E., Kustas, W. P., Norman, J. M., Cook, D. R., Houser, P. R., Meyers, T. P., et al. (2000). Correcting eddy‐covariance ﬂux underestimates over a grassland. Agricultural and Forest Meteorology, 103(3), 279–300. Vergopolan, N., & Fisher, J. B. (2016). The impact of deforestation on the hydrological cycle in Amazonia as observed from remote sensing. International Journal of Remote Sensing, 37(22), 5412–5430. Verma, M., Fisher, J. B., Mallick, K., Ryu, Y., Kobayashi, H., Guillaume, A., et al. (2016). Global surface net‐radiation at 5 km from MODIS Terra. Remote Sensing, 8(739), 1–20. Vicente‐Serrano, S. M., Beguería, S., & López‐Moreno, J. I. (2010). A multiscalar drought index sensitive to global warming: The standar- dized precipitation evapotranspiration index. Journal of Climate, 23(7), 1696–1718. Vinukollu, R. K., Wood, E. F., Ferguson, C. R., & Fisher, J. B. (2011). Global estimates of evapotranspiration for climate studies using multi‐sensor remote sensing data: Evaluation of three process‐based approaches. Remote Sensing of Environment, 115,"
+      },
+      {
+        "source": "S44",
+        "page": 4,
+        "chunk_id": "5a043d8faa609138b139124c064884185451b9ba",
+        "excerpt": "1 1 Introduction One of the primary interests of the Earth Observing System (EOS) program is to study the quantity and role of terrestrial vegetation in large-scale global processes with the goal of understanding how the Earth functions as a system. This requires an understanding of the global distribution of vegetation types as well as their biophysical and structural properties and spatial/temporal variations. Vegetation Indices (VI) are robust, empirical measures of vegetation activity at the land surface. They are designed to enhance the vegetation reflected signal from measured spectral responses by combining two (or more) wavebands, often in the red (0.6 - 0.7 µm) and NIR wavelengths (0.7-1.1 µm) regions. 1.1 The MODIS vegetation index (VI) products The MODIS VI products (MOD13) provide consistent, spatial and temporal time series comparisons of global vegetation conditions that can be used to monitor the Earth’s terrestrial photosynthetic vegetation activity in support of phenology, change detection, and biophysical interpretations. Gridded vegetation index maps depicting spatial and temporal variations in vegetation activity are derived at 16-day and monthly intervals in"
+      },
+      {
+        "source": "S14",
+        "page": 4,
+        "chunk_id": "49733e86b27e076841574d0767ef1b84da5d05e0",
+        "excerpt": "Downloaded source text snapshot | 2 November 2026 | Original retained separately PDF page 4 Use Remote Sensing Data to Study Vegetation Dynamics Learn how remote sensing is used to determine the unique spectral characteristics of plants. Tutorial Oct. 29, 2018 Get Started with MODIS Vegetation Indices Data Part 1: All About Accessing Data Learn how to access and use Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices data. Tutorial April 10, 2017 Get Started with MODIS Vegetation Indices Data Part 2: Using the Data Learn how to access and use Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices data. Tutorial April 10, 2017 Get Started with MODIS Vegetation Indices Data Part 3: Interpreting Quality Information Learn how to interpret Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices quality data by understanding layers, decoding bits, and using tools for quality assessment. Tutorial April 10, 2017 SHOWING 6 OF 6 Items 4 8 12 16 Get Help QUESTIONS & SUPPORT Have a question? Get help with NASA Earth science data, datasets, tools, services, and metadata on the Earthdata Forum. Experienced staff in the data user community"
+      }
+    ]
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "schema": "assistant-development-diagnosis-v1",
+  "report": "eval-daily-v17-nano-dev.json",
+  "report_sha256": "822e42b0db2bf649d176352443c510a5db2063443befa87ac81edd789f0107b0",
+  "reviewer": "implementation agent, manual bilingual review; not independent agronomist/farmer",
+  "decision": "reject",
+  "scope": "All rendered developer answers read. Listed failures are sufficient to reject; unlisted attempts are not claimed to have passed a full citation-entailment audit.",
+  "hard_gate_failures": [
+    {
+      "attempt_id": "daily-v4-01/1",
+      "category": "clarity",
+      "finding": "Exposes daily_metrics=true instead of farmer language; metric meanings are otherwise provided."
+    },
+    {
+      "attempt_id": "daily-v4-01/2",
+      "category": "semantic",
+      "finding": "Incorrectly treats field area as one of the six metrics and says the other five while listing six."
+    },
+    {
+      "attempt_id": "daily-v4-02/1",
+      "category": "context_projection",
+      "finding": "Claims no option results despite frozen alternatives; both options phrase did not select comparison projection."
+    },
+    {
+      "attempt_id": "daily-v4-03/1",
+      "category": "numeric_scope",
+      "finding": "Presents first daily gap 9.20 m3 as overall water shortage, repeats unit, and omits bounded 12-of-30 detail."
+    },
+    {
+      "attempt_id": "daily-v4-03/2",
+      "category": "numeric_scope",
+      "finding": "States 30 constraints but again presents the first daily gap as the overall shortage and omits shown count."
+    },
+    {
+      "attempt_id": "daily-v4-08/1",
+      "category": "completeness",
+      "finding": "Correctly refuses writes but does not explicitly say displayed results still belong to old conditions."
+    },
+    {
+      "attempt_id": "daily-v4-10/2",
+      "category": "language",
+      "finding": "Answers an English request in Chinese; internal implementation_ready key exposed."
+    },
+    {
+      "attempt_id": "daily-v4-11/1",
+      "category": "retrieval_and_support",
+      "finding": "No annotated relevant source retrieved; adds specific diagnostic procedures not established by cited DATAV3/HELPV3/S03 passages."
+    },
+    {
+      "attempt_id": "daily-v4-12/1",
+      "category": "requirement",
+      "finding": "Does not ask for a specific option; claims advantages for an unselected plan."
+    }
+  ],
+  "retrieval_recall": 0.75,
+  "protected_tests_run": false,
+  "comparison_policy": "Frozen case questions, expectations, fixture bytes, and original reports preserved. No score improvement claimed from unit tests."
+}

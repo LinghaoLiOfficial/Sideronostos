@@ -1,0 +1,13 @@
+{
+  "schema": "legacy-regression-refreeze-v1",
+  "sha256": "165b6c278e0e88482fe836194e57d4a37b838a84e1549fa6b5252fa17c5fb569",
+  "case_sha256": "41985bfa558fb7a58108b44bd0440e050c7d3d5b5ebc4888acf7ae1fec7a6134",
+  "cases": 60,
+  "owner_gates": {
+    "run": true,
+    "field": true,
+    "selection": true
+  },
+  "origin": "Existing prepare.py, synthetic North/South benchmark fields and public published weather/SMAP; original v2 solver executed in rollback-only transaction.",
+  "limitation": "Historical rotation-v2 evaluation fixtures/reports referenced by README were not present in this checkout or the bounded prior-workspace search. This new freeze supports current legacy regression, not a paired re-score on the original historical inputs. Original documented scores remain unchanged."
+}

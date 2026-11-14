@@ -1,3 +1,28 @@
+# Current evaluation status — 2026-11-14 credential recovery
+
+The new local credential cleared the embedding block. The isolated release
+`field-shift-knowledge-20261114-v5-daily` is published with 4,911/4,911 vectors.
+Six real development batches are archived under `output/evidence/fields-bot-v3`:
+Nano baseline, projection, validation, retrieval; Mini v17; Mini v18.
+Case/fixture hashes are unchanged. Retrieval reaches 4/4 annotated cases, but semantic
+acceptance remains HOLD. Nano substituted disease severity for drought severity even with
+the correct passage. Mini improved wording but still omits required qualifications; v18 is
+not approved. Production model settings remain Nano; Mini is a process-local candidate.
+
+Read `ai-development-recovery-checkpoint.json` before continuing. It records exact hashes,
+remaining failures, costs, and the original runner's misleading `answer_tokens` label
+(which counts input+output tokens). No protected cases have been generated. Development
+plus exposed regression must pass the unchanged rubric before a `promote_to_held_out` review.
+
+The old rotation-v2 reports/fixtures referenced below were absent from this checkout and
+bounded prior-workspace searches. A new synthetic legacy v1 freeze is archived as
+`eval-fixtures-v1-refrozen-20261114.json.gz`, with provenance in
+`legacy-refreeze-provenance.json`. It is not a paired re-score on the old inputs. Preserve
+all historical scores and original case expectations. No real farmer pilot data is used.
+
+The remaining sections retain the historical preparation/replay record; their earlier
+provider-blocked and pre-generation descriptions are superseded by this status.
+
 # Rotation evaluation: real runs and offline replay
 
 The real evaluator is `run.py`. The offline diagnostic is `replay.py`; it reads an archived report and its exact frozen fixture, with no database, embedding or model calls. They answer different questions.

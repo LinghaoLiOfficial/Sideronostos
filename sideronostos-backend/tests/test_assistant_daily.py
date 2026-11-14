@@ -268,3 +268,38 @@ def test_preparation_error_details_are_bounded_without_hiding_total(daily_run):
     assert any(
         "full" in line for line in lookup["current.preparation.shown_error_count"]["limitations"]
     )
+
+
+def test_resource_amounts_are_linked_to_their_own_date_not_a_plan_total(daily_run):
+    option = daily_run["result"]["options"][0]
+    option["verification"].update(
+        diagnostic=True,
+        resource_feasible=False,
+        gap_cost=60,
+        resources=[
+            {
+                "id": "water:shared:2027-04-20",
+                "kind": "water",
+                "used": 10,
+                "capacity": 4,
+                "gap": 6,
+                "unit": "m3",
+                "gap_cost": 60,
+                "remedy": "Confirm additional allocation",
+                "evidence_ids": [],
+            }
+        ],
+    )
+    facts, view = projected(daily_run, "这个方案供水缺口是多少？")
+    gap = next(f for f in facts if f["key"] == "current.option-1.resource.0.gap")
+    date_fact = next(f for f in facts if f["key"] == "current.option-1.resource.0.date")
+    projected_gap = next(f for f in view["facts"] if f["id"] == gap["id"])
+    assert projected_gap["scope"] == "single_resource_constraint_not_plan_total"
+    assert projected_gap["date_reference"] == "{{" + date_fact["id"] + "}}"
+    assert projected_gap["quantity_kind"] == "gap"
+    assert projected_gap["resource_group"]
+    assert "2027-04-20" not in projected_gap["resource_group"]
+    overview = view["context"]["resource_gap_overviews"][0]
+    assert overview["details_truncated"] is False
+    assert overview["gap_total_reference"] is None
+    assert overview["count_reference"] and overview["shown_count_reference"]

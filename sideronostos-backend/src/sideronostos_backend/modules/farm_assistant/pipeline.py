@@ -132,6 +132,7 @@ async def generate_answer(
                 visible_knowledge,
                 allowed_actions=view["context"]["allowed_actions"],
                 can_claim_optimal=context["can_claim_optimal"],
+                answer_requirement=view["context"].get("answer_requirement"),
             )
         except ValueError as error:
             if attempt:

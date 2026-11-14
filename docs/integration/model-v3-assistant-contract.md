@@ -1,7 +1,8 @@
 # Daily v3 assistant evidence contract
 
-Status: deterministic projection/validation implemented; real v17 semantic evaluation and
-v3 vector release are NOT VERIFIED. A working model call alone is insufficient acceptance.
+Status: isolated v3 vector release is published and real development calls work. Semantic
+acceptance remains HOLD after v17/v18 development runs; no protected test has run.
+A working model call and retrieval recall alone are insufficient acceptance.
 
 ## Responsibilities and immutable identity
 
@@ -43,7 +44,7 @@ raw facts and server-computed change directions; the model must not invent numer
 
 ## Retrieval and answer validation
 
-Prompt candidate: `farmer-evidence-bound-20261114-v17-daily-diagnostics`. New workflows and daily runs use
+Prompt candidate: `farmer-evidence-bound-20261114-v18-scoped-explanations`. New workflows and daily runs use
 HELPV3. Old v1/v2 results retain compatible product help. V3 excludes HELPV2; old results
 exclude HELPV3/MODELV3/DATAV3 before lexical/vector rankings. The visible projection and
 citation binding repeat this scope so hidden/incompatible passages cannot become citations.
@@ -58,7 +59,8 @@ NASA modeling/data-requirement docs at commit 8c498cf. These product/model docum
 implementation authority, not independent agronomic validation. Source hashes and original
 URLs remain attached. The offline bundle is 47 sources / 4,911 chunks / 28 reviewed claims.
 The CLI's existing default manifest is unchanged; use the explicit v3 manifest for preparation
-and publication. No vector activation or real generation evaluation is claimed here.
+and publication. The isolated v5-daily release is published with all 4,911 vectors; actual development reports
+are archived in fields-bot-v3. No semantic promotion is claimed.
 
 ## Required next evidence
 
@@ -81,9 +83,29 @@ into a distinct-candidate count. Chat can suggest reviewing actual form inputs b
 relax hard limits or add irrigation infrastructure. The actual rainfed browser run supplies
 the regression: nine rejected candidates, no plan metric, no nonexistent option request.
 
-Prompt v17 and the failure adapter are unevaluated semantic candidates. The v5 input archive
+The pre-output v17 preparation stage preserved the case identity as follows. The v5 input archive
 preserves the original 26 case expectations and changes only the two failed-run contexts
 (7 added bound facts each). The other 24 contexts are byte-equivalent as JSON values.
 The v4 archive remains immutable. See `ai-diagnostics-fixture-update.json` for both hashes.
 All seven current owner/version gates and compact/full projection equivalence checks pass.
 No provider calls or held-out answer evaluations were made for this change.
+
+
+## Access recovery and development findings
+
+The replacement local credential cleared the embedding 403. Only public document text and
+explicit synthetic engineering contexts were evaluated. `provider-and-knowledge-recovery.json`
+records activation without credentials. All original case/fixture bytes remain unchanged.
+
+The compact projection now recognizes both/all options and explicitly groups each resource
+amount with its own date; row counts are not water totals. Server validation requires the
+matching date for numeric resource rows, rejects duplicate units and requires clarification
+for an unselected option. A negated implementation-proof statement is not an affirmative claim.
+The bilingual vegetation-diagnosis expansion bridges to English literature without source IDs.
+
+Nano still substituted disease severity for drought severity even after correct retrieval.
+Mini is an evaluation-only process override, not a production configuration change. Prompt
+v18 improved bounded gap explanations but still omitted required qualifications in other dev
+cases. Keep HOLD, preserve the 90% rubric/zero-error gates, and finish exposed regressions before
+protected evaluation. See `ai-development-recovery-checkpoint.json` for exact report hashes,
+provider-reported costs and remaining failures. No independent farmer review is claimed.
