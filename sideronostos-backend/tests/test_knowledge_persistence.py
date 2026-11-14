@@ -156,3 +156,20 @@ async def test_explicit_single_source_help_search_can_retrieve_more_than_two_sec
     hits = await search_release(session, release_id='help-test', query='water', vector=[0.7, 0.3],
                                 namespace='test', source_ids=['S0'], limit=8)
     assert len(hits) == 4
+
+
+async def test_source_exclusion_applies_to_both_rankings_before_fusion(session):
+    await stage(session)
+    for row in (await session.scalars(select(KnowledgeChunk))).all():
+        row.embedding = [0.7, 0.3]
+    await activate_release(session, "test-r1")
+    await session.commit()
+    hits = await search_release(
+        session,
+        release_id="test-r1",
+        query="soil",
+        vector=[0.7, 0.3],
+        namespace="test",
+        excluded_source_ids=["S0"],
+    )
+    assert hits and {hit["source"]["id"] for hit in hits} == {"S1"}

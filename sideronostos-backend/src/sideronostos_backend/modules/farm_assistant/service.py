@@ -48,6 +48,7 @@ def message_view(row: AssistantMessage) -> dict[str, Any]:
             ],
             "selection_kind": (row.context_snapshot.get("selection") or {}).get("kind"),
             "run_id": row.context_snapshot["reference"].get("run_id"),
+            "plan_id": row.context_snapshot["reference"].get("plan_id"),
             "option_id": row.context_snapshot["reference"].get("option_id"),
         },
         "response": row.response,

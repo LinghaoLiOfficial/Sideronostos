@@ -1457,5 +1457,6 @@
   "正在规划": "Planning",
   "个经营地块 · 地图选区用于查询背景": "managed fields · Map selections provide background data",
   "NASA 回测": "NASA backtest",
-  "导出种植表 CSV": "Export planting CSV"
+  "导出种植表 CSV": "Export planting CSV",
+  "所选方案不属于这次计算，请重新打开已存计划或选择方案。": "The selected option does not belong to this calculation. Reopen the saved plan or choose an option."
 }

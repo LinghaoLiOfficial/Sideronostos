@@ -16,7 +16,7 @@ from ..knowledge.retrieval import tokenize
 from ..knowledge.store import search_release
 from ..knowledge.web_search import search_web
 from .bot_scope import scoped_sources
-from .intents import classify, retrieval_query, retrieval_sources
+from .intents import classify, excluded_product_sources, retrieval_query, retrieval_sources
 from .model_view import model_view, redact_quantities
 from .prompts import DOMAIN_GUIDANCE, SYSTEM, VERSION
 from .schemas import ModelAnswer, Paragraph, generation_schema
@@ -57,8 +57,9 @@ async def collect_evidence(
         product=product,
         product_version="006" if product else None,
         source_ids=scoped_sources(
-            context.get("bot_id", "rotation-guide"), retrieval_sources(question, intent)
+            context.get("bot_id", "rotation-guide"), retrieval_sources(question, intent, context)
         ),
+        excluded_source_ids=excluded_product_sources(context),
         limit=get_assistant_settings().retrieval_limit,
     )
     knowledge = [{**hit, "chunk_id": hit["id"], "id": f"K{i + 1}"} for i, hit in enumerate(hits)]
@@ -157,8 +158,11 @@ async def generate_answer(
     validation_errors = []
     visible_ids = {v["id"] for v in view["facts"]}
     visible_facts = [f for f in evidence["facts"] if f["id"] in visible_ids]
+    visible_knowledge_ids = {k["id"] for k in view["knowledge"]}
+    visible_knowledge = [k for k in evidence["knowledge"] if k["id"] in visible_knowledge_ids]
     output_schema = generation_schema(
-        [fact["id"] for fact in view["facts"] if fact["render_reference"]]
+        [fact["id"] for fact in view["facts"] if fact["render_reference"]],
+        sorted(visible_ids | visible_knowledge_ids),
     )
     for attempt in range(2):
         # The service's enclosing deadline includes both calls. Transport failures
@@ -172,10 +176,11 @@ async def generate_answer(
             bound = bind_answer(
                 parsed,
                 visible_facts,
-                evidence["knowledge"],
+                visible_knowledge,
                 allowed_actions=view["context"]["allowed_actions"],
                 can_claim_optimal=context["can_claim_optimal"],
                 bot_id=bot_id,
+                answer_requirement=view["context"].get("answer_requirement"),
             )
         except ValueError as error:
             if attempt:
@@ -228,7 +233,7 @@ async def generate_answer(
         **bound,
         "intent": evidence["intent"],
         "facts": evidence["facts"],
-        "citations": evidence["knowledge"],
+        "citations": visible_knowledge,
         "warnings": context["warnings"],
         "retrieval_mode": evidence["retrieval_mode"],
         "kb_release_id": evidence["kb_release_id"],
