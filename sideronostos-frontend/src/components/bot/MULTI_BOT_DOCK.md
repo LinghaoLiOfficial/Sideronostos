@@ -1,16 +1,34 @@
 # SI module bot dock
 
-This UI slice mounts `MultiBotDock` on the four placeholder `/si` module pages. Its shared catalog is `src/lib/bot-catalog.ts`. The catalog gives each specialist a stable ID, module, EN/ZH name, avatar variant, hue, intended capability scope, planned backend preset, and honest fallback text.
+`MultiBotDock` mounts on the four placeholder `/si` module pages. It uses the
+shared `src/lib/bot-catalog.ts` registry with `/si/multi-agent`. The registry
+defines stable IDs, module, preset, EN/ZH names, avatar, color, and a bounded
+capability description.
 
-| Module | Specialist IDs | Planned preset |
+| Module | Bot IDs | Conversation preset |
 | --- | --- | --- |
 | Field management | `field-guide` | `field_management` |
 | Remote sensing | `remote-water`, `remote-soil`, `remote-weather` | `remote_sensing` |
 | Local knowledge | `local-knowledge-guide` | `local_agriculture` |
 | Rotation recommendation | `rotation-guide` | `rotation` |
 
-The current `main` backend accepts only `rotation`, and this SI dock does not call it. No module page has a conversation adapter yet. The panel reuses the familiar `Bot` shell but shows a localized unavailable state without a composer or send action. The functional rotation assistant in the existing planning workspace remains unchanged. The pending conversation branch adds four module presets, but its single `remote_sensing` preset does not itself enforce water, soil, and weather specialization. Integration must bind each catalog ID to a validated server-side scope before enabling chat.
+The dock requires an authenticated farmer before loading history or sending a
+message. It creates conversations with `bot_id` and accepts a listed or loaded
+conversation only when both its preset and bot ID match the selected identity.
+The server persists and validates that identity, scopes the remote specialists'
+facts and retrieval, and rejects actions outside their specialties. Weather
+answers use historical observations and must not claim a forecast. The dock
+supports chat, source viewing, voice draft entry, and persisted language;
+guided field and remote-sensing actions live in `/si/multi-agent`.
 
-The dock keeps one panel open at a time. Pointer hover expands the cluster; the count button provides explicit expansion on touch. Expanded avatars show localized short names, so color and shape are not the only cues. Focus also reveals avatars, Escape collapses and restores focus, and the fixed host lets clicks pass through to the page outside the dock. CSS handles the small layout and avatar transitions, including `prefers-reduced-motion`.
+Only one dock chat is open at a time. Pointer hover expands the cluster; the
+count button provides explicit expansion on touch. Expanded avatars show short
+names. Focus and Escape behavior restore the launcher, and the fixed host lets
+clicks pass through outside the dock. CSS handles mobile safe areas and
+reduced motion. The four module pages themselves still contain no underlying
+module workflow or map.
 
-Rendered checks used the current placeholder pages at desktop and 390 × 844 mobile width in EN/ZH. The pages have no map yet, so future map interaction needs an integrated check after real module content lands. Real touch hardware, 200% zoom, and assistive technology were not exercised in this UI-only slice.
+The integrated branch passed 278 frontend tests and scoped ESLint checks.
+Rendered checks covered desktop and a 390 × 844 mobile viewport with a local
+API stub. Real touch hardware, 200% zoom, a deployed backend, and assistive
+technology were not exercised for this dock.
