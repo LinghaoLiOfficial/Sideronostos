@@ -168,17 +168,41 @@ def append_run_facts(
 
 
 async def freeze_context(
-    session: AsyncSession, owner: str, reference: ContextRef, language: str
+    session: AsyncSession,
+    owner: str,
+    reference: ContextRef,
+    language: str,
+    *,
+    preset: str = "rotation",
 ) -> dict[str, Any]:
     facts: list[dict[str, Any]] = []
     fields = []
-    for ref in reference.fields:
-        row = await session.scalar(
-            select(FieldRecord).where(FieldRecord.id == ref.id, FieldRecord.owner_user_id == owner)
+    owned_fields = (
+        (
+            await session.scalars(
+                select(FieldRecord)
+                .where(FieldRecord.owner_user_id == owner)
+                .order_by(FieldRecord.updated_at.desc(), FieldRecord.id)
+                .limit(11)
+            )
+        ).all()
+        if preset == "field_management" and not reference.fields
+        else []
+    )
+    field_list_truncated = len(owned_fields) > 10
+    for ref in reference.fields or owned_fields[:10]:
+        row = (
+            ref
+            if isinstance(ref, FieldRecord)
+            else await session.scalar(
+                select(FieldRecord).where(
+                    FieldRecord.id == ref.id, FieldRecord.owner_user_id == owner
+                )
+            )
         )
         if row is None:
             raise HTTPException(404, "Context field not found")
-        if row.version != ref.expected_version:
+        if not isinstance(ref, FieldRecord) and row.version != ref.expected_version:
             raise HTTPException(409, "Context field version changed")
         field = {**row.data, "id": row.id, "version": row.version}
         fields.append(field)
@@ -201,7 +225,7 @@ async def freeze_context(
         "comparison": None,
         "v1_analysis": None,
         "facts": facts,
-        "warnings": [],
+        "warnings": ["field_list_truncated"] if field_list_truncated else [],
         "allowed_actions": ["open_planner", "choose_field", "view_sources"],
         "can_claim_optimal": False,
     }

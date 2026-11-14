@@ -16,7 +16,7 @@ def utcnow() -> datetime:
 class FarmerPreference(Base):
     __tablename__ = "assistant_preferences"
     owner_user_id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    language: Mapped[str] = mapped_column(String(8), default="zh")
+    language: Mapped[str] = mapped_column(String(8), default="en")
     detail: Mapped[str] = mapped_column(String(12), default="brief")
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
@@ -26,7 +26,7 @@ class Conversation(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
     preset: Mapped[str] = mapped_column(String(30), default="rotation")
-    language: Mapped[str] = mapped_column(String(8), default="zh")
+    language: Mapped[str] = mapped_column(String(8), default="en")
     detail: Mapped[str] = mapped_column(String(12), default="brief")
     kb_release_id: Mapped[str] = mapped_column(ForeignKey("knowledge_releases.id"))
     next_sequence: Mapped[int] = mapped_column(Integer, default=1)

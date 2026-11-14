@@ -159,7 +159,7 @@ class AssistantService:
     async def preferences(self, session: AsyncSession, owner: str) -> dict[str, str]:
         pref = await session.get(FarmerPreference, owner)
         return {
-            "language": pref.language if pref else "zh",
+            "language": pref.language if pref else "en",
             "detail": pref.detail if pref else "brief",
         }
 
@@ -232,7 +232,10 @@ class AssistantService:
         )
         if (active or 0) >= 2:
             raise HTTPException(429, "Please wait for your current replies to finish")
-        context = await freeze_context(session, owner, body.context, conversation.language)
+        context = await freeze_context(
+            session, owner, body.context, conversation.language, preset=conversation.preset
+        )
+        context["preset"] = conversation.preset
         context["language"] = conversation.language
         context["detail"] = conversation.detail
         context["kb_release_id"] = conversation.kb_release_id
@@ -377,7 +380,7 @@ async def process_message(factory: async_sessionmaker[AsyncSession], identifier:
     except Exception:
         error = "assistant_unavailable"
     if error:
-        zh = context.get("language", "zh") == "zh"
+        zh = context.get("language", "en") == "zh"
         response = {
             "paragraphs": [
                 {

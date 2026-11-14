@@ -14,7 +14,7 @@ from ..knowledge.models import KBRelease
 from ..knowledge.store import search_release
 from .intents import classify, retrieval_query, retrieval_sources
 from .model_view import model_view
-from .prompts import SYSTEM, VERSION
+from .prompts import DOMAIN_GUIDANCE, SYSTEM, VERSION
 from .schemas import ModelAnswer, generation_schema
 from .settings import get_assistant_settings
 from .validation import bind_answer
@@ -80,8 +80,10 @@ async def generate_answer(
 ) -> dict[str, Any]:
     settings = get_ai_settings().for_task("farm_assistant")
     view = model_view(question, context, evidence)
+    domain = context.get("preset", "rotation")
     messages: list[BaseMessage] = [
         SystemMessage(content=SYSTEM),
+        SystemMessage(content=DOMAIN_GUIDANCE[domain]),
         SystemMessage(
             content=(
                 "Write every paragraph in English. Keep source IDs only in evidence_ids."
@@ -93,6 +95,7 @@ async def generate_answer(
             content=json.dumps(
                 {
                     "question": question,
+                    "domain": domain,
                     "language": language,
                     "detail": detail,
                     "intent": evidence["intent"],

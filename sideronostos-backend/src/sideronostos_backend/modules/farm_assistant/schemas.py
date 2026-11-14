@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, create_mod
 
 Identifier = Annotated[str, Field(min_length=1, max_length=100)]
 Language = Literal["zh", "en"]
+Preset = Literal["field_management", "remote_sensing", "local_agriculture", "rotation"]
 Detail = Literal["brief", "detailed"]
 Action = Literal["open_planner", "edit_conditions", "choose_field", "view_sources"]
 Intent = Literal["learn", "explain_current", "guide", "compare_runs", "what_if_request"]
@@ -84,15 +85,15 @@ class ContextRef(Contract):
 
 
 class ConversationCreate(Contract):
-    preset: Literal["rotation"] = "rotation"
-    language: Language = "zh"
+    preset: Preset = "rotation"
+    language: Language = "en"
     detail: Detail = "brief"
 
 
 class MessageCreate(Contract):
     client_message_id: str = Field(min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
     text: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
-    context: ContextRef
+    context: ContextRef = Field(default_factory=lambda: ContextRef(page="map", revision=1))
 
 
 class Paragraph(Contract):
@@ -161,5 +162,5 @@ def generation_schema(fact_ids: list[str]) -> type[BaseModel]:
 
 
 class PreferenceInput(Contract):
-    language: Language = "zh"
+    language: Language = "en"
     detail: Detail = "brief"
