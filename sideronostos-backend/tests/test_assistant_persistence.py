@@ -2,14 +2,16 @@
 
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
+
 import pytest
 from fastapi import HTTPException
 from sqlalchemy import select
 from test_rotation_persistence import setup as setup
-from sideronostos_backend.modules.knowledge.models import KBActivation, KBRelease
+
 from sideronostos_backend.modules.farm_assistant.models import AssistantMessage
 from sideronostos_backend.modules.farm_assistant.schemas import ConversationCreate, MessageCreate
 from sideronostos_backend.modules.farm_assistant.service import AssistantService
+from sideronostos_backend.modules.knowledge.models import KBActivation, KBRelease
 
 pytestmark = pytest.mark.asyncio
 
@@ -72,6 +74,30 @@ async def test_message_idempotency_and_conversation_owner_checked_before_work(se
         assert busy.value.status_code == 409
 
 
+async def test_bot_identity_persists_through_create_list_and_detail(setup):
+    factory, owner, _, _ = setup
+    await conversation(factory, owner)  # Publishes synthetic knowledge for creation.
+    service = AssistantService()
+    async with factory() as session:
+        soil = await service.create_conversation(
+            session, owner, ConversationCreate(preset="remote_sensing", bot_id="remote-soil")
+        )
+        legacy = await service.create_conversation(
+            session, owner, ConversationCreate(preset="remote_sensing")
+        )
+        assert soil["bot_id"] == "remote-soil"
+        assert legacy["bot_id"] == "remote-water"
+        assert (await service.get_conversation(session, owner, soil["id"]))[
+            "bot_id"
+        ] == "remote-soil"
+        rows = await service.list_conversations(session, owner)
+        assert {row["id"]: row["bot_id"] for row in rows}[soil["id"]] == "remote-soil"
+        assert {row["id"]: row["bot_id"] for row in rows}[legacy["id"]] == "remote-water"
+        with pytest.raises(HTTPException) as denied:
+            await service.get_conversation(session, "other-owner", soil["id"])
+        assert denied.value.status_code == 404
+
+
 async def test_context_authority_and_pending_recovery_prevent_late_overwrite(setup):
     factory, owner, fid, _ = setup
     conv = await conversation(factory, owner)
@@ -120,10 +146,10 @@ async def test_context_authority_and_pending_recovery_prevent_late_overwrite(set
 
 
 async def test_run_only_context_retains_frozen_field_and_calendar_facts(setup):
-    from sideronostos_backend.modules.field_shift.models import FieldRecord
-    from sideronostos_backend.modules.rotation_optimizer.service import RotationService
     from sideronostos_backend.modules.farm_assistant.context import freeze_context
     from sideronostos_backend.modules.farm_assistant.schemas import ContextRef
+    from sideronostos_backend.modules.field_shift.models import FieldRecord
+    from sideronostos_backend.modules.rotation_optimizer.service import RotationService
 
     factory, owner, fid, request = setup
     async with factory() as s:

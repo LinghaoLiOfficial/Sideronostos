@@ -12,6 +12,7 @@ from ..ai.provider import StructuredInvocationError
 from ..knowledge.models import KBRelease
 from ..knowledge.store import active_release
 from ..rotation_optimizer.service import digest
+from .bot_scope import default_bot_id, scope_context
 from .context import freeze_context
 from .models import AssistantMessage, Conversation, FarmerPreference, utcnow
 from .pipeline import collect_evidence, generate_answer
@@ -23,6 +24,7 @@ def conversation_view(row: Conversation) -> dict[str, Any]:
     return {
         "id": row.id,
         "preset": row.preset,
+        "bot_id": row.bot_id,
         "language": row.language,
         "detail": row.detail,
         "kb_release_id": row.kb_release_id,
@@ -93,6 +95,7 @@ class AssistantService:
         row = Conversation(
             owner_user_id=owner,
             preset=body.preset,
+            bot_id=body.bot_id or default_bot_id(body.preset),
             language=language,
             detail=detail,
             kb_release_id=release.id,
@@ -235,7 +238,9 @@ class AssistantService:
         context = await freeze_context(
             session, owner, body.context, conversation.language, preset=conversation.preset
         )
+        context = scope_context(context, conversation.bot_id)
         context["preset"] = conversation.preset
+        context["bot_id"] = conversation.bot_id
         context["language"] = conversation.language
         context["detail"] = conversation.detail
         context["kb_release_id"] = conversation.kb_release_id

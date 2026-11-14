@@ -91,6 +91,7 @@ def bind_answer(
     *,
     allowed_actions: list[str],
     can_claim_optimal: bool,
+    bot_id: str = "rotation-guide",
 ) -> dict[str, Any]:
     values = {f["id"]: f for f in facts}
     sources = {k["id"] for k in knowledge} | set(values)
@@ -148,6 +149,19 @@ def bind_answer(
             raise ValueError("Unsupported agricultural guarantee")
         if not can_claim_optimal and affirmed(r"最优|\boptimal\b", remainder):
             raise ValueError("Unsupported optimality claim")
+        future = r"(?:明天|后天|下周|未来|tomorrow|next week|future)"
+        forecast_claim = (
+            future
+            + r"[^。.!?;；]{0,70}(?:会|将|可能|预计|下雨|放晴|will|is (?:rainy|dry|sunny))"
+            + r"|(?:\bcan forecast\b|可以预测)[^。.!?;；]{0,70}"
+            + future
+            + r"|\bwill\b[^。.!?;；]{0,40}(?:rain|be (?:dry|sunny))[^。.!?;；]{0,40}"
+            + future
+        )
+        if bot_id in {"remote-weather", "remote-water", "remote-soil"} and affirmed(
+            forecast_claim, remainder
+        ):
+            raise ValueError("Unsupported weather forecast claim")
         rendered = PLACEHOLDER.sub(lambda m: str(values[m.group(1)]["display"]), raw)
         paragraphs.append({"text": rendered, "evidence_ids": evidence_ids})
     return {

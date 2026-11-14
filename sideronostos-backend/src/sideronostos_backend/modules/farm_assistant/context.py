@@ -260,6 +260,7 @@ async def freeze_context(
                 item.get("unit", "m3/m3"),
                 {
                     "kind": item["data_kind"],
+                    "metric": item["metric"],
                     **item["source"],
                     "period": item["period"],
                     "status": item.get("status"),

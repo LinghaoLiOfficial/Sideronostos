@@ -17,6 +17,7 @@ from .agent_actions import (
     AgentActionService,
     PendingAction,
 )
+from .bot_scope import action_allowed, layer_allowed
 from .models import AssistantAction, utcnow
 from .service import AssistantService
 
@@ -119,6 +120,11 @@ class AssistantActionService:
         conversation = await AssistantService()._conversation(
             session, owner_user_id, conversation_id, lock=True
         )
+        metric = (
+            request.arguments.get("metric") if request.action == "remote_sensing.fact" else None
+        )
+        if not action_allowed(conversation.bot_id, request.action, metric):
+            raise HTTPException(422, "Action is outside this bot's specialty")
         row = await session.scalar(
             select(AssistantAction)
             .where(
@@ -180,6 +186,15 @@ class AssistantActionService:
             )
         except ActionConflict as error:
             raise HTTPException(409, str(error)) from error
+        if (
+            request.action == "remote_sensing.layer"
+            and outcome.status == "succeeded"
+            and not layer_allowed(
+                conversation.bot_id, ((outcome.result or {}).get("source") or {}).get("product")
+            )
+        ):
+            await session.rollback()
+            raise HTTPException(422, "Layer is outside this bot's specialty")
         if request.action == "field.create" and outcome.status == "succeeded":
             return outcome  # Journal committed field, action result, and audit together.
         row.status = outcome.status

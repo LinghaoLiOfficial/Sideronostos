@@ -4,6 +4,8 @@ from typing import Annotated, Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, create_model, model_validator
 
+from .bot_scope import BOT_PRESETS
+
 Identifier = Annotated[str, Field(min_length=1, max_length=100)]
 Language = Literal["zh", "en"]
 Preset = Literal["field_management", "remote_sensing", "local_agriculture", "rotation"]
@@ -86,8 +88,15 @@ class ContextRef(Contract):
 
 class ConversationCreate(Contract):
     preset: Preset = "rotation"
+    bot_id: str | None = None
     language: Language = "en"
     detail: Detail = "brief"
+
+    @model_validator(mode="after")
+    def matching_bot(self) -> Self:
+        if self.bot_id is not None and BOT_PRESETS.get(self.bot_id) != self.preset:
+            raise ValueError("Bot identity does not match the conversation preset")
+        return self
 
 
 class MessageCreate(Contract):

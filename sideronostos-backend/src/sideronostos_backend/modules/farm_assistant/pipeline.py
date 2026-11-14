@@ -12,6 +12,7 @@ from ..ai.settings import get_ai_settings
 from ..knowledge.embeddings import EmbeddingProvider, EmbeddingUnavailable
 from ..knowledge.models import KBRelease
 from ..knowledge.store import search_release
+from .bot_scope import scoped_sources
 from .intents import classify, retrieval_query, retrieval_sources
 from .model_view import model_view
 from .prompts import DOMAIN_GUIDANCE, SYSTEM, VERSION
@@ -50,7 +51,9 @@ async def collect_evidence(
         namespace=release.embedding_namespace,
         product=product,
         product_version="006" if product else None,
-        source_ids=retrieval_sources(question, intent),
+        source_ids=scoped_sources(
+            context.get("bot_id", "rotation-guide"), retrieval_sources(question, intent)
+        ),
         limit=get_assistant_settings().retrieval_limit,
     )
     knowledge = [{**hit, "chunk_id": hit["id"], "id": f"K{i + 1}"} for i, hit in enumerate(hits)]
@@ -81,9 +84,24 @@ async def generate_answer(
     settings = get_ai_settings().for_task("farm_assistant")
     view = model_view(question, context, evidence)
     domain = context.get("preset", "rotation")
+    bot_id = context.get("bot_id", "rotation-guide")
     messages: list[BaseMessage] = [
         SystemMessage(content=SYSTEM),
         SystemMessage(content=DOMAIN_GUIDANCE[domain]),
+        SystemMessage(
+            content=(
+                "This is the historical weather specialist. Explain only supplied rainfall and "
+                "reference ET0 observations. No future weather forecast or future-condition claim."
+                if bot_id == "remote-weather"
+                else "This is the surface soil moisture specialist. Explain only supplied SMAP "
+                "surface observations, not root-zone conditions or irrigation instructions."
+                if bot_id == "remote-soil"
+                else "This is the water specialist. Explain only supplied surface moisture, "
+                "historical rainfall and reference ET0; these are not an irrigation prescription."
+                if bot_id == "remote-water"
+                else "Follow the conversation domain and its released evidence."
+            )
+        ),
         SystemMessage(
             content=(
                 "Write every paragraph in English. Keep source IDs only in evidence_ids."
@@ -96,6 +114,7 @@ async def generate_answer(
                 {
                     "question": question,
                     "domain": domain,
+                    "bot_id": bot_id,
                     "language": language,
                     "detail": detail,
                     "intent": evidence["intent"],
@@ -132,6 +151,7 @@ async def generate_answer(
                 evidence["knowledge"],
                 allowed_actions=view["context"]["allowed_actions"],
                 can_claim_optimal=context["can_claim_optimal"],
+                bot_id=bot_id,
             )
         except ValueError as error:
             if attempt:

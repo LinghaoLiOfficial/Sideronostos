@@ -2,7 +2,15 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -23,9 +31,20 @@ class FarmerPreference(Base):
 
 class Conversation(Base):
     __tablename__ = "assistant_conversations"
+    __table_args__ = (
+        CheckConstraint(
+            "(preset = 'field_management' AND bot_id = 'field-guide') OR "
+            "(preset = 'remote_sensing' AND bot_id IN "
+            "('remote-water', 'remote-soil', 'remote-weather')) OR "
+            "(preset = 'local_agriculture' AND bot_id = 'local-knowledge-guide') OR "
+            "(preset = 'rotation' AND bot_id = 'rotation-guide')",
+            name="ck_assistant_conversation_bot_preset",
+        ),
+    )
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
     preset: Mapped[str] = mapped_column(String(30), default="rotation")
+    bot_id: Mapped[str] = mapped_column(String(40), default="rotation-guide")
     language: Mapped[str] = mapped_column(String(8), default="en")
     detail: Mapped[str] = mapped_column(String(12), default="brief")
     kb_release_id: Mapped[str] = mapped_column(ForeignKey("knowledge_releases.id"))

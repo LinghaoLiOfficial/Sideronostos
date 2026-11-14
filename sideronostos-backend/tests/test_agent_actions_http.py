@@ -70,6 +70,7 @@ async def api():
                 id=conversation_id,
                 owner_user_id=owner,
                 preset="field_management",
+                bot_id="field-guide",
                 language="en",
                 detail="brief",
                 kb_release_id=release.id,
@@ -252,7 +253,12 @@ async def test_field_action_resumes_persists_and_retries_once(api):
 
 
 async def test_remote_layer_and_fact_only_report_confirmed_owner_data(api):
-    client, _, identity, conversation_id, selection_id = api
+    client, factory, identity, conversation_id, selection_id = api
+    async with factory() as session:
+        row = await session.get(Conversation, conversation_id)
+        row.preset = "remote_sensing"
+        row.bot_id = "remote-water"
+        await session.commit()
     path = f"/farm-assistant/conversations/{conversation_id}/actions"
     layer = await client.post(
         path,
@@ -288,6 +294,63 @@ async def test_remote_layer_and_fact_only_report_confirmed_owner_data(api):
     )
     identity["id"] = str(uuid4())
     assert (await client.get(path + "/fact-key-1")).status_code == 404
+
+
+async def test_remote_specialist_action_scope_is_enforced_before_journaling(api):
+    client, factory, identity, conversation_id, selection_id = api
+    async with factory() as session:
+        row = await session.get(Conversation, conversation_id)
+        row.preset = "remote_sensing"
+        row.bot_id = "remote-weather"
+        await session.commit()
+    path = f"/farm-assistant/conversations/{conversation_id}/actions"
+    soil = await client.post(
+        path,
+        json={
+            "action": "remote_sensing.fact",
+            "arguments": {"selection_id": selection_id, "metric": "surface_soil_moisture"},
+            "idempotency_key": "weather-soil-denied",
+        },
+    )
+    assert soil.status_code == 422
+    smap_layer = await client.post(
+        path,
+        json={
+            "action": "remote_sensing.layer",
+            "arguments": {"layer_id": "agent-test-smap:am"},
+            "idempotency_key": "weather-layer-denied",
+        },
+    )
+    assert smap_layer.status_code == 422
+    rain = await client.post(
+        path,
+        json={
+            "action": "remote_sensing.fact",
+            "arguments": {"selection_id": selection_id, "metric": "rainfall_total"},
+            "idempotency_key": "weather-rain-allowed",
+        },
+    )
+    assert rain.status_code == 200 and rain.json()["status"] == "succeeded"
+    async with factory() as session:
+        keys = (
+            await session.scalars(
+                select(AssistantAction.idempotency_key).where(
+                    AssistantAction.conversation_id == conversation_id
+                )
+            )
+        ).all()
+        assert keys == ["weather-rain-allowed"]
+    identity["id"] = str(uuid4())
+    assert (
+        await client.post(
+            path,
+            json={
+                "action": "remote_sensing.fact",
+                "arguments": {"selection_id": selection_id, "metric": "rainfall_total"},
+                "idempotency_key": "foreign-weather-key",
+            },
+        )
+    ).status_code == 404
 
 
 async def test_crash_after_field_insert_rolls_back_action_and_field(api, monkeypatch):
