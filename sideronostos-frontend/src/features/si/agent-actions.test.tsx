@@ -87,3 +87,17 @@ it("offers each remote specialist only its supported actions and observations", 
   expect(within(soilMetrics).getByRole("option", { name: "Surface soil moisture" })).toBeInTheDocument();
   expect(within(soilMetrics).queryByRole("option", { name: "Rainfall total" })).not.toBeInTheDocument();
 });
+
+it("limits the soil specialist's published layer choices to SMAP", async () => {
+  const user = userEvent.setup();
+  rotation.listLayers.mockResolvedValue({ items: [
+    { id: "smap:am", title: "Soil moisture", source: { product: "SPL3SMP_E" } },
+    { id: "nasa:rain", title: "Rainfall", source: { product: "NASA_POWER" } },
+  ] });
+  api.postAction.mockResolvedValue({ status: "needs_input", action: "remote_sensing.layer", text: "Choose a layer.", missing_fields: ["layer_id"], pending: { arguments: {} }, result: null, href: null });
+  render(<AgentActions conversationId="chat-soil" ensureConversation={async () => "chat-soil"} domain="remote_sensing" botId="remote-soil" language="en" userId="owner-1" />);
+  await user.click(screen.getByRole("button", { name: "Open published layer" }));
+  const layers = await screen.findByRole("combobox", { name: "Published layer" });
+  expect(within(layers).getByRole("option", { name: "Soil moisture" })).toBeInTheDocument();
+  expect(within(layers).queryByRole("option", { name: "Rainfall" })).not.toBeInTheDocument();
+});

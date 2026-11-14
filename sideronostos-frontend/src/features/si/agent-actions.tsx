@@ -79,8 +79,8 @@ export function AgentActions({ conversationId, ensureConversation, domain, botId
 
   useEffect(() => {
     if (action === "field.create") listProfiles().then((value) => setProfiles(value.items)).catch(() => setError(true));
-    if (action === "remote_sensing.layer") listLayers().then((value) => setLayers(value.items)).catch(() => setError(true));
-  }, [action]);
+    if (action === "remote_sensing.layer") listLayers().then((value) => setLayers(botId === "remote-soil" ? value.items.filter((layer) => layer.source.product === "SPL3SMP_E") : value.items)).catch(() => setError(true));
+  }, [action, botId]);
 
   async function start(next: AgentActionName) {
     if (busy) return;
