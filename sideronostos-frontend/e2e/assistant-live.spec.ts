@@ -70,6 +70,29 @@ test("general assistant reads registered field, observation and rotation tools",
   await page.screenshot({ path: `output/playwright/general-bot-result-viewer-${testInfo.project.name}.png`, fullPage: true });
 });
 
+test("general assistant returns both owned results from one cross-module request", async ({ page }, testInfo) => {
+  await page.goto("/si/multi-agent");
+  await chooseBot(page, "Farm assistant");
+  const composer = page.getByRole("textbox", { name: "Message Farm assistant" });
+  await composer.fill("Please show my saved fields and available satellite layers.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByRole("link", { name: "Open result page" })).toHaveCount(2);
+  await expect(page.getByRole("link", { name: "View task details" })).toHaveCount(2);
+  await expect(page.getByRole("img", { name: "Task result page" })).toHaveCount(2, { timeout: 30_000 });
+  const results = page.getByRole("region", { name: "Task result" });
+  await expect(results).toHaveCount(2);
+  await results.first().scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: `output/playwright/general-bot-multi-read-fields-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+  await results.last().scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: `output/playwright/general-bot-multi-read-layers-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+});
+
 test("creates an owned field, restores the server-confirmed result and opens the saved page", async ({ page }) => {
   await page.goto("/si/multi-agent");
   await chooseBot(page, "Field guide");

@@ -63,6 +63,7 @@ export function TaskResultCard({ task, language }: { task: AssistantTask; langua
   const fieldResult = shown.href.startsWith("/field-shift?field=");
   return <section className="mt-3 rounded-lg border border-border bg-card p-3" aria-label={zh ? "任务结果" : "Task result"}>
     <p className="text-xs font-semibold uppercase text-muted-foreground">{fieldResult ? (zh ? "已保存的结果" : "Saved result") : (zh ? "任务结果" : "Task result")}</p>
+    {shown.title && <p className="mt-1 font-semibold">{shown.title}</p>}
     <Link className="mt-2 inline-block font-semibold text-primary underline" href={shown.href}>{fieldResult ? (zh ? "打开已保存地块" : "Open saved field") : (zh ? "打开结果页面" : "Open result page")}</Link>
     {shown.result_page_url && <Link className="ml-3 inline-block text-sm text-primary underline" href={shown.result_page_url}>{zh ? "查看任务记录" : "View task details"}</Link>}
     {preview && <figure className="mt-3"><Image unoptimized src={preview} alt={fieldResult ? (zh ? "已保存地块的结果页面" : "Saved field result page") : (zh ? "任务结果页面" : "Task result page")} width={720} height={450} className="max-h-64 w-auto max-w-full rounded border border-border object-contain" /><figcaption className="mt-1 text-xs text-muted-foreground">{zh ? "真实结果页面截图" : "Screenshot of the real result page"}</figcaption></figure>}

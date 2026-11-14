@@ -182,6 +182,10 @@ def test_field_list_reply_uses_a_farmer_readable_singular_label():
         "zh",
     )
     assert zh_answer.startswith("已查到 1 项地块：西边地块。")
+    empty = _farmer_outcome_text(
+        tool, {"status": "succeeded", "result": {"items": []}}, "en"
+    )
+    assert empty.startswith("I found no saved fields")
 
 
 def test_chinese_farmer_requests_select_only_tools_allowed_to_the_bot():

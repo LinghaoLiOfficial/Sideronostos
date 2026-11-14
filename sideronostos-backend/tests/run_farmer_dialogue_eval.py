@@ -73,13 +73,16 @@ async def evaluate_one(client: httpx.AsyncClient, case: dict, limit: asyncio.Sem
                         for paragraph in (message.get("response") or {}).get("paragraphs", [])
                     ),
                     "task": (message.get("response") or {}).get("task"),
+                    "tasks": (message.get("response") or {}).get("tasks"),
                 })
             result["transcript"] = transcript
             result["status"] = message["status"]
             result["message_id"] = message["id"]
             result["response"] = message.get("response")
             task = (message.get("response") or {}).get("task")
+            tasks = (message.get("response") or {}).get("tasks") or []
             result["task"] = task
+            result["tasks"] = tasks
             expected_status = case.get("expected_task_status")
             expected_operation = case.get("expected_operation_id")
             result["operation_check"] = (
@@ -87,6 +90,13 @@ async def evaluate_one(client: httpx.AsyncClient, case: dict, limit: asyncio.Sem
             ) and (
                 expected_operation is None or (task or {}).get("operation_id") == expected_operation
             )
+            expected_operations = case.get("expected_operations")
+            if expected_operations is not None:
+                result["operation_check"] = result["operation_check"] and [
+                    item.get("operation_id") for item in tasks
+                ] == expected_operations and all(
+                    item.get("status") == "completed" for item in tasks
+                )
             expected_turns = case.get("expected_turn_statuses")
             if expected_turns is not None:
                 result["operation_check"] = result["operation_check"] and [

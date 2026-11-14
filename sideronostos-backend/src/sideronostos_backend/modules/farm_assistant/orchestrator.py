@@ -149,6 +149,28 @@ def choose_tool(question: str, tools: list[ModuleTool]) -> ModuleTool | None:
     return ranked[0][1]
 
 
+def choose_read_bundle(question: str, tools: list[ModuleTool]) -> list[ModuleTool]:
+    """The offline planner recognizes a small, explicit cross-domain read bundle."""
+    if not REQUEST.search(question.strip()) or not re.search(r"\band\b|和", question, re.I):
+        return []
+    if re.search(r"\b(?:do\s+not|don't|not)\s+(?:show|list|run)\b|不要", question, re.I):
+        return []
+    patterns = (
+        (r"\bfields?\b|地块", "list_fields_field_shift_fields_get"),
+        (r"\b(?:satellite|map)?\s*layers?\b|图层", "layers_agri_data_layers_get"),
+        (r"\b(?:crop|rotation)\s+profiles?\b|(?:轮作|作物).{0,8}(?:配置|参数)",
+         "profiles_rotation_optimizer_profiles_get"),
+        (r"\brotation\s+runs?\b|轮作任务", "runs_rotation_optimizer_runs_get"),
+    )
+    selected = []
+    for pattern, operation_id in patterns:
+        if re.search(pattern, question, re.I):
+            tool = next((item for item in tools if item.operation_id == operation_id), None)
+            if tool is not None and tool.method == "GET" and not tool.path_parameters:
+                selected.append(tool)
+    return selected if len({item.domain for item in selected}) > 1 else []
+
+
 def _supplied(question: str, tool: ModuleTool, context: dict[str, Any]) -> dict[str, Any]:
     supplied: dict[str, Any] = {"path_params": {}, "query_params": {}, "body": None}
     start = question.find("{")
@@ -261,8 +283,24 @@ def _farmer_outcome_text(tool: ModuleTool, outcome: dict[str, Any], language: st
     if outcome.get("status") != "succeeded" or not isinstance(data, dict):
         return str(outcome.get("text", ""))
     items = data.get("items")
-    if not isinstance(items, list) or not items:
+    if not isinstance(items, list):
         return str(outcome.get("text", ""))
+    if not items:
+        empty_labels = (
+            "saved fields" if tool.operation_id.startswith("list_fields_")
+            else "published satellite layers" if tool.operation_id.startswith("layers_")
+            else "rotation calculations" if tool.operation_id.startswith("runs_")
+            else "records"
+        )
+        if language == "zh":
+            zh_empty = {
+                "saved fields": "已保存地块",
+                "published satellite layers": "已发布卫星图层",
+                "rotation calculations": "轮作计算任务",
+                "records": "相关记录",
+            }[empty_labels]
+            return f"当前账户还没有{zh_empty}。可打开结果页面核对。"
+        return f"I found no {empty_labels} in this account yet. Open the result page to check."
     labels: list[str] = []
     seen: set[str] = set()
     for item in items[:5]:
@@ -368,6 +406,38 @@ async def handle_module_chat(
     )
     question = message.text.strip()
     if flow is None:
+        if preset == "general":
+            bundle = choose_read_bundle(question, tools)
+            if bundle:
+                replies = []
+                for index, item in enumerate(bundle):
+                    step = AssistantAction(
+                        id=str(uuid4()),
+                        conversation_id=message.conversation_id,
+                        owner_user_id=message.owner_user_id,
+                        idempotency_key=f"chat-bundle-{message.id}-{index}",
+                        action="chat.module.operation",
+                        status="needs_input",
+                        outcome=None,
+                        arguments={
+                            "operation_id": item.operation_id,
+                            "title": item.title,
+                            "payload": {"path_params": {}, "query_params": {}, "body": None},
+                        },
+                        audit_events=[{"at": utcnow().isoformat(), "status": "started"}],
+                    )
+                    session.add(step)
+                    replies.append(await _execute(
+                        session, step, item, app, headers, cookies, preset, language
+                    ))
+                return {
+                    "paragraphs": [
+                        paragraph for reply in replies for paragraph in reply["paragraphs"]
+                    ],
+                    "facts": [], "citations": [], "actions": [],
+                    "needs_clarification": False, "retrieval_mode": "registered_tool_bundle",
+                    "tasks": [reply["task"] for reply in replies],
+                }
         tool = choose_tool(question, tools)
         if tool is None:
             return None

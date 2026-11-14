@@ -402,6 +402,7 @@ export type AssistantAnswer = {
   retrieval_mode?: string;
   kb_release_id?: string;
   task?: AssistantTask;
+  tasks?: AssistantTask[];
 };
 export type AssistantTask = {
   id: string;

@@ -401,6 +401,34 @@ async def test_generic_tool_result_has_an_owned_viewer_and_private_preview(api, 
     identity["id"] = first_owner
 
 
+async def test_general_chat_combines_two_owned_read_tools_in_one_request(api):
+    client, factory, _, conversation_id, _ = api
+    async with factory() as session:
+        conversation = await session.get(Conversation, conversation_id)
+        conversation.preset = "general"
+        conversation.bot_id = "general-guide"
+        await session.commit()
+    reply = await client.post(
+        f"/farm-assistant/conversations/{conversation_id}/messages",
+        json={
+            "client_message_id": "cross-module-read-bundle-1",
+            "text": "Please show my saved fields and available satellite layers.",
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    assert reply.status_code == 200
+    response = reply.json()["response"]
+    assert {task["operation_id"] for task in response["tasks"]} == {
+        "list_fields_field_shift_fields_get",
+        "layers_agri_data_layers_get",
+    }
+    assert all(
+        task["status"] == "completed" and task["result_page_url"]
+        for task in response["tasks"]
+    )
+    assert len(response["paragraphs"]) == 2
+
+
 async def test_chat_async_job_waits_for_real_completion_before_preview(api):
     client, factory, _, conversation_id, _ = api
     async with factory() as session:
