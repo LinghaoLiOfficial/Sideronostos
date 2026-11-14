@@ -13,6 +13,7 @@ beforeEach(() => { mocks.getCurrentUser.mockRejectedValue(new Error("not signed 
 afterEach(() => { cleanup(); vi.clearAllMocks(); mocks.query = ""; });
 describe("Field Shift account entry", () => {
   it("keeps the farming destination and context on the registration link", () => {
+    window.localStorage.setItem("agrisata-locale", "zh-CN");
     mocks.query = new URLSearchParams({ next: "/field-shift?field=field-1&step=planning" }).toString();
     render(<LoginPage />);
     const href = screen.getByRole("link", { name: "立即注册" }).getAttribute("href")!;

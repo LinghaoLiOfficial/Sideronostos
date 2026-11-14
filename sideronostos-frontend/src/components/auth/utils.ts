@@ -1,6 +1,7 @@
 import { ApiError } from "@/lib/api/client";
+import type { Locale } from "@/lib/i18n/locale";
 
-export function authErrorMessage(error: unknown) {
+export function authErrorMessage(error: unknown, locale: Locale = "zh-CN") {
   if (error instanceof ApiError) {
     const messages: Record<string, string> = {
       invalid_credentials: "邮箱或密码不正确",
@@ -22,9 +23,14 @@ export function authErrorMessage(error: unknown) {
       "Origin is not allowed": "当前页面来源不在后端允许列表中",
       "CSRF validation failed": "安全校验失败，请刷新页面后重试",
     };
-    return messages[error.error.code] ?? backendMessages[error.error.message] ?? error.error.message;
+    const message = messages[error.error.code] ?? backendMessages[error.error.message] ?? error.error.message;
+    if (locale === "en") {
+      const english: Record<string, string> = { "邮箱或密码不正确": "Incorrect email or password", "请先完成邮箱验证后再登录": "Please verify your email before signing in", "登录状态已失效，请重新登录": "Your session has expired. Please sign in again", "请求失败，请稍后重试": "Request failed. Please try again later" };
+      return english[message] ?? message;
+    }
+    return message;
   }
-  return error instanceof Error ? error.message : "请求失败，请稍后重试";
+  return error instanceof Error ? error.message : locale === "en" ? "Request failed. Please try again later" : "请求失败，请稍后重试";
 }
 
 export function safeNextPath(value: string | null) {
