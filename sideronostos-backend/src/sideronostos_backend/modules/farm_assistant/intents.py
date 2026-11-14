@@ -45,6 +45,8 @@ def help_version(context: dict[str, Any] | None) -> str:
 
 
 def excluded_product_sources(context: dict[str, Any]) -> list[str]:
+    if context.get("preset", "rotation") != "rotation":
+        return []
     return ["HELPV2"] if help_version(context) == "v3" else ["HELPV3", "MODELV3", "DATAV3"]
 
 
@@ -65,6 +67,8 @@ def compares_current_alternatives(question: str, context: dict[str, Any] | None)
 def retrieval_sources(
     question: str, intent: Intent, context: dict[str, Any] | None = None
 ) -> list[str] | None:
+    if context is not None and context.get("preset", "rotation") != "rotation":
+        return None
     if compares_current_alternatives(question, context):
         return ["HELPV3", "MODELV3", "DATAV3"] if help_version(context) == "v3" else ["HELPV2"]
     if intent in ("guide", "what_if_request") or re.search(r"积温|\bgdd\b", question, re.I):

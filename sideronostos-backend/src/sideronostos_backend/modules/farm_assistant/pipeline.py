@@ -1,5 +1,7 @@
 """Evidence-bounded generation with at most one validated repair; read-only business context."""
 
+# ruff: noqa: E501 -- local fallback copy is kept as complete translatable sentences.
+
 import json
 import re
 import time
@@ -16,6 +18,7 @@ from ..knowledge.retrieval import tokenize
 from ..knowledge.store import search_release
 from ..knowledge.web_search import search_web
 from .bot_scope import scoped_sources
+from .dialogue import DialogueRoute, product_evidence, route_message
 from .intents import classify, excluded_product_sources, retrieval_query, retrieval_sources
 from .model_view import model_view, redact_quantities
 from .prompts import DOMAIN_GUIDANCE, SYSTEM, VERSION
@@ -30,6 +33,29 @@ async def collect_evidence(
     started = time.perf_counter()
     intent = classify(question, context)
     query = retrieval_query(question)
+    route = route_message(question, context)
+    # Scenario-specific offline guidance is a local-demo fallback. A real
+    # release must still retrieve its scoped sources and owned observations.
+    if route.topic.startswith("farmer_") and not release.id.startswith("local-mock-"):
+        route = DialogueRoute("evidence")
+    if route.kind != "evidence":
+        return {
+            "intent": "guide",
+            "route": route.kind,
+            "conversation_reply": list(route.paragraphs) if route.kind == "conversation" else [],
+            "needs_clarification": route.needs_clarification,
+            "retrieval_query": query,
+            "knowledge": [product_evidence(route)] if route.kind == "product_help" else [],
+            "facts": [],
+            "web_search": {"preset": context.get("preset", "rotation"), "result_count": 0},
+            "kb_release_id": release.id,
+            "kb_manifest_sha256": release.manifest_sha256,
+            "retrieval_mode": route.kind,
+            "degraded_reason": None,
+            "embedding_tokens": 0,
+            "retrieval_ms": round((time.perf_counter() - started) * 1000),
+            "prompt_version": VERSION,
+        }
     provider = EmbeddingProvider()
     vector = None
     tokens = 0
@@ -69,6 +95,7 @@ async def collect_evidence(
     knowledge.extend({**hit, "id": f"W{i + 1}"} for i, hit in enumerate(web_hits))
     return {
         "intent": intent,
+        "route": "evidence",
         "retrieval_query": query,
         "knowledge": knowledge,
         "web_search": {
@@ -95,6 +122,12 @@ async def generate_answer(
     detail: str,
     history: list[dict[str, str]],
 ) -> dict[str, Any]:
+    if evidence.get("route") == "conversation":
+        answer = ModelAnswer(
+            paragraphs=[Paragraph(text=text) for text in evidence["conversation_reply"]]
+        )
+        bound = bind_answer(answer, [], [], allowed_actions=[], can_claim_optimal=False)
+        return _local_response(bound, context, evidence, model="conversation-router", mock=False)
     ai_settings = get_ai_settings()
     settings = ai_settings.for_task("farm_assistant")
     view = model_view(question, context, evidence)
@@ -290,9 +323,26 @@ def _mock_answer(
     bot_id: str,
 ) -> dict[str, Any]:
     """Ground a local demo reply in one stored source or ask for missing context."""
-    knowledge = evidence["knowledge"]
+    # The bundled HELPV2 fixture describes the old rotation form. Its broad
+    # lexical matches are not evidence for another module's farm question.
+    knowledge = [
+        item
+        for item in evidence["knowledge"]
+        if item.get("source", {}).get("id") != "HELPV2" or context.get("preset") == "rotation"
+    ]
+    if len(knowledge) != len(evidence["knowledge"]):
+        evidence = {**evidence, "knowledge": knowledge}
     facts = [fact for fact in evidence["facts"] if fact["id"] in {f["id"] for f in view["facts"]}]
-    if knowledge:
+    if evidence.get("route") == "product_help" and knowledge:
+        source = knowledge[0]
+        answer = ModelAnswer(
+            paragraphs=[
+                Paragraph(text=text, evidence_ids=[source["id"]])
+                for text in source["excerpt"].split("\n\n")
+            ],
+            needs_clarification=evidence.get("needs_clarification", False),
+        )
+    elif knowledge:
         source = knowledge[0]
         excerpt = _mock_excerpt(source["excerpt"], question, context.get("language", "en"))
         if source.get("retrieval_mode") == "web_search":
@@ -328,14 +378,53 @@ def _mock_answer(
             needs_clarification=False,
         )
     else:
-        text = (
-            "当前演示环境没有足够的已发布资料或数据库上下文。你想查询哪个模块、地块或时间范围？"
-            if context.get("language") == "zh"
-            else (
-                "This demo has no published source or database context for that question yet. "
-                "Which module, field, or time range should I check?"
+        fallbacks = {
+            "field-guide": (
+                "I need to identify your field before using its records. Which saved field do you mean, or are you adding a new one?",
+                "需要先确定地块，才能核对它的记录。你说的是账户中的哪块地，还是要新增地块？",
+            ),
+            "remote-water": (
+                "I need a map area and observation period to check published water-related data. Which area and date should I look at?",
+                "需要地图选区和观测时间，才能核对已发布的水分相关数据。要查看哪片区域、哪段时间？",
+            ),
+            "remote-soil": (
+                "I need a map area and date to check published surface soil moisture. Which area should I inspect?",
+                "需要地图选区和日期，才能核对已发布的表层土壤湿度。要查看哪片区域？",
+            ),
+            "remote-weather": (
+                "I can check published historical rainfall or reference evapotranspiration. Which map area, past period and indicator should I use?",
+                "可以核对已发布的历史降雨或参考蒸散。请告诉我地图选区、过去的时间段和想看的指标。",
+            ),
+            "rotation-guide": (
+                "I need a saved field or planning run before discussing your own rotation result. Which field or run should I open?",
+                "需要指定账户中的地块或规划任务，才能讨论你的轮作结果。要打开哪块地或哪次任务？",
+            ),
+            "local-knowledge-guide": (
+                "I do not have a verified local source for that answer yet. Which crop, region and topic should I check?",
+                "目前没有足以核实这个问题的本地资料。请告诉我作物、地区和想查的主题。",
+            ),
+        }
+        text = fallbacks.get(bot_id, fallbacks["rotation-guide"])[
+            int(context.get("language") == "zh")
+        ]
+        if bot_id == "field-guide" and re.search(r"record|记录|area|面积", question, re.I):
+            text = (
+                "I need to identify the saved field before reading its record. Which field do you mean?"
+                if context.get("language") != "zh"
+                else "需要先确定账户中的地块，才能核对它的记录。你说的是哪块地？"
             )
-        )
+        if bot_id == "rotation-guide" and re.search(r"run|calculation|任务|计算", question, re.I):
+            text = (
+                "I need to identify the saved planning run before reporting its result. Which run do you mean?"
+                if context.get("language") != "zh"
+                else "需要先确定是哪次规划任务，才能核对结果。你说的是哪次计算？"
+            )
+        if bot_id == "local-knowledge-guide" and re.search(r"county|县", question, re.I):
+            text = (
+                "I do not have a verified source for your county yet. Which county and crop should I check?"
+                if context.get("language") != "zh"
+                else "目前没有足以核实你所在县情况的资料。请告诉我哪个县和哪种作物？"
+            )
         answer = ModelAnswer(
             paragraphs=[Paragraph(text=text)], actions=[], needs_clarification=True
         )
@@ -347,16 +436,28 @@ def _mock_answer(
         can_claim_optimal=context["can_claim_optimal"],
         bot_id=bot_id,
     )
+    return _local_response(bound, context, evidence, model="local-mock", mock=True)
+
+
+def _local_response(
+    bound: dict[str, Any],
+    context: dict[str, Any],
+    evidence: dict[str, Any],
+    *,
+    model: str,
+    mock: bool,
+) -> dict[str, Any]:
     return {
         **bound,
         "intent": evidence["intent"],
         "facts": evidence["facts"],
-        "citations": knowledge,
+        "citations": evidence["knowledge"],
         "warnings": context["warnings"],
         "retrieval_mode": evidence["retrieval_mode"],
         "kb_release_id": evidence["kb_release_id"],
         "metrics": {
-            "model": "local-mock",
+            "model": model,
+            "response_mode": evidence.get("route", "evidence"),
             "prompt_version": VERSION,
             "usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
             "embedding_tokens": evidence["embedding_tokens"],
@@ -364,6 +465,6 @@ def _mock_answer(
             "retrieval_ms": evidence["retrieval_ms"],
             "model_ms": 0,
             "validation_repairs": 0,
-            "mock": True,
+            "mock": mock,
         },
     }

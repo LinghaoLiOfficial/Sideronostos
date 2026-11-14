@@ -11,6 +11,14 @@ uv run python -m sideronostos_backend.modules.knowledge.cli mock-bootstrap
 
 The bootstrap command is idempotent for its release ID. It publishes only `product-help-v2.md`; it does not ingest arbitrary files or write farmer data. Replace it with the reviewed source manifest and a real embedding provider before using the KB as agronomic evidence.
 
+Once a conversation exists, greetings skip evidence retrieval. Field-creation and
+capability questions use shipped product instructions with source references; they do
+not need a saved field or a new KB bootstrap. For other questions, rotation-specific
+help-version filters no longer remove field-management or local-knowledge sources.
+The metrics distinguish `conversation-router` replies from `local-mock` answers and
+record the selected response route. Enabling a model still requires its configured key;
+successful offline or local-demo tests do not establish live LLM answer quality.
+
 At query time, each specialist uses a fixed web-search preset limited to public NASA, FAO, or extension-service domains. Search snippets remain transient citations and are not promoted into the reviewed database release. The request removes email addresses, exact coordinates, dates, UUIDs, and phone-like strings before sending a query to DuckDuckGo. Network failures return no web hits and preserve database retrieval.
 
 Offline tests use HTTPX `MockTransport`; they verify domain scoping, source URLs, identifier stripping, and graceful network failure without calling a search provider.

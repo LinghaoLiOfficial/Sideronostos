@@ -70,6 +70,20 @@ through an unfiltered business endpoint. The catalog is an explicit operation
 picker with JSON input for complex request bodies. It does not infer
 operations from free chat prose.
 
+Chat first routes complete greetings and thanks to a conversational reply. A greeting
+followed by a substantive question continues to the question handler. Field-creation
+instructions and bot-capability questions use shipped product help, so they work for
+a new account and in conversations pinned to an older knowledge release. These help
+answers include a source and describe the real controls without claiming an operation
+has run. Other questions use the existing database, released knowledge and web evidence
+pipeline, followed by the configured LLM or the explicitly metered local mock answerer.
+Rotation help-version filters apply only to the rotation domain.
+
+The screenshot regressions are covered in `tests/test_assistant_dialogue_flow.py`:
+“What information do I need before creating a new field?” lists the form inputs and
+next steps; “hi” receives a greeting without an evidence search. These tests cover
+routing and provider integration, not the quality of an external model.
+
 ## Bot identity and entry points
 
 `/si/multi-agent` and the four `/si` module docks share the six identities in
@@ -113,10 +127,27 @@ from the mock KB; that module has no business API. The existing functional
   independent live business run. Rotation jobs and
   published satellite layers require their own data releases, workers, and
   scenario inputs for a complete operational matrix.
-- Free-text intent routing is not implemented; chat prose alone cannot trigger
-  a write. The workspace has a generic operation picker and three guided
-  actions; module docks remain chat-only. A production AI provider and real
+- Free-text chat now routes common greetings, product-use questions, and
+  missing-context requests to bot-specific guidance in the local mock demo.
+  Chat prose alone does not trigger a write. The generic operation picker and
+  guided actions remain the execution path. A production AI provider and real
   agronomic corpus have not been configured or evaluated.
+
+## Farmer-facing answer boundaries
+
+Field Guide can describe saved field setup and planting history, and should ask
+which owned field is meant before claiming a past crop or an edit. Water Guide
+can explain published surface moisture, historical rainfall and reference
+evapotranspiration; map color alone is not an irrigation prescription. Soil
+Guide is limited to regional SMAP surface moisture, which does not establish
+root-zone conditions. Weather Guide handles historical rainfall and reference
+evapotranspiration, not a future forecast or pump setting. Rotation Guide
+should ask for the saved fields, planting history, planning period and
+constraints before creating a run, and should not promise profit or diagnose an
+unidentified failed run. Local Knowledge Guide should request region, crop and
+verifiable local sources before discussing current varieties, prices or
+jurisdiction-specific pesticide rules. An operation is reported complete only
+after its server response provides a result link.
 
 The checked-in browser evidence is under `docs/integration/evidence`:
 `assistant-field-completion.png`, `assistant-field-result-page.png`,
