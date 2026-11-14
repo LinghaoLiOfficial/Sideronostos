@@ -1124,3 +1124,32 @@
   font-size: 11px;
   font-weight: 400;
 }
+
+/* Sourced daily-model editors share the existing planning visual language. */
+.evidenceValue {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+}
+.evidenceValue > small { color: var(--muted-foreground); }
+.dailyPanel {
+  min-width: 0;
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.dailyPanel > summary { font-weight: 600; cursor: pointer; }
+.dailyGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 12px; margin: 14px 0; }
+.dailyGrid fieldset { min-width: 0; }
+.readinessList { padding-left: 20px; overflow-wrap: anywhere; }
+.readinessList li { margin: 12px 0; }
+.dailyActionBar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 16px 0; border-top: 1px solid var(--border); }
+.dailySectionNav { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+.dailySectionNav a { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; }

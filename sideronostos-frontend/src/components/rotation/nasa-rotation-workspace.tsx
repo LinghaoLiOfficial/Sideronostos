@@ -7,6 +7,7 @@ import { BarChart3, Database, FlaskConical, Leaf, Settings2, Sprout } from "luci
 import { getCurrentUser } from "@/lib/api/client";
 import * as fieldsApi from "@/lib/api/field-shift";
 import * as api from "@/lib/api/rotation";
+import { isDailyRun } from "@/lib/api/daily-types";
 import type { Field } from "@/lib/api/field-shift-types";
 import type { NasaDataRelease, RotationInput, RotationPreflightInput, RotationWeights, RunV2 } from "@/lib/api/rotation-types";
 import { errorMessage } from "../field-shift/model";
@@ -248,7 +249,7 @@ export function NasaRotationWorkspace() {
         <div className={styles.results}>
           {release && <NasaReleaseMap key={release.id} release={release} fields={chosen.length ? chosen : eligibleFields} />}
           <section className={styles.section}><h2><BarChart3 size={16}/> 运行摘要</h2><dl className={styles.summary}><div><dt>地块</dt><dd>{chosen.length}</dd></div><div><dt>总面积</dt><dd>{totalArea.toFixed(1)} ha</dd></div><div><dt>候选作物</dt><dd>{selectedCrops.length}</dd></div></dl>{release && <><h3>数据产品边界</h3><div className={styles.chips}>{Object.entries(release.products).map(([name, product]) => <span key={name} className={styles.chip}>{name.toUpperCase()} · {product.model_usable ? "入模" : "证据"}</span>)}</div><p>{release.limitations.join(" ")}</p></>}</section>
-          {run ? <RunResults owner={session.data.id} run={run} changes={[]} selectedOptionId={selectedOption} onSelect={setSelectedOption} onExplain={() => undefined} onUpdate={(value) => { setRun(value); client.setQueryData(["nasa-rotation", "run", value.id], value); }} onSaved={() => undefined} compareRunId={null} compareOptionId={null} onCompare={() => undefined}/> : <section className={styles.section}><h2>尚未运行</h2><p>完成左侧配置后，结果区将显示 Gurobi 状态、方案时间轴、资源消耗、约束核验、候选拒绝原因和可审计导出。</p></section>}
+          {run ? <RunResults owner={session.data.id} run={run} changes={[]} selectedOptionId={selectedOption} onSelect={setSelectedOption} onExplain={() => undefined} onUpdate={(value) => { if (isDailyRun(value)) return; setRun(value); client.setQueryData(["nasa-rotation", "run", value.id], value); }} onSaved={() => undefined} compareRunId={null} compareOptionId={null} onCompare={() => undefined}/> : <section className={styles.section}><h2>尚未运行</h2><p>完成左侧配置后，结果区将显示 Gurobi 状态、方案时间轴、资源消耗、约束核验、候选拒绝原因和可审计导出。</p></section>}
           {run?.result && <section className={styles.section}><h2>模型诊断</h2><dl className={styles.summary}><div><dt>候选数</dt><dd>{run.result.candidate_count ?? "—"}</dd></div><div><dt>返回方案</dt><dd>{allOptions(run).length}</dd></div><div><dt>求解上限</dt><dd>{run.result.solver_time_limit_seconds ?? solverSeconds}s</dd></div></dl><h3>候选拒绝原因</h3>{Object.entries(run.result.rejected_by_reason ?? {}).length ? <ul>{Object.entries(run.result.rejected_by_reason ?? {}).map(([reason, count]) => <li key={reason}>{reason}: {count}</li>)}</ul> : <p>暂无拒绝候选诊断。</p>}</section>}
         </div>
       </div>

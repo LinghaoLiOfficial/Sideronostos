@@ -1,4 +1,10 @@
 import { apiBlob, apiRequest } from "./client";
+import {
+  isDailyRun,
+  isDailySaved,
+  type AnyRotationRun,
+  type AnySavedPlan,
+} from "./daily-types";
 import type {
   AssistantContext,
   AssistantMessage,
@@ -65,10 +71,22 @@ export const getNasaDataRelease = (value: string) =>
   apiRequest<NasaDataRelease>(`/rotation-optimizer/data-releases/${id(value)}`);
 export const createRun = (body: RotationInput) =>
   apiRequest<RunV2>("/rotation-optimizer/runs", { method: "POST", body });
-export const listRuns = () =>
-  apiRequest<{ items: RunV2[] }>("/rotation-optimizer/runs");
-export const getRun = (value: string) =>
-  apiRequest<RunV2>(`/rotation-optimizer/runs/${id(value)}`);
+export const listRuns = async () => {
+  const result = await apiRequest<{ items: AnyRotationRun[] }>(
+    "/rotation-optimizer/runs",
+  );
+  return {
+    items: result.items.filter((run): run is RunV2 => !isDailyRun(run)),
+  };
+};
+export const getRun = async (value: string) => {
+  const result = await apiRequest<AnyRotationRun>(
+    `/rotation-optimizer/runs/${id(value)}`,
+  );
+  if (isDailyRun(result))
+    throw new Error("此结果采用逐日 v3 模型，请使用当前规划结果页。");
+  return result;
+};
 export const cancelRun = (value: string) =>
   apiRequest<RunV2>(`/rotation-optimizer/runs/${id(value)}/cancel`, {
     method: "POST",
@@ -85,8 +103,14 @@ export const exportRunCsv = (value: string) =>
   apiBlob(`/rotation-optimizer/runs/${id(value)}/export.csv`);
 export const listRotationPlans = () =>
   apiRequest<{ items: PlanSummaryV2[] }>("/rotation-optimizer/plans");
-export const getRotationPlan = (value: string) =>
-  apiRequest<SavedV2>(`/rotation-optimizer/plans/${id(value)}`);
+export const getRotationPlan = async (value: string) => {
+  const result = await apiRequest<AnySavedPlan>(
+    `/rotation-optimizer/plans/${id(value)}`,
+  );
+  if (isDailySaved(result))
+    throw new Error("此计划采用逐日 v3 模型，请使用当前计划详情页。");
+  return result;
+};
 export const saveRotationPlan = (body: {
   run_id: string;
   option_id: string;

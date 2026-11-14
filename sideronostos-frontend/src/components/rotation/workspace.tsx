@@ -12,6 +12,7 @@ import {
 import { buildAssistantContext } from "./assistant-context";
 import { useWorkspaceNavigation } from "./use-workspace-navigation";
 import { useScienceQueries } from "./use-science-queries";
+import { useRotationSnapshots } from "./use-rotation-snapshots";
 import { useWorkspaceSession } from "./use-workspace-session";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Layers, Map, Plus, Sprout } from "lucide-react";
@@ -19,13 +20,18 @@ import { Surface } from "@/components/ui/surface";
 import { ApiError, type AuthUser } from "@/lib/api/client";
 import * as fieldsApi from "@/lib/api/field-shift";
 import * as api from "@/lib/api/rotation";
+import * as dailyApi from "@/lib/api/daily";
+import * as farmsApi from "@/lib/api/farms";
+import {
+  isDailyRun,
+  type AnyRotationRun,
+  type DailyDraft,
+} from "@/lib/api/daily-types";
 import type { Field } from "@/lib/api/field-shift-types";
 import type {
   ChangedCondition,
   Geometry,
   RegionSelection,
-  RotationInput,
-  RunV2,
   ScienceFact,
 } from "@/lib/api/rotation-types";
 import { observationWindow, scienceSourceName } from "./workspace-state";
@@ -165,11 +171,16 @@ function OwnerWorkspace({
   mode: "map" | "rotation";
 }) {
   const navigation = useWorkspaceNavigation(`/field-shift/${mode}`);
-  const { search, latestSearch, revision: contextRevision, setRevision: setContextRevision } = navigation;
+  const {
+    search,
+    latestSearch,
+    revision: contextRevision,
+    setRevision: setContextRevision,
+  } = navigation;
   const client = useQueryClient();
   const requestedField = search.get("field"),
     selectionId = search.get("selection"),
-    runId = search.get("run"),
+    requestedRunId = search.get("run"),
     optionId = search.get("option"),
     planId = search.get("plan"),
     compareId = search.get("compare"),
@@ -193,9 +204,25 @@ function OwnerWorkspace({
   const dateEnd =
     dateDraft?.basis === dateBasis ? dateDraft.end : (dates?.end ?? "");
 
-  const [changes, setChanges] = useState<ChangedCondition[]>([]),
-    [draftFields, setDraftFields] = useState<RotationInput["fields"]>([]),
-    [openRequest, setOpenRequest] = useState<{ id: number; text: string }>(),
+  const { run, saved, runId } = useRotationSnapshots(
+    owner.id,
+    requestedRunId,
+    planId,
+  );
+  const draftBasis = `${runId ?? "new"}:${planId ?? ""}`;
+  const [draftContext, setDraftContext] = useState<{
+    basis: string;
+    changes: ChangedCondition[];
+    fields: DailyDraft["fields"];
+  } | null>(null);
+  const changes =
+    draftContext?.basis === draftBasis ? draftContext.changes : [];
+  const draftFields =
+    draftContext?.basis === draftBasis ? draftContext.fields : [];
+  const [openRequest, setOpenRequest] = useState<{
+      id: number;
+      text: string;
+    }>(),
     [boundaryBusy, setBoundaryBusy] = useState(false),
     [boundaryMessage, setBoundaryMessage] = useState<string | null>(null),
     [savedMessage, setSavedMessage] = useState<string | null>(null);
@@ -204,9 +231,10 @@ function OwnerWorkspace({
     mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
+    const selectionCounter = selectionSeq;
     return () => {
       mounted.current = false;
-      selectionSeq.current++;
+      selectionCounter.current++;
       abort.current?.abort();
     };
   }, []);
@@ -221,42 +249,40 @@ function OwnerWorkspace({
     retry: false,
     staleTime: 300000,
   });
-  const selectedField = fields.data?.items.find((f) => f.id === requestedField),
-    profile =
-      profiles.data?.items.find(
-        (item) => item.id === profiles.data?.default_profile_id,
-      ) ?? profiles.data?.items[0];
-  const { selection, facts, layers, manifest } = useScienceQueries(owner.id, selectionId, layerId, dates);
-  const run = useQuery({
-    queryKey: ["rotation", owner.id, "run", runId],
-    queryFn: () => api.getRun(runId!),
-    enabled: Boolean(runId),
+  const dailyProfiles = useQuery({
+    queryKey: ["rotation", owner.id, "v3-profiles"],
+    queryFn: () => dailyApi.listDailyProfiles(owner.id),
+    enabled: mode === "rotation",
     retry: false,
-    refetchInterval: (q) =>
-      ["pending", "running"].includes(q.state.data?.status ?? "")
-        ? 1800
-        : false,
+    staleTime: 300000,
   });
-  const plans = useQuery({
-    queryKey: ["rotation", owner.id, "plans"],
-    queryFn: api.listRotationPlans,
+  const farms = useQuery({
+    queryKey: ["rotation", owner.id, "farm-headers"],
+    queryFn: () => farmsApi.listFarms(undefined, owner.id),
     enabled: mode === "rotation",
     retry: false,
   });
-  const saved = useQuery({
-    queryKey: ["rotation", owner.id, "plan", planId],
-    queryFn: () => api.getRotationPlan(planId!),
-    enabled: Boolean(planId),
+  const selectedField = fields.data?.items.find((f) => f.id === requestedField);
+  const { selection, facts, layers, manifest } = useScienceQueries(
+    owner.id,
+    selectionId,
+    layerId,
+    dates,
+  );
+  const plans = useQuery({
+    queryKey: ["rotation", owner.id, "plans"],
+    queryFn: () => dailyApi.listAllPlans(owner.id),
+    enabled: mode === "rotation",
     retry: false,
   });
   const history = useQuery({
-    queryKey: ["rotation", owner.id, "runs"],
-    queryFn: api.listRuns,
+    queryKey: ["rotation", owner.id, "all-runs"],
+    queryFn: () => dailyApi.listAllRuns(owner.id),
     enabled: mode === "rotation",
     retry: false,
   });
   function navigate(patch: Record<string, string | null>, nextMode = mode) {
-    navigation.navigate(patch, `/field-shift/${nextMode}`);
+    navigation.navigate(patch, nextMode === "map" ? "/fields" : "/field-shift/rotation");
   }
   async function selectRegion(
     kind: RegionSelection["kind"],
@@ -320,7 +346,12 @@ function OwnerWorkspace({
     [client, owner.id, setContextRevision],
   );
   async function saveBoundary() {
-    if (!selectedField || selectedField.farm_id || selection.data?.kind !== "polygon") return;
+    if (
+      !selectedField ||
+      selectedField.farm_id ||
+      selection.data?.kind !== "polygon"
+    )
+      return;
     const origin = { field: selectedField.id, selection: selection.data.id };
     setBoundaryBusy(true);
     setBoundaryMessage(null);
@@ -346,9 +377,11 @@ function OwnerWorkspace({
       if (mounted.current) setBoundaryBusy(false);
     }
   }
-  function updateRun(value: RunV2) {
+  function updateRun(value: AnyRotationRun) {
     client.setQueryData(["rotation", owner.id, "run", value.id], value);
-    void client.invalidateQueries({ queryKey: ["rotation", owner.id, "runs"] });
+    void client.invalidateQueries({
+      queryKey: ["rotation", owner.id, "all-runs"],
+    });
     if (mounted.current && latestSearch.current === search.toString())
       navigate({
         run: value.id,
@@ -359,16 +392,14 @@ function OwnerWorkspace({
       });
   }
   const onDraft = useCallback(
-    (next: ChangedCondition[], chosen: RotationInput["fields"]) => {
-      setChanges((old) =>
-        JSON.stringify(old) === JSON.stringify(next) ? old : next,
-      );
-      setDraftFields((old) =>
-        JSON.stringify(old) === JSON.stringify(chosen) ? old : chosen,
+    (next: ChangedCondition[], chosen: DailyDraft["fields"]) => {
+      const value = { basis: draftBasis, changes: next, fields: chosen };
+      setDraftContext((old) =>
+        JSON.stringify(old) === JSON.stringify(value) ? old : value,
       );
       setContextRevision((value) => value + 1);
     },
-    [setContextRevision],
+    [setContextRevision, draftBasis],
   );
   const fieldStale =
     run.data?.field_snapshots.some((snapshot) => {
@@ -387,13 +418,37 @@ function OwnerWorkspace({
       allOptions(run.data).find(
         (o) => o.id === (planId ? saved.data?.option_id : optionId),
       );
+  const mapSearch = new URLSearchParams(search.toString());
+  if (hasRun && run.data) {
+    mapSearch.set("run", run.data.id);
+    if (actualOption) mapSearch.set("option", actualOption.id);
+    if (!mapSearch.has("field") && run.data.field_snapshots[0])
+      mapSearch.set("field", run.data.field_snapshots[0].id);
+  }
   const context = buildAssistantContext({
-    revision: contextRevision, page: mode,
-    selection: selection.data ? { id: selection.data.id, revision: selection.data.revision } : null,
-    dates, fields: mode === "rotation" ? draftFields.filter(f => fields.data?.items.some(current => current.id === f.id && current.version === f.expected_version))
-      : selectedField ? [{ id: selectedField.id, expected_version: selectedField.version }] : [],
-    runId: hasRun ? run.data!.id : null, optionId: actualOption?.id,
-    compareRunId: compareId, compareOptionId, saved: Boolean(planId), changes: visibleChanges,
+    revision: contextRevision,
+    page: mode,
+    selection: selection.data
+      ? { id: selection.data.id, revision: selection.data.revision }
+      : null,
+    dates,
+    fields:
+      mode === "rotation"
+        ? draftFields.filter((f) =>
+            fields.data?.items.some(
+              (current) =>
+                current.id === f.id && current.version === f.expected_version,
+            ),
+          )
+        : selectedField
+          ? [{ id: selectedField.id, expected_version: selectedField.version }]
+          : [],
+    runId: hasRun ? run.data!.id : null,
+    optionId: actualOption?.id,
+    compareRunId: compareId,
+    compareOptionId,
+    saved: Boolean(planId),
+    changes: visibleChanges,
   });
   const contextLabel = [
     hasRun
@@ -602,23 +657,25 @@ function OwnerWorkspace({
                 清除选区
               </button>
             </div>
-            {selection.data.kind === "polygon" && selectedField && !selectedField.farm_id && (
-              <details className={styles.details}>
-                <summary>将区域保存为「{selectedField.name}」的边界</summary>
-                <p className={styles.help}>
-                  经营面积：{n(selectedField.area_ha, 2)} ha；绘制面积：
-                  {n(selection.data.area_ha, 2)}{" "}
-                  ha。保存只更新边界与版本，请在地块管理中核对面积。
-                </p>
-                <button
-                  type="button"
-                  disabled={boundaryBusy}
-                  onClick={() => void saveBoundary()}
-                >
-                  {boundaryBusy ? "正在保存…" : "保存为此地块边界"}
-                </button>
-              </details>
-            )}
+            {selection.data.kind === "polygon" &&
+              selectedField &&
+              !selectedField.farm_id && (
+                <details className={styles.details}>
+                  <summary>将区域保存为「{selectedField.name}」的边界</summary>
+                  <p className={styles.help}>
+                    经营面积：{n(selectedField.area_ha, 2)} ha；绘制面积：
+                    {n(selection.data.area_ha, 2)}{" "}
+                    ha。保存只更新边界与版本，请在地块管理中核对面积。
+                  </p>
+                  <button
+                    type="button"
+                    disabled={boundaryBusy}
+                    onClick={() => void saveBoundary()}
+                  >
+                    {boundaryBusy ? "正在保存…" : "保存为此地块边界"}
+                  </button>
+                </details>
+              )}
             {boundaryMessage && <Notice>{boundaryMessage}</Notice>}
           </>
         )}
@@ -656,6 +713,15 @@ function OwnerWorkspace({
       </p>
     </>
   );
+  const dailyRun = run.data && isDailyRun(run.data) ? run.data : undefined;
+  const legacyRun = run.data && !isDailyRun(run.data) ? run.data : undefined;
+  const profile = dailyRun
+    ? dailyProfiles.data?.items.find(
+        (p) =>
+          p.id === dailyRun.request.profile_id &&
+          p.sha256 === dailyRun.provenance.profile_sha256,
+      )
+    : dailyProfiles.data?.items[0];
   let planningBody: ReactNode;
   if (planId) {
     planningBody = (
@@ -667,7 +733,16 @@ function OwnerWorkspace({
         ) : saved.data ? (
           <SavedPlan plan={saved.data} />
         ) : null}
-        <button type="button" onClick={() => navigate({ plan: null })}>
+        <button
+          type="button"
+          onClick={() =>
+            navigate({
+              plan: null,
+              run: runId,
+              option: saved.data?.option_id ?? null,
+            })
+          }
+        >
           返回规划
         </button>
       </>
@@ -675,31 +750,73 @@ function OwnerWorkspace({
   } else {
     planningBody = (
       <>
-        {profiles.isPending ||
-        fields.isPending ||
-        Boolean(runId && run.isPending) ? (
+        {legacyRun ? (
+          <Notice>
+            这是旧版 v2 计算，保留当时的输入、指标与结果。新规划使用逐日 v3
+            模型。
+            <button
+              type="button"
+              onClick={() =>
+                navigate({
+                  run: null,
+                  option: null,
+                  plan: null,
+                  compare: null,
+                  compareOption: null,
+                })
+              }
+            >
+              开始新的逐日规划
+            </button>
+          </Notice>
+        ) : dailyProfiles.isPending ||
+          farms.isPending ||
+          fields.isPending ||
+          Boolean(runId && run.isPending) ? (
           <p role="status">正在恢复你的规划资料…</p>
-        ) : profiles.error || fields.error ? (
+        ) : dailyProfiles.error || farms.error || fields.error ? (
           <QueryError
-            error={profiles.error ?? fields.error}
+            error={dailyProfiles.error ?? farms.error ?? fields.error}
             retry={() => {
-              void profiles.refetch();
+              void dailyProfiles.refetch();
+              void farms.refetch();
               void fields.refetch();
             }}
           />
+        ) : dailyRun && !profile ? (
+          <Notice>
+            当时的逐日参数包已不可用或已更新。下方仍显示原始计算快照；如需新计算，请先开始新规划并核对当前参数。
+            <button
+              type="button"
+              onClick={() =>
+                navigate({
+                  run: null,
+                  option: null,
+                  plan: null,
+                  compare: null,
+                  compareOption: null,
+                })
+              }
+            >
+              开始新的逐日规划
+            </button>
+          </Notice>
         ) : profile ? (
           <PlannerForm
+            key={`${owner.id}:${profile.id}:${profile.sha256}`}
+            version="v3"
             owner={owner.id}
             profile={profile}
             fields={fields.data?.items ?? []}
-            run={run.data}
+            farms={farms.data?.items ?? []}
+            run={dailyRun}
             selectedFieldId={selectedField?.id}
             onRun={updateRun}
             onDraft={onDraft}
             onFieldSaved={updateField}
           />
         ) : (
-          <Notice>当前没有可用的农艺参数包。</Notice>
+          <Notice>当前没有可用的逐日农艺参数包。</Notice>
         )}
         {run.error && (
           <QueryError error={run.error} retry={() => void run.refetch()} />
@@ -743,7 +860,7 @@ function OwnerWorkspace({
   }
   return (
     <Surface tone="light" className={styles.app}>
-      <Header mode={mode} user={owner} search={search.toString()} />
+      <Header mode={mode} user={owner} search={mapSearch.toString()} />
       <div
         className={mode === "map" ? styles.mapLayout : styles.planningLayout}
       >
@@ -757,7 +874,7 @@ function OwnerWorkspace({
           ) : (
             <>
               <div className={styles.planningNavigation}>
-                <Link href={`/fields?${search}`}>
+                <Link href={`/fields?${mapSearch}`}>
                   <ArrowLeft size={14} />
                   返回地图
                 </Link>
@@ -781,6 +898,7 @@ function OwnerWorkspace({
                       {history.data?.items.map((item) => (
                         <option key={item.id} value={item.id}>
                           {new Date(item.created_at).toLocaleString()} ·{" "}
+                          {isDailyRun(item) ? "v3" : "v2"} ·{" "}
                           {runStatus[
                             item.id === run.data?.id
                               ? run.data.status
@@ -863,7 +981,11 @@ function OwnerWorkspace({
             ownerId={owner.id}
             context={context}
             contextLabel={contextLabel}
-            contextPending={selecting || Boolean((runId || planId) && !hasRun) || Boolean(selectionId && !selection.data)}
+            contextPending={
+              selecting ||
+              Boolean((runId || planId) && !hasRun) ||
+              Boolean(selectionId && !selection.data)
+            }
             openRequest={openRequest}
             onAction={(action) => {
               if (action === "open_planner" || action === "edit_conditions") {
@@ -872,7 +994,8 @@ function OwnerWorkspace({
                   () => document.getElementById("planning-conditions")?.focus(),
                   50,
                 );
-              } else if (action === "choose_field") navigation.navigate({}, "/fields");
+              } else if (action === "choose_field")
+                navigation.navigate({}, "/fields");
             }}
           />
         </section>
