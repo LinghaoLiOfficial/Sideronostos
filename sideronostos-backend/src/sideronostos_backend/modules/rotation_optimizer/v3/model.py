@@ -215,6 +215,13 @@ class Problem(Contract):
                     raise ValueError("Irrigated field needs its own declared water-system capacity")
             elif field.water_system_id is not None:
                 raise ValueError("Rainfed field cannot silently acquire an irrigation system")
+            memberships = [
+                r.id for r in self.daily_resources if r.kind == "water" and field.id in r.field_ids
+            ]
+            if memberships != ([field.water_system_id] if field.irrigation_available else []):
+                raise ValueError(
+                    "Each field must have exactly its declared water resource membership"
+                )
             for history in field.history:
                 if history.end_latest >= self.start or history.family not in self.family_gaps:
                     raise ValueError("History must predate horizon and use a declared family rule")
