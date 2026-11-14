@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { ChevronDown } from "lucide-react";
 import { Bot, BotAvatar } from "./Bot";
+import { MultiBotChat } from "./MultiBotChat";
 import { botsForModule, type CatalogBot, type SiBotModule } from "@/lib/bot-catalog";
 import { useLocale, type Locale } from "@/lib/i18n/locale";
 import styles from "./MultiBotDock.module.css";
@@ -96,14 +97,11 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
           <Bot
             identity={{ id: selected.id, name: selected.name[locale], description: selected.capability[locale], color: selected.color, avatar: selected.avatar }}
             locale={locale}
-            purpose="details"
+            purpose="chat"
             mode="chat"
             onModeChange={(mode) => { if (mode === "collapsed") collapseChat(); }}
           >
-            <div className={styles.notice}>
-              <h3>{locale === "en" ? "Chat not available here yet" : "此处暂不能对话"}</h3>
-              <p>{selected.fallback[locale]}</p>
-            </div>
+            <MultiBotChat bot={selected} locale={locale} />
           </Bot>
         </div>
       )}

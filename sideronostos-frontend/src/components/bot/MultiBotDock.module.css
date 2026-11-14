@@ -122,27 +122,39 @@
 }
 .botHost { position: absolute; inset: 0; pointer-events: none; }
 .botHost :global(button), .botHost :global(section[data-bot-panel]) { pointer-events: auto; }
-.botHost :global(section[data-bot-panel]) { height: min(340px, calc(100% - 136px)); }
-.notice {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 13px;
-  padding: 24px;
-  background: #fff;
-  color: #282735;
-}
-.notice h3 { margin: 0; font-size: 17px; font-weight: 650; }
-.notice p { max-width: 35ch; margin: 0; color: #63616d; font-size: 14px; line-height: 1.6; }
+.botHost :global(section[data-bot-panel]) { height: min(560px, calc(100% - 136px)); }
+.chatStatus { display: flex; flex: 1; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 24px; color: #5d5965; text-align: center; font-size: 14px; }
+.chatStatus p { margin: 0; }
+.chatStatus a, .chatStatus button { border: 0; border-radius: 8px; background: #e9e4f5; color: #483574; padding: 9px 14px; font: inherit; font-weight: 650; text-decoration: none; cursor: pointer; }
+.chatBody { display: flex; flex: 1; min-height: 0; flex-direction: column; background: #fff; color: #282735; }
+.messageList { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 16px; overscroll-behavior: contain; }
+.empty { margin: 32px 0; color: #66616d; text-align: center; font-size: 14px; }
+.older { display: block; margin: 0 auto 16px; border: 0; background: none; color: #584489; font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
+.messagePair { display: flex; flex-direction: column; gap: 9px; margin-bottom: 18px; font-size: 13px; line-height: 1.55; }
+.question { align-self: flex-end; max-width: 86%; margin: 0; padding: 10px 13px; border-radius: 15px 15px 4px 15px; background: #ebe6f6; overflow-wrap: anywhere; }
+.answer { align-self: flex-start; max-width: 92%; padding: 11px 13px; border-radius: 15px 15px 15px 4px; background: #f2f1f3; overflow-wrap: anywhere; }
+.answer p { margin: 0 0 8px; }
+.answer p:last-child { margin-bottom: 0; }
+.sourceButton { margin: 4px 5px 2px 0; padding: 4px 7px; border: 1px solid #d5cbea; border-radius: 6px; background: #fff; color: #55417c; font: inherit; font-size: 11px; cursor: pointer; }
+.facts { margin-top: 8px; color: #5d5965; font-size: 11px; }
+.facts summary { cursor: pointer; }
+.facts dl { margin: 6px 0 0; }
+.facts div { margin: 4px 0; }
+.facts dt, .facts dd { display: inline; margin: 0; }
+.sourcePanel { margin: 0 16px 8px; padding: 10px 12px; border: 1px solid #ded8ea; border-radius: 10px; background: #faf9fc; font-size: 12px; }
+.sourcePanel button { float: right; width: 28px; height: 28px; border: 0; border-radius: 4px; background: none; font-size: 20px; cursor: pointer; }
+.sourcePanel h3 { margin: 0 30px 5px 0; font-size: 12px; }
+.sourcePanel p { margin: 0; color: #5d5965; line-height: 1.5; }
+.chatError { margin: 0; padding: 8px 16px; color: #9d3030; font-size: 12px; }
+.composerWrap { flex: none; border-top: 1px solid #ece9ef; padding-bottom: 10px; }
+.limit { margin: 5px 18px 0; color: #6a6071; text-align: center; font-size: 10px; line-height: 1.4; }
 @media (max-width: 700px) {
   .cluster { right: 12px; bottom: calc(18px + env(safe-area-inset-bottom)); gap: 7px; padding: 7px 8px 7px 11px; min-height: 64px; border-radius: 22px; }
   .label { display: none; }
   .avatars { max-width: min(68vw, 320px); }
   .botButton { width: 46px; height: 46px; }
   .root[data-expanded="true"] .botButton { width: 68px; height: 66px; }
-  .botHost :global(section[data-bot-panel]) { height: min(340px, calc(100dvh - 170px)); }
+  .botHost :global(section[data-bot-panel]) { height: min(68dvh, calc(100dvh - 170px)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .chevron, .botButton, .avatarLabel { transition: none; }
