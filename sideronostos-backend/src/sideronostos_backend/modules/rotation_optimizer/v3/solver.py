@@ -18,9 +18,14 @@ def solve(
     time_limit: float = 30,
     cancelled: Callable[[], bool] | None = None,
     exclude: list[str] | None = None,
+    max_gap_cost: float | None = None,
 ) -> dict[str, Any]:
     if not math.isfinite(time_limit) or not 0 < time_limit <= 120:
         raise ValueError("Solver deadline must be between zero and 120 seconds")
+    if max_gap_cost is not None and (
+        isinstance(max_gap_cost, bool) or not math.isfinite(max_gap_cost) or max_gap_cost < 0
+    ):
+        raise ValueError("Alternative gap-cost ceiling must be finite and nonnegative")
     if exclude is not None and not set(exclude) <= {c.id for c in problem.candidates}:
         raise ValueError("Excluded combination contains unknown candidates")
     result: dict[str, Any] = {
@@ -37,6 +42,7 @@ def solve(
         "hierarchy": ["minimize_resource_gap_cost", "maximize_normalized_six_metric_score"],
         "objective_degradation_tolerance": 0,
         "excluded_combination": exclude,
+        "max_gap_cost": max_gap_cost,
     }
     if cancelled and cancelled():
         return {**result, "status": "cancelled"}
@@ -53,6 +59,8 @@ def solve(
                 model.Params.MIPGapAbs = 0
                 model.Params.FeasibilityTol = 1e-8
                 model.Params.IntFeasTol = 1e-8
+                if max_gap_cost is not None:
+                    model.addConstr(built.gap_cost <= max_gap_cost, name="preserve_gap_priority")
                 if exclude is not None:
                     prior = set(exclude)
                     model.addConstr(
@@ -87,6 +95,8 @@ def solve(
                 valid = verification["valid"] and math.isclose(
                     built.score.getValue(), verification["score"], rel_tol=1e-7, abs_tol=1e-6
                 )
+                if max_gap_cost is not None and verification["gap_cost"] > max_gap_cost + 1e-6:
+                    valid = False
                 for (fid, day), var in built.water.items():
                     if not math.isclose(
                         var.X,

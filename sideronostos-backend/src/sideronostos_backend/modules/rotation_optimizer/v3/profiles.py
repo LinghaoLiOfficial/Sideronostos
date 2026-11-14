@@ -25,6 +25,9 @@ Key = Annotated[str, Field(pattern=r"^[a-zA-Z0-9_-]{1,80}$")]
 
 
 class SoilLimits(Contract):
+    allowed_textures: list[Literal["sand", "loam", "clay"]] = Field(min_length=1)
+    allowed_aspects: list[Literal["flat", "north", "east", "south", "west"]] = Field(min_length=1)
+    allowed_terrain_positions: list[Literal["level", "slope", "depression"]] = Field(min_length=1)
     ph_min: Annotated[float, Field(strict=True, ge=0, le=14)]
     ph_max: Annotated[float, Field(strict=True, ge=0, le=14)]
     min_depth_m: Positive
