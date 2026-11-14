@@ -34,6 +34,7 @@ class Conversation(Base):
     __tablename__ = "assistant_conversations"
     __table_args__ = (
         CheckConstraint(
+            "(preset = 'general' AND bot_id = 'general-guide') OR "
             "(preset = 'field_management' AND bot_id = 'field-guide') OR "
             "(preset = 'remote_sensing' AND bot_id IN "
             "('remote-water', 'remote-soil', 'remote-weather')) OR "

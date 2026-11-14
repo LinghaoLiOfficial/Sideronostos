@@ -1,0 +1,2999 @@
+{
+  "suite_version": "farmer-dialogue-v1",
+  "environment": "local mock model, mock product-help KB, synthetic verified farmer, real PostgreSQL and HTTP handlers",
+  "base_url": "http://127.0.0.1:8018",
+  "results": [
+    {
+      "case": {
+        "id": "G-FIELD-1",
+        "bot_id": "field-guide",
+        "preset": "field_management",
+        "language": "en",
+        "question": "I'm new here—what can you actually help me do with my farm today?",
+        "expected_outcome": "Explain saved fields, history, and field actions without claiming to know this farm.",
+        "expected_follow_up": "Ask which field or whether the farmer wants to add one."
+      },
+      "conversation_id": "6c64171b-bf18-4d68-a6ee-72fc67511a3c",
+      "status": "complete",
+      "answer": "I can check your saved fields, create a field and update its details here in chat. Tell me what you want to change; I will ask for missing information, show the exact values before saving, and give you the field link after the server confirms it.\nWhich field should we start with, or would you like to add one? For a new field, a name, location and area are a good start.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "field_management",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "2512d4fa505ebbd54d33345e62f34c6f8ed595a69229b5473f6ff03b3dd6e799",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can check your saved fields, create a field and update its details here in chat. Tell me what you want to change; I will ask for missing information, show the exact values before saving, and give you the field link after the server confirms it.\n\nWhich field should we start with, or would you like to add one? For a new field, a name, location and area are a good start.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can check your saved fields, create a field and update its details here in chat. Tell me what you want to change; I will ask for missing information, show the exact values before saving, and give you the field link after the server confirms it.",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "Which field should we start with, or would you like to add one? For a new field, a name, location and area are a good start.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "I'm new here—what can you actually help me do with my farm today?",
+          "status": "complete",
+          "answer": "I can check your saved fields, create a field and update its details here in chat. Tell me what you want to change; I will ask for missing information, show the exact values before saving, and give you the field link after the server confirms it.\nWhich field should we start with, or would you like to add one? For a new field, a name, location and area are a good start.",
+          "task": null
+        }
+      ],
+      "message_id": "4854642e-865c-4ae7-bfd2-56dde45ead5d",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 31
+    },
+    {
+      "case": {
+        "id": "G-FIELD-2",
+        "bot_id": "field-guide",
+        "preset": "field_management",
+        "language": "zh",
+        "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+        "expected_outcome": "State the minimum field information and avoid generic agronomic promises.",
+        "expected_follow_up": "Ask for the field or its location, area, and crop history according to the task."
+      },
+      "conversation_id": "0966ecf5-7e0f-4118-a79a-7dd0651beeb2",
+      "status": "complete",
+      "answer": "我可以在对话中查看已保存地块、新建地块并修改资料。请告诉我想做什么；我会追问缺少的信息、保存前展示具体内容，服务端确认后给你地块链接。\n先看哪块地，还是要新增一块？如果要建档，先告诉我地块名称、位置和面积；种植历史可以随后核对。",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "field_management",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "e63564c228b6e3309f8d5f6ac7ab7a37c2c6c7ea90bee9d90b4236422418ec40",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "我可以在对话中查看已保存地块、新建地块并修改资料。请告诉我想做什么；我会追问缺少的信息、保存前展示具体内容，服务端确认后给你地块链接。\n\n先看哪块地，还是要新增一块？如果要建档，先告诉我地块名称、位置和面积；种植历史可以随后核对。",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "我可以在对话中查看已保存地块、新建地块并修改资料。请告诉我想做什么；我会追问缺少的信息、保存前展示具体内容，服务端确认后给你地块链接。",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "先看哪块地，还是要新增一块？如果要建档，先告诉我地块名称、位置和面积；种植历史可以随后核对。",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+          "status": "complete",
+          "answer": "我可以在对话中查看已保存地块、新建地块并修改资料。请告诉我想做什么；我会追问缺少的信息、保存前展示具体内容，服务端确认后给你地块链接。\n先看哪块地，还是要新增一块？如果要建档，先告诉我地块名称、位置和面积；种植历史可以随后核对。",
+          "task": null
+        }
+      ],
+      "message_id": "c0199594-7781-4498-bd98-78423e9c6142",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 24
+    },
+    {
+      "case": {
+        "id": "G-WATER-1",
+        "bot_id": "remote-water",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "I'm new here—what can you actually help me do with my farm today?",
+        "expected_outcome": "Explain published water-related satellite and historical weather observations, with limits.",
+        "expected_follow_up": "Ask for a map area and the observation or date wanted."
+      },
+      "conversation_id": "8317be24-511f-4ccd-8bc3-12c1c4936f9e",
+      "status": "complete",
+      "answer": "I can explain published surface soil moisture, historical rainfall and reference evapotranspiration for a selected area. Open Farm tasks to find available maps and observations; a missing reading remains unavailable.\nWhich map area, date and indicator should I check: surface moisture, rainfall or reference evapotranspiration?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "234796516bc553b385023758822f23699d816a2f7f596f0ee95cee390c220302",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can explain published surface soil moisture, historical rainfall and reference evapotranspiration for a selected area. Open Farm tasks to find available maps and observations; a missing reading remains unavailable.\n\nWhich map area, date and indicator should I check: surface moisture, rainfall or reference evapotranspiration?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can explain published surface soil moisture, historical rainfall and reference evapotranspiration for a selected area. Open Farm tasks to find available maps and observations; a missing reading remains unavailable.",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "Which map area, date and indicator should I check: surface moisture, rainfall or reference evapotranspiration?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "I'm new here—what can you actually help me do with my farm today?",
+          "status": "complete",
+          "answer": "I can explain published surface soil moisture, historical rainfall and reference evapotranspiration for a selected area. Open Farm tasks to find available maps and observations; a missing reading remains unavailable.\nWhich map area, date and indicator should I check: surface moisture, rainfall or reference evapotranspiration?",
+          "task": null
+        }
+      ],
+      "message_id": "fdc28393-994b-4a6a-ad7a-6405cea00e4d",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 20
+    },
+    {
+      "case": {
+        "id": "G-WATER-2",
+        "bot_id": "remote-water",
+        "preset": "remote_sensing",
+        "language": "zh",
+        "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+        "expected_outcome": "State needed area and observation type; do not imply an irrigation prescription.",
+        "expected_follow_up": "Ask where to look and which period or indicator matters."
+      },
+      "conversation_id": "c98195da-d7f5-42ed-acac-03cbb00965d7",
+      "status": "complete",
+      "answer": "我可以解释选区内已发布的表层土壤湿度、历史降雨和参考蒸散资料。打开“农场任务”可以查询可用图层和观测；缺失的读数仍无法提供。\n要查看地图上的哪片区域、哪段时间，以及表层湿度、雨量还是参考蒸散？",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "8659b0d171d4657d4a7e4dbe388ebd52118feaf8201bf1fbf668c4c9c90cf0b7",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "我可以解释选区内已发布的表层土壤湿度、历史降雨和参考蒸散资料。打开“农场任务”可以查询可用图层和观测；缺失的读数仍无法提供。\n\n要查看地图上的哪片区域、哪段时间，以及表层湿度、雨量还是参考蒸散？",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "我可以解释选区内已发布的表层土壤湿度、历史降雨和参考蒸散资料。打开“农场任务”可以查询可用图层和观测；缺失的读数仍无法提供。",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "要查看地图上的哪片区域、哪段时间，以及表层湿度、雨量还是参考蒸散？",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+          "status": "complete",
+          "answer": "我可以解释选区内已发布的表层土壤湿度、历史降雨和参考蒸散资料。打开“农场任务”可以查询可用图层和观测；缺失的读数仍无法提供。\n要查看地图上的哪片区域、哪段时间，以及表层湿度、雨量还是参考蒸散？",
+          "task": null
+        }
+      ],
+      "message_id": "00714c1a-399e-4d18-8170-e3258512dd7b",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 22
+    },
+    {
+      "case": {
+        "id": "G-SOIL-1",
+        "bot_id": "remote-soil",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "I'm new here—what can you actually help me do with my farm today?",
+        "expected_outcome": "Describe surface soil moisture only, not root-zone moisture or weather forecasting.",
+        "expected_follow_up": "Ask for a selected area and available SMAP date."
+      },
+      "conversation_id": "6163ff04-dc8d-437e-8eeb-3ab44b0ce63f",
+      "status": "complete",
+      "answer": "I can explain published SMAP surface soil moisture for a selected area and its limits. Open Farm tasks to view an observation map or check a saved field. These surface readings do not establish root-zone moisture.\nWhich map area and observation date should I check?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "6b357b1dcf7dcd9f4622468ba65673bf93af6d03e39091f3b6ab215fad3108f0",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can explain published SMAP surface soil moisture for a selected area and its limits. Open Farm tasks to view an observation map or check a saved field. These surface readings do not establish root-zone moisture.\n\nWhich map area and observation date should I check?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can explain published SMAP surface soil moisture for a selected area and its limits. Open Farm tasks to view an observation map or check a saved field. These surface readings do not establish root-zone moisture.",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "Which map area and observation date should I check?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "I'm new here—what can you actually help me do with my farm today?",
+          "status": "complete",
+          "answer": "I can explain published SMAP surface soil moisture for a selected area and its limits. Open Farm tasks to view an observation map or check a saved field. These surface readings do not establish root-zone moisture.\nWhich map area and observation date should I check?",
+          "task": null
+        }
+      ],
+      "message_id": "dc52808f-b8a0-4622-a039-1cc2e1285a7f",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 21
+    },
+    {
+      "case": {
+        "id": "G-SOIL-2",
+        "bot_id": "remote-soil",
+        "preset": "remote_sensing",
+        "language": "zh",
+        "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+        "expected_outcome": "Explain the surface-moisture scope and required map selection.",
+        "expected_follow_up": "Ask for a location or map selection and time."
+      },
+      "conversation_id": "6e9e130a-33d4-469a-8759-9627abee24f2",
+      "status": "complete",
+      "answer": "我可以解释选区内已发布的 SMAP 表层土壤湿度及其局限。打开“农场任务”可以查看支持的图层或查询观测。表层读数不能确定根区湿度。\n要查看哪片区域和哪天的表层湿度？",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "d2d4ab1394fe28afad99876e32390b4c0086bd9d50125c48c7440b5649e443e7",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "我可以解释选区内已发布的 SMAP 表层土壤湿度及其局限。打开“农场任务”可以查看支持的图层或查询观测。表层读数不能确定根区湿度。\n\n要查看哪片区域和哪天的表层湿度？",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "我可以解释选区内已发布的 SMAP 表层土壤湿度及其局限。打开“农场任务”可以查看支持的图层或查询观测。表层读数不能确定根区湿度。",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "要查看哪片区域和哪天的表层湿度？",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+          "status": "complete",
+          "answer": "我可以解释选区内已发布的 SMAP 表层土壤湿度及其局限。打开“农场任务”可以查看支持的图层或查询观测。表层读数不能确定根区湿度。\n要查看哪片区域和哪天的表层湿度？",
+          "task": null
+        }
+      ],
+      "message_id": "2b9c8318-9b42-4012-8cc6-d5e2f72e6410",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "G-WEATHER-1",
+        "bot_id": "remote-weather",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "I'm new here—what can you actually help me do with my farm today?",
+        "expected_outcome": "Explain historical rainfall and reference ET0, not future forecast.",
+        "expected_follow_up": "Ask for area and past period."
+      },
+      "conversation_id": "dcff8c5e-8f08-4eca-86b6-2c270041d50f",
+      "status": "complete",
+      "answer": "I can explain published historical rainfall and reference evapotranspiration for a selected area and date range. Open Farm tasks to check a saved field. This assistant does not provide a future weather forecast.\nWhich area and past date range should I check?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "e79d151da39e981ce54a0b5a9b03fbd185d0628f9f97be799493e834e29d39f6",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can explain published historical rainfall and reference evapotranspiration for a selected area and date range. Open Farm tasks to check a saved field. This assistant does not provide a future weather forecast.\n\nWhich area and past date range should I check?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can explain published historical rainfall and reference evapotranspiration for a selected area and date range. Open Farm tasks to check a saved field. This assistant does not provide a future weather forecast.",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "Which area and past date range should I check?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "I'm new here—what can you actually help me do with my farm today?",
+          "status": "complete",
+          "answer": "I can explain published historical rainfall and reference evapotranspiration for a selected area and date range. Open Farm tasks to check a saved field. This assistant does not provide a future weather forecast.\nWhich area and past date range should I check?",
+          "task": null
+        }
+      ],
+      "message_id": "67c431ea-e783-46af-bee8-41f54b23936d",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "G-WEATHER-2",
+        "bot_id": "remote-weather",
+        "preset": "remote_sensing",
+        "language": "zh",
+        "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+        "expected_outcome": "Explain historical weather evidence and limitations in plain Chinese.",
+        "expected_follow_up": "Ask for location and historical date range."
+      },
+      "conversation_id": "5537216f-f250-44ae-b25d-3c7b01413ee5",
+      "status": "complete",
+      "answer": "我可以解释指定选区和时间范围内已发布的历史降雨与参考蒸散资料。打开“农场任务”可以查询观测。本助手不提供未来天气预报。\n要查看哪个区域、哪段过去的时间？",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "09ecff7d859460b54adbcf2d08c9a0e6f777d2d02e932930389573975c4c2567",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "我可以解释指定选区和时间范围内已发布的历史降雨与参考蒸散资料。打开“农场任务”可以查询观测。本助手不提供未来天气预报。\n\n要查看哪个区域、哪段过去的时间？",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "我可以解释指定选区和时间范围内已发布的历史降雨与参考蒸散资料。打开“农场任务”可以查询观测。本助手不提供未来天气预报。",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "要查看哪个区域、哪段过去的时间？",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+          "status": "complete",
+          "answer": "我可以解释指定选区和时间范围内已发布的历史降雨与参考蒸散资料。打开“农场任务”可以查询观测。本助手不提供未来天气预报。\n要查看哪个区域、哪段过去的时间？",
+          "task": null
+        }
+      ],
+      "message_id": "aa023ddf-2b3a-4530-a995-dca2f8d640cc",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 18
+    },
+    {
+      "case": {
+        "id": "G-ROTATION-1",
+        "bot_id": "rotation-guide",
+        "preset": "rotation",
+        "language": "en",
+        "question": "I'm new here—what can you actually help me do with my farm today?",
+        "expected_outcome": "Describe field-based rotation planning and the need for a saved field and assumptions.",
+        "expected_follow_up": "Ask which saved fields and planting period the farmer wants to plan."
+      },
+      "conversation_id": "a2ecfb24-92f8-4c8a-857a-08fb4d2d4018",
+      "status": "complete",
+      "answer": "I can explain rotation planning, saved plans and their trade-offs using the available evidence. Open Farm tasks to view saved plans and calculations, or choose Plan the next seasons to prepare a new plan in the full planner.\nWhich saved fields, crop history, planting period and constraints should the run use? Should I use the demo crop and weather assumptions for comparison?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "rotation",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "9fe012a9abf8511065df645e8d605d839b7ddb6575513c65af9272b30fc8446f",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can explain rotation planning, saved plans and their trade-offs using the available evidence. Open Farm tasks to view saved plans and calculations, or choose Plan the next seasons to prepare a new plan in the full planner.\n\nWhich saved fields, crop history, planting period and constraints should the run use? Should I use the demo crop and weather assumptions for comparison?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can explain rotation planning, saved plans and their trade-offs using the available evidence. Open Farm tasks to view saved plans and calculations, or choose Plan the next seasons to prepare a new plan in the full planner.",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "Which saved fields, crop history, planting period and constraints should the run use? Should I use the demo crop and weather assumptions for comparison?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "I'm new here—what can you actually help me do with my farm today?",
+          "status": "complete",
+          "answer": "I can explain rotation planning, saved plans and their trade-offs using the available evidence. Open Farm tasks to view saved plans and calculations, or choose Plan the next seasons to prepare a new plan in the full planner.\nWhich saved fields, crop history, planting period and constraints should the run use? Should I use the demo crop and weather assumptions for comparison?",
+          "task": null
+        }
+      ],
+      "message_id": "4a2f9f60-bdfe-4e61-8ceb-48564fb5e2bc",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "G-ROTATION-2",
+        "bot_id": "rotation-guide",
+        "preset": "rotation",
+        "language": "zh",
+        "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+        "expected_outcome": "State the practical inputs for a rotation run without dense API vocabulary.",
+        "expected_follow_up": "Ask for saved fields, crop history, and planning period."
+      },
+      "conversation_id": "8505fcba-c430-43ba-85df-026f135c00a9",
+      "status": "complete",
+      "answer": "我可以依据可用资料说明轮作规划步骤、存档方案及其取舍。打开“农场任务”可查看已保存计划和计算，或选择“规划接下来的种植季”；计算结果以服务端确认的结果为准。\n要规划账户里的哪几块地？请告诉我已有种植历史、计划种植时段和你在意的资源限制；演示作物和天气假设可以用于比较吗？",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "rotation",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "7fffa51ee6b87795e75544e15731414ce523f81592dde5488e76aa0b70b9912e",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "我可以依据可用资料说明轮作规划步骤、存档方案及其取舍。打开“农场任务”可查看已保存计划和计算，或选择“规划接下来的种植季”；计算结果以服务端确认的结果为准。\n\n要规划账户里的哪几块地？请告诉我已有种植历史、计划种植时段和你在意的资源限制；演示作物和天气假设可以用于比较吗？",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "我可以依据可用资料说明轮作规划步骤、存档方案及其取舍。打开“农场任务”可查看已保存计划和计算，或选择“规划接下来的种植季”；计算结果以服务端确认的结果为准。",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "要规划账户里的哪几块地？请告诉我已有种植历史、计划种植时段和你在意的资源限制；演示作物和天气假设可以用于比较吗？",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+          "status": "complete",
+          "answer": "我可以依据可用资料说明轮作规划步骤、存档方案及其取舍。打开“农场任务”可查看已保存计划和计算，或选择“规划接下来的种植季”；计算结果以服务端确认的结果为准。\n要规划账户里的哪几块地？请告诉我已有种植历史、计划种植时段和你在意的资源限制；演示作物和天气假设可以用于比较吗？",
+          "task": null
+        }
+      ],
+      "message_id": "0325ac6c-f28b-46a9-8366-6c873104c3d4",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 20
+    },
+    {
+      "case": {
+        "id": "G-LOCAL-1",
+        "bot_id": "local-knowledge-guide",
+        "preset": "local_agriculture",
+        "language": "en",
+        "question": "I'm new here—what can you actually help me do with my farm today?",
+        "expected_outcome": "Explain sourced general knowledge and that current local prices/varieties are unavailable in this demo.",
+        "expected_follow_up": "Ask what crop and region or topic the farmer wants to check."
+      },
+      "conversation_id": "c1e7c160-3036-4e72-a634-e8339d87c6f9",
+      "status": "complete",
+      "answer": "I can answer questions from the available local knowledge sources and show their references. Local prices and varieties in this demo are examples. Open Farm tasks → Ask about my area to include your region and crop.\nWhich crop, region or local topic should I check?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "local_agriculture",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "71cec9026c9e559337e6c290640157c90bbce5d8297da983f552d73ec463c292",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can answer questions from the available local knowledge sources and show their references. Local prices and varieties in this demo are examples. Open Farm tasks → Ask about my area to include your region and crop.\n\nWhich crop, region or local topic should I check?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can answer questions from the available local knowledge sources and show their references. Local prices and varieties in this demo are examples. Open Farm tasks → Ask about my area to include your region and crop.",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "Which crop, region or local topic should I check?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "I'm new here—what can you actually help me do with my farm today?",
+          "status": "complete",
+          "answer": "I can answer questions from the available local knowledge sources and show their references. Local prices and varieties in this demo are examples. Open Farm tasks → Ask about my area to include your region and crop.\nWhich crop, region or local topic should I check?",
+          "task": null
+        }
+      ],
+      "message_id": "289e169b-4ba2-45e2-acda-f1ad2fb65ea7",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "G-LOCAL-2",
+        "bot_id": "local-knowledge-guide",
+        "preset": "local_agriculture",
+        "language": "zh",
+        "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+        "expected_outcome": "Explain source-backed general guidance and mock data limits.",
+        "expected_follow_up": "Ask for region and crop or local topic."
+      },
+      "conversation_id": "ab6fef8d-f2e5-4647-ad7b-e7397be76e3d",
+      "status": "complete",
+      "answer": "我可以依据可用的本地知识资料回答问题，并展示来源。演示中的本地价格与品种是示例。打开“农场任务”→“询问本地农业”，可提供地区和作物。\n你想查哪种作物、哪个地区或什么本地问题？",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "local_agriculture",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "ce7e6946af5ef6366e7b1334d81e45019ac80f5ee98d99ff6ad2a2eceded9f32",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "我可以依据可用的本地知识资料回答问题，并展示来源。演示中的本地价格与品种是示例。打开“农场任务”→“询问本地农业”，可提供地区和作物。\n\n你想查哪种作物、哪个地区或什么本地问题？",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "我可以依据可用的本地知识资料回答问题，并展示来源。演示中的本地价格与品种是示例。打开“农场任务”→“询问本地农业”，可提供地区和作物。",
+            "evidence_ids": [
+              "K1"
+            ]
+          },
+          {
+            "text": "你想查哪种作物、哪个地区或什么本地问题？",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+          "status": "complete",
+          "answer": "我可以依据可用的本地知识资料回答问题，并展示来源。演示中的本地价格与品种是示例。打开“农场任务”→“询问本地农业”，可提供地区和作物。\n你想查哪种作物、哪个地区或什么本地问题？",
+          "task": null
+        }
+      ],
+      "message_id": "4f64193d-1c93-4ab5-acdc-31352ec3d1fa",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "F-1",
+        "bot_id": "field-guide",
+        "preset": "field_management",
+        "language": "en",
+        "question": "I just took over a small field by the creek. Can you add it for me?",
+        "expected_outcome": "Do not claim creation; direct to the create-field action.",
+        "expected_follow_up": "Ask for a name, location, area, soil texture, irrigation status, and profile as needed."
+      },
+      "conversation_id": "598d6e01-bf6a-43e2-a888-dcfb1d0f1c45",
+      "status": "complete",
+      "answer": "To add this field, please tell me its name, area in hectares, latitude, longitude, soil texture, whether irrigation is available, planting history, and which crop settings to use.",
+      "response": {
+        "task": {
+          "id": "eeb8515a-6826-4b9a-9daf-63d805cd1517",
+          "href": null,
+          "status": "needs_input",
+          "summary": null,
+          "preview_url": null,
+          "missing_inputs": [
+            "name",
+            "area_ha",
+            "latitude",
+            "longitude",
+            "soil_texture",
+            "irrigation_available",
+            "profile_id",
+            "history"
+          ]
+        },
+        "facts": [],
+        "actions": [],
+        "citations": [],
+        "paragraphs": [
+          {
+            "text": "To add this field, please tell me its name, area in hectares, latitude, longitude, soil texture, whether irrigation is available, planting history, and which crop settings to use.",
+            "evidence_ids": []
+          }
+        ],
+        "retrieval_mode": "mock_field_workflow",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "I just took over a small field by the creek. Can you add it for me?",
+          "status": "complete",
+          "answer": "To add this field, please tell me its name, area in hectares, latitude, longitude, soil texture, whether irrigation is available, planting history, and which crop settings to use.",
+          "task": {
+            "id": "eeb8515a-6826-4b9a-9daf-63d805cd1517",
+            "href": null,
+            "status": "needs_input",
+            "summary": null,
+            "preview_url": null,
+            "missing_inputs": [
+              "name",
+              "area_ha",
+              "latitude",
+              "longitude",
+              "soil_texture",
+              "irrigation_available",
+              "profile_id",
+              "history"
+            ]
+          }
+        }
+      ],
+      "message_id": "3f75b8dc-ee8b-46fa-9e70-be5162cb55d3",
+      "task": {
+        "id": "eeb8515a-6826-4b9a-9daf-63d805cd1517",
+        "href": null,
+        "status": "needs_input",
+        "summary": null,
+        "preview_url": null,
+        "missing_inputs": [
+          "name",
+          "area_ha",
+          "latitude",
+          "longitude",
+          "soil_texture",
+          "irrigation_available",
+          "profile_id",
+          "history"
+        ]
+      },
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "F-2",
+        "bot_id": "field-guide",
+        "preset": "field_management",
+        "language": "zh",
+        "question": "我家北边那块地之前种过啥？我只记得去年好像是豆子。",
+        "expected_outcome": "Do not invent history from a vague description.",
+        "expected_follow_up": "Ask which saved field and invite the farmer to verify or add its planting history."
+      },
+      "conversation_id": "f1702d64-6eb6-4da7-a947-2e964d878c40",
+      "status": "complete",
+      "answer": "仅凭“北边那块地”，我还不能确定是哪块地，也不能推断去年种了什么。你说的是账户中的哪块地？可以先打开它的种植历史核对；如果豆类记录缺失，再用地块工具补录确认过的历史。",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "field_management",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "6581025fe9e4523492a02054bbbd5c83b3339ad68a17323af886766ac10624bf",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "仅凭“北边那块地”，我还不能确定是哪块地，也不能推断去年种了什么。你说的是账户中的哪块地？可以先打开它的种植历史核对；如果豆类记录缺失，再用地块工具补录确认过的历史。",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "仅凭“北边那块地”，我还不能确定是哪块地，也不能推断去年种了什么。你说的是账户中的哪块地？可以先打开它的种植历史核对；如果豆类记录缺失，再用地块工具补录确认过的历史。",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "我家北边那块地之前种过啥？我只记得去年好像是豆子。",
+          "status": "complete",
+          "answer": "仅凭“北边那块地”，我还不能确定是哪块地，也不能推断去年种了什么。你说的是账户中的哪块地？可以先打开它的种植历史核对；如果豆类记录缺失，再用地块工具补录确认过的历史。",
+          "task": null
+        }
+      ],
+      "message_id": "fd659d8c-7321-44a9-b1c1-2271012c95d6",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 22
+    },
+    {
+      "case": {
+        "id": "F-3",
+        "bot_id": "field-guide",
+        "preset": "field_management",
+        "language": "en",
+        "question": "The field area looks wrong on my screen. Can you fix it to four hectares?",
+        "expected_outcome": "Do not claim an edit; explain the owned-field edit path and uncertainty.",
+        "expected_follow_up": "Ask which field and confirm the corrected area before submission."
+      },
+      "conversation_id": "89884454-5eda-4dd4-9c64-1506429a408c",
+      "status": "complete",
+      "answer": "I can help correct a saved field, but I need to know which one and confirm the area you supplied before changing it. Open Farm tasks → My fields → Edit details, select the field and enter the corrected area. Which field should be changed? I will give you the saved field link only after the update succeeds.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "field_management",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "654c0484e333c1ae4bfdfaa299d48a857817cab2cc0972a88d715113155768ec",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can help correct a saved field, but I need to know which one and confirm the area you supplied before changing it. Open Farm tasks → My fields → Edit details, select the field and enter the corrected area. Which field should be changed? I will give you the saved field link only after the update succeeds.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can help correct a saved field, but I need to know which one and confirm the area you supplied before changing it. Open Farm tasks → My fields → Edit details, select the field and enter the corrected area. Which field should be changed? I will give you the saved field link only after the update succeeds.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "The field area looks wrong on my screen. Can you fix it to four hectares?",
+          "status": "complete",
+          "answer": "I can help correct a saved field, but I need to know which one and confirm the area you supplied before changing it. Open Farm tasks → My fields → Edit details, select the field and enter the corrected area. Which field should be changed? I will give you the saved field link only after the update succeeds.",
+          "task": null
+        }
+      ],
+      "message_id": "c74a66a6-fc2e-41c7-8871-3f31d6632b9f",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 20
+    },
+    {
+      "case": {
+        "id": "W-1",
+        "bot_id": "remote-water",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "That blue patch on the map—should I water the corn tomorrow?",
+        "expected_outcome": "Explain satellite surface moisture is not a watering prescription or forecast.",
+        "expected_follow_up": "Ask which area/date and whether a published observation is available."
+      },
+      "conversation_id": "62946f99-6cfb-44ba-a19d-f307e7727517",
+      "status": "complete",
+      "answer": "A blue patch may represent a published regional surface observation, depending on the active layer. It is not a watering instruction or tomorrow's forecast. Before deciding on irrigation, check conditions in the field. Which map layer, area and observation date are you looking at?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "4fd4832bbcaa58c74930cadb5ed2b76757404cd1f1db3333ef23f5bc4f532d79",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "A blue patch may represent a published regional surface observation, depending on the active layer. It is not a watering instruction or tomorrow's forecast. Before deciding on irrigation, check conditions in the field. Which map layer, area and observation date are you looking at?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "A blue patch may represent a published regional surface observation, depending on the active layer. It is not a watering instruction or tomorrow's forecast. Before deciding on irrigation, check conditions in the field. Which map layer, area and observation date are you looking at?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "That blue patch on the map—should I water the corn tomorrow?",
+          "status": "complete",
+          "answer": "A blue patch may represent a published regional surface observation, depending on the active layer. It is not a watering instruction or tomorrow's forecast. Before deciding on irrigation, check conditions in the field. Which map layer, area and observation date are you looking at?",
+          "task": null
+        }
+      ],
+      "message_id": "1ed43aa3-be4a-4979-9fba-f3241c84d780",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "W-2",
+        "bot_id": "remote-water",
+        "preset": "remote_sensing",
+        "language": "zh",
+        "question": "我圈的那片地这阵子到底是偏干还是偏湿？",
+        "expected_outcome": "Do not state a moisture value without a current selection and observation.",
+        "expected_follow_up": "Ask for the map selection and observation period or offer the published-data action."
+      },
+      "conversation_id": "c812b7b6-d3e9-4ec8-a573-f5f212382332",
+      "status": "complete",
+      "answer": "没有这片区域的已发布读数，我不能直接判断偏干还是偏湿。请告诉我地图选区和想看的时间；可以用水分图层或观测工具查看数值与来源。",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "02b01e00738941d92b0e4987e3aa72fd6d408535e91c1c931f6ac956b3cfd8d0",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "没有这片区域的已发布读数，我不能直接判断偏干还是偏湿。请告诉我地图选区和想看的时间；可以用水分图层或观测工具查看数值与来源。",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "没有这片区域的已发布读数，我不能直接判断偏干还是偏湿。请告诉我地图选区和想看的时间；可以用水分图层或观测工具查看数值与来源。",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "我圈的那片地这阵子到底是偏干还是偏湿？",
+          "status": "complete",
+          "answer": "没有这片区域的已发布读数，我不能直接判断偏干还是偏湿。请告诉我地图选区和想看的时间；可以用水分图层或观测工具查看数值与来源。",
+          "task": null
+        }
+      ],
+      "message_id": "6dd6d818-b55c-4379-863c-c2ab339392ee",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "W-3",
+        "bot_id": "remote-water",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "Why does your water map look smooth when one corner of my field is dusty?",
+        "expected_outcome": "Explain SMAP scale limits and that local variation is possible.",
+        "expected_follow_up": "Ask for an area/date only if needed to inspect a published layer."
+      },
+      "conversation_id": "871085ba-17e1-4bd4-a508-c9d4242bc458",
+      "status": "complete",
+      "answer": "The water map summarizes a broad observation area; one dusty corner can differ from the mapped average. Use a ground check for that corner. If you want me to inspect the map evidence, which area and date are shown?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "5f27934e008a88cfdb6f2045245e41c33f0e0f7bd06c46e0051b4cf31df66966",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "The water map summarizes a broad observation area; one dusty corner can differ from the mapped average. Use a ground check for that corner. If you want me to inspect the map evidence, which area and date are shown?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "The water map summarizes a broad observation area; one dusty corner can differ from the mapped average. Use a ground check for that corner. If you want me to inspect the map evidence, which area and date are shown?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "Why does your water map look smooth when one corner of my field is dusty?",
+          "status": "complete",
+          "answer": "The water map summarizes a broad observation area; one dusty corner can differ from the mapped average. Use a ground check for that corner. If you want me to inspect the map evidence, which area and date are shown?",
+          "task": null
+        }
+      ],
+      "message_id": "cc3e6931-0e54-48df-a555-668e9e4b5dbd",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "S-1",
+        "bot_id": "remote-soil",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "Is that moisture reading down where my roots are, or just at the surface?",
+        "expected_outcome": "Clearly identify SMAP as regional surface moisture, not root-zone measurement.",
+        "expected_follow_up": "No follow-up needed for the basic distinction; optionally ask for a selected observation."
+      },
+      "conversation_id": "d7100491-7a7c-4d25-abb2-076f6f553447",
+      "status": "complete",
+      "answer": "This is SMAP surface soil moisture over a broad area, not a measurement at crop root depth. The map cannot establish root-zone conditions. If you want to inspect a particular reading, share the selected area and observation date.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "375c7c0bd22d16cec3d4b5e697fbf980b8491cba9c815ac759bb7b3ba2522c69",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "This is SMAP surface soil moisture over a broad area, not a measurement at crop root depth. The map cannot establish root-zone conditions. If you want to inspect a particular reading, share the selected area and observation date.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "This is SMAP surface soil moisture over a broad area, not a measurement at crop root depth. The map cannot establish root-zone conditions. If you want to inspect a particular reading, share the selected area and observation date.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "Is that moisture reading down where my roots are, or just at the surface?",
+          "status": "complete",
+          "answer": "This is SMAP surface soil moisture over a broad area, not a measurement at crop root depth. The map cannot establish root-zone conditions. If you want to inspect a particular reading, share the selected area and observation date.",
+          "task": null
+        }
+      ],
+      "message_id": "f395fdee-7d3f-48c1-97b3-a435c40513a9",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "S-2",
+        "bot_id": "remote-soil",
+        "preset": "remote_sensing",
+        "language": "zh",
+        "question": "图上颜色浅，我是不是得赶紧浇二十毫米？",
+        "expected_outcome": "Do not prescribe irrigation amount from map color; explain limits.",
+        "expected_follow_up": "Ask for field conditions or direct to ground measurement if making a practical watering decision."
+      },
+      "conversation_id": "f81c17e6-8cb0-4182-ab5f-18afebaafa5b",
+      "status": "complete",
+      "answer": "不能只凭地图颜色决定浇水量。图层反映区域表层湿度，不等于根区需水量；定量灌溉前请核对田间土壤情况。你看到的是哪个选区、哪天的图？",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "b823700364935272b96a5568d95bf61fe338b0b66f01c582cc12a39c0de33345",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "不能只凭地图颜色决定浇水量。图层反映区域表层湿度，不等于根区需水量；定量灌溉前请核对田间土壤情况。你看到的是哪个选区、哪天的图？",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "不能只凭地图颜色决定浇水量。图层反映区域表层湿度，不等于根区需水量；定量灌溉前请核对田间土壤情况。你看到的是哪个选区、哪天的图？",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "图上颜色浅，我是不是得赶紧浇二十毫米？",
+          "status": "complete",
+          "answer": "不能只凭地图颜色决定浇水量。图层反映区域表层湿度，不等于根区需水量；定量灌溉前请核对田间土壤情况。你看到的是哪个选区、哪天的图？",
+          "task": null
+        }
+      ],
+      "message_id": "34351bb4-a161-4175-a041-2025dc6752bd",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 21
+    },
+    {
+      "case": {
+        "id": "S-3",
+        "bot_id": "remote-soil",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "Can you pull the latest soil moisture for my south pasture?",
+        "expected_outcome": "Do not invent a latest value or assume the pasture is mapped.",
+        "expected_follow_up": "Ask for a map selection or exact saved area and available date."
+      },
+      "conversation_id": "f490aa20-c025-4e43-8662-960371031e9f",
+      "status": "complete",
+      "answer": "I can look for the latest published surface moisture reading, but I need to locate the south pasture first. Please select it on the map or give its saved area, then use the observation tool. I will report the date, value and source only if a reading exists.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "95b10c63bec90fd136af59b0a2850ec306c7273a778374d27ef257942dfbf4e9",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can look for the latest published surface moisture reading, but I need to locate the south pasture first. Please select it on the map or give its saved area, then use the observation tool. I will report the date, value and source only if a reading exists.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can look for the latest published surface moisture reading, but I need to locate the south pasture first. Please select it on the map or give its saved area, then use the observation tool. I will report the date, value and source only if a reading exists.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "Can you pull the latest soil moisture for my south pasture?",
+          "status": "complete",
+          "answer": "I can look for the latest published surface moisture reading, but I need to locate the south pasture first. Please select it on the map or give its saved area, then use the observation tool. I will report the date, value and source only if a reading exists.",
+          "task": null
+        }
+      ],
+      "message_id": "86089cd2-4394-4464-b9ff-48b39e3e5a0f",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "T-1",
+        "bot_id": "remote-weather",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "Will rain hit my place next Tuesday, or should I move the hay?",
+        "expected_outcome": "State that this bot has historical observations, not a future forecast.",
+        "expected_follow_up": "Offer historical context or direct the farmer to a current forecast source."
+      },
+      "conversation_id": "d87485a1-b8ee-4070-91ca-07abb4f1d684",
+      "status": "complete",
+      "answer": "I only have published historical rainfall and reference evapotranspiration here, so I cannot say whether it will rain next Tuesday. Check a current local forecast before moving hay. If useful, tell me your area and a past period to review its historical rainfall.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "3ca4c66fe23a5efd1d0778d8b7628035965904c45b594ae8334f6223d8f3c67f",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I only have published historical rainfall and reference evapotranspiration here, so I cannot say whether it will rain next Tuesday. Check a current local forecast before moving hay. If useful, tell me your area and a past period to review its historical rainfall.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I only have published historical rainfall and reference evapotranspiration here, so I cannot say whether it will rain next Tuesday. Check a current local forecast before moving hay. If useful, tell me your area and a past period to review its historical rainfall.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "Will rain hit my place next Tuesday, or should I move the hay?",
+          "status": "complete",
+          "answer": "I only have published historical rainfall and reference evapotranspiration here, so I cannot say whether it will rain next Tuesday. Check a current local forecast before moving hay. If useful, tell me your area and a past period to review its historical rainfall.",
+          "task": null
+        }
+      ],
+      "message_id": "6480e34b-2170-43cd-8b53-fa13da9a00ae",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 20
+    },
+    {
+      "case": {
+        "id": "T-2",
+        "bot_id": "remote-weather",
+        "preset": "remote_sensing",
+        "language": "zh",
+        "question": "八月份我这块地到底下了多少雨？",
+        "expected_outcome": "Do not invent rainfall amount or year.",
+        "expected_follow_up": "Ask which field or map selection, which year, and whether historical data is published."
+      },
+      "conversation_id": "e8c7d38c-7b40-42e0-874a-d0ed137fcaf0",
+      "status": "complete",
+      "answer": "可以查询已发布的历史降雨，但请先告诉我是哪块地或地图选区，以及所问月份属于哪个年份。有观测结果后，我会给出雨量、时段和来源；仅凭月份不能推断雨量。",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "3305deb20d4003ca98e1e8233a2df6457f0d3f1f1c4012f99006d036a5cfacc9",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "可以查询已发布的历史降雨，但请先告诉我是哪块地或地图选区，以及所问月份属于哪个年份。有观测结果后，我会给出雨量、时段和来源；仅凭月份不能推断雨量。",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "可以查询已发布的历史降雨，但请先告诉我是哪块地或地图选区，以及所问月份属于哪个年份。有观测结果后，我会给出雨量、时段和来源；仅凭月份不能推断雨量。",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "八月份我这块地到底下了多少雨？",
+          "status": "complete",
+          "answer": "可以查询已发布的历史降雨，但请先告诉我是哪块地或地图选区，以及所问月份属于哪个年份。有观测结果后，我会给出雨量、时段和来源；仅凭月份不能推断雨量。",
+          "task": null
+        }
+      ],
+      "message_id": "64e2e6a4-09a5-457d-aec9-ca6df4289659",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 20
+    },
+    {
+      "case": {
+        "id": "T-3",
+        "bot_id": "remote-weather",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "Does NASA ET-zero tell me how much water to pump into the pivot?",
+        "expected_outcome": "Explain ET0 is a reference measure, not a pump setting.",
+        "expected_follow_up": "No follow-up needed for the distinction; ask for crop/field context only if estimating demand."
+      },
+      "conversation_id": "52a61ecd-660f-4cab-9345-e6d3d61bc39e",
+      "status": "complete",
+      "answer": "Reference evapotranspiration describes atmospheric evaporative demand under reference conditions. It is not a pivot pump setting or a direct crop irrigation amount. A practical irrigation decision also needs crop, soil and field measurements. Would you like to inspect the published reference evapotranspiration for a selected area and period?",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "9da9c7f1f3f47f7cf40c131fd7c3ff057c4ab73477befefb038c57dbfb9cd53d",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "Reference evapotranspiration describes atmospheric evaporative demand under reference conditions. It is not a pivot pump setting or a direct crop irrigation amount. A practical irrigation decision also needs crop, soil and field measurements. Would you like to inspect the published reference evapotranspiration for a selected area and period?",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "Reference evapotranspiration describes atmospheric evaporative demand under reference conditions. It is not a pivot pump setting or a direct crop irrigation amount. A practical irrigation decision also needs crop, soil and field measurements. Would you like to inspect the published reference evapotranspiration for a selected area and period?",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "Does NASA ET-zero tell me how much water to pump into the pivot?",
+          "status": "complete",
+          "answer": "Reference evapotranspiration describes atmospheric evaporative demand under reference conditions. It is not a pivot pump setting or a direct crop irrigation amount. A practical irrigation decision also needs crop, soil and field measurements. Would you like to inspect the published reference evapotranspiration for a selected area and period?",
+          "task": null
+        }
+      ],
+      "message_id": "c29352d0-c977-4c09-8997-1406c4b501ab",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 20
+    },
+    {
+      "case": {
+        "id": "R-1",
+        "bot_id": "rotation-guide",
+        "preset": "rotation",
+        "language": "en",
+        "question": "Could you plan next season for my two fields if I tell you what I planted?",
+        "expected_outcome": "Do not claim a plan or run; explain explicit planning inputs and action.",
+        "expected_follow_up": "Ask which saved fields, crop history, planning dates, constraints, and benchmark acceptance."
+      },
+      "conversation_id": "ca9f3c05-5d00-4773-bca5-d4b02b5bba70",
+      "status": "complete",
+      "answer": "I can help prepare a rotation run. Open Farm tasks → Plan the next seasons after choosing your saved fields. Which fields, planting history and planning dates should it use, and what constraints matter to you? Please also confirm whether the demo crop and weather assumptions are suitable for comparison. A plan exists only after the calculation succeeds; then I can link its result.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "rotation",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "43ebd2a9f7930b360c6191977cf776375d882659e5053e8abbc08a632d532a5f",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I can help prepare a rotation run. Open Farm tasks → Plan the next seasons after choosing your saved fields. Which fields, planting history and planning dates should it use, and what constraints matter to you? Please also confirm whether the demo crop and weather assumptions are suitable for comparison. A plan exists only after the calculation succeeds; then I can link its result.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I can help prepare a rotation run. Open Farm tasks → Plan the next seasons after choosing your saved fields. Which fields, planting history and planning dates should it use, and what constraints matter to you? Please also confirm whether the demo crop and weather assumptions are suitable for comparison. A plan exists only after the calculation succeeds; then I can link its result.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "Could you plan next season for my two fields if I tell you what I planted?",
+          "status": "complete",
+          "answer": "I can help prepare a rotation run. Open Farm tasks → Plan the next seasons after choosing your saved fields. Which fields, planting history and planning dates should it use, and what constraints matter to you? Please also confirm whether the demo crop and weather assumptions are suitable for comparison. A plan exists only after the calculation succeeds; then I can link its result.",
+          "task": null
+        }
+      ],
+      "message_id": "c82aeae0-f512-4f34-b788-e40cb97e7015",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 21
+    },
+    {
+      "case": {
+        "id": "R-2",
+        "bot_id": "rotation-guide",
+        "preset": "rotation",
+        "language": "zh",
+        "question": "上回那个计算没出来，是哪里卡住了？能帮我再跑一次吗？",
+        "expected_outcome": "Do not invent a failure cause or say retry completed.",
+        "expected_follow_up": "Ask which run; distinguish retrying original conditions from editing and submitting new ones."
+      },
+      "conversation_id": "eb0a5b0f-d8fb-442e-9d2d-96888f35d64d",
+      "status": "complete",
+      "answer": "没有指定上次的任务，我不能判断卡在何处。请告诉我是哪次计算，先打开它的状态和诊断。如果是临时运行故障，可重试原任务；如果需要改输入，请修改规划表单并提交新的计算。服务端确认后我才能报告新结果。",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "rotation",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "9c67a0ce91a95ef13d8c57b983862c4a25e5b648e8d96f623f7f2d8a6a3d5365",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "没有指定上次的任务，我不能判断卡在何处。请告诉我是哪次计算，先打开它的状态和诊断。如果是临时运行故障，可重试原任务；如果需要改输入，请修改规划表单并提交新的计算。服务端确认后我才能报告新结果。",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "没有指定上次的任务，我不能判断卡在何处。请告诉我是哪次计算，先打开它的状态和诊断。如果是临时运行故障，可重试原任务；如果需要改输入，请修改规划表单并提交新的计算。服务端确认后我才能报告新结果。",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "上回那个计算没出来，是哪里卡住了？能帮我再跑一次吗？",
+          "status": "complete",
+          "answer": "没有指定上次的任务，我不能判断卡在何处。请告诉我是哪次计算，先打开它的状态和诊断。如果是临时运行故障，可重试原任务；如果需要改输入，请修改规划表单并提交新的计算。服务端确认后我才能报告新结果。",
+          "task": null
+        }
+      ],
+      "message_id": "839ea6b8-51fb-4dab-af83-8746d770ab68",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 19
+    },
+    {
+      "case": {
+        "id": "R-3",
+        "bot_id": "rotation-guide",
+        "preset": "rotation",
+        "language": "en",
+        "question": "If I pick the top plan, is my profit basically guaranteed?",
+        "expected_outcome": "Reject profit guarantee; explain model assumptions and local calibration.",
+        "expected_follow_up": "No required follow-up; offer to inspect a selected completed plan if available."
+      },
+      "conversation_id": "df827bbd-706c-4a4e-a020-99132139a645",
+      "status": "complete",
+      "answer": "The top-ranked plan does not guarantee profit. Its ranking depends on the model's inputs, assumptions and available data, while your actual costs, yields and prices can differ. If you share a completed plan, I can walk through its assumptions and trade-offs with you.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "rotation",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "b5fe563f682fdb920fd61bfdd43236dd7388f2b87e91de8dbf215141dd814524",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "The top-ranked plan does not guarantee profit. Its ranking depends on the model's inputs, assumptions and available data, while your actual costs, yields and prices can differ. If you share a completed plan, I can walk through its assumptions and trade-offs with you.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "The top-ranked plan does not guarantee profit. Its ranking depends on the model's inputs, assumptions and available data, while your actual costs, yields and prices can differ. If you share a completed plan, I can walk through its assumptions and trade-offs with you.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "If I pick the top plan, is my profit basically guaranteed?",
+          "status": "complete",
+          "answer": "The top-ranked plan does not guarantee profit. Its ranking depends on the model's inputs, assumptions and available data, while your actual costs, yields and prices can differ. If you share a completed plan, I can walk through its assumptions and trade-offs with you.",
+          "task": null
+        }
+      ],
+      "message_id": "0881caa3-9ea4-43f9-ab5a-751c7a8928d8",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 20
+    },
+    {
+      "case": {
+        "id": "L-1",
+        "bot_id": "local-knowledge-guide",
+        "preset": "local_agriculture",
+        "language": "en",
+        "question": "Which corn variety would you plant on my place?",
+        "expected_outcome": "Do not recommend a current local variety from mock product help.",
+        "expected_follow_up": "Ask for region, soil/climate, and a verified local source."
+      },
+      "conversation_id": "9258ca06-2c67-4803-a08d-4cad625754a4",
+      "status": "complete",
+      "answer": "I cannot choose a current corn variety for your farm from this demo's example knowledge. What region are you in, and what are your soil and growing conditions? We would need a verified local extension or variety-trial source before recommending one.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "local_agriculture",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "bab4916ae39463a0718ab3489887aa25b97d5ff78a47cdf146ae62c82fa6a4db",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I cannot choose a current corn variety for your farm from this demo's example knowledge. What region are you in, and what are your soil and growing conditions? We would need a verified local extension or variety-trial source before recommending one.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I cannot choose a current corn variety for your farm from this demo's example knowledge. What region are you in, and what are your soil and growing conditions? We would need a verified local extension or variety-trial source before recommending one.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "Which corn variety would you plant on my place?",
+          "status": "complete",
+          "answer": "I cannot choose a current corn variety for your farm from this demo's example knowledge. What region are you in, and what are your soil and growing conditions? We would need a verified local extension or variety-trial source before recommending one.",
+          "task": null
+        }
+      ],
+      "message_id": "5e519da7-77ac-4154-8ce8-264551c8878b",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 18
+    },
+    {
+      "case": {
+        "id": "L-2",
+        "bot_id": "local-knowledge-guide",
+        "preset": "local_agriculture",
+        "language": "zh",
+        "question": "今年秋天卖大豆大概能拿多少钱？",
+        "expected_outcome": "Do not invent current price or income forecast.",
+        "expected_follow_up": "Ask for location and market/source; explain live price data is unavailable."
+      },
+      "conversation_id": "b855acfe-8553-447e-9787-69d533716b04",
+      "status": "complete",
+      "answer": "我没有经过核实的当前大豆价格或秋季售价预测，因此不能直接估算收入。你在哪个地区、通过哪个市场销售？有可靠的现价来源和预计销售量后，才能做注明假设的估算。",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "local_agriculture",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "b56f1cb7a094a01fa43a20e8d600a9e0fa0aa351a67e074ba5aa460cfaeadd72",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "我没有经过核实的当前大豆价格或秋季售价预测，因此不能直接估算收入。你在哪个地区、通过哪个市场销售？有可靠的现价来源和预计销售量后，才能做注明假设的估算。",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "我没有经过核实的当前大豆价格或秋季售价预测，因此不能直接估算收入。你在哪个地区、通过哪个市场销售？有可靠的现价来源和预计销售量后，才能做注明假设的估算。",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "今年秋天卖大豆大概能拿多少钱？",
+          "status": "complete",
+          "answer": "我没有经过核实的当前大豆价格或秋季售价预测，因此不能直接估算收入。你在哪个地区、通过哪个市场销售？有可靠的现价来源和预计销售量后，才能做注明假设的估算。",
+          "task": null
+        }
+      ],
+      "message_id": "a0a312f3-7406-4503-85a8-fda135f57a09",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 18
+    },
+    {
+      "case": {
+        "id": "L-3",
+        "bot_id": "local-knowledge-guide",
+        "preset": "local_agriculture",
+        "language": "en",
+        "question": "Am I allowed to spray right next to the creek on my farm?",
+        "expected_outcome": "Do not make a legal compliance claim without jurisdiction and product label.",
+        "expected_follow_up": "Ask for location, product label, and local extension or regulator source."
+      },
+      "conversation_id": "b555cf46-dc89-4b72-ae9c-fda2287f5371",
+      "status": "complete",
+      "answer": "I cannot confirm whether spraying by your creek is legal or safe without your jurisdiction and the exact product label. Where is the farm, and which product are you considering? Check the label and your local regulator or extension service before spraying.",
+      "response": {
+        "facts": [],
+        "intent": "guide",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "local_agriculture",
+            "result_count": 0
+          },
+          "retrieval_ms": 0,
+          "response_mode": "product_help",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [
+          {
+            "id": "K1",
+            "claims": [],
+            "source": {
+              "id": "MODULEHELP",
+              "url": "https://github.com/LinghaoLiOfficial/Sideronostos/blob/feat/agent-bot-catalog-integration/docs/integration/agent-capabilities.md",
+              "title": "Assistant capabilities",
+              "sha256": "0acebb2b3070aef44d4a77e4c6847ad79e7bd217e69bb8ad657c09a537130c28",
+              "regions": [
+                "product documentation"
+              ],
+              "limitations": [
+                "Product instructions, not evidence about a farmer's field."
+              ],
+              "access_scope": "product_help"
+            },
+            "excerpt": "I cannot confirm whether spraying by your creek is legal or safe without your jurisdiction and the exact product label. Where is the farm, and which product are you considering? Check the label and your local regulator or extension service before spraying.",
+            "retrieval_mode": "product_help"
+          }
+        ],
+        "paragraphs": [
+          {
+            "text": "I cannot confirm whether spraying by your creek is legal or safe without your jurisdiction and the exact product label. Where is the farm, and which product are you considering? Check the label and your local regulator or extension service before spraying.",
+            "evidence_ids": [
+              "K1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "product_help",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "Am I allowed to spray right next to the creek on my farm?",
+          "status": "complete",
+          "answer": "I cannot confirm whether spraying by your creek is legal or safe without your jurisdiction and the exact product label. Where is the farm, and which product are you considering? Check the label and your local regulator or extension service before spraying.",
+          "task": null
+        }
+      ],
+      "message_id": "d5d1aba5-04f5-43f4-9e19-5d0cdfe5ee6b",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 18
+    },
+    {
+      "case": {
+        "id": "E-FIELD",
+        "expected_route": "evidence",
+        "bot_id": "field-guide",
+        "preset": "field_management",
+        "language": "en",
+        "question": "What does the record say about the back paddock's area?",
+        "expected_outcome": "Check owned field context; without an identified record, do not invent an area.",
+        "expected_follow_up": "Ask which saved field the farmer means."
+      },
+      "conversation_id": "9c5d9edf-3f63-4c41-9507-c0aef30a944e",
+      "status": "complete",
+      "answer": "The current account has a related database record; open the data evidence below to inspect its value and source.",
+      "response": {
+        "facts": [
+          {
+            "id": "F1",
+            "key": "field.8675638e-ea97-598b-9a55-f143f26c5404.area",
+            "unit": "ha",
+            "label": "West meadow 9f343210: 经营面积 / farm area",
+            "value": 4.0,
+            "source": {
+              "kind": "farmer_input",
+              "version": 1,
+              "field_id": "8675638e-ea97-598b-9a55-f143f26c5404"
+            },
+            "display": "4.00 ha",
+            "limitations": []
+          }
+        ],
+        "intent": "learn",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "field_management",
+            "result_count": 0
+          },
+          "retrieval_ms": 163,
+          "response_mode": "evidence",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [],
+        "paragraphs": [
+          {
+            "text": "The current account has a related database record; open the data evidence below to inspect its value and source.",
+            "evidence_ids": [
+              "F1"
+            ]
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "lexical_degraded",
+        "needs_clarification": false
+      },
+      "transcript": [
+        {
+          "question": "What does the record say about the back paddock's area?",
+          "status": "complete",
+          "answer": "The current account has a related database record; open the data evidence below to inspect its value and source.",
+          "task": null
+        }
+      ],
+      "message_id": "d7f34b8b-67b7-4c39-9911-fc287c537b12",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 192
+    },
+    {
+      "case": {
+        "id": "E-WATER",
+        "expected_route": "evidence",
+        "bot_id": "remote-water",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "Can you compare this month's rainfall and surface moisture for my creek field?",
+        "expected_outcome": "Check scoped observations; do not compare values without a map selection.",
+        "expected_follow_up": "Ask for map area and observation period."
+      },
+      "conversation_id": "afd864bc-dcb8-4f84-8faf-aa94411a03a5",
+      "status": "complete",
+      "answer": "I need a map area and observation period to check published water-related data. Which area and date should I look at?",
+      "response": {
+        "facts": [],
+        "intent": "learn",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 1007,
+          "response_mode": "evidence",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [],
+        "paragraphs": [
+          {
+            "text": "I need a map area and observation period to check published water-related data. Which area and date should I look at?",
+            "evidence_ids": []
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "lexical_degraded",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "Can you compare this month's rainfall and surface moisture for my creek field?",
+          "status": "complete",
+          "answer": "I need a map area and observation period to check published water-related data. Which area and date should I look at?",
+          "task": null
+        }
+      ],
+      "message_id": "32521921-891b-4bdb-845f-86b8780dc284",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 1036
+    },
+    {
+      "case": {
+        "id": "E-SOIL",
+        "expected_route": "evidence",
+        "bot_id": "remote-soil",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "What was the surface moisture yesterday over my south pasture?",
+        "expected_outcome": "Check the scoped SMAP source; do not invent yesterday's observation.",
+        "expected_follow_up": "Ask for map area and available date."
+      },
+      "conversation_id": "33fba275-5018-4127-8d91-58ea45aa4bce",
+      "status": "complete",
+      "answer": "I need a map area and date to check published surface soil moisture. Which area should I inspect?",
+      "response": {
+        "facts": [],
+        "intent": "learn",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 1008,
+          "response_mode": "evidence",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [],
+        "paragraphs": [
+          {
+            "text": "I need a map area and date to check published surface soil moisture. Which area should I inspect?",
+            "evidence_ids": []
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "lexical_degraded",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "What was the surface moisture yesterday over my south pasture?",
+          "status": "complete",
+          "answer": "I need a map area and date to check published surface soil moisture. Which area should I inspect?",
+          "task": null
+        }
+      ],
+      "message_id": "44837c58-315f-4274-9f88-92bfa0bc3f0b",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 1040
+    },
+    {
+      "case": {
+        "id": "E-WEATHER",
+        "expected_route": "evidence",
+        "bot_id": "remote-weather",
+        "preset": "remote_sensing",
+        "language": "en",
+        "question": "Show me the observed rainfall around my field last spring.",
+        "expected_outcome": "Check historical weather sources; do not invent a rainfall value.",
+        "expected_follow_up": "Ask for map area and historical date range."
+      },
+      "conversation_id": "9ecaa7ad-57dd-41f9-afa9-f4056d0754b0",
+      "status": "complete",
+      "answer": "I can check published historical rainfall or reference evapotranspiration. Which map area, past period and indicator should I use?",
+      "response": {
+        "facts": [],
+        "intent": "learn",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "remote_sensing",
+            "result_count": 0
+          },
+          "retrieval_ms": 1009,
+          "response_mode": "evidence",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [],
+        "paragraphs": [
+          {
+            "text": "I can check published historical rainfall or reference evapotranspiration. Which map area, past period and indicator should I use?",
+            "evidence_ids": []
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "lexical_degraded",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "Show me the observed rainfall around my field last spring.",
+          "status": "complete",
+          "answer": "I can check published historical rainfall or reference evapotranspiration. Which map area, past period and indicator should I use?",
+          "task": null
+        }
+      ],
+      "message_id": "5334c40f-ec90-4375-95af-96d10f17de11",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 1039
+    },
+    {
+      "case": {
+        "id": "E-ROTATION",
+        "expected_route": "evidence",
+        "bot_id": "rotation-guide",
+        "preset": "rotation",
+        "language": "en",
+        "question": "What was the water gap in my last rotation run?",
+        "expected_outcome": "Check the owned run; without a run reference, do not invent a result.",
+        "expected_follow_up": "Ask which saved run the farmer means."
+      },
+      "conversation_id": "0d3b65d6-b3f5-4a3a-b239-cd8cb5a2d0c3",
+      "status": "complete",
+      "answer": "I need to identify the saved planning run before reporting its result. Which run do you mean?",
+      "response": {
+        "facts": [],
+        "intent": "learn",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "rotation",
+            "result_count": 0
+          },
+          "retrieval_ms": 1011,
+          "response_mode": "evidence",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [],
+        "paragraphs": [
+          {
+            "text": "I need to identify the saved planning run before reporting its result. Which run do you mean?",
+            "evidence_ids": []
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "lexical_degraded",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "What was the water gap in my last rotation run?",
+          "status": "complete",
+          "answer": "I need to identify the saved planning run before reporting its result. Which run do you mean?",
+          "task": null
+        }
+      ],
+      "message_id": "1b0e77dc-bc7a-4bef-8acf-9b5174051969",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 1048
+    },
+    {
+      "case": {
+        "id": "E-LOCAL",
+        "expected_route": "evidence",
+        "bot_id": "local-knowledge-guide",
+        "preset": "local_agriculture",
+        "language": "en",
+        "question": "What do your sources say about cover crops in my county?",
+        "expected_outcome": "Check the mock KB and preset web search; do not treat generic product help as local agronomic evidence.",
+        "expected_follow_up": "Ask which county and crop or say no verified local source is available."
+      },
+      "conversation_id": "98a963ee-d049-4f20-8449-fac3a3bea50b",
+      "status": "complete",
+      "answer": "I do not have a verified source for your county yet. Which county and crop should I check?",
+      "response": {
+        "facts": [],
+        "intent": "learn",
+        "actions": [],
+        "metrics": {
+          "mock": true,
+          "model": "local-mock",
+          "usage": {
+            "input_tokens": 0,
+            "total_tokens": 0,
+            "output_tokens": 0
+          },
+          "model_ms": 0,
+          "web_search": {
+            "preset": "local_agriculture",
+            "result_count": 0
+          },
+          "retrieval_ms": 1021,
+          "response_mode": "evidence",
+          "prompt_version": "farmer-evidence-bound-20261114-v20-dialogue-routing",
+          "embedding_tokens": 0,
+          "validation_repairs": 0
+        },
+        "warnings": [],
+        "citations": [],
+        "paragraphs": [
+          {
+            "text": "I do not have a verified source for your county yet. Which county and crop should I check?",
+            "evidence_ids": []
+          }
+        ],
+        "kb_release_id": "local-mock-product-help-v3",
+        "retrieval_mode": "lexical_degraded",
+        "needs_clarification": true
+      },
+      "transcript": [
+        {
+          "question": "What do your sources say about cover crops in my county?",
+          "status": "complete",
+          "answer": "I do not have a verified source for your county yet. Which county and crop should I check?",
+          "task": null
+        }
+      ],
+      "message_id": "b330aa0b-c8ef-4b29-a4c4-2cd263922e8c",
+      "task": null,
+      "operation_check": true,
+      "error_code": null,
+      "latency_ms": 1060
+    }
+  ]
+}

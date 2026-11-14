@@ -405,11 +405,16 @@ export type AssistantAnswer = {
 };
 export type AssistantTask = {
   id: string;
-  status: "needs_input" | "awaiting_confirmation" | "completed" | "failed" | "cancelled";
+  status: "needs_input" | "awaiting_confirmation" | "pending" | "completed" | "failed" | "cancelled";
+  operation_id?: string;
+  title?: string;
   missing_inputs: string[];
   summary: Record<string, unknown> | null;
   href: string | null;
+  result_page_url?: string | null;
   preview_url: string | null;
+  refresh_url?: string | null;
+  execution?: Record<string, unknown> | null;
 };
 export type AssistantMessage = {
   id: string;

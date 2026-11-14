@@ -77,7 +77,10 @@ def _reply(flow: AssistantAction, text: str, *, href: str | None = None) -> dict
 
 async def handle_field_chat(session: AsyncSession, message_id: str) -> dict[str, Any] | None:
     message = await session.get(AssistantMessage, message_id)
-    if message is None or message.context_snapshot.get("bot_id") != "field-guide":
+    if message is None or message.context_snapshot.get("bot_id") not in {
+        "field-guide",
+        "general-guide",
+    }:
         return None
     flow = await session.scalar(
         select(AssistantAction)
@@ -93,8 +96,18 @@ async def handle_field_chat(session: AsyncSession, message_id: str) -> dict[str,
     )
     question = message.text.strip()
     if flow is None:
+        if re.match(r"^(?:what|how|which|why|when|where)\b|^(?:什么|如何|怎么)", question, re.I):
+            return None
+        if re.search(
+            r"\b(?:do\s+not|don't|not)\s+(?:add|create)\b|不要(?:新增|创建)", question, re.I
+        ):
+            return None
         if not re.search(
-            r"\b(?:add|create|new)\b.*\bfield\b|(?:新增|创建).*(?:地块|田地)", question, re.I
+            r"\b(?:add|create|new)\b.*\bfield\b|"
+            r"\bfield\b.{0,80}\b(?:add|create)\s+it\b|"
+            r"(?:新增|创建).*(?:地块|田地)",
+            question,
+            re.I,
         ):
             return None
         flow = AssistantAction(

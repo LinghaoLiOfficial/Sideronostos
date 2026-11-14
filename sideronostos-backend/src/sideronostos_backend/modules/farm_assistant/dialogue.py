@@ -21,6 +21,7 @@ class DialogueRoute:
 
 
 BOT_NAMES = {
+    "general-guide": ("Farm assistant", "农场综合助手"),
     "field-guide": ("Field guide", "地块助手"),
     "remote-water": ("Water specialist", "水分助手"),
     "remote-soil": ("Soil specialist", "土壤助手"),
@@ -30,12 +31,19 @@ BOT_NAMES = {
 }
 
 CAPABILITIES = {
+    "general-guide": (
+        "I can check your saved fields, published observations and rotation records, "
+        "and help prepare an operation through the same business services as the workspaces. "
+        "I will show the exact details and ask before saving a change.",
+        "我可以查看已保存地块、已发布观测和轮作记录，也能通过现有业务服务协助操作。"
+        "保存修改前，我会列出具体内容并请你确认。",
+    ),
     "field-guide": (
-        "I can explain field setup and the saved field records available in this conversation. "
-        "To create or update a field, open Farm tasks and choose Add a field or My fields; "
-        "the form asks for the details it needs.",
-        "我可以说明地块填写步骤，并解释当前对话中可用的地块记录。"
-        "要创建或修改地块，请打开“农场任务”并选择对应操作，表单会提示需要填写的信息。",
+        "I can check your saved fields, create a field and update its details here in chat. "
+        "Tell me what you want to change; I will ask for missing information, show the exact "
+        "values before saving, and give you the field link after the server confirms it.",
+        "我可以在对话中查看已保存地块、新建地块并修改资料。请告诉我想做什么；"
+        "我会追问缺少的信息、保存前展示具体内容，服务端确认后给你地块链接。",
     ),
     "remote-water": (
         "I can explain published surface soil moisture, historical rainfall and reference "
@@ -186,6 +194,10 @@ FARMER_HELP: dict[str, tuple[tuple[str, str], ...]] = {
 
 
 GENERAL_FOLLOW_UP = {
+    "general-guide": (
+        "Which field, map area or rotation task would you like to start with?",
+        "先从哪块地、哪个地图选区或哪项轮作任务开始？",
+    ),
     "field-guide": (
         "Which field should we start with, or would you like to add one? For a new field, a name, location and area are a good start.",
         "先看哪块地，还是要新增一块？如果要建档，先告诉我地块名称、位置和面积；种植历史可以随后核对。",
@@ -246,6 +258,9 @@ def route_message(question: str, context: dict[str, Any]) -> DialogueRoute:
         r"new here|what can you actually help|first time here|先不填.*表|需要.{0,8}告诉你什么|"
         r"what (?:can|should) i (?:do|check).{0,40}(?:field|planning)|"
         r"what can (?:the |a )?satellite map tell me|"
+        r"what can (?:the |a )?(?:soil|weather|water|rotation|local) (?:bot|specialist|guide)|"
+        r"what can you do.{0,50}(?:rotation|field|weather)|"
+        r"what local farming knowledge can you check|"
         r"how do i prepare (?:a )?rotation",
         text,
     ):
@@ -296,6 +311,8 @@ def route_message(question: str, context: dict[str, Any]) -> DialogueRoute:
         ):
             return help_topic(1)
     if bot == "remote-soil":
+        if re.search(r"(?:what does|what is|explain|什么是|解释).{0,35}(?:smap|soil moisture|土壤湿度)", text):
+            return help_topic(0, clarify=False)
         if re.search(
             r"(?:root|根区|根部).{0,50}(?:surface|表层|moisture|湿度)|(?:surface|表层).{0,50}(?:root|根区|根部)",
             text,

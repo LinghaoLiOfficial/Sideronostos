@@ -320,7 +320,14 @@ class AssistantService:
         return dict(item)
 
 
-async def process_message(factory: async_sessionmaker[AsyncSession], identifier: str) -> None:
+async def process_message(
+    factory: async_sessionmaker[AsyncSession],
+    identifier: str,
+    *,
+    app: Any | None = None,
+    headers: dict[str, str] | None = None,
+    cookies: dict[str, str] | None = None,
+) -> None:
     service = AssistantService()
     evidence: dict[str, Any] | None = None
     context: dict[str, Any] = {}
@@ -359,6 +366,14 @@ async def process_message(factory: async_sessionmaker[AsyncSession], identifier:
         async with asyncio.timeout(max(0.01, seconds)):
             async with factory() as session:
                 response = await handle_field_chat(session, identifier)
+            if response is None and app is not None:
+                # Imported here because the registered tool service uses AssistantService.
+                from .orchestrator import handle_module_chat
+
+                async with factory() as session:
+                    response = await handle_module_chat(
+                        session, identifier, app, headers or {}, cookies or {}
+                    )
             if response is None:
                 async with factory() as session:
                     release = await session.get(KBRelease, context["kb_release_id"])

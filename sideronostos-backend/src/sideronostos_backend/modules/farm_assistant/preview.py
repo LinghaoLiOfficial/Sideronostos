@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from urllib.parse import parse_qs, urlsplit
 from uuid import UUID
 
@@ -17,13 +18,30 @@ def field_result_path(href: str) -> str:
     if parsed.scheme or parsed.netloc or parsed.fragment or parsed.path != "/field-shift":
         raise ValueError("Preview target is not an internal field result")
     query = parse_qs(parsed.query, strict_parsing=True)
-    if (
-        set(query) != {"field", "step"}
-        or query["step"] != ["field"]
-        or len(query["field"]) != 1
-    ):
+    if set(query) != {"field", "step"} or query["step"] != ["field"] or len(query["field"]) != 1:
         raise ValueError("Preview target is not a field result")
     UUID(query["field"][0])
+    return href
+
+
+def generic_result_path(conversation_id: str, workflow_id: str) -> str:
+    UUID(conversation_id)
+    UUID(workflow_id)
+    return f"/si/multi-agent/results/{workflow_id}?conversation={conversation_id}"
+
+
+def _capture_path(href: str) -> str:
+    if href.startswith("/field-shift?"):
+        return field_result_path(href)
+    parsed = urlsplit(href)
+    if parsed.scheme or parsed.netloc or parsed.fragment:
+        raise ValueError("Preview target must be an internal result page")
+    match = re.fullmatch(r"/si/multi-agent/results/([0-9a-f-]{36})", parsed.path)
+    query = parse_qs(parsed.query, strict_parsing=True)
+    if match is None or set(query) != {"conversation"} or len(query["conversation"]) != 1:
+        raise ValueError("Preview target must be a result page")
+    UUID(match.group(1))
+    UUID(query["conversation"][0])
     return href
 
 
@@ -32,7 +50,7 @@ async def capture_result_page(href: str, authorization: str | None) -> bytes:
     from playwright.async_api import Route, async_playwright
 
     settings = get_assistant_settings()
-    path = field_result_path(href)
+    path = _capture_path(href)
     if authorization is not None and not authorization.startswith("Bearer "):
         raise ValueError("Invalid access token for result capture")
     app_origin = settings.result_frontend_origin.rstrip("/")
@@ -62,7 +80,11 @@ async def capture_result_page(href: str, authorization: str | None) -> bytes:
             await page.route("**/*", route_request)
             await page.goto(app_origin + path, wait_until="domcontentloaded", timeout=20_000)
             await page.locator('[data-testid="result-ready"]').wait_for(timeout=20_000)
-            image = await page.screenshot(full_page=True, type="png")
+            image = (
+                await page.locator('[data-testid="result-ready"]').screenshot(type="png")
+                if path.startswith("/si/multi-agent/results/")
+                else await page.screenshot(full_page=True, type="png")
+            )
             if len(image) > 4 * 1024 * 1024:
                 raise ValueError("Result screenshot is too large")
             return image
@@ -82,23 +104,37 @@ async def owned_preview(
         flow is None
         or flow.owner_user_id != owner
         or flow.conversation_id != conversation_id
-        or flow.action != "chat.field.create"
+        or flow.action not in {"chat.field.create", "chat.module.operation"}
         or flow.status != "completed"
     ):
         raise HTTPException(404, "Result preview not found")
     outcome = flow.outcome or {}
     href = outcome.get("href")
-    if not isinstance(href, str):
-        raise HTTPException(404, "Result preview not found")
-    try:
-        field_result_path(href)
-    except (ValueError, KeyError, IndexError) as error:
-        raise HTTPException(404, "Result preview not found") from error
+    if flow.action == "chat.field.create":
+        if not isinstance(href, str):
+            raise HTTPException(404, "Result preview not found")
+        try:
+            target = field_result_path(href)
+        except (ValueError, KeyError, IndexError) as error:
+            raise HTTPException(404, "Result preview not found") from error
+    else:
+        tool_id = flow.arguments.get("operation_id", "")
+        if (
+            isinstance(href, str)
+            and href.startswith("/field-shift?field=")
+            and tool_id.startswith(("create_field_", "get_field_", "update_field_"))
+        ):
+            try:
+                target = field_result_path(href)
+            except (ValueError, KeyError, IndexError) as error:
+                raise HTTPException(404, "Result preview not found") from error
+        else:
+            target = generic_result_path(conversation_id, workflow_id)
     existing = await session.get(AssistantPreview, workflow_id)
     if existing is not None:
         return existing.png
     try:
-        png = await capture_result_page(href, authorization)
+        png = await capture_result_page(target, authorization)
     except Exception as error:
         raise HTTPException(
             503, "Result is saved, but its preview is temporarily unavailable"
@@ -115,3 +151,27 @@ async def owned_preview(
     )
     await session.commit()
     return png
+
+
+async def owned_result(
+    session: AsyncSession, owner: str, conversation_id: str, workflow_id: str
+) -> dict[str, object]:
+    flow = await session.get(AssistantAction, workflow_id)
+    if (
+        flow is None
+        or flow.owner_user_id != owner
+        or flow.conversation_id != conversation_id
+        or flow.action != "chat.module.operation"
+        or flow.status not in {"completed", "pending", "failed"}
+        or flow.outcome is None
+    ):
+        raise HTTPException(404, "Result not found")
+    return {
+        "id": flow.id,
+        "operation_id": flow.arguments["operation_id"],
+        "title": flow.arguments.get("title", flow.arguments["operation_id"]),
+        "status": flow.status,
+        "href": flow.outcome.get("href"),
+        "content_type": flow.outcome.get("content_type"),
+        "result": flow.outcome.get("result"),
+    }

@@ -11,6 +11,7 @@ from .action_execution import AssistantActionService
 from .agent_actions import ActionOutcome, ActionRequest
 from .models import AssistantMessage
 from .module_tools import ModuleOperationOutcome, ModuleOperationRequest, ModuleOperationService
+from .orchestrator import refresh_module_workflow
 from .presets import enabled_presets
 from .schemas import ConversationCreate, MessageCreate, PreferenceInput
 from .service import AssistantService, message_view, process_message
@@ -134,7 +135,13 @@ async def send(
 ) -> dict[str, Any]:
     message, work = await AssistantService().start_message(session, user.id, conversation_id, body)
     if work:
-        await process_message(request.app.state.session_factory, message.id)
+        await process_message(
+            request.app.state.session_factory,
+            message.id,
+            app=request.app,
+            headers=dict(request.headers),
+            cookies=request.cookies,
+        )
         await session.refresh(message)
     response.status_code = 202 if message.status == "pending" else 200
     return message_view(message)
@@ -166,6 +173,23 @@ async def result_preview(
     )
     return Response(
         content=png, media_type="image/png", headers={"Cache-Control": "private, no-store"}
+    )
+
+
+@router.get("/conversations/{conversation_id}/results/{workflow_id}")
+async def result_view(
+    conversation_id: str, workflow_id: str, user: User, session: Session
+) -> dict[str, object]:
+    return await preview.owned_result(session, user.id, conversation_id, workflow_id)
+
+
+@router.get("/conversations/{conversation_id}/workflows/{workflow_id}/refresh")
+async def refresh_workflow(
+    conversation_id: str, workflow_id: str, user: User, session: Session, request: Request
+) -> dict[str, Any]:
+    return await refresh_module_workflow(
+        session, user.id, conversation_id, workflow_id, request.app,
+        dict(request.headers), request.cookies,
     )
 
 

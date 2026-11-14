@@ -3,6 +3,7 @@
 from typing import Any
 
 BOT_PRESETS = {
+    "general-guide": "general",
     "field-guide": "field_management",
     "remote-water": "remote_sensing",
     "remote-soil": "remote_sensing",
@@ -12,6 +13,7 @@ BOT_PRESETS = {
 }
 
 DEFAULT_BOTS = {
+    "general": "general-guide",
     "field_management": "field-guide",
     "remote_sensing": "remote-water",
     "local_agriculture": "local-knowledge-guide",

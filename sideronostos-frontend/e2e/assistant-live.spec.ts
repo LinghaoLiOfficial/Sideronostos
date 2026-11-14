@@ -47,6 +47,29 @@ test("three turn farmer chat confirms a field and shows its actual result page",
   await page.screenshot({ path: `output/playwright/agent-three-turn-result-${testInfo.project.name}.png`, fullPage: true });
 });
 
+test("general assistant reads registered field, observation and rotation tools", async ({ page }, testInfo) => {
+  await page.goto("/si/multi-agent");
+  await chooseBot(page, "Farm assistant");
+  const composer = page.getByRole("textbox", { name: "Message Farm assistant" });
+  for (const { question, result } of [
+    { question: "Please show my saved fields.", result: /\/field-shift$/ },
+    { question: "Please run layers_agri_data_layers_get", result: /\/field-shift\/map/ },
+    { question: "Please run profiles_rotation_optimizer_profiles_get", result: /\/field-shift\/rotation/ },
+  ]) {
+    await composer.fill(question);
+    await page.getByRole("button", { name: "Send message" }).click();
+    await expect(page.getByRole("link", { name: "Open result page" }).last()).toHaveAttribute("href", result);
+  }
+  const lastResult = page.getByRole("link", { name: "View task details" }).last().locator("..");
+  await expect(lastResult.getByRole("img", { name: "Task result page" })).toBeVisible({ timeout: 30_000 });
+  await lastResult.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `output/playwright/general-bot-cross-module-${testInfo.project.name}.png`, fullPage: true });
+  await page.getByRole("link", { name: "View task details" }).last().click();
+  await expect(page).toHaveURL(/\/si\/multi-agent\/results\/[a-f0-9-]+\?conversation=/);
+  await expect(page.getByTestId("result-ready")).toContainText("records returned");
+  await page.screenshot({ path: `output/playwright/general-bot-result-viewer-${testInfo.project.name}.png`, fullPage: true });
+});
+
 test("creates an owned field, restores the server-confirmed result and opens the saved page", async ({ page }) => {
   await page.goto("/si/multi-agent");
   await chooseBot(page, "Field guide");

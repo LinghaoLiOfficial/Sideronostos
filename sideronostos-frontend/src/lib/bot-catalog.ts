@@ -2,6 +2,7 @@ import type { Locale } from "@/lib/i18n/locale";
 import type { BotAvatarVariant } from "@/lib/bot";
 
 export type SiBotModule =
+  | "general"
   | "field-management"
   | "remote-sensing"
   | "local-knowledge"
@@ -20,6 +21,17 @@ export type CatalogBot = {
 };
 
 export const botCatalog: readonly CatalogBot[] = [
+  {
+    id: "general-guide",
+    module: "general",
+    presetId: "general",
+    avatar: "field",
+    color: "#5a9b79",
+    name: { en: "Farm assistant", "zh-CN": "农场综合助手" },
+    shortName: { en: "Farm", "zh-CN": "综合" },
+    capability: { en: "Fields, observations, and rotation across your farm", "zh-CN": "跨地块、观测和轮作的农场帮助" },
+    fallback: { en: "Ask about your fields, observations, or rotation plans.", "zh-CN": "可以询问地块、观测或轮作方案。" },
+  },
   {
     id: "field-guide",
     module: "field-management",

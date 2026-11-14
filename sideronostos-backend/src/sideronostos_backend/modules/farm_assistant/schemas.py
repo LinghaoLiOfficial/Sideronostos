@@ -8,7 +8,7 @@ from .bot_scope import BOT_PRESETS
 
 Identifier = Annotated[str, Field(min_length=1, max_length=100)]
 Language = Literal["zh", "en"]
-Preset = Literal["field_management", "remote_sensing", "local_agriculture", "rotation"]
+Preset = Literal["general", "field_management", "remote_sensing", "local_agriculture", "rotation"]
 Detail = Literal["brief", "detailed"]
 Action = Literal["open_planner", "edit_conditions", "choose_field", "view_sources"]
 Intent = Literal["learn", "explain_current", "guide", "compare_runs", "what_if_request"]

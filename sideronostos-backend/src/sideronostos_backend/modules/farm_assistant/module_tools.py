@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 from dataclasses import dataclass
@@ -17,7 +18,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.types import ASGIApp
 
-from .bot_scope import REMOTE_METRICS
+from .bot_scope import REMOTE_METRICS, layer_allowed
 from .models import AssistantAction
 from .service import AssistantService
 
@@ -113,10 +114,7 @@ class ModuleOperationService:
                 .limit(20)
             )
         ).all()
-        return [
-            {"idempotency_key": row.idempotency_key, "outcome": row.outcome}
-            for row in rows
-        ]
+        return [{"idempotency_key": row.idempotency_key, "outcome": row.outcome} for row in rows]
 
     async def catalog(
         self,
@@ -128,8 +126,6 @@ class ModuleOperationService:
         conversation = await AssistantService()._conversation(
             session, owner_user_id, conversation_id
         )
-        if conversation.bot_id in REMOTE_METRICS and conversation.bot_id != "remote-water":
-            return []
         executor = ModuleToolExecutor(app)
         return [
             {
@@ -155,15 +151,14 @@ class ModuleOperationService:
         conversation = await AssistantService()._conversation(
             session, owner_user_id, conversation_id, lock=True
         )
-        if conversation.bot_id in REMOTE_METRICS and conversation.bot_id != "remote-water":
-            raise HTTPException(422, "Use this specialist's scoped guided actions")
         executor = ModuleToolExecutor(app)
         try:
             tool = executor._tool(request.operation_id, conversation.preset)
         except ValueError as error:
             raise HTTPException(422, str(error)) from error
         missing = executor.missing_inputs(
-            tool.operation_id, conversation.preset,
+            tool.operation_id,
+            conversation.preset,
             path_params=request.path_params,
             query_params=request.query_params,
             body=request.body,
@@ -175,8 +170,10 @@ class ModuleOperationService:
                 else "Please provide these inputs to continue: "
             )
             return ModuleOperationOutcome(
-                status="needs_input", operation_id=tool.operation_id,
-                text=text + ", ".join(missing), missing_inputs=missing,
+                status="needs_input",
+                operation_id=tool.operation_id,
+                text=text + ", ".join(missing),
+                missing_inputs=missing,
             )
         if set(request.path_params) != set(tool.path_parameters):
             raise HTTPException(422, "Path parameters do not match the selected operation")
@@ -184,6 +181,16 @@ class ModuleOperationService:
             raise HTTPException(422, "Query parameters do not match the selected operation")
         if tool.body_schema is None and request.body is not None:
             raise HTTPException(422, "This operation does not accept a request body")
+        if conversation.bot_id in REMOTE_METRICS and "layer_id" in request.path_params:
+            from ..agri_data.service import AgriDataService
+
+            available = await AgriDataService().layers(session, owner_user_id)
+            permitted_ids = {
+                item["id"] for item in available
+                if layer_allowed(conversation.bot_id, (item.get("source") or {}).get("product"))
+            }
+            if request.path_params["layer_id"] not in permitted_ids:
+                raise HTTPException(422, "This layer is outside the specialist's scope")
 
         payload = {
             "operation_id": tool.operation_id,
@@ -218,22 +225,53 @@ class ModuleOperationService:
             )
 
         row = AssistantAction(
-            id=str(uuid4()), conversation_id=conversation_id, owner_user_id=owner_user_id,
-            idempotency_key=request.idempotency_key, action=action_name,
-            payload_hash=fingerprint, arguments=payload, status="pending", outcome=None,
+            id=str(uuid4()),
+            conversation_id=conversation_id,
+            owner_user_id=owner_user_id,
+            idempotency_key=request.idempotency_key,
+            action=action_name,
+            payload_hash=fingerprint,
+            arguments=payload,
+            status="pending",
+            outcome=None,
             audit_events=[_audit_event("started")],
         )
         session.add(row)
         await session.commit()
         try:
             result = await executor.execute(
-                operation_id=tool.operation_id, domain=conversation.preset,
-                path_params=request.path_params, query_params=request.query_params,
-                body=request.body, headers=headers, cookies=cookies,
+                operation_id=tool.operation_id,
+                domain=conversation.preset,
+                path_params=request.path_params,
+                query_params=request.query_params,
+                body=request.body,
+                headers=headers,
+                cookies=cookies,
             )
+            if conversation.bot_id in REMOTE_METRICS and isinstance(result.data, dict):
+                data = dict(result.data)
+                if tool.path == "/agri-data/layers" and isinstance(data.get("items"), list):
+                    data["items"] = [
+                        item for item in data["items"]
+                        if isinstance(item, dict)
+                        and layer_allowed(
+                            conversation.bot_id, (item.get("source") or {}).get("product")
+                        )
+                    ]
+                if tool.path.endswith("/facts") and isinstance(data.get("facts"), list):
+                    data["facts"] = [
+                        fact for fact in data["facts"]
+                        if isinstance(fact, dict)
+                        and fact.get("metric") in REMOTE_METRICS[conversation.bot_id]
+                    ]
+                    data["unavailable"] = []
+                result = ModuleToolResult(
+                    result.status_code, data, result.content_type, result.href
+                )
         except Exception:
             outcome = ModuleOperationOutcome(
-                status="failed", operation_id=tool.operation_id,
+                status="failed",
+                operation_id=tool.operation_id,
                 text=(
                     "操作未能确认完成，请先检查目标模块状态再重试。"
                     if conversation.language == "zh"
@@ -251,37 +289,46 @@ class ModuleOperationService:
         accepted = result.status_code == 202
         succeeded = result.succeeded and not accepted
         empty_list = (
-            succeeded and isinstance(result.data, dict)
+            succeeded
+            and isinstance(result.data, dict)
             and isinstance(result.data.get("items"), list)
             and not result.data["items"]
         )
         created_field = succeeded and tool.operation_id.startswith("create_field_")
         if conversation.language == "zh":
             text = (
-                "任务已开始处理。打开进度页面查看最新状态。" if accepted else
-                "当前账户还没有相关记录。打开模块可查看现状。" if empty_list else
-                "地块已保存。打开页面核对位置、面积和种植记录。" if created_field else
-                "结果已准备好。打开页面核对地块、观测或规划结果。" if succeeded else
-                "这项操作未能完成，请核对输入或稍后重试。"
+                "任务已开始处理。打开进度页面查看最新状态。"
+                if accepted
+                else "当前账户还没有相关记录。打开模块可查看现状。"
+                if empty_list
+                else "地块已保存。打开页面核对位置、面积和种植记录。"
+                if created_field
+                else "结果已准备好。打开页面核对地块、观测或规划结果。"
+                if succeeded
+                else "这项操作未能完成，请核对输入或稍后重试。"
             )
         else:
             text = (
                 "Your task is underway. Open its progress page for the latest status."
-                if accepted else
-                "No records are available for this account yet. "
+                if accepted
+                else "No records are available for this account yet. "
                 "Open the module to review its current state."
-                if empty_list else
-                "Your field is saved. Open it to review its location, area, and planting history."
-                if created_field else
-                "Your result is ready. Open it to review the field, observation, or plan."
-                if succeeded else
-                "This task could not be completed. Check the inputs or try again later."
+                if empty_list
+                else "Your field is saved. Open it to review its location, area, "
+                "and planting history."
+                if created_field
+                else "Your result is ready. Open it to review the field, observation, or plan."
+                if succeeded
+                else "This task could not be completed. Check the inputs or try again later."
             )
         outcome = ModuleOperationOutcome(
             status="pending" if accepted else "succeeded" if succeeded else "failed",
             operation_id=tool.operation_id,
-            text=text, status_code=result.status_code, result=result.data,
-            content_type=result.content_type, href=result.href,
+            text=text,
+            status_code=result.status_code,
+            result=result.data,
+            content_type=result.content_type,
+            href=result.href,
         )
         # A 202 response has been delivered once, while the business job remains pending.
         row.status = "succeeded" if accepted else outcome.status
@@ -351,10 +398,10 @@ class ModuleToolExecutor:
         return None
 
     def tools_for(self, domain: str) -> list[ModuleTool]:
-        if domain not in PREFIX_BY_DOMAIN:
+        if domain not in PREFIX_BY_DOMAIN and domain != "general":
             return []
         return sorted(
-            (tool for tool in self._tools.values() if tool.domain == domain),
+            (tool for tool in self._tools.values() if tool.domain == domain or domain == "general"),
             key=lambda item: (item.path, item.method),
         )
 
@@ -376,19 +423,18 @@ class ModuleToolExecutor:
         body: Any,
     ) -> list[str]:
         tool = self._tool(operation_id, domain)
-        missing = [
-            name for name in tool.path_parameters
-            if path_params.get(name) in (None, "")
-        ]
+        missing = [name for name in tool.path_parameters if path_params.get(name) in (None, "")]
         missing.extend(
-            name for name in tool.required_query_parameters
-            if query_params.get(name) in (None, "")
+            name for name in tool.required_query_parameters if query_params.get(name) in (None, "")
         )
         if tool.body_required and body is None:
-            missing.append("body")
+            missing.extend(f"body.{name}" for name in tool.required_body_parameters)
+            if not tool.required_body_parameters:
+                missing.append("body")
         elif isinstance(body, dict):
             missing.extend(
-                f"body.{name}" for name in tool.required_body_parameters
+                f"body.{name}"
+                for name in tool.required_body_parameters
                 if body.get(name) in (None, "")
             )
         elif tool.required_body_parameters:
@@ -397,7 +443,7 @@ class ModuleToolExecutor:
 
     def _tool(self, operation_id: str, domain: str) -> ModuleTool:
         tool = self._tools.get(operation_id)
-        if tool is None or tool.domain != domain:
+        if tool is None or (tool.domain != domain and domain != "general"):
             raise ValueError("Operation is not available for this assistant")
         return tool
 
@@ -427,8 +473,11 @@ class ModuleToolExecutor:
         if tool.body_required and body is None:
             raise ValueError("This operation requires a request body")
         missing_inputs = self.missing_inputs(
-            operation_id, domain,
-            path_params=path_params, query_params=query_params, body=body,
+            operation_id,
+            domain,
+            path_params=path_params,
+            query_params=query_params,
+            body=body,
         )
         if missing_inputs:
             raise ValueError("Missing required inputs: " + ", ".join(missing_inputs))
@@ -459,6 +508,12 @@ class ModuleToolExecutor:
                 data = None
         elif content_type.startswith("text/") or "csv" in content_type:
             data = response.text
+        elif content_type.split(";", 1)[0] in {"image/png", "image/jpeg", "image/webp"}:
+            data = (
+                {"image_base64": base64.b64encode(response.content).decode("ascii")}
+                if len(response.content) <= 1024 * 1024
+                else {"image_unavailable": "Image exceeds the preview size limit"}
+            )
         else:
             data = None
         href = self._result_href(tool, path_params, data) if response.is_success else None

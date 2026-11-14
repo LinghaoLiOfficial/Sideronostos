@@ -66,3 +66,19 @@ def test_old_rotation_mock_excerpt_cannot_answer_an_unrelated_field_question():
     assert "Which saved field" in result["paragraphs"][0]["text"]
     assert result["citations"] == []
     assert result["needs_clarification"] is True
+
+
+@pytest.mark.parametrize(
+    ("bot_id", "preset", "question", "fragment"),
+    [
+        ("remote-soil", "remote_sensing", "What does SMAP actually measure here?", "surface soil moisture"),
+        ("remote-soil", "remote_sensing", "What can the soil bot tell me before I irrigate?", "root-zone"),
+        ("rotation-guide", "rotation", "What can you do for next season's rotation?", "rotation planning"),
+    ],
+)
+def test_capability_and_definition_questions_are_answered_before_asking_for_a_location(
+    bot_id, preset, question, fragment
+):
+    route = route_message(question, {"bot_id": bot_id, "preset": preset, "language": "en"})
+    assert route.kind == "product_help"
+    assert fragment in " ".join(route.paragraphs)

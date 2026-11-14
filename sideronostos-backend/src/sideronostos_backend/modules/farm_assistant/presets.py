@@ -1,4 +1,13 @@
 PRESETS = {
+    "general": {
+        "id": "general",
+        "enabled": True,
+        "name": "农场综合助手",
+        "name_en": "Farm assistant",
+        "description": "跨地块、遥感和轮作模块协助查询与操作。",
+        "description_en": "Help with fields, observations and rotation tasks across modules.",
+        "color": "#5a9b79",
+    },
     "field_management": {
         "id": "field_management",
         "enabled": True,

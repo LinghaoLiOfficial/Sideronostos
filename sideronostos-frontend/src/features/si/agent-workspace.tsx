@@ -16,6 +16,7 @@ import { FarmerTasks } from "./farmer-tasks";
 import { TaskResultCard } from "./task-result-card";
 
 const domains: { id: AgentDomain; en: string; zh: string }[] = [
+  { id: "general", en: "All farm tasks", zh: "农场综合" },
   { id: "field_management", en: "Field management", zh: "地块管理" },
   { id: "remote_sensing", en: "Remote sensing", zh: "遥感分析" },
   { id: "local_agriculture", en: "Local agriculture", zh: "本地农业知识" },

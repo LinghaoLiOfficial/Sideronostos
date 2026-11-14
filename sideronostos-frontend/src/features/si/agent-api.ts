@@ -1,7 +1,7 @@
 import { apiRequest } from "@/lib/api/client";
 import type { AssistantMessage, Citation, Fact } from "@/lib/api/rotation-types";
 
-export type AgentDomain = "field_management" | "remote_sensing" | "local_agriculture" | "rotation";
+export type AgentDomain = "general" | "field_management" | "remote_sensing" | "local_agriculture" | "rotation";
 export type AgentConversation = {
   id: string;
   preset: AgentDomain;
@@ -67,6 +67,19 @@ export const sendMessage = (conversation: string, body: { client_message_id: str
 
 export const getMessage = (conversation: string, message: string) =>
   apiRequest<AssistantMessage>(`${path(conversation)}/messages/${encodeURIComponent(message)}`);
+
+export type AgentToolResult = {
+  id: string;
+  operation_id: string;
+  title: string;
+  status: string;
+  href: string | null;
+  content_type: string | null;
+  result: unknown;
+};
+
+export const getToolResult = (conversation: string, workflow: string) =>
+  apiRequest<AgentToolResult>(`${path(conversation)}/results/${encodeURIComponent(workflow)}`);
 
 export const getSource = (conversation: string, message: string, evidence: string) =>
   apiRequest<Fact | Citation>(`${path(conversation)}/messages/${encodeURIComponent(message)}/sources/${encodeURIComponent(evidence)}`);

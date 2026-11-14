@@ -1,6 +1,7 @@
 """Real PostgreSQL action journey against an explicitly dedicated test database."""
 
 import asyncio
+import json
 import os
 from datetime import UTC, datetime
 from uuid import uuid4
@@ -24,7 +25,9 @@ from sideronostos_backend.modules.farm_assistant.models import (
     AssistantAction,
     Conversation,
 )
+from sideronostos_backend.modules.farm_assistant.module_tools import ModuleToolExecutor
 from sideronostos_backend.modules.farm_assistant.router import router
+from sideronostos_backend.modules.farm_assistant.schemas import ConversationCreate
 from sideronostos_backend.modules.field_shift.models import FieldRecord
 from sideronostos_backend.modules.field_shift.router import router as field_shift_router
 from sideronostos_backend.modules.field_shift.service import FieldShiftService
@@ -150,6 +153,15 @@ async def api():
     async def start_mock_job():
         return {"id": "job-1"}
 
+    app.state.mock_job_status = "pending"
+
+    @app.get(
+        "/rotation-optimizer/runs/{run_id}",
+        operation_id="get_rotation_optimizer_runs__run_id__get",
+    )
+    async def read_mock_job(run_id: str):
+        return {"id": run_id, "status": app.state.mock_job_status, "result": None}
+
     async def principal():
         return AuthPrincipal(identity["id"], "farmer@example.test", "Farmer", datetime.now(UTC))
 
@@ -180,6 +192,31 @@ def field_arguments(**changes):
         "history": [],
         **changes,
     }
+
+
+async def test_general_bot_is_a_valid_cross_module_conversation():
+    conversation = ConversationCreate(preset="general", bot_id="general-guide")
+    assert conversation.bot_id == "general-guide"
+
+
+async def test_field_setup_question_does_not_start_a_write_workflow(api):
+    client, factory, _, conversation_id, _ = api
+    reply = await client.post(
+        f"/farm-assistant/conversations/{conversation_id}/messages",
+        json={
+            "client_message_id": "field-setup-information-only",
+            "text": "What information do I need before creating a new field?",
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    assert reply.status_code == 200
+    response = reply.json()["response"]
+    assert response.get("task") is None
+    assert "Open Farm tasks → Add a field" in " ".join(
+        paragraph["text"] for paragraph in response["paragraphs"]
+    )
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(AssistantAction)) == 0
 
 
 async def test_three_turn_field_chat_requires_confirmation_and_creates_once(api, monkeypatch):
@@ -274,6 +311,207 @@ async def test_field_chat_decline_never_creates_a_field(api):
         assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 0
 
 
+async def test_field_chat_understands_a_farmer_asking_to_add_it(api):
+    client, factory, _, conversation_id, _ = api
+    reply = await client.post(
+        f"/farm-assistant/conversations/{conversation_id}/messages",
+        json={
+            "client_message_id": "farmer-asks-add-it",
+            "text": "I just took over a small field by the creek. Can you add it for me?",
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    assert reply.status_code == 200
+    assert reply.json()["response"]["task"]["status"] == "needs_input"
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 0
+
+
+async def test_chat_can_run_a_registered_read_tool_and_restore_its_outcome(api):
+    client, factory, _, conversation_id, _ = api
+    response = await client.post(
+        f"/farm-assistant/conversations/{conversation_id}/messages",
+        json={
+            "client_message_id": "chat-read-fields-1",
+            "text": "Please show my saved fields.",
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    assert response.status_code == 200
+    task = response.json()["response"]["task"]
+    assert task["status"] == "completed"
+    assert task["operation_id"] == "list_fields_field_shift_fields_get"
+    assert task["href"] == "/field-shift"
+    loaded = await client.get(f"/farm-assistant/conversations/{conversation_id}")
+    assert loaded.json()["messages"][-1]["response"]["task"] == task
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 0
+
+
+async def test_chat_names_profiles_returned_by_the_real_business_api(api):
+    client, _, _, conversation_id, _ = api
+    response = await client.post(
+        f"/farm-assistant/conversations/{conversation_id}/messages",
+        json={
+            "client_message_id": "chat-read-profiles-1",
+            "text": "Please list field crop profiles.",
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    assert response.status_code == 200
+    answer = response.json()["response"]
+    assert answer["task"]["operation_id"] == "list_profiles_field_shift_profiles_get"
+    assert "I found" in answer["paragraphs"][0]["text"]
+
+
+async def test_generic_tool_result_has_an_owned_viewer_and_private_preview(api, monkeypatch):
+    client, factory, identity, conversation_id, _ = api
+    first_owner = identity["id"]
+    response = await client.post(
+        f"/farm-assistant/conversations/{conversation_id}/messages",
+        json={
+            "client_message_id": "chat-result-view-1",
+            "text": "Please list field crop profiles.",
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    task = response.json()["response"]["task"]
+    assert task["preview_url"]
+    result_path = f"/farm-assistant/conversations/{conversation_id}/results/{task['id']}"
+    view = await client.get(result_path)
+    assert view.status_code == 200
+    assert view.json()["operation_id"] == "list_profiles_field_shift_profiles_get"
+    assert view.json()["title"] == "List Profiles"
+    assert view.json()["result"]["items"]
+    png = b"\x89PNG\r\n\x1a\n" + b"result-viewer"
+
+    async def capture(path: str, authorization: str | None) -> bytes:
+        assert path.startswith(f"/si/multi-agent/results/{task['id']}?")
+        return png
+
+    monkeypatch.setattr(
+        "sideronostos_backend.modules.farm_assistant.preview.capture_result_page", capture
+    )
+    preview = await client.get(task["preview_url"])
+    assert preview.status_code == 200
+    assert preview.content == png
+    identity["id"] = str(uuid4())
+    assert (await client.get(result_path)).status_code == 404
+    assert (await client.get(task["preview_url"])).status_code == 404
+    identity["id"] = first_owner
+
+
+async def test_chat_async_job_waits_for_real_completion_before_preview(api):
+    client, factory, _, conversation_id, _ = api
+    async with factory() as session:
+        conversation = await session.get(Conversation, conversation_id)
+        conversation.preset = "rotation"
+        conversation.bot_id = "rotation-guide"
+        await session.commit()
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    async def ask(turn: int, text: str):
+        return await client.post(path, json={
+            "client_message_id": f"chat-job-turn-{turn}", "text": text,
+            "context": {"page": "map", "revision": 1},
+        })
+
+    proposed = await ask(1, "Please run start_mock_job")
+    assert proposed.status_code == 200
+    assert proposed.json()["response"]["task"]["status"] == "awaiting_confirmation"
+    approved = await ask(2, "Confirm")
+    task = approved.json()["response"]["task"]
+    assert task["status"] == "pending"
+    assert task["preview_url"] is None
+    refresh_path = f"/farm-assistant/conversations/{conversation_id}/workflows/{task['id']}/refresh"
+    still_pending = await client.get(refresh_path)
+    assert still_pending.status_code == 200
+    assert still_pending.json()["status"] == "pending"
+    assert still_pending.json()["preview_url"] is None
+    client._transport.app.state.mock_job_status = "completed"
+    completed = await client.get(refresh_path)
+    assert completed.status_code == 200
+    assert completed.json()["status"] == "completed"
+    assert completed.json()["preview_url"]
+    assert completed.json()["result_page_url"]
+    assert (await client.get(refresh_path)).json()["status"] == "completed"
+
+
+async def test_general_chat_executes_registered_write_only_after_confirmation(api):
+    client, factory, _, conversation_id, _ = api
+    async with factory() as session:
+        conversation = await session.get(Conversation, conversation_id)
+        assert conversation is not None
+        conversation.preset = "general"
+        conversation.bot_id = "general-guide"
+        await session.commit()
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    body = field_arguments(name="South field")
+    request = await client.post(
+        path,
+        json={
+            "client_message_id": "general-write-turn-1",
+            "text": "Please run create_field_field_shift_fields_post " + json.dumps({"body": body}),
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    assert request.status_code == 200
+    pending = request.json()["response"]["task"]
+    assert pending["status"] == "awaiting_confirmation"
+    assert pending["summary"]["body"] == body
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 0
+    approved = await client.post(
+        path,
+        json={
+            "client_message_id": "general-write-turn-2",
+            "text": "Yes, confirm this operation.",
+            "context": {"page": "map", "revision": 2},
+        },
+    )
+    assert approved.status_code == 200
+    result = approved.json()["response"]["task"]
+    assert result["status"] == "completed"
+    assert result["operation_id"] == "create_field_field_shift_fields_post"
+    assert result["href"].startswith("/field-shift?field=")
+    async with factory() as session:
+        assert await session.scalar(select(func.count()).select_from(FieldRecord)) == 1
+
+
+async def test_field_chat_uses_owned_record_for_area_edit_and_waits_for_confirmation(api):
+    client, factory, _, conversation_id, _ = api
+    created = await client.post("/field-shift/fields", json=field_arguments())
+    assert created.status_code == 201
+    field_id = created.json()["id"]
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    proposed = await client.post(
+        path,
+        json={
+            "client_message_id": "edit-area-turn-1",
+            "text": "Please update North field area to 5 hectares.",
+            "context": {"page": "map", "revision": 1},
+        },
+    )
+    assert proposed.status_code == 200
+    task = proposed.json()["response"]["task"]
+    assert task["status"] == "awaiting_confirmation"
+    assert task["summary"]["path_params"]["field_id"] == field_id
+    assert task["summary"]["body"]["area_ha"] == 5
+    async with factory() as session:
+        assert (await session.get(FieldRecord, field_id)).data["area_ha"] == 4
+    confirmed = await client.post(
+        path,
+        json={
+            "client_message_id": "edit-area-turn-2",
+            "text": "Yes, confirm this operation.",
+            "context": {"page": "map", "revision": 2},
+        },
+    )
+    assert confirmed.status_code == 200
+    assert confirmed.json()["response"]["task"]["status"] == "completed"
+    async with factory() as session:
+        assert (await session.get(FieldRecord, field_id)).data["area_ha"] == 5
+
+
 async def test_module_operations_are_catalogued_by_conversation_and_executed_idempotently(api):
     client, factory, identity, conversation_id, _ = api
     path = f"/farm-assistant/conversations/{conversation_id}/operations"
@@ -329,8 +567,8 @@ async def test_module_operations_are_catalogued_by_conversation_and_executed_ide
     assert conflict.status_code == 409
 
 
-async def test_specialty_bot_cannot_bypass_its_remote_sensing_scope_via_generic_operations(api):
-    client, factory, identity, _, _ = api
+async def test_specialty_bot_can_use_remote_tools_without_crossing_its_metric_scope(api):
+    client, factory, identity, _, selection_id = api
     async with factory() as session:
         release = await session.scalar(select(KBRelease).limit(1))
         specialist = Conversation(
@@ -346,7 +584,11 @@ async def test_specialty_bot_cannot_bypass_its_remote_sensing_scope_via_generic_
         session.add(specialist)
         await session.commit()
     path = f"/farm-assistant/conversations/{specialist.id}/operations"
-    assert (await client.get(path)).json()["items"] == []
+    catalog = (await client.get(path)).json()["items"]
+    assert {item["operation_id"] for item in catalog} == {
+        item.operation_id
+        for item in ModuleToolExecutor(client._transport.app).tools_for("remote_sensing")
+    }
     attempt = await client.post(
         path,
         json={
@@ -357,7 +599,71 @@ async def test_specialty_bot_cannot_bypass_its_remote_sensing_scope_via_generic_
             "idempotency_key": "specialist-scope-1",
         },
     )
-    assert attempt.status_code == 422
+    assert attempt.status_code == 200
+    assert attempt.json()["status"] == "succeeded"
+    assert [item["id"] for item in attempt.json()["result"]["items"]] == ["agent-test-smap:am"]
+    async with factory() as session:
+        specialist.bot_id = "remote-weather"
+        await session.merge(specialist)
+        await session.commit()
+    weather_layers = await client.post(path, json={
+        "operation_id": "layers_agri_data_layers_get", "path_params": {},
+        "query_params": {}, "body": None, "idempotency_key": "specialist-weather-layers-1",
+    })
+    assert weather_layers.status_code == 200
+    assert weather_layers.json()["result"]["items"] == []
+    blocked_manifest = await client.post(path, json={
+        "operation_id": "manifest_agri_data_layers__layer_id__manifest_get",
+        "path_params": {"layer_id": "agent-test-smap:am"},
+        "query_params": {}, "body": None, "idempotency_key": "specialist-weather-manifest-1",
+    })
+    assert blocked_manifest.status_code == 422
+    weather_facts = await client.post(path, json={
+        "operation_id": "facts_agri_data_selections__selection_id__facts_get",
+        "path_params": {"selection_id": selection_id},
+        "query_params": {}, "body": None, "idempotency_key": "specialist-weather-facts-1",
+    })
+    assert weather_facts.status_code == 200
+    assert all(
+        fact["metric"] in {"rainfall_total", "reference_et0_total"}
+        for fact in weather_facts.json()["result"]["facts"]
+    )
+
+
+async def test_soil_and_weather_specialists_call_scoped_business_tools_from_chat(api):
+    client, factory, _, conversation_id, selection_id = api
+    path = f"/farm-assistant/conversations/{conversation_id}/messages"
+    async with factory() as session:
+        row = await session.get(Conversation, conversation_id)
+        row.preset = "remote_sensing"
+        row.bot_id = "remote-soil"
+        await session.commit()
+    soil = await client.post(path, json={
+        "client_message_id": "soil-tool-chat-1",
+        "text": "Please run layers_agri_data_layers_get",
+        "context": {"page": "map", "revision": 1},
+    })
+    soil_task = soil.json()["response"]["task"]
+    assert soil_task["status"] == "completed"
+    assert [item["id"] for item in soil_task["execution"]["result"]["items"]] == [
+        "agent-test-smap:am"
+    ]
+    async with factory() as session:
+        row = await session.get(Conversation, conversation_id)
+        row.bot_id = "remote-weather"
+        await session.commit()
+    weather = await client.post(path, json={
+        "client_message_id": "weather-tool-chat-1",
+        "text": "Please run facts_agri_data_selections__selection_id__facts_get "
+        + json.dumps({"path_params": {"selection_id": selection_id}}),
+        "context": {"page": "map", "revision": 1},
+    })
+    weather_task = weather.json()["response"]["task"]
+    assert weather_task["status"] == "completed"
+    assert all(
+        fact["metric"] in {"rainfall_total", "reference_et0_total"}
+        for fact in weather_task["execution"]["result"]["facts"]
+    )
 
 
 async def test_module_operation_reports_required_inputs_before_execution(api):

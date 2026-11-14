@@ -178,7 +178,7 @@ async def freeze_context(
                 .limit(11)
             )
         ).all()
-        if preset == "field_management" and not reference.fields
+        if preset in {"field_management", "general"} and not reference.fields
         else []
     )
     field_list_truncated = len(owned_fields) > 10

@@ -43,28 +43,55 @@ async def evaluate_one(client: httpx.AsyncClient, case: dict, limit: asyncio.Sem
             created.raise_for_status()
             conversation_id = created.json()["id"]
             result["conversation_id"] = conversation_id
-            reply = await client.post(
-                f"/farm-assistant/conversations/{conversation_id}/messages",
-                json={
-                    "client_message_id": "eval-" + uuid4().hex,
-                    "text": case["question"],
-                    "context": {"page": "map", "revision": 1},
-                },
-            )
-            reply.raise_for_status()
-            message = reply.json()
-            for _ in range(40):
-                if message["status"] != "pending":
-                    break
-                await asyncio.sleep(0.5)
-                checked = await client.get(
-                    f"/farm-assistant/conversations/{conversation_id}/messages/{message['id']}"
+            transcript = []
+            nonce = uuid4().hex[:8]
+            for question in case.get("turns", [case.get("question")]):
+                question = question.replace("{{nonce}}", nonce)
+                reply = await client.post(
+                    f"/farm-assistant/conversations/{conversation_id}/messages",
+                    json={
+                        "client_message_id": "eval-" + uuid4().hex,
+                        "text": question,
+                        "context": {"page": "map", "revision": 1},
+                    },
                 )
-                checked.raise_for_status()
-                message = checked.json()
+                reply.raise_for_status()
+                message = reply.json()
+                for _ in range(40):
+                    if message["status"] != "pending":
+                        break
+                    await asyncio.sleep(0.5)
+                    checked = await client.get(
+                        f"/farm-assistant/conversations/{conversation_id}/messages/{message['id']}"
+                    )
+                    checked.raise_for_status()
+                    message = checked.json()
+                transcript.append({
+                    "question": question, "status": message["status"],
+                    "answer": "\n".join(
+                        paragraph["text"]
+                        for paragraph in (message.get("response") or {}).get("paragraphs", [])
+                    ),
+                    "task": (message.get("response") or {}).get("task"),
+                })
+            result["transcript"] = transcript
             result["status"] = message["status"]
             result["message_id"] = message["id"]
             result["response"] = message.get("response")
+            task = (message.get("response") or {}).get("task")
+            result["task"] = task
+            expected_status = case.get("expected_task_status")
+            expected_operation = case.get("expected_operation_id")
+            result["operation_check"] = (
+                expected_status is None or (task or {}).get("status") == expected_status
+            ) and (
+                expected_operation is None or (task or {}).get("operation_id") == expected_operation
+            )
+            expected_turns = case.get("expected_turn_statuses")
+            if expected_turns is not None:
+                result["operation_check"] = result["operation_check"] and [
+                    (turn.get("task") or {}).get("status") for turn in transcript
+                ] == expected_turns
             result["answer"] = "\n".join(
                 paragraph["text"]
                 for paragraph in (message.get("response") or {}).get("paragraphs", [])
@@ -79,12 +106,13 @@ async def evaluate_one(client: httpx.AsyncClient, case: dict, limit: asyncio.Sem
 async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-url", default="http://127.0.0.1:8010")
+    parser.add_argument("--cases", type=Path, default=CASES)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
     target = urlsplit(args.base_url)
     if target.scheme != "http" or target.hostname not in {"localhost", "127.0.0.1", "::1"}:
         parser.error("Evaluation is restricted to a local test-only HTTP server")
-    suite = json.loads(CASES.read_text())
+    suite = json.loads(args.cases.read_text())
     async with httpx.AsyncClient(base_url=args.base_url, timeout=60) as client:
         identity = await client.get("/users/me")
         identity.raise_for_status()

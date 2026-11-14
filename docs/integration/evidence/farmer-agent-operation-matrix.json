@@ -1,0 +1,593 @@
+{
+  "environment": "synthetic local account, real HTTP and business routers; no write confirmed",
+  "total": 39,
+  "passed": 39,
+  "items": [
+    {
+      "operation_id": "layers_agri_data_layers_get",
+      "method": "GET",
+      "path": "/agri-data/layers",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "layers_agri_data_layers_get",
+      "missing_inputs": [],
+      "href": "/field-shift/map",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "manifest_agri_data_layers__layer_id__manifest_get",
+      "method": "GET",
+      "path": "/agri-data/layers/{layer_id}/manifest",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "manifest_agri_data_layers__layer_id__manifest_get",
+      "missing_inputs": [
+        "layer_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "tile_agri_data_layers__layer_id__tiles__z___x___y__get",
+      "method": "GET",
+      "path": "/agri-data/layers/{layer_id}/tiles/{z}/{x}/{y}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "tile_agri_data_layers__layer_id__tiles__z___x___y__get",
+      "missing_inputs": [
+        "layer_id",
+        "z",
+        "x",
+        "y"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "create_selection_agri_data_selections_post",
+      "method": "POST",
+      "path": "/agri-data/selections",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "create_selection_agri_data_selections_post",
+      "missing_inputs": [
+        "body.kind",
+        "body.revision",
+        "body.geometry"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "get_selection_agri_data_selections__selection_id__get",
+      "method": "GET",
+      "path": "/agri-data/selections/{selection_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "get_selection_agri_data_selections__selection_id__get",
+      "missing_inputs": [
+        "selection_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "facts_agri_data_selections__selection_id__facts_get",
+      "method": "GET",
+      "path": "/agri-data/selections/{selection_id}/facts",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "facts_agri_data_selections__selection_id__facts_get",
+      "missing_inputs": [
+        "selection_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "get_analysis_field_shift_analyses__analysis_id__get",
+      "method": "GET",
+      "path": "/field-shift/analyses/{analysis_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "get_analysis_field_shift_analyses__analysis_id__get",
+      "missing_inputs": [
+        "analysis_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "list_farms_field_shift_farms_get",
+      "method": "GET",
+      "path": "/field-shift/farms",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "list_farms_field_shift_farms_get",
+      "missing_inputs": [],
+      "href": "/field-shift",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "sync_farm_field_shift_farms_sync_post",
+      "method": "POST",
+      "path": "/field-shift/farms/sync",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "sync_farm_field_shift_farms_sync_post",
+      "missing_inputs": [
+        "body.farm",
+        "body.fields"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "get_farm_field_shift_farms__farm_id__get",
+      "method": "GET",
+      "path": "/field-shift/farms/{farm_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "get_farm_field_shift_farms__farm_id__get",
+      "missing_inputs": [
+        "farm_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "list_fields_field_shift_fields_get",
+      "method": "GET",
+      "path": "/field-shift/fields",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "list_fields_field_shift_fields_get",
+      "missing_inputs": [],
+      "href": "/field-shift",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "create_field_field_shift_fields_post",
+      "method": "POST",
+      "path": "/field-shift/fields",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "create_field_field_shift_fields_post",
+      "missing_inputs": [
+        "body.name",
+        "body.area_ha",
+        "body.latitude",
+        "body.longitude",
+        "body.soil_texture",
+        "body.irrigation_available",
+        "body.profile_id",
+        "body.history"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "get_field_field_shift_fields__field_id__get",
+      "method": "GET",
+      "path": "/field-shift/fields/{field_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "get_field_field_shift_fields__field_id__get",
+      "missing_inputs": [
+        "field_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "update_field_field_shift_fields__field_id__patch",
+      "method": "PATCH",
+      "path": "/field-shift/fields/{field_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "update_field_field_shift_fields__field_id__patch",
+      "missing_inputs": [
+        "field_id",
+        "body.name",
+        "body.area_ha",
+        "body.latitude",
+        "body.longitude",
+        "body.soil_texture",
+        "body.irrigation_available",
+        "body.profile_id",
+        "body.history",
+        "body.expected_version"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "create_analysis_field_shift_fields__field_id__analyses_post",
+      "method": "POST",
+      "path": "/field-shift/fields/{field_id}/analyses",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "create_analysis_field_shift_fields__field_id__analyses_post",
+      "missing_inputs": [
+        "field_id",
+        "body.start_year",
+        "body.baseline_crop_ids",
+        "body.allowed_crop_ids",
+        "body.max_irrigation_mm",
+        "body.max_cost_usd_ha",
+        "body.max_labor_days_ha",
+        "body.weights",
+        "body.scenario",
+        "body.accept_demo_assumptions",
+        "body.expected_field_version"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "get_environment_field_shift_fields__field_id__environment_get",
+      "method": "GET",
+      "path": "/field-shift/fields/{field_id}/environment",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "get_environment_field_shift_fields__field_id__environment_get",
+      "missing_inputs": [
+        "field_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "list_plans_field_shift_plans_get",
+      "method": "GET",
+      "path": "/field-shift/plans",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "list_plans_field_shift_plans_get",
+      "missing_inputs": [],
+      "href": "/field-shift",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "save_plan_field_shift_plans_post",
+      "method": "POST",
+      "path": "/field-shift/plans",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "save_plan_field_shift_plans_post",
+      "missing_inputs": [
+        "body.analysis_id",
+        "body.option_id",
+        "body.title",
+        "body.notes"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "get_plan_field_shift_plans__plan_id__get",
+      "method": "GET",
+      "path": "/field-shift/plans/{plan_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "get_plan_field_shift_plans__plan_id__get",
+      "missing_inputs": [
+        "plan_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "list_profiles_field_shift_profiles_get",
+      "method": "GET",
+      "path": "/field-shift/profiles",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "list_profiles_field_shift_profiles_get",
+      "missing_inputs": [],
+      "href": "/field-shift",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "compare_rotation_optimizer_compare_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/compare",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "compare_rotation_optimizer_compare_post",
+      "missing_inputs": [
+        "body.first_run_id",
+        "body.second_run_id",
+        "body.first_option_id",
+        "body.second_option_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "data_releases_rotation_optimizer_data_releases_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/data-releases",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "data_releases_rotation_optimizer_data_releases_get",
+      "missing_inputs": [],
+      "href": "/field-shift/rotation",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "data_release_rotation_optimizer_data_releases__release_id__get",
+      "method": "GET",
+      "path": "/rotation-optimizer/data-releases/{release_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "data_release_rotation_optimizer_data_releases__release_id__get",
+      "missing_inputs": [
+        "release_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "data_release_availability_rotation_optimizer_data_releases__release_id__availability_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/data-releases/{release_id}/availability",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "data_release_availability_rotation_optimizer_data_releases__release_id__availability_get",
+      "missing_inputs": [
+        "release_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "plans_rotation_optimizer_plans_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/plans",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "plans_rotation_optimizer_plans_get",
+      "missing_inputs": [],
+      "href": "/field-shift/rotation",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "save_rotation_optimizer_plans_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/plans",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "save_rotation_optimizer_plans_post",
+      "missing_inputs": [
+        "body.run_id",
+        "body.option_id",
+        "body.title"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "plan_rotation_optimizer_plans__plan_id__get",
+      "method": "GET",
+      "path": "/rotation-optimizer/plans/{plan_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "plan_rotation_optimizer_plans__plan_id__get",
+      "missing_inputs": [
+        "plan_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "preflight_rotation_optimizer_preflight_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/preflight",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "preflight_rotation_optimizer_preflight_post",
+      "missing_inputs": [
+        "body.profile_id",
+        "body.fields",
+        "body.start",
+        "body.end",
+        "body.allowed_crop_ids"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "profiles_rotation_optimizer_profiles_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/profiles",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "profiles_rotation_optimizer_profiles_get",
+      "missing_inputs": [],
+      "href": "/field-shift/rotation",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "runs_rotation_optimizer_runs_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/runs",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "runs_rotation_optimizer_runs_get",
+      "missing_inputs": [],
+      "href": "/field-shift/rotation",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "create_rotation_optimizer_runs_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/runs",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "create_rotation_optimizer_runs_post",
+      "missing_inputs": [
+        "body.profile_id",
+        "body.fields",
+        "body.start",
+        "body.end",
+        "body.allowed_crop_ids",
+        "body.farm_limits",
+        "body.accept_benchmark_assumptions"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "get_rotation_optimizer_runs__run_id__get",
+      "method": "GET",
+      "path": "/rotation-optimizer/runs/{run_id}",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "get_rotation_optimizer_runs__run_id__get",
+      "missing_inputs": [
+        "run_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "cancel_rotation_optimizer_runs__run_id__cancel_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/runs/{run_id}/cancel",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "cancel_rotation_optimizer_runs__run_id__cancel_post",
+      "missing_inputs": [
+        "run_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "export_rotation_optimizer_runs__run_id__export_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/runs/{run_id}/export",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "export_rotation_optimizer_runs__run_id__export_get",
+      "missing_inputs": [
+        "run_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "export_csv_rotation_optimizer_runs__run_id__export_csv_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/runs/{run_id}/export.csv",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "export_csv_rotation_optimizer_runs__run_id__export_csv_get",
+      "missing_inputs": [
+        "run_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "retry_rotation_optimizer_runs__run_id__retry_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/runs/{run_id}/retry",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "retry_rotation_optimizer_runs__run_id__retry_post",
+      "missing_inputs": [
+        "run_id"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "daily_profiles_rotation_optimizer_v3_profiles_get",
+      "method": "GET",
+      "path": "/rotation-optimizer/v3/profiles",
+      "expected_status": "completed",
+      "actual_status": "completed",
+      "selected_operation": "daily_profiles_rotation_optimizer_v3_profiles_get",
+      "missing_inputs": [],
+      "href": "/field-shift/rotation",
+      "business_status_code": 200,
+      "passed": true
+    },
+    {
+      "operation_id": "daily_readiness_rotation_optimizer_v3_readiness_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/v3/readiness",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "daily_readiness_rotation_optimizer_v3_readiness_post",
+      "missing_inputs": [
+        "body.profile_id",
+        "body.fields",
+        "body.start",
+        "body.end",
+        "body.allowed_crop_ids",
+        "body.periods"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    },
+    {
+      "operation_id": "create_daily_rotation_optimizer_v3_runs_post",
+      "method": "POST",
+      "path": "/rotation-optimizer/v3/runs",
+      "expected_status": "needs_input",
+      "actual_status": "needs_input",
+      "selected_operation": "create_daily_rotation_optimizer_v3_runs_post",
+      "missing_inputs": [
+        "body.profile_id",
+        "body.fields",
+        "body.start",
+        "body.end",
+        "body.allowed_crop_ids",
+        "body.periods"
+      ],
+      "href": null,
+      "business_status_code": null,
+      "passed": true
+    }
+  ]
+}
