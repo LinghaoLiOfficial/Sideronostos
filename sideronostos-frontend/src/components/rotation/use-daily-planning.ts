@@ -148,7 +148,9 @@ export function useDailyPlanning({
       void _key;
       body = value;
     } catch (cause) {
-      setError(errorMessage(cause));
+      // This branch contains only local input validation, before any API call.
+      // Preserve its actionable message instead of reporting a network outage.
+      setError(cause instanceof Error ? cause.message : "请检查规划条件。");
       return;
     }
     const token = ++sequence.current,

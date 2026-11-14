@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
-import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { cleanup, screen, fireEvent } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { Field } from "@/lib/api/field-shift-types";
 import type { ServerFarmHeader } from "@/lib/api/farms";

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { cleanup, screen, fireEvent } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import type { EvidenceSource, RecordedValue } from "@/lib/api/daily-types";
 import { EvidenceValue, SourcesEditor } from "./daily-evidence";
 const source: EvidenceSource = {

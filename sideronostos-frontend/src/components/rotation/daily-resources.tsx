@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "@/lib/i18n/provider";
 import { useState } from "react";
 import type { Field } from "@/lib/api/field-shift-types";
 import type { ServerFarmHeader } from "@/lib/api/farms";
@@ -29,18 +30,18 @@ function CalendarEditor({
   onChange: (resource: DailyResource) => void;
   onRemove: () => void;
 }) {
+  const { t } = useI18n();
+
   const [date, setDate] = useState("");
   const unit = value.kind === "water" ? "m3/day" : "h/day";
   return (
     <details className={styles.dailyPanel}>
       <summary>
-        {label} · {value.field_ids.length} 个地块共享
-      </summary>
+        {t(label)} · {value.field_ids.length} {t(" 个地块共享")}</summary>
       <button type="button" onClick={onRemove}>
-        移除此资源
-      </button>
+        {t("移除此资源")}</button>
       <fieldset className={styles.unstyledFieldset}>
-        <legend>资源覆盖的地块（该上限由这些地块共享）</legend>
+        <legend>{t("资源覆盖的地块（该上限由这些地块共享）")}</legend>
         {fields.map((f) => (
           <label className={styles.checkLabel} key={f.id}>
             <input
@@ -62,8 +63,7 @@ function CalendarEditor({
       {value.kind === "water" && (
         <>
           <label>
-            水量口径
-            <select
+            {t("水量口径")}<select
               value={value.water_basis ?? ""}
               onChange={(e) =>
                 onChange({
@@ -77,14 +77,14 @@ function CalendarEditor({
                 })
               }
             >
-              <option value="">尚未确认</option>
-              <option value="net">净水量：到达根区的水</option>
-              <option value="gross">毛水量：从水源取用的水</option>
+              <option value="">{t("尚未确认")}</option>
+              <option value="net">{t("净水量：到达根区的水")}</option>
+              <option value="gross">{t("毛水量：从水源取用的水")}</option>
             </select>
           </label>
           {value.water_basis === "gross" && (
             <EvidenceValue
-              label="灌溉效率（0–1）"
+              label={t("灌溉效率（0–1）")}
               unit="1"
               value={value.irrigation_efficiency ?? undefined}
               sources={sources}
@@ -97,7 +97,7 @@ function CalendarEditor({
         </>
       )}
       <CapacityEditor
-        label="通常每天的可用量"
+        label={t("通常每天的可用量")}
         unit={unit}
         value={value.default}
         sources={sources}
@@ -105,11 +105,9 @@ function CalendarEditor({
         onChange={(next) => onChange({ ...value, default: next })}
       />
       <details className={styles.details}>
-        <summary>特定日期的例外</summary>
+        <summary>{t("特定日期的例外")}</summary>
         <p className={styles.help}>
-          例外值会替换当天的通常可用量，例如设备检修日填写
-          0。不能补救的硬上限仍然生效。
-        </p>
+          {t("例外值会替换当天的通常可用量，例如设备检修日填写 0。不能补救的硬上限仍然生效。")}</p>
         {Object.entries(value.overrides).map(([day, amount]) => (
           <div key={day}>
             <EvidenceValue
@@ -133,13 +131,11 @@ function CalendarEditor({
                 onChange({ ...value, overrides });
               }}
             >
-              移除 {day} 例外
-            </button>
+              {t("移除 ")}{day} {t(" 例外")}</button>
           </div>
         ))}
         <label>
-          例外日期
-          <input
+          {t("例外日期")}<input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -156,8 +152,7 @@ function CalendarEditor({
             setDate("");
           }}
         >
-          加入日期例外
-        </button>
+          {t("加入日期例外")}</button>
       </details>
     </details>
   );
@@ -177,6 +172,8 @@ export function DailyResourcesEditor({
   defaultSource: string;
   onChange: (resources: DailyDraft["farm_resources"]) => void;
 }) {
+  const { t } = useI18n();
+
   const machineTypes = [
     ...new Set(
       draft.allowed_crop_ids.flatMap(
@@ -188,20 +185,19 @@ export function DailyResourcesEditor({
     onChange({ ...draft.farm_resources, [id]: farm });
   return (
     <section className={styles.formBlock} id="daily-resources">
-      <h2>共享资源与分期供需</h2>
+      <h2>{t("共享资源与分期供需")}</h2>
       <p className={styles.help}>
-        供水与农机按实际作业日检查；种子按播种期、市场按收获期检查。各农场分别核算，同一资源的额度由勾选地块共同使用。
-      </p>
+        {t("供水与农机按实际作业日检查；种子按播种期、市场按收获期检查。各农场分别核算，同一资源的额度由勾选地块共同使用。")}</p>
       {Object.entries(draft.farm_resources).map(([farmId, farm]) => (
         <section
           key={farmId}
-          aria-label={farms.find((f) => f.id === farmId)?.name ?? "农场资源"}
+          aria-label={farms.find((f) => f.id === farmId)?.name ?? t("农场资源")}
         >
           <h3>{farms.find((f) => f.id === farmId)?.name ?? farmId}</h3>
           {Object.entries(farm.daily).map(([id, resource]) => (
             <CalendarEditor
               key={id}
-              label={`${resource.kind === "water" ? "水源" : resource.machine_type === "tractor" ? "拖拉机" : resource.machine_type === "harvester" ? "收获机" : resource.machine_type} ${
+              label={`${resource.kind === "water" ? t("水源") : resource.machine_type === "tractor" ? t("拖拉机") : resource.machine_type === "harvester" ? t("收获机") : resource.machine_type} ${
                 Object.entries(farm.daily)
                   .filter(
                     ([, r]) =>
@@ -229,8 +225,7 @@ export function DailyResourcesEditor({
             />
           ))}
           <label>
-            增加独立资源
-            <select
+            {t("增加独立资源")}<select
               value=""
               onChange={(e) => {
                 if (!e.target.value) return;
@@ -255,29 +250,27 @@ export function DailyResourcesEditor({
                 });
               }}
             >
-              <option value="">选择资源种类…</option>
-              <option value="water">另一个水源</option>
+              <option value="">{t("选择资源种类…")}</option>
+              <option value="water">{t("另一个水源")}</option>
               {machineTypes.map((m) => (
                 <option key={m} value={m}>
-                  另一组 {m}
+                  {t("另一组 ")}{m}
                 </option>
               ))}
             </select>
           </label>
           <p className={styles.help}>
-            若添加独立资源，请核对各组地块归属。每块地只能归属一个水源，每类必需设备只能归属一组。
-          </p>
+            {t("若添加独立资源，请核对各组地块归属。每块地只能归属一个水源，每类必需设备只能归属一组。")}</p>
           {draft.periods.map((period) => (
             <details key={period.id} className={styles.dailyPanel}>
               <summary>
-                {period.start}—{period.end} · 种子与市场容量
-              </summary>
+                {period.start}—{period.end} {t(" · 种子与市场容量")}</summary>
               {farm.period_limits.map(
                 (limit, index) =>
                   limit.period_id === period.id && (
                     <CapacityEditor
                       key={`${limit.kind}:${limit.crop_id}`}
-                      label={`${profile.crops[limit.crop_id]?.name ?? limit.crop_id} · ${limit.kind === "seed" ? "可获得种子" : "可销售产量"}`}
+                      label={t(`${t(profile.crops[limit.crop_id]?.name ?? limit.crop_id)} · ${limit.kind === "seed" ? t("可获得种子") : t("可销售产量")}`)}
                       unit="kg"
                       value={limit.limit}
                       sources={draft.sources}

@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "@/lib/i18n/provider";
+import { LanguageSwitch } from "@/components/language-switch";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -57,12 +59,13 @@ function Notice({ children }: { children: ReactNode }) {
   );
 }
 function QueryError({ error, retry }: { error: unknown; retry: () => void }) {
+  const { t } = useI18n();
+
   return (
     <div className={styles.error} role="alert">
-      {errorMessage(error)}{" "}
+      {t(errorMessage(error))}{" "}
       <button type="button" onClick={retry}>
-        重试
-      </button>
+        {t("重试")}</button>
     </div>
   );
 }
@@ -75,44 +78,48 @@ function Header({
   user?: AuthUser;
   search?: string;
 }) {
+  const { t } = useI18n();
+
   return (
     <header className={styles.header}>
-      <Link className={styles.brand} href="/refer-2">
+      <Link className={styles.brand} href="/fields">
         <Sprout size={25} />
         <span>
-          Agrisata <small>FIELD SHIFT</small>
+          {t("Agrisata ")}<small>{t("FIELD SHIFT")}</small>
         </span>
       </Link>
-      <nav aria-label="Field Shift 工作区">
+      <nav aria-label={t("Field Shift 工作区")}>
         <Link
           aria-current={mode === "map" ? "page" : undefined}
           href={`/fields${search ? "?" + search : ""}`}
         >
           <Map size={16} />
-          地图
-        </Link>
+          {t("地图")}</Link>
         <Link
           aria-current={mode === "rotation" ? "page" : undefined}
           href={`/field-shift/rotation${search ? "?" + search : ""}`}
         >
           <Sprout size={16} />
-          轮作规划
+          {t("轮作规划")}
         </Link>
         <Link href="/field-shift/nasa-rotation">
           <Layers size={16} />
-          NASA 回测
+          {t("NASA 回测")}
         </Link>
       </nav>
+      <LanguageSwitch />
       <Link
         className={styles.account}
         href={user ? "/personal/account" : "/field-shift"}
       >
-        {user?.display_name ?? "地块管理"}
+        {user?.display_name ?? t("地块管理")}
       </Link>
     </header>
   );
 }
 export function RotationWorkspace({ mode }: { mode: "map" | "rotation" }) {
+  const { t } = useI18n();
+
   const search = useSearchParams();
   const { session, ready } = useWorkspaceSession();
   if (!ready)
@@ -120,8 +127,7 @@ export function RotationWorkspace({ mode }: { mode: "map" | "rotation" }) {
       <Surface tone="light" className={styles.app}>
         <Header mode={mode} />
         <main className={styles.empty} role="status">
-          正在确认登录状态…
-        </main>
+          {t("正在确认登录状态…")}</main>
       </Surface>
     );
   if (
@@ -133,16 +139,16 @@ export function RotationWorkspace({ mode }: { mode: "map" | "rotation" }) {
         <Header mode={mode} />
         <main className={styles.empty}>
           <Sprout size={38} />
-          <h1>从你的地块，开始下一轮种植</h1>
-          <p>登录后可以查看区域数据、比较轮作，并保存你的计划。</p>
+          <h1>{t("从你的地块，开始下一轮种植")}</h1>
+          <p>{t("登录后可以查看区域数据、比较轮作，并保存你的计划。")}</p>
           {session.data && !session.data.email_verified && (
-            <p>请先完成邮箱验证。</p>
+            <p>{t("请先完成邮箱验证。")}</p>
           )}
           <Link
             className={styles.primary}
             href={`/login?next=${encodeURIComponent(`/field-shift/${mode}?${search}`)}`}
           >
-            登录并继续 <ArrowRight size={16} />
+            {t("登录并继续 ")}<ArrowRight size={16} />
           </Link>
         </main>
       </Surface>
@@ -170,6 +176,8 @@ function OwnerWorkspace({
   owner: AuthUser;
   mode: "map" | "rotation";
 }) {
+  const { t, locale } = useI18n();
+
   const navigation = useWorkspaceNavigation(`/field-shift/${mode}`);
   const {
     search,
@@ -314,7 +322,7 @@ function OwnerWorkspace({
           kind === "polygon" &&
             cause instanceof ApiError &&
             cause.status === 422
-            ? "区域未能保存。请检查边界是否交叉、范围是否过大或顶点过多；顶点已保留，可以撤回修正。"
+            ? t("区域未能保存。请检查边界是否交叉、范围是否过大或顶点过多；顶点已保留，可以撤回修正。")
             : errorMessage(cause),
         );
       return false;
@@ -369,7 +377,7 @@ function OwnerWorkspace({
         params.get("selection") === origin.selection
       )
         setBoundaryMessage(
-          "边界已保存。经营面积保持你填写的数值，地块版本已更新。",
+          t("边界已保存。经营面积保持你填写的数值，地块版本已更新。"),
         );
     } catch (cause) {
       if (mounted.current) setBoundaryMessage(errorMessage(cause));
@@ -453,18 +461,18 @@ function OwnerWorkspace({
   const contextLabel = [
     hasRun
       ? run.data!.field_snapshots.map((f) => f.name).join("、")
-      : (selectedField?.name ?? "未选择经营地块"),
+      : (selectedField?.name ?? t("未选择经营地块")),
     selection.data
-      ? `地图${{ point: "选点", polygon: "区域", viewport: "视野" }[selection.data.kind]} ${selection.data.center.map((v) => n(v, 3)).join(", ")}`
-      : "未选地图区域",
+      ? t("地图{0} {1}", { "0": { point: "选点", polygon: "区域", viewport: "视野" }[selection.data.kind], "1": selection.data.center.map((v) => n(v, 3)).join(", ") })
+      : t("未选地图区域"),
     actualOption
       ? actualOption.id === "baseline"
-        ? "基准种法"
-        : actualOption.id.replace("option-", "方案 ")
+        ? t("基准种法")
+        : actualOption.id.replace("option-", t("方案 "))
       : hasRun
-        ? "未选择方案"
+        ? t("未选择方案")
         : "",
-    dates ? `${dates.start}—${dates.end}` : "全部已发布观测",
+    dates ? `${dates.start}—${dates.end}` : t("全部已发布观测"),
   ]
     .filter(Boolean)
     .join(" · ");
@@ -472,7 +480,7 @@ function OwnerWorkspace({
     event.preventDefault();
     const next = observationWindow(dateStart, dateEnd);
     if (!next.dates) {
-      setSelectionError(next.error ?? "请填写观测起止日期。");
+      setSelectionError(next.error ?? t("请填写观测起止日期。"));
       return;
     }
     navigate({ obsStart: dateStart, obsEnd: dateEnd });
@@ -481,12 +489,11 @@ function OwnerWorkspace({
   const dataSidebar = (
     <>
       <section className={styles.sidebarSection}>
-        <p className={styles.eyebrow}>YOUR LAND, YOUR DECISIONS</p>
-        <h1>先了解这片土地</h1>
-        <p className={styles.help}>查看已准备的数据，再讨论下一轮种植。</p>
+        <p className={styles.eyebrow}>{t("YOUR LAND, YOUR DECISIONS")}</p>
+        <h1>{t("先了解这片土地")}</h1>
+        <p className={styles.help}>{t("查看已准备的数据，再讨论下一轮种植。")}</p>
         <label>
-          我的经营地块
-          <select
+          {t("我的经营地块")}<select
             value={selectedField?.id ?? ""}
             onChange={(e) => {
               const f = fields.data?.items.find((f) => f.id === e.target.value);
@@ -494,15 +501,14 @@ function OwnerWorkspace({
               else navigate({ field: null });
             }}
           >
-            <option value="">选择已有地块</option>
+            <option value="">{t("选择已有地块")}</option>
             {fields.data?.items.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name} · {f.area_ha} ha
-              </option>
+                {f.name} · {f.area_ha} {t(" ha")}</option>
             ))}
           </select>
         </label>
-        {fields.isPending && <p role="status">正在读取地块…</p>}
+        {fields.isPending && <p role="status">{t("正在读取地块…")}</p>}
         {fields.error && (
           <QueryError
             error={fields.error}
@@ -511,31 +517,29 @@ function OwnerWorkspace({
         )}
         <div className={styles.sidebarLinks}>
           <Link href={`/field-shift?field=${selectedField?.id ?? "new"}`}>
-            {selectedField ? "编辑地块与历史" : "创建地块"} <Plus size={13} />
+            {selectedField ? t("编辑地块与历史") : t("创建地块")} <Plus size={13} />
           </Link>
           <Link href={`/field-shift/rotation?${search}`}>
-            开始轮作规划 <ArrowRight size={13} />
+            {t("开始轮作规划 ")}<ArrowRight size={13} />
           </Link>
         </div>
         {requestedField && !selectedField && !fields.isPending && (
-          <Notice>此地块当前不可用，请重新选择。</Notice>
+          <Notice>{t("此地块当前不可用，请重新选择。")}</Notice>
         )}
       </section>
       <section className={styles.sidebarSection}>
         <h2>
           <Layers size={16} />
-          已发布数据
-        </h2>
+          {t("已发布数据")}</h2>
         <label>
-          地图图层
-          <select
+          {t("地图图层")}<select
             value={layerId}
             onChange={(e) => navigate({ layer: e.target.value || null })}
           >
-            <option value="">仅显示底图</option>
+            <option value="">{t("仅显示底图")}</option>
             {layers.data?.items.map((layer) => (
               <option key={layer.id} value={layer.id}>
-                SMAP 表层土壤水分 · {layer.pass} · {layer.start.slice(0, 10)}
+                {t("SMAP 表层土壤水分 · ")}{layer.pass} · {layer.start.slice(0, 10)}
               </option>
             ))}
           </select>
@@ -548,16 +552,14 @@ function OwnerWorkspace({
         )}
         {window.error && (
           <Notice>
-            {window.error}当前显示全部已发布观测，请重新应用日期。
-          </Notice>
+            {t(window.error)}{t("当前显示全部已发布观测，请重新应用日期。")}</Notice>
         )}
         <details className={styles.details}>
-          <summary>按观测日期筛选数据</summary>
+          <summary>{t("按观测日期筛选数据")}</summary>
           <form onSubmit={applyDates}>
             <div className={styles.twoColumns}>
               <label>
-                开始
-                <input
+                {t("开始")}<input
                   type="date"
                   value={dateStart}
                   required
@@ -571,8 +573,7 @@ function OwnerWorkspace({
                 />
               </label>
               <label>
-                结束
-                <input
+                {t("结束")}<input
                   type="date"
                   value={dateEnd}
                   min={dateStart}
@@ -588,7 +589,7 @@ function OwnerWorkspace({
               </label>
             </div>
             <div className={styles.actions}>
-              <button>应用日期</button>
+              <button>{t("应用日期")}</button>
               <button
                 type="button"
                 onClick={() => {
@@ -597,22 +598,19 @@ function OwnerWorkspace({
                   navigate({ obsStart: null, obsEnd: null });
                 }}
               >
-                查看全部
-              </button>
+                {t("查看全部")}</button>
             </div>
           </form>
         </details>
         <p className={styles.help}>
-          图层日期与查询日期分别显示。2025 年历史天气和 2026
-          年卫星观测是不同资料，不表示未来预报。
-        </p>
+          {t("图层日期与查询日期分别显示。2025 年历史天气和 2026 年卫星观测是不同资料，不表示未来预报。")}</p>
       </section>
       <section className={styles.sidebarSection}>
-        <h2>所选区域的资料</h2>
-        {selecting && <p role="status">正在保存选区…</p>}
+        <h2>{t("所选区域的资料")}</h2>
+        {selecting && <p role="status">{t("正在保存选区…")}</p>}
         {selectionError && (
           <p className={styles.error} role="alert">
-            {selectionError}
+            {t(selectionError)}
           </p>
         )}
         {selection.error && (
@@ -623,8 +621,7 @@ function OwnerWorkspace({
         )}{" "}
         {!selectionId && !selecting && (
           <p className={styles.help}>
-            点击地图选点、画一个区域，或明确采用当前视野。仅拖动地图不会改变助手的选区。
-          </p>
+            {t("点击地图选点、画一个区域，或明确采用当前视野。仅拖动地图不会改变助手的选区。")}</p>
         )}
         {selection.data && (
           <>
@@ -632,9 +629,9 @@ function OwnerWorkspace({
               <strong>
                 {
                   {
-                    point: "地图选点",
-                    polygon: "手绘区域",
-                    viewport: "已采用的视野",
+                    point: t("地图选点"),
+                    polygon: t("手绘区域"),
+                    viewport: t("已采用的视野"),
                   }[selection.data.kind]
                 }
               </strong>
@@ -642,7 +639,7 @@ function OwnerWorkspace({
                 {selection.data.center.map((v) => n(v, 4)).join(", ")}
               </span>
               {selection.data.area_ha != null && (
-                <span>几何面积 {n(selection.data.area_ha, 2)} ha</span>
+                <span>{t("几何面积 ")}{n(selection.data.area_ha, 2)} {t(" ha")}</span>
               )}
               <button
                 type="button"
@@ -654,32 +651,29 @@ function OwnerWorkspace({
                   navigate({ selection: null });
                 }}
               >
-                清除选区
-              </button>
+                {t("清除选区")}</button>
             </div>
             {selection.data.kind === "polygon" &&
               selectedField &&
               !selectedField.farm_id && (
                 <details className={styles.details}>
-                  <summary>将区域保存为「{selectedField.name}」的边界</summary>
+                  <summary>{t("将区域保存为「")}{selectedField.name}{t("」的边界")}</summary>
                   <p className={styles.help}>
-                    经营面积：{n(selectedField.area_ha, 2)} ha；绘制面积：
-                    {n(selection.data.area_ha, 2)}{" "}
-                    ha。保存只更新边界与版本，请在地块管理中核对面积。
-                  </p>
+                    {t("经营面积：")}{n(selectedField.area_ha, 2)} {t(" ha；绘制面积：")}{n(selection.data.area_ha, 2)}{" "}
+                    {t("ha。保存只更新边界与版本，请在地块管理中核对面积。")}</p>
                   <button
                     type="button"
                     disabled={boundaryBusy}
                     onClick={() => void saveBoundary()}
                   >
-                    {boundaryBusy ? "正在保存…" : "保存为此地块边界"}
+                    {boundaryBusy ? t("正在保存…") : t("保存为此地块边界")}
                   </button>
                 </details>
               )}
             {boundaryMessage && <Notice>{boundaryMessage}</Notice>}
           </>
         )}
-        {facts.isFetching && <p role="status">正在读取已发布的区域事实…</p>}
+        {facts.isFetching && <p role="status">{t("正在读取已发布的区域事实…")}</p>}
         {facts.error && (
           <QueryError error={facts.error} retry={() => void facts.refetch()} />
         )}{" "}
@@ -696,21 +690,20 @@ function OwnerWorkspace({
               )}
               ：
             </strong>{" "}
-            {missingReason[missing.reason] ?? "该范围暂无适用资料。"}
-            {!missingReason[missing.reason] && missing.detail
+            {t(missingReason[missing.reason] ?? t("该范围暂无适用资料。"))}
+            {t(!missingReason[missing.reason] && missing.detail
               ? ` · ${missing.detail}`
-              : ""}
+              : "")}
           </Notice>
         ))}
         {facts.data &&
           !facts.data.facts.length &&
           !facts.data.unavailable.length && (
-            <Notice>该区域与日期没有已发布的资料。缺测不能解释为零。</Notice>
+            <Notice>{t("该区域与日期没有已发布的资料。缺测不能解释为零。")}</Notice>
           )}
       </section>
       <p className={styles.sidebarFooter}>
-        初始地图停在研发天气样本附近，尚未确定业务试点。
-      </p>
+        {t("初始地图停在研发天气样本附近，尚未确定业务试点。")}</p>
     </>
   );
   const dailyRun = run.data && isDailyRun(run.data) ? run.data : undefined;
@@ -727,7 +720,7 @@ function OwnerWorkspace({
     planningBody = (
       <>
         {saved.isPending ? (
-          <p role="status">正在恢复保存时的计划…</p>
+          <p role="status">{t("正在恢复保存时的计划…")}</p>
         ) : saved.error ? (
           <QueryError error={saved.error} retry={() => void saved.refetch()} />
         ) : saved.data ? (
@@ -743,8 +736,7 @@ function OwnerWorkspace({
             })
           }
         >
-          返回规划
-        </button>
+          {t("返回规划")}</button>
       </>
     );
   } else {
@@ -752,9 +744,7 @@ function OwnerWorkspace({
       <>
         {legacyRun ? (
           <Notice>
-            这是旧版 v2 计算，保留当时的输入、指标与结果。新规划使用逐日 v3
-            模型。
-            <button
+            {t("这是旧版 v2 计算，保留当时的输入、指标与结果。新规划使用逐日 v3 模型。")}<button
               type="button"
               onClick={() =>
                 navigate({
@@ -766,14 +756,13 @@ function OwnerWorkspace({
                 })
               }
             >
-              开始新的逐日规划
-            </button>
+              {t("开始新的逐日规划")}</button>
           </Notice>
         ) : dailyProfiles.isPending ||
           farms.isPending ||
           fields.isPending ||
           Boolean(runId && run.isPending) ? (
-          <p role="status">正在恢复你的规划资料…</p>
+          <p role="status">{t("正在恢复你的规划资料…")}</p>
         ) : dailyProfiles.error || farms.error || fields.error ? (
           <QueryError
             error={dailyProfiles.error ?? farms.error ?? fields.error}
@@ -785,8 +774,7 @@ function OwnerWorkspace({
           />
         ) : dailyRun && !profile ? (
           <Notice>
-            当时的逐日参数包已不可用或已更新。下方仍显示原始计算快照；如需新计算，请先开始新规划并核对当前参数。
-            <button
+            {t("当时的逐日参数包已不可用或已更新。下方仍显示原始计算快照；如需新计算，请先开始新规划并核对当前参数。")}<button
               type="button"
               onClick={() =>
                 navigate({
@@ -798,8 +786,7 @@ function OwnerWorkspace({
                 })
               }
             >
-              开始新的逐日规划
-            </button>
+              {t("开始新的逐日规划")}</button>
           </Notice>
         ) : profile ? (
           <PlannerForm
@@ -816,7 +803,7 @@ function OwnerWorkspace({
             onFieldSaved={updateField}
           />
         ) : (
-          <Notice>当前没有可用的逐日农艺参数包。</Notice>
+          <Notice>{t("当前没有可用的逐日农艺参数包。")}</Notice>
         )}
         {run.error && (
           <QueryError error={run.error} retry={() => void run.refetch()} />
@@ -833,7 +820,7 @@ function OwnerWorkspace({
               navigate({ option: option.id });
               setOpenRequest({
                 id: Date.now(),
-                text: "请解释这个方案的主要取舍，以及我需要核对什么。",
+                text: t("请解释这个方案的主要取舍，以及我需要核对什么。"),
               });
             }}
             onUpdate={updateRun}
@@ -845,7 +832,7 @@ function OwnerWorkspace({
               void client.invalidateQueries({
                 queryKey: ["rotation", owner.id, "plans"],
               });
-              setSavedMessage("计划已保存，包含本次输入、结果与来源。");
+              setSavedMessage(t("计划已保存，包含本次输入、结果与来源。"));
               navigate({ plan: plan.id });
             }}
             compareRunId={compareId}
@@ -876,13 +863,11 @@ function OwnerWorkspace({
               <div className={styles.planningNavigation}>
                 <Link href={`/fields?${mapSearch}`}>
                   <ArrowLeft size={14} />
-                  返回地图
-                </Link>
+                  {t("返回地图")}</Link>
                 <details>
-                  <summary>计算与已存计划</summary>
+                  <summary>{t("计算与已存计划")}</summary>
                   <label>
-                    计算历史
-                    <select
+                    {t("计算历史")}<select
                       value={runId ?? ""}
                       onChange={(e) =>
                         navigate({
@@ -894,23 +879,22 @@ function OwnerWorkspace({
                         })
                       }
                     >
-                      <option value="">新规划</option>
+                      <option value="">{t("新规划")}</option>
                       {history.data?.items.map((item) => (
                         <option key={item.id} value={item.id}>
-                          {new Date(item.created_at).toLocaleString()} ·{" "}
+                          {new Date(item.created_at).toLocaleString(locale === "zh" ? "zh-CN" : "en-US")} ·{" "}
                           {isDailyRun(item) ? "v3" : "v2"} ·{" "}
-                          {runStatus[
+                          {t(runStatus[
                             item.id === run.data?.id
                               ? run.data.status
                               : item.status
-                          ] ?? item.status}
+                          ] ?? item.status)}
                         </option>
                       ))}
                     </select>
                   </label>
                   <label>
-                    已存计划
-                    <select
+                    {t("已存计划")}<select
                       value={planId ?? ""}
                       onChange={(e) => {
                         const chosen = plans.data?.items.find(
@@ -929,7 +913,7 @@ function OwnerWorkspace({
                         });
                       }}
                     >
-                      <option value="">选择已存计划</option>
+                      <option value="">{t("选择已存计划")}</option>
                       {plans.data?.items.map((item) => (
                         <option key={item.id} value={item.id}>
                           {item.title}
@@ -953,7 +937,7 @@ function OwnerWorkspace({
             </>
           )}
         </main>
-        <section className={styles.mapStage} aria-label="地图与轮作助手">
+        <section className={styles.mapStage} aria-label={t("地图与轮作助手")}>
           <MapCanvas
             fields={fields.data?.items ?? []}
             selectedField={selectedField}
@@ -971,11 +955,8 @@ function OwnerWorkspace({
             </div>
           )}
           {mode === "rotation" && (
-            <div className={styles.mapSummary}>
-              正在规划{" "}
-              {run.data ? run.data.field_snapshots.length : draftFields.length}{" "}
-              个经营地块 · 地图选区用于查询背景
-            </div>
+            <div className={styles.mapSummary}>{t("正在规划")}{" "}
+              {run.data ? run.data.field_snapshots.length : draftFields.length}{" "}{t("个经营地块 · 地图选区用于查询背景")}</div>
           )}
           <AssistantDock
             ownerId={owner.id}
@@ -1005,33 +986,35 @@ function OwnerWorkspace({
 }
 
 function ScienceRow({ fact }: { fact: ScienceFact }) {
+  const { t } = useI18n();
+
   return (
     <article className={styles.scienceRow}>
       <div>
         <strong>
-          {labels[fact.metric] ?? fact.metric}
+          {t(labels[fact.metric] ?? fact.metric)}
           {fact.pass ? ` · ${fact.pass}` : ""}
         </strong>
         <b>
-          {fact.value == null
-            ? "暂无有效值"
-            : `${n(fact.value, 4)} ${readableUnit(fact.unit)}`}
+          {t(fact.value == null
+            ? t("暂无有效值")
+            : `${n(fact.value, 4)} ${readableUnit(fact.unit)}`)}
         </b>
       </div>
       <p>
         {fact.period?.start?.slice(0, 10)}—{fact.period?.end?.slice(0, 10)} ·{" "}
-        {dataStatus[fact.status] ?? "资料状态待核对"}
+        {t(dataStatus[fact.status] ?? t("资料状态待核对"))}
       </p>
       <details>
-        <summary>来源与限制</summary>
+        <summary>{t("来源与限制")}</summary>
         <p>
           {String(
             fact.source.product ?? fact.source.release_id ?? fact.data_kind,
           )}
         </p>
-        {fact.acquired_at && <p>采集时间：{fact.acquired_at}</p>}
+        {fact.acquired_at && <p>{t("采集时间：")}{fact.acquired_at}</p>}
         {fact.retrieval_qual_flag != null && (
-          <p>检索质量标记：{fact.retrieval_qual_flag}</p>
+          <p>{t("检索质量标记：")}{fact.retrieval_qual_flag}</p>
         )}
         <ul>
           {fact.limitations.map((v, i) => (
@@ -1041,8 +1024,7 @@ function ScienceRow({ fact }: { fact: ScienceFact }) {
         {typeof fact.source.url === "string" &&
           /^https?:\/\//.test(fact.source.url) && (
             <a href={fact.source.url} target="_blank" rel="noreferrer">
-              原始来源
-            </a>
+              {t("原始来源")}</a>
           )}
       </details>
     </article>

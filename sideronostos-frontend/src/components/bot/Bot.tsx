@@ -10,6 +10,7 @@ import {
 import { Minus } from "lucide-react";
 import type { BotAvatarVariant, BotIdentity, BotMode } from "@/lib/bot";
 import type { Locale } from "@/lib/i18n/locale";
+import { useI18n } from "@/lib/i18n/provider";
 import styles from "./bot.module.css";
 
 export type BotProps = {
@@ -44,9 +45,11 @@ export function Bot({
   onModeChange,
   children,
   headerActions,
-  locale = "zh-CN",
+  locale: localeProp,
   purpose = "chat",
 }: BotProps) {
+  const { locale: interfaceLocale, t } = useI18n();
+  const locale = localeProp ?? (interfaceLocale === "zh" ? "zh-CN" : "en");
   const id = useId();
   const panel = useRef<HTMLElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -245,7 +248,7 @@ export function Bot({
           <BotAvatar small variant={identity.avatar} />
           <div className={styles.heading}>
             <h2 id={`${id}-title`}>{identity.name}</h2>
-            <p id={`${id}-description`}>{identity.description}</p>
+            <p id={`${id}-description`}>{t(identity.description)}</p>
           </div>
           <div className={styles.headerActions}>{headerActions}</div>
           <button

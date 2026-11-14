@@ -1,13 +1,15 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/provider";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Locale } from "@/lib/i18n/locale";
 
-export function PasswordField({ locale = "zh-CN", ...props }: Omit<React.ComponentProps<typeof Input>, "type"> & { locale?: Locale }) {
+export function PasswordField(props: Omit<React.ComponentProps<typeof Input>, "type">) {
+  const { t } = useI18n();
+
   const [visible, setVisible] = useState(false);
   return (
     <div className="relative min-w-0 w-full">
@@ -17,7 +19,7 @@ export function PasswordField({ locale = "zh-CN", ...props }: Omit<React.Compone
         variant="ghost"
         size="icon-sm"
         className="absolute right-1.5 top-1.5"
-        aria-label={visible ? (locale === "en" ? "Hide password" : "隐藏密码") : (locale === "en" ? "Show password" : "显示密码")}
+        aria-label={visible ? t("隐藏密码") : t("显示密码")}
         onClick={() => setVisible((value) => !value)}
       >
         {visible ? <EyeOff /> : <Eye />}

@@ -112,6 +112,9 @@ it("invalidates readiness when a saved field version changes", async () => {
   expect(result.current.readiness?.ready).toBe(true);
   rerender({ ...props, fields: [{ ...field, version: 2 }] });
   expect(result.current.readiness).toBeNull();
+  await act(async () => result.current.check());
+  expect(result.current.error).toBe("地块版本已更新，请核对新资料并确认版本。");
+  expect(api.checkDailyReadiness).toHaveBeenCalledTimes(1);
   await act(async () => result.current.submit());
   expect(api.createDailyRun).not.toHaveBeenCalled();
 });
