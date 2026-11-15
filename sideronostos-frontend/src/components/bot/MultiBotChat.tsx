@@ -214,7 +214,7 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
   }
 
   if (loading) return <div className={styles.chatStatus} role="status">{l.loading}</div>;
-  if (unauthenticated) return <div className={styles.chatStatus}><p>{l.signIn}</p><Link href={`/login?next=${encodeURIComponent(`/si/${bot.module}`)}&authRequired=1`}>{l.signInLink}</Link></div>;
+  if (unauthenticated) return <div className={styles.chatStatus}><p>{l.signIn}</p><Link href={`/login?next=${encodeURIComponent(bot.module === "general" ? "/si" : `/si/${bot.module}`)}&authRequired=1`}>{l.signInLink}</Link></div>;
   if (error === "load") return <div className={styles.chatStatus} role="alert"><p>{l.loadError}</p><button type="button" onClick={() => { setLoading(true); setError(null); setReload((value) => value + 1); }}>{l.retry}</button></div>;
 
   return <div className={styles.chatBody}>

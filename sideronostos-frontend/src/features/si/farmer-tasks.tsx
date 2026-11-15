@@ -23,6 +23,7 @@ type TaskId = "fields" | "add" | "field-plans" | "observations" | "maps" | "plan
 type Choice = { id: TaskId; en: string; zh: string };
 
 function choices(bot: string): Choice[] {
+  if (bot === "general-guide") return [{ id: "fields", en: "My fields", zh: "我的地块" }, { id: "observations", en: "Check observations", zh: "查询观测" }, { id: "plans", en: "My saved plans", zh: "已保存计划" }];
   if (bot === "field-guide") return [{ id: "fields", en: "My fields", zh: "我的地块" }, { id: "add", en: "Add a field", zh: "添加地块" }, { id: "field-plans", en: "My planting plans", zh: "我的种植计划" }];
   if (bot === "rotation-guide") return [{ id: "plans", en: "My saved plans", zh: "已保存计划" }, { id: "runs", en: "My calculations", zh: "我的计算" }, { id: "compare", en: "Compare saved plans", zh: "比较已保存计划" }];
   if (bot === "local-knowledge-guide") return [{ id: "local", en: "Ask about my area", zh: "询问本地农业" }];

@@ -35,6 +35,13 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
+it("offers cross-module actions to the general farm assistant", () => {
+  render(<FarmerTasks {...props} botId="general-guide" />);
+  expect(screen.getByRole("button", { name: "My fields" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "My saved plans" })).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Check water conditions" })).not.toBeInTheDocument();
+});
+
 it("lets a farmer choose a saved field by name and opens its actual page", async () => {
   render(<FarmerTasks {...props} />);
   await userEvent.click(screen.getByRole("button", { name: "My fields" }));
