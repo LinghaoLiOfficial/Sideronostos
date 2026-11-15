@@ -29,8 +29,8 @@ const moduleHomes = {
   "rotation-recommendation": { href: "/si/rotation-recommendation", en: "Crop rotation", zh: "轮作策略推荐" },
 } as const satisfies Record<SiBotModule, { href: string; en: string; zh: string }>;
 const labels = {
-  en: { title: "Your SI assistants", history: "Conversations", newChat: "New chat", empty: "No conversations yet", start: "Start a conversation", loading: "Loading conversations…", pending: "Working on your request…", error: "Something went wrong. Your draft is safe.", failed: "This reply could not be completed.", mock: "Local prices and crop varieties are mock examples, not live local data.", source: "View source", older: "Load earlier messages", signIn: "Sign in to use your assistants", login: "Sign in", retry: "Try again" },
-  zh: { title: "你的助手", history: "对话记录", newChat: "新建对话", empty: "还没有对话", start: "开始对话", loading: "正在加载对话…", pending: "正在处理你的请求…", error: "发生错误。草稿已保留。", failed: "这条回复未能完成。", mock: "价格与品种数据为模拟数据，并非实时本地数据。", source: "查看依据", older: "加载更早的消息", signIn: "登录后使用助手", login: "登录", retry: "重试" },
+  en: { title: "Your SI assistants", history: "Conversations", newChat: "New chat", empty: "No conversations yet", loading: "Loading conversations…", pending: "Working on your request…", error: "Something went wrong. Your draft is safe.", failed: "This reply could not be completed.", mock: "Local prices and crop varieties are mock examples, not live local data.", source: "View source", older: "Load earlier messages", signIn: "Sign in to use your assistants", login: "Sign in", retry: "Try again" },
+  zh: { title: "你的助手", history: "对话记录", newChat: "新建对话", empty: "还没有对话", loading: "正在加载对话…", pending: "正在处理你的请求…", error: "发生错误。草稿已保留。", failed: "这条回复未能完成。", mock: "价格与品种数据为模拟数据，并非实时本地数据。", source: "查看依据", older: "加载更早的消息", signIn: "登录后使用助手", login: "登录", retry: "重试" },
 };
 function defaultBot(domain: AgentDomain): CatalogBot {
   return botCatalog.find((bot) => bot.presetId === domain) ?? botCatalog[0];
@@ -80,6 +80,7 @@ export function AgentWorkspace() {
   const [reload, setReload] = useState(0);
   const [error, setError] = useState<"request" | "failed" | null>(null);
   const [menu, setMenu] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
   const [outgoing, setOutgoing] = useState<string | null>(null);
   const [source, setSource] = useState<{ title: string; text: string; url: string | null } | null>(null);
   const active = useRef<string | null>(null);
@@ -156,6 +157,7 @@ export function AgentWorkspace() {
     setDraft("");
     setError(null);
     setMenu(false);
+    setActionsOpen(false);
   }
   function chooseBot(bot: CatalogBot) {
     chooseDomain(bot.presetId as AgentDomain);
@@ -174,6 +176,7 @@ export function AgentWorkspace() {
     setDraft("");
     setError(null);
     setMenu(false);
+    setActionsOpen(false);
     showBotInUrl(bot);
     if (user) localStorage.setItem("agrisata-agent-chat:" + user.id, item.id);
   }
@@ -190,6 +193,7 @@ export function AgentWorkspace() {
       setPage({ ...chat, messages: [], next_before_sequence: null });
       if (user) localStorage.setItem("agrisata-agent-chat:" + user.id, chat.id);
       setMenu(false);
+      setActionsOpen(false);
       return chat.id;
     } catch { setError("request"); return null; }
     finally { setBusy(false); }
@@ -224,6 +228,11 @@ export function AgentWorkspace() {
       return true;
     } catch { setError("request"); return false; }
     finally { setOutgoing(null); setBusy(false); }
+  }
+  async function openActions() {
+    if (busy) return;
+    if (!id && !await create()) return;
+    setActionsOpen(true);
   }
   async function openSource(message: AssistantMessage, evidence: string) {
     if (!id) return;
@@ -268,12 +277,12 @@ export function AgentWorkspace() {
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-3 sm:px-6"><button type="button" className="inline-flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-primary lg:hidden" aria-label={menu ? (zh ? "关闭菜单" : "Close menu") : (zh ? "打开菜单" : "Open menu")} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X size={20} /> : <Menu size={20} />}</button><div className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar small variant={selectedBot.avatar} /><h2 className="truncate text-sm font-semibold sm:text-base">{selectedBot.name[locale]}</h2></div><Link href={moduleHome.href} aria-label={zh ? `前往${moduleHome.zh}` : `Open ${moduleHome.en}`} className="ml-auto inline-flex min-h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-border bg-card px-2.5 text-xs font-medium text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary sm:px-3 sm:text-sm"><span className="sm:hidden">{zh ? "主页" : "Home"}</span><span className="hidden sm:inline">{zh ? moduleHome.zh : moduleHome.en}</span><ArrowUpRight size={15} aria-hidden="true" /></Link></header>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8" aria-live="polite"><div className="mx-auto flex min-h-full max-w-3xl flex-col">
           {page?.next_before_sequence && <button type="button" className="mx-auto mb-6 text-sm text-primary" onClick={() => void older()} disabled={busy}>{l.older}</button>}
-          {!page?.messages.length && !outgoing && <div className="my-auto py-12 text-center"><div className="mx-auto mb-5 flex size-14 items-center justify-center" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar variant={selectedBot.avatar} /></div><h3 className="text-2xl font-semibold">{l.start}</h3></div>}
+          {!page?.messages.length && !outgoing && <div className="my-auto py-12 text-center"><div className="mx-auto flex size-14 items-center justify-center" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar variant={selectedBot.avatar} /></div></div>}
           <div className="space-y-6">{page?.messages.map((message) => <div key={message.id} className="space-y-3"><div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground">{message.text}</div><div className="max-w-[95%] rounded-2xl rounded-bl-sm bg-muted px-4 py-3 text-sm leading-7 sm:max-w-[85%]">{message.status === "pending" ? <span className="flex items-center gap-2 text-muted-foreground"><LoaderCircle size={15} className="animate-spin" />{l.pending}</span> : message.status === "failed" || message.status === "interrupted" ? <span role="alert">{l.failed}</span> : message.response ? <>{message.response.paragraphs.map((paragraph, index) => <p key={index} className="mb-2 last:mb-0">{paragraph.text}</p>)}{message.response.task && <TaskResultCard task={message.response.task} language={zh ? "zh" : "en"} />}{message.response.tasks?.map((task) => <TaskResultCard key={task.id} task={task} language={zh ? "zh" : "en"} />)}{[...new Set(message.response.paragraphs.flatMap((paragraph) => paragraph.evidence_ids))].map((evidence) => <button key={evidence} type="button" onClick={() => void openSource(message, evidence)} className="mr-2 mt-2 rounded-md border border-border px-2 py-1 text-xs text-primary">{l.source} {evidence}</button>)}{message.facts.length > 0 && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer">{zh ? "查看当时的数据" : "View data used"}</summary><dl>{message.facts.map((fact) => <div key={fact.id}><dt className="inline font-medium">{fact.label}: </dt><dd className="inline">{fact.display}</dd></div>)}</dl></details>}{message.response.actions.includes("open_planner") && <Link href="/si/fields?step=planning" className="mt-3 block text-xs text-primary underline">{zh ? "打开轮作规划" : "Open rotation planner"}</Link>}</> : null}</div></div>)}{outgoing && <div className="ml-auto w-fit max-w-[85%] rounded-2xl bg-primary/70 px-4 py-3 text-sm text-primary-foreground">{outgoing}</div>}</div><div ref={end} />
         </div></div>
         {error && <div role="alert" className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2 text-sm text-destructive"><span>{error === "failed" ? l.failed : l.error}</span></div>}
         {source && <section aria-label={zh ? "依据详情" : "Source details"} className="mx-auto mb-2 w-[calc(100%-2rem)] max-w-3xl rounded-lg border border-border bg-card p-4 text-sm"><div className="flex justify-between gap-2"><h3 className="font-semibold">{source.title}</h3><button type="button" aria-label={zh ? "关闭依据" : "Close source"} onClick={() => setSource(null)}><X size={16} /></button></div><p className="mt-2 text-muted-foreground">{source.text}</p>{source.url && <a className="mt-2 inline-block text-primary underline" href={source.url} target="_blank" rel="noreferrer">{zh ? "打开来源" : "Open source"}</a>}</section>}
-        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{id && user ? <FarmerTasks key={`${selectedBot.id}:${id}`} conversationId={id} ensureConversation={create} botId={selectedBot.id} language={zh ? "zh" : "en"} userId={user.id} onAsk={async (question) => { if (!await send(question)) throw new Error("Question not sent"); }} /> : <button className="mb-3 min-h-10 rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted" disabled={busy} onClick={() => void create()}>{zh ? "打开农场任务" : "Open farm tasks"}</button>}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + selectedBot.name[locale] + "留言" : "Message " + selectedBot.name[locale]} placeholder={zh ? "询问问题，或从上方选择任务…" : "Ask a question, or choose a task above…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
+        <div className="shrink-0 border-t border-border bg-background px-4 py-3 sm:px-8"><div className="mx-auto max-w-3xl">{actionsOpen && id && user ? <FarmerTasks key={`${selectedBot.id}:${id}`} conversationId={id} ensureConversation={create} botId={selectedBot.id} language={zh ? "zh" : "en"} userId={user.id} onBack={() => setActionsOpen(false)} onAsk={async (question) => { if (!await send(question)) throw new Error("Question not sent"); }} /> : <button type="button" className="mb-3 min-h-10 rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50" disabled={busy} onClick={() => void openActions()}>{zh ? "操作" : "Actions"}</button>}<BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={zh ? "给" + selectedBot.name[locale] + "留言" : "Message " + selectedBot.name[locale]} placeholder={zh ? "输入问题…" : "Ask a question…"} language={zh ? "zh-CN" : "en-US"} />{domain === "local_agriculture" && <p className="mt-2 text-center text-xs text-muted-foreground">{l.mock}</p>}</div></div>
       </section>
     </main>}
   </div>;

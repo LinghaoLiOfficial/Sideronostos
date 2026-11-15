@@ -15,6 +15,7 @@ export type FarmerTasksProps = {
   botId: string;
   language: "en" | "zh";
   onAsk: (text: string) => void | Promise<void>;
+  onBack?: () => void;
   compact?: boolean;
 };
 
@@ -36,9 +37,9 @@ export function FarmerTasks(props: FarmerTasksProps) {
   const options = choices(botId);
   const active = options.find((item) => item.id === selected);
   const taskProps = { ...props, scope };
-  return <section aria-label={tr(language, "Farm tasks", "农场任务")} className="mb-3 rounded-xl border border-border bg-card p-3 text-sm sm:p-4">
+  return <section aria-label={tr(language, "Actions", "操作")} className="mb-3 rounded-xl border border-border bg-card p-3 text-sm sm:p-4">
     {active ? <>
-      <header className="mb-3 flex items-center gap-3"><button type="button" onClick={() => setSelected(null)} className="flex min-h-10 items-center gap-1 rounded-lg px-2 text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"><ArrowLeft size={16} aria-hidden="true" />{tr(language, "All tasks", "所有任务")}</button><h3 className="min-w-0 font-semibold">{tr(language, active.en, active.zh)}</h3></header>
+      <header className="mb-3 flex items-center gap-3"><button type="button" onClick={() => setSelected(null)} className="flex min-h-10 items-center gap-1 rounded-lg px-2 text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"><ArrowLeft size={16} aria-hidden="true" />{tr(language, "Actions", "操作")}</button><h3 className="min-w-0 font-semibold">{tr(language, active.en, active.zh)}</h3></header>
       <div data-task-scroll className={props.compact ? "pr-1" : "max-h-[min(48dvh,30rem)] overflow-y-auto overscroll-contain pr-1"}>
         {selected === "fields" && <FieldList {...taskProps} />}
         {selected === "add" && <FieldForm {...taskProps} />}
@@ -50,7 +51,7 @@ export function FarmerTasks(props: FarmerTasksProps) {
         {selected === "compare" && <ComparePlans {...taskProps} />}
         {selected === "local" && <LocalQuestion {...taskProps} />}
       </div>
-    </> : <><h3 className="mb-3 font-medium">{tr(language, "What would you like to do?", "你想做什么？")}</h3><div className="flex flex-wrap gap-2">
+    </> : <><header className="mb-3 flex items-center gap-3">{props.onBack && <button type="button" onClick={props.onBack} className="flex min-h-10 items-center gap-1 rounded-lg px-2 text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"><ArrowLeft size={16} aria-hidden="true" />{tr(language, "Back", "返回")}</button>}<h3 className="font-semibold">{tr(language, "Actions", "操作")}</h3></header><div className="flex flex-wrap gap-2">
       {options.map((task) => <button key={task.id} type="button" onClick={() => setSelected(task.id)} className="min-h-10 rounded-lg border border-border bg-background px-3 py-2 text-left hover:border-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary">{tr(language, task.en, task.zh)}</button>)}
       {botId === "rotation-guide" && <Link href="/si/fields?step=planning" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 hover:border-primary hover:bg-muted">{tr(language, "Plan the next seasons", "规划接下来的种植季")}<ArrowUpRight size={14} aria-hidden="true" /></Link>}
     </div></>}
@@ -73,7 +74,6 @@ function LocalQuestion({ language, scope, onAsk }: TaskProps) {
   return <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); void ask(); }}><fieldset className="space-y-3" disabled={busy}>
     <div className="grid gap-3 sm:grid-cols-2"><Input label={tr(language, "Region or nearest town", "地区或最近城镇")} required value={draft.region} onChange={(e) => setDraft({ ...draft, region: e.target.value })} /><Input label={tr(language, "Crop", "作物")} required value={draft.crop} onChange={(e) => setDraft({ ...draft, crop: e.target.value })} /></div>
     <label className="block">{tr(language, "Your question", "你的问题")}<textarea className={control} required rows={3} value={draft.question} onChange={(e) => setDraft({ ...draft, question: e.target.value })} placeholder={tr(language, "For example: What should I check before choosing a planting date?", "例如：确定播种日期前应该查看什么？")} /></label>
-    <p className="text-xs text-muted-foreground">{tr(language, "I’ll look for relevant sources. Current prices and local rules need dated, local evidence; example data will be identified in the answer.", "我会查找相关来源。当前价格和本地规定需要有日期的本地依据，示例数据会明确标注。")}</p>
     <button className={primary}>{tr(language, busy ? "Looking for sources…" : "Ask local knowledge", busy ? "正在查找依据…" : "询问本地知识")}</button>
   </fieldset>{error && <p role="alert">{tr(language, "The question could not be sent. Your input is kept; try again.", "问题未能发送，输入已保留，请重试。")}</p>}</form>;
 }
