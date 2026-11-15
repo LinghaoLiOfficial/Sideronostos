@@ -51,9 +51,11 @@ describe("Field Shift account entry", () => {
   });
 });
 
-it("preserves the unified fields map through registration and uses farming account copy", () => {
-  expect(registrationNextPath("/fields?field=f1&selection=a1#data")).toBe("/fields?field=f1&selection=a1#data");
-  expect(isFieldShiftDestination("/fields?field=f1")).toBe(true);
+it("preserves the SI farm map through registration and rejects the retired map path", () => {
+  expect(registrationNextPath("/si/field-management?field=f1&selection=a1#data")).toBe("/si/field-management?field=f1&selection=a1#data");
+  expect(isFieldShiftDestination("/si/field-management?field=f1")).toBe(true);
+  expect(registrationNextPath("/fields?field=f1&selection=a1#data")).toBe("/workspace/files");
+  expect(isFieldShiftDestination("/fields?field=f1")).toBe(false);
   expect(isFieldShiftDestination("/field-shift/rotation")).toBe(true);
   expect(isFieldShiftDestination("/fields-unrelated")).toBe(false);
 });

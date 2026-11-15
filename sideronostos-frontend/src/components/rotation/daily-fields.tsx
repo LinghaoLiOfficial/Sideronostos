@@ -88,7 +88,7 @@ export function DailyFieldEditor({
       </summary>
       <p>
         {t("土壤类型：")}{t(`soil.${field.soil_texture}`)} {t(" · 灌溉设施：")}{field.irrigation_available ? t("已记录为有") : t("已记录为无")} ·{" "}
-        <Link href={`/fields?field=${encodeURIComponent(field.id)}`}>
+        <Link href={`/si/field-management?field=${encodeURIComponent(field.id)}`}>
           {t("返回地图修改基本资料")}</Link>
       </p>
       <HistoryEditor

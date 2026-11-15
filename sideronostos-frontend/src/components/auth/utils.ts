@@ -47,7 +47,7 @@ export function registrationNextPath(value: string | null) {
   const next = safeNextPath(value);
   const path = next.split(/[?#]/, 1)[0];
   if (next.length > 2048 || path.includes("%") || path.split("/").some((part) => part === "." || part === "..")) return "/workspace/files";
-  return ["/fields", "/field-shift", "/workspace", "/personal", "/si"].some((prefix) => path === prefix || path.startsWith(`${prefix}/`)) ? next : "/workspace/files";
+  return ["/si/field-management", "/field-shift", "/workspace", "/personal", "/si"].some((prefix) => path === prefix || path.startsWith(`${prefix}/`)) ? next : "/workspace/files";
 }
 
 export function authHref(route: "/login" | "/register" | "/verify-email", next: string | null, values: Record<string, string> = {}) {
@@ -58,5 +58,5 @@ export function authHref(route: "/login" | "/register" | "/verify-email", next: 
 
 export function isFieldShiftDestination(next: string | null) {
   const path = new URL(safeNextPath(next), "https://agrisata.invalid").pathname;
-  return path === "/fields" || path === "/field-shift" || path.startsWith("/field-shift/");
+  return path === "/si/field-management" || path === "/field-shift" || path.startsWith("/field-shift/");
 }

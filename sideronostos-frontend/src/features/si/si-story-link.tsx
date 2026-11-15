@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import styles from "./si-model-guide.module.css";
 
-export const rotationOverviewHref = "/si/rotation-recommendation";
+export const rotationOverviewHref = "/si/introduction";
 export const rotationLayersHref = `${rotationOverviewHref}/layers`;
 
 const story = ["/si", rotationOverviewHref, rotationLayersHref];

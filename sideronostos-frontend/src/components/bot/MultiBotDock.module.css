@@ -85,8 +85,9 @@
   max-width: min(70vw, 600px);
   overflow-x: auto;
   padding: 4px 1px 4px 17px;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
+.avatars::-webkit-scrollbar { display: none; }
 .botButton {
   position: relative;
   display: grid;

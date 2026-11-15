@@ -82,7 +82,7 @@ function Header({
 
   return (
     <header className={styles.header}>
-      <Link className={styles.brand} href="/fields">
+      <Link className={styles.brand} href="/si/field-management">
         <Sprout size={25} />
         <span>
           {t("Agrisata ")}<small>{t("FIELD SHIFT")}</small>
@@ -91,7 +91,7 @@ function Header({
       <nav aria-label={t("Field Shift 工作区")}>
         <Link
           aria-current={mode === "map" ? "page" : undefined}
-          href={`/fields${search ? "?" + search : ""}`}
+          href={`/si/field-management${search ? "?" + search : ""}`}
         >
           <Map size={16} />
           {t("地图")}</Link>
@@ -178,7 +178,7 @@ function OwnerWorkspace({
 }) {
   const { t, locale } = useI18n();
 
-  const navigation = useWorkspaceNavigation(`/field-shift/${mode}`);
+  const navigation = useWorkspaceNavigation(mode === "map" ? "/si/field-management" : "/field-shift/rotation");
   const {
     search,
     latestSearch,
@@ -290,7 +290,7 @@ function OwnerWorkspace({
     retry: false,
   });
   function navigate(patch: Record<string, string | null>, nextMode = mode) {
-    navigation.navigate(patch, nextMode === "map" ? "/fields" : "/field-shift/rotation");
+    navigation.navigate(patch, nextMode === "map" ? "/si/field-management" : "/field-shift/rotation");
   }
   async function selectRegion(
     kind: RegionSelection["kind"],
@@ -872,7 +872,7 @@ function OwnerWorkspace({
           ) : (
             <>
               <div className={styles.planningNavigation}>
-                <Link href={`/fields?${mapSearch}`}>
+                <Link href={`/si/field-management?${mapSearch}`}>
                   <ArrowLeft size={14} />
                   {t("返回地图")}</Link>
                 <details>
@@ -987,7 +987,7 @@ function OwnerWorkspace({
                   50,
                 );
               } else if (action === "choose_field")
-                navigation.navigate({}, "/fields");
+                navigation.navigate({}, "/si/field-management");
             }}
           />
         </section>

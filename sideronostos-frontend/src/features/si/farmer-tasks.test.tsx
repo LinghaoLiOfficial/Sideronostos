@@ -27,7 +27,7 @@ beforeEach(() => {
       if (failWrite) { failWrite = false; throw new TypeError("Network lost"); }
       data = { status: "succeeded", action: body.action, text: "Confirmed by the server.", missing_fields: [], pending: null,
         result: body.action === "field.create" ? { id: "field-new", name: "East field" } : { value: 0, unit: "mm", limitations: ["Historical observations only."] },
-        href: body.action === "field.create" ? "/field-shift?field=field-new&step=field" : "/field-shift/map?selection=selection-2" };
+        href: body.action === "field.create" ? "/field-shift?field=field-new&step=field" : "/si/field-management?selection=selection-2" };
     }
     if (path === "/rotation-optimizer/runs") data = { items: [{ id: "run-1", status: "running", created_at: "2026-11-01T00:00:00Z", field_snapshots: [field], request: {}, result: null }] };
     return new Response(JSON.stringify(data), { status: 200, headers: { "Content-Type": "application/json" } });

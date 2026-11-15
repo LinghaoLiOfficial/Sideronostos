@@ -161,7 +161,7 @@ export function FieldShiftWorkspace({ basePath = "/field-shift" }: { basePath?: 
   const navDisabled = (id: string) => id !== "field" && !selectedField || id === "comparison" && !activeAnalysis;
   const authRequired = user.error instanceof ApiError && user.error.status === 401 || user.isSuccess && !authenticated;
   const loginHref = `/login?next=${encodeURIComponent(`${basePath}${search.size ? `?${search}` : ""}`)}`;
-  const homePath = basePath === "/si/fields" ? "/si" : "/fields";
+  const homePath = basePath === "/si/fields" ? "/si" : "/si/field-management";
   const shell = (content: React.ReactNode) => <Surface tone="dark" className={styles.app}><header className={styles.topbar}><div className={styles.brandGroup}><Link href={homePath} aria-label={t("Agrisata 农业首页")}><BrandLogo priority className="w-28 sm:w-36" /></Link><span className={styles.productName}>{t(basePath === "/si/fields" ? "地块管理" : "Field Shift")}</span><Link href={selectedId ? `${basePath}?field=${encodeURIComponent(selectedId)}` : basePath} className={styles.userLink}>{t("地图与轮作助手")}</Link></div>{authenticated && user.data ? <Link href="/personal/account" className={styles.userLink}>{user.data.display_name}</Link> : <Link href={homePath} className={styles.userLink}>{t("了解 Agrisata")}</Link>}<LanguageSwitch /></header>{content}</Surface>;
 
   if (user.isPending || !identityReady) return shell(<Loading text={t("正在确认登录状态…")} />);

@@ -1,2 +1,2 @@
 import { redirect } from "next/navigation";
-export default function Home() { redirect("/fields"); }
+export default function Home() { redirect("/si"); }

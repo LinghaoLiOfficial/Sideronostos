@@ -39,7 +39,7 @@ export function FieldCompletionPanel({ farm, field, ownerId, store, syncing, pla
     <h3 className="text-sm font-semibold">{t("地块资料 / Field details")}</h3>
     <p role="status" className="my-2 text-xs leading-5">{synced ? t("已同步到账户；计算前仍需检查气象、参数与经营条件。") : pending ? t("上次保存结果尚待核对，重试将沿用原请求。") : t("边界已确认。补齐资料并保存后才能用于轮作规划。")}</p>
     {(farm.properties.syncError || field.properties.syncError || retryError) && <p role="alert" className="my-2 text-xs text-red-700">{t(retryError ?? field.properties.syncError ?? farm.properties.syncError ?? "")}</p>}
-    {!ownerId ? <Link className="text-sm underline" href={`/login?next=${encodeURIComponent(typeof window === "undefined" ? "/fields" : window.location.pathname + window.location.search)}`}>{t("登录并验证邮箱后保存资料")}</Link> : <>
+    {!ownerId ? <Link className="text-sm underline" href={`/login?next=${encodeURIComponent(typeof window === "undefined" ? "/si/field-management" : window.location.pathname + window.location.search)}`}>{t("登录并验证邮箱后保存资料")}</Link> : <>
       {pending && <Button className="my-2 w-full" disabled={syncing} onClick={async () => { setRetryError(null); try { await store.synchronize(farm.properties.id) } catch (error) { setRetryError(error instanceof Error ? error.message : t("同步未完成")) } }}>{t("核对并重试上次保存")}</Button>}
       {profiles.isPending && <p role="status">{t("正在加载地区配置…")}</p>}
       {profiles.isError && <div role="alert"><p>{t("地区配置未载入，暂时无法保存。")}</p><Button onClick={() => void profiles.refetch()}>{t("重试")}</Button></div>}

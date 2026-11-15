@@ -211,7 +211,7 @@ export function NasaRotationWorkspace() {
   if (session.isPending) return <main className={styles.page} role="status">正在确认登录状态…</main>;
   if (!session.data) return <main className={styles.page}><div className={styles.main}><p className={styles.error}>请先登录并验证邮箱。</p><Link href="/login?next=/field-shift/nasa-rotation">登录</Link></div></main>;
   return <main className={styles.page}>
-    <header className={styles.header}><Link className={styles.brand} href="/field-shift/map"><Sprout /> Agrisata · NASA Rotation Lab</Link><nav><Link href="/field-shift/map">地图</Link><Link href="/field-shift/rotation">轮作规划</Link><Link href="/field-shift/nasa-rotation" aria-current="page">NASA 回测</Link></nav></header>
+    <header className={styles.header}><Link className={styles.brand} href="/si/field-management"><Sprout /> Agrisata · NASA Rotation Lab</Link><nav><Link href="/si/field-management">地图</Link><Link href="/field-shift/rotation">轮作规划</Link><Link href="/field-shift/nasa-rotation" aria-current="page">NASA 回测</Link></nav></header>
     <div className={styles.main}>
       {release ? <section className={styles.releaseBar}>
         <div><h1>NASA 历史轮作回测</h1><p>工程 benchmark，不是未来天气预报或种植处方。</p></div>

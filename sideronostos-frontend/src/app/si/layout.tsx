@@ -15,6 +15,7 @@ const localModuleRoutes = new Set([
   "/si/remote-sensing",
   "/si/local-knowledge",
   "/si/multi-agent",
+  "/si/rotation-recommendation",
 ]);
 
 export default function SiLayout({ children }: { children: ReactNode }) {

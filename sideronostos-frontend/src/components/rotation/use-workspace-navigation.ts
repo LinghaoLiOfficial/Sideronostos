@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-export function useWorkspaceNavigation(path: "/fields" | "/field-shift/map" | "/field-shift/rotation") {
+export function useWorkspaceNavigation(path: "/si/field-management" | "/field-shift/rotation") {
   const router = useRouter(), search = useSearchParams(), latestSearch = useRef(search.toString())
   const [revision, setRevision] = useState(1)
   useEffect(() => { latestSearch.current = search.toString() }, [search])

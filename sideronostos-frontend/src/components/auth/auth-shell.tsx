@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 export function AuthShell({ children, agriculture = false }: { children: React.ReactNode; agriculture?: boolean }) {
   const { t } = useI18n();
 
-  const home = agriculture ? "/fields" : "/components";
+  const home = agriculture ? "/si/field-management" : "/components";
   return (
     <main className="gallery-surface relative isolate min-h-screen overflow-hidden px-5 py-8 sm:px-8 lg:px-12">
       <div aria-hidden="true" className="gallery-grid pointer-events-none absolute inset-0 -z-10" />

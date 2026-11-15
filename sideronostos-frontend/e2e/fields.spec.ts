@@ -147,7 +147,8 @@ test("imports and exports farm GeoJSON without removed SMAP layers", async ({ pa
   await page.getByRole("button", { name: "Export", exact: true }).click()
   expect((await download).suggestedFilename()).toBe("field-shift-farms-and-fields.geojson")
 
-  await expect(page.getByText("SMAP soil moisture · day", { exact: true })).toHaveCount(0)
-  await expect(page.getByText("SMAP soil moisture · night", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("SMAP soil moisture · day", { exact: true })).toBeVisible()
+  await expect(page.getByText("SMAP soil moisture · night", { exact: true })).toBeVisible()
+  await expect(page.getByText("Display date", { exact: true })).toBeVisible()
   if (mobile) await expect(page.getByRole("button", { name: "Layers", exact: true })).toHaveCount(0)
 })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildGibsTileUrl, clampLayerDate, GIBS_LAYERS, shiftDate } from "@/data/gibs-layers"
+import { buildGibsTileUrl, clampLayerDate, NASA_REMOTE_SENSING_LAYERS, shiftDate } from "@/data/gibs-layers"
 import type { GibsLayerConfig } from "@/types/workspace"
 
 describe("GIBS layer configuration", () => {
@@ -21,8 +21,23 @@ describe("GIBS layer configuration", () => {
     attribution: "test",
   }
 
-  it("does not expose the removed SMAP layers", () => {
-    expect(GIBS_LAYERS).toEqual([])
+  it("exposes the farm-relevant NASA visualization layers", () => {
+    expect(NASA_REMOTE_SENSING_LAYERS.map((layer) => layer.id)).toEqual([
+      "modis-true-color",
+      "modis-ndvi",
+      "modis-evi",
+      "imerg-precipitation",
+      "smap-day",
+      "smap-night",
+    ])
+  })
+
+  it("uses local assets for every configured legend", () => {
+    expect(NASA_REMOTE_SENSING_LAYERS.filter((layer) => layer.legendUrl).every((layer) => layer.legendUrl?.startsWith("/images/"))).toBe(true)
+  })
+
+  it("uses one compact attribution for all NASA data sources", () => {
+    expect(new Set(NASA_REMOTE_SENSING_LAYERS.map((layer) => layer.attribution))).toEqual(new Set(["NASA Data"]))
   })
 
   it("builds the EPSG:3857 REST tile template", () => {

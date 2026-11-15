@@ -145,7 +145,7 @@ export function DailyPlannerForm(props: DailyPlannerProps) {
           )}
           {!active.length && (
             <p>
-              {t("还没有可参与本次规划的地块。")}<Link href="/fields">{t("返回地图确认分割并补齐资料")}</Link>。
+              {t("还没有可参与本次规划的地块。")}<Link href="/si/field-management">{t("返回地图确认分割并补齐资料")}</Link>。
             </p>
           )}
           {active.map((field) => (

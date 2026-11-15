@@ -7,10 +7,12 @@ import {
   Crosshair,
   Globe2,
   LocateFixed,
+  Map as MapIcon,
   MapPin,
   MousePointer2,
   Pentagon,
   Search,
+  Satellite,
 } from "lucide-react"
 import Map, {
   AttributionControl,
@@ -37,7 +39,7 @@ import { toFieldFeature } from "./map-feature"
 import type { Geometry, LayerManifest, RegionSelection } from "@/lib/api/rotation-types"
 import { ScienceRaster } from "./science-raster"
 import { Button } from "@/components/ui/button"
-import { buildGibsTileUrl, GIBS_LAYERS } from "@/data/gibs-layers"
+import { buildGibsTileUrl, clampLayerDate, NASA_REMOTE_SENSING_LAYERS } from "@/data/gibs-layers"
 import { featureBounds, validatePolygon } from "@/features/fields/geometry"
 import { synchronizeSharedVertices, validateCandidatePartition } from "@/features/fields/partition"
 import { cn } from "@/lib/utils"
@@ -78,7 +80,7 @@ interface FieldMapProps {
   onFieldsChange: (fields: FieldFeature[]) => void
   onFarmCreated: (geometry: Polygon) => void
   onSelectField: (id: string | null) => void
-  onViewChange: (view: Pick<WorkspaceSettings, "longitude" | "latitude" | "zoom">) => void
+  onViewChange: (view: Partial<Pick<WorkspaceSettings, "longitude" | "latitude" | "zoom" | "basemap">>) => void
   onCoordinateChange: (coordinate: [number, number]) => void
   onError: (message: string) => void
 }
@@ -125,7 +127,7 @@ function toDrawFeature(field: FieldFeature): GeoJSONStoreFeatures {
 }
 
 
-function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
+function SearchBox({ mapRef, basemap, onBasemapChange }: { mapRef: React.RefObject<MapRef | null>; basemap: "satellite" | "streets"; onBasemapChange: (basemap: "satellite" | "streets") => void }) {
   const { t } = useI18n();
 
   const [query, setQuery] = useState("")
@@ -171,7 +173,8 @@ function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
   }
 
   return (
-    <div className="absolute left-3 top-3 z-10 w-[min(22rem,calc(100%-6rem))]">
+    <div className="absolute left-3 top-3 z-10 flex w-[min(35rem,calc(100%-1.5rem))] items-start gap-2">
+      <div className="min-w-0 flex-1">
       <div className="flex h-11 items-center border border-black/10 bg-white shadow-lg">
         <Search className="ml-3 size-4 shrink-0 text-neutral-500" aria-hidden="true" />
         <input
@@ -202,6 +205,11 @@ function SearchBox({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
           ))}
         </div>
       )}
+      </div>
+      <div className="flex h-11 shrink-0 border border-black/10 bg-white p-0.5 shadow-lg" role="group" aria-label={t("Basemap") }>
+        <button type="button" onClick={() => onBasemapChange("satellite")} className={cn("flex items-center gap-1 px-2 text-xs", basemap === "satellite" && "bg-primary text-primary-foreground")} aria-pressed={basemap === "satellite"} title={t("Satellite")}><Satellite className="size-4" /><span className="hidden sm:inline">{t("Satellite")}</span></button>
+        <button type="button" onClick={() => onBasemapChange("streets")} className={cn("flex items-center gap-1 px-2 text-xs", basemap === "streets" && "bg-primary text-primary-foreground")} aria-pressed={basemap === "streets"} title={t("Streets")}><MapIcon className="size-4" /><span className="hidden sm:inline">{t("Streets")}</span></button>
+      </div>
     </div>
   )
 }
@@ -595,7 +603,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           if (!message.includes("404")) onError(message)
         }}
       >
-        {GIBS_LAYERS.map((layer) => {
+        {NASA_REMOTE_SENSING_LAYERS.map((layer) => {
           const state = layers[layer.id]
           if (!state?.visible) return null
           const sourceId = `gibs-${layer.id}-${date}`
@@ -604,7 +612,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
               key={sourceId}
               id={sourceId}
               type="raster"
-              tiles={[buildGibsTileUrl(layer, date)]}
+              tiles={[buildGibsTileUrl(layer, clampLayerDate(date, layer))]}
               tileSize={256}
               maxzoom={layer.maxNativeZoom}
               attribution={layer.attribution}
@@ -651,7 +659,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
         <AttributionControl position="top-right" compact />
       </Map>
 
-      <SearchBox mapRef={mapRef} />
+      <SearchBox mapRef={mapRef} basemap={settings.basemap} onBasemapChange={(basemap) => onViewChange({ basemap })} />
       {queryMode && <div className="absolute left-3 right-14 top-16 z-20 max-w-sm rounded border bg-background p-3 shadow-lg" role="region" aria-label={t("临时提问选区工具")}><p className="text-sm font-medium">{queryMode === "polygon" ? t("临时提问区域 · {0} 个顶点", { "0": queryVertices.length }) : t("点击地图选择提问位置")}</p><p className="my-1 text-xs">{t("农场与经营地块边界保持锁定。")}</p><div className="flex flex-wrap gap-2">{queryMode === "polygon" && <><Button size="sm" disabled={queryBusy || queryVertices.length < 3} onClick={() => void finishQuery()}>{t("确认提问区域")}</Button><Button size="sm" variant="outline" disabled={queryBusy || !queryVertices.length} onClick={() => setQueryVertices(v => v.slice(0, -1))}>{t("撤回顶点")}</Button></>}<Button size="sm" variant="ghost" disabled={queryBusy} onClick={leaveQuery}>{t("结束提问选区")}</Button></div></div>}
 
 

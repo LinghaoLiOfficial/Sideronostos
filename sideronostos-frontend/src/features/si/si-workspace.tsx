@@ -16,12 +16,9 @@ export function SiWorkspace() {
         <div className="si-hero-copy">
           <h1>see your fields from space</h1>
           <div className="si-hero-links">
-            <SiStoryLink href={rotationOverviewHref}>
+            <SiStoryLink className="si-hero-primary-link" href={rotationOverviewHref}>
               {isEnglish ? "Explore the rotation model" : "了解轮作模型"}
             </SiStoryLink>
-            <span aria-hidden="true">/</span>
-            <Link href="/si/chat">{isEnglish ? "Skip intro" : "跳过前导"}</Link>
-            <span aria-hidden="true">/</span>
             <Link href="/si/multi-agent">{isEnglish ? "Open multi-agent" : "进入多智能体"}</Link>
           </div>
         </div>

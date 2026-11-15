@@ -28,7 +28,7 @@
   "备用底图 · 卫星底图与地点搜索暂不可用，仍可通过边界文件或坐标选区。": "Fallback basemap · Satellite imagery and place search are unavailable. You can still import boundaries or query coordinates.",
   "科学资料与临时提问选区": "Scientific evidence and temporary question area",
   "科学资料 / Evidence": "Scientific evidence",
-  "临时提问选区独立于农场与地块边界。NASA GIBS 图层用于显示，下面仅列已实际处理的数据。": "The temporary question area is separate from farm and field boundaries. NASA GIBS layers are for display; only processed data is listed below.",
+  "临时提问选区独立于农场与地块边界。NASA 遥感图层用于显示，下面仅列已实际处理的数据。": "The temporary question area is separate from farm and field boundaries. NASA remote-sensing layers are for display; only processed data is listed below.",
   "地图选点": "Pick a point",
   "临时多边形": "Temporary polygon",
   "使用当前视野": "Use current map view",

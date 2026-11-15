@@ -1,7 +1,7 @@
 import { SiWorkspace } from "@/features/si";
 
 export const metadata = {
-  title: "SI · Agrisata",
+  title: "Agrisata",
 };
 
 export default function SiPage() {

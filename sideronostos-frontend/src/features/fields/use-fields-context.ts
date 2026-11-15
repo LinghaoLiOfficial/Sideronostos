@@ -14,7 +14,7 @@ import { useWorkspaceNavigation } from "@/components/rotation/use-workspace-navi
 
 export function useFieldsContext(ownerId: string | null, field: FieldFeature | null, formDirty: boolean) {
   const { t } = useI18n();
-  const navigation = useWorkspaceNavigation("/fields"), { search } = navigation, client = useQueryClient()
+  const navigation = useWorkspaceNavigation("/si/field-management"), { search } = navigation, client = useQueryClient()
   const window = observationWindow(search.get("obsStart"), search.get("obsEnd"))
   const science = useScienceQueries(ownerId, search.get("selection"), search.get("layer") ?? "", window.dates)
   const planId = search.get("plan")
@@ -39,7 +39,7 @@ export function useFieldsContext(ownerId: string | null, field: FieldFeature | n
     return () => { current.sequence++; current.controller?.abort() }
   }, [selectionBasis])
   function cancelSelection() { flight.current.sequence++; flight.current.controller?.abort(); setSelecting(false) }
-  function navigate(patch: Record<string, string | null>, nextPath?: "/fields" | "/field-shift/map" | "/field-shift/rotation") {
+  function navigate(patch: Record<string, string | null>, nextPath?: "/si/field-management" | "/field-shift/rotation") {
     cancelSelection(); navigation.navigate(patch, nextPath)
   }
   async function selectRegion(kind: RegionSelection["kind"], geometry: Geometry) {
