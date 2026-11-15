@@ -4,7 +4,7 @@ import { useState } from "react"
 import { NasaRotationWorkspace } from "@/components/rotation/nasa-rotation-workspace"
 import { useWorkspaceSession } from "@/components/rotation/use-workspace-session"
 import { useOwnedWorkspace } from "@/features/fields/use-owned-workspace"
-import { hasSampleFarmData } from "@/features/fields/farm-data-scope"
+import { hasSampleFarmData, sortFarmsWithIowaFirst } from "@/features/fields/farm-data-scope"
 import { useLocale } from "@/lib/i18n/locale"
 import { ApiError } from "@/lib/api/client"
 import { FarmSelector } from "./local-knowledge-workspace"
@@ -24,7 +24,7 @@ function OwnedRotationRecommendationWorkspace({ ownerId }: { ownerId: string | n
   const local = useOwnedWorkspace(ownerId, Boolean(ownerId))
   const en = useLocale() === "en"
   const [selectedFarmId, setSelectedFarmId] = useState<string | null>(null)
-  const farms = local.workspace?.farms ?? []
+  const farms = sortFarmsWithIowaFirst(local.workspace?.farms ?? [])
   const fields = local.workspace?.fields ?? []
   const farm = farms.find(item => item.properties.id === selectedFarmId) ?? farms[0] ?? null
   if (!local.workspace) return <p role="status">{en ? "Loading farms…" : "正在加载农场…"}</p>

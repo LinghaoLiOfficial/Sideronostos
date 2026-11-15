@@ -9,7 +9,7 @@ import type { CropV2, LocalKnowledgeProfile, ParameterSource } from "@/lib/api/r
 import { useWorkspaceSession } from "@/components/rotation/use-workspace-session";
 import { useOwnedWorkspace } from "@/features/fields/use-owned-workspace";
 import { featureAreaHectares } from "@/features/fields/geometry";
-import { hasSampleFarmData } from "@/features/fields/farm-data-scope";
+import { hasSampleFarmData, sortFarmsWithIowaFirst } from "@/features/fields/farm-data-scope";
 import { ApiError } from "@/lib/api/client";
 import type { FarmFeature, FieldFeature } from "@/types/workspace";
 
@@ -121,7 +121,7 @@ export function LocalKnowledgeWorkspace() {
 
 function OwnedLocalKnowledgeWorkspace({ ownerId }: { ownerId: string | null }) {
   const local = useOwnedWorkspace(ownerId, Boolean(ownerId));
-  const farms = local.workspace?.farms ?? [];
+  const farms = sortFarmsWithIowaFirst(local.workspace?.farms ?? []);
   const fields = local.workspace?.fields ?? [];
   const [selectedFarmId, setSelectedFarmId] = useState<string | null>(null);
   const selectedFarm = farms.find((farm) => farm.properties.id === selectedFarmId) ?? farms[0] ?? null;

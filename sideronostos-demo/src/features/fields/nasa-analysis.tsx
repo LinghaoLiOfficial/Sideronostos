@@ -11,7 +11,7 @@ import type { NASAAnalysisData } from "@/features/fields/nasa-analysis-types"
 import { useOwnedWorkspace } from "@/features/fields/use-owned-workspace"
 import { cn } from "@/lib/utils"
 import { useLocale } from "@/lib/i18n/locale"
-import { hasSampleFarmData } from "./farm-data-scope"
+import { hasSampleFarmData, sortFarmsWithIowaFirst } from "./farm-data-scope"
 import type { FarmFeature, FieldFeature } from "@/types/workspace"
 
 function useChartWidth() {
@@ -174,7 +174,7 @@ function FarmSelector({ farms, fields, selectedFarmId, onSelect }: {
 function OwnedRemoteSensingWorkspace({ ownerId }: { ownerId: string | null }) {
   const en = useLocale() === "en"
   const local = useOwnedWorkspace(ownerId, Boolean(ownerId))
-  const farms = local.workspace?.farms ?? []
+  const farms = sortFarmsWithIowaFirst(local.workspace?.farms ?? [])
   const fields = local.workspace?.fields ?? []
   const [selectedFarmId, setSelectedFarmId] = useState<string | null>(null)
   const selectedFarm = farms.find((farm) => farm.properties.id === selectedFarmId) ?? farms[0] ?? null

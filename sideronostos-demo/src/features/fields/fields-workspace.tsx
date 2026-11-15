@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { NASA_REMOTE_SENSING_LAYERS, shiftDate, toIsoDate } from "@/data/gibs-layers"
 import { createDemoObservations } from "@/features/fields/demo-data"
 import { DEMO_FARM_ID } from "@/lib/demo/data"
+import { sortFarmsWithIowaFirst } from "@/features/fields/farm-data-scope"
 import { createFarmFeature, featureAreaHectares, featureCentroid, parseFarmGeoJson } from "@/features/fields/geometry"
 import { FieldMap, type FieldMapHandle } from "@/features/fields/field-map"
 import { FieldsShell } from "@/features/fields/fields-shell"
@@ -115,7 +116,7 @@ function OwnedFieldsWorkspace({ owner, unverified, embedded, remote }: { owner: 
   const ownerId = owner?.id ?? null
   const local = useOwnedWorkspace(ownerId, remote), { store } = local
   const [settings, setSettings] = useState(() => loadSettings(ownerId))
-  const farms = local.workspace?.farms ?? null, fields = local.workspace?.fields ?? []
+  const farms = local.workspace ? sortFarmsWithIowaFirst(local.workspace.farms) : null, fields = local.workspace?.fields ?? []
   function setFarms(value: FarmFeature[] | ((current: FarmFeature[] | null) => FarmFeature[])) { store.update(w => ({ ...w, farms: typeof value === "function" ? value(w.farms) : value })) }
   function setFields(value: FieldFeature[]) { store.update(w => ({ ...w, fields: value })) }
   const [selectedFarmId, setSelectedFarmId] = useState<string | null>(null)
