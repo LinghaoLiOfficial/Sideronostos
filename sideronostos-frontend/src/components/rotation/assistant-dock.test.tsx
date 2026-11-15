@@ -1,14 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it, vi } from "vitest";
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { act, cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type {
@@ -241,7 +234,7 @@ it("serializes preference edits and ignores a late failure after switching conve
   const user = userEvent.setup();
   await user.click(screen.getByRole("button", { name: "打开轮作助手" }));
   await user.click(screen.getByRole("button", { name: "回答偏好" }));
-  await user.selectOptions(screen.getByLabelText(/语言/), "en");
+  await user.selectOptions(screen.getByLabelText(/解释程度/), "detailed");
   expect(screen.getByLabelText(/解释程度/)).toBeDisabled();
   await user.click(screen.getByRole("button", { name: "历史对话" }));
   await user.click(screen.getByRole("button", { name: "开始新对话" }));
@@ -644,4 +637,19 @@ it("preserves an unsent draft when collapsed without exposing a full-screen acti
     "这片地适合种什么？",
   );
   expect(api.sendMessage).not.toHaveBeenCalled();
+});
+
+it("keeps the message draft while unresolved map or historical context blocks sending", async () => {
+  api.getPreferences.mockResolvedValue({ language: "zh", detail: "brief" });
+  api.listConversations.mockResolvedValue({ items: [] });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const view = (pending: boolean) => <QueryClientProvider client={client}><AssistantDock ownerId="context-owner" context={context} contextLabel="正在核对旧方案" contextPending={pending} onAction={vi.fn()} /></QueryClientProvider>;
+  const { rerender } = render(view(true));
+  fireEvent.click(screen.getByRole("button", { name: "打开轮作助手" }));
+  fireEvent.change(screen.getByRole("textbox", { name: "给轮作助手留言" }), { target: { value: "解释这个历史方案" } });
+  expect(screen.getByRole("button", { name: "发送消息" })).toBeDisabled();
+  expect(api.sendMessage).not.toHaveBeenCalled();
+  rerender(view(false));
+  expect(screen.getByRole("textbox", { name: "给轮作助手留言" })).toHaveValue("解释这个历史方案");
+  expect(screen.getByRole("button", { name: "发送消息" })).toBeEnabled();
 });

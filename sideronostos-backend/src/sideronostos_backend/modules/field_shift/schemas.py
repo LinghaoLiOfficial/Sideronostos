@@ -141,7 +141,7 @@ class FieldInput(Contract):
         if self.geometry is not None:
             from ..agri_data.schemas import validate_geometry
 
-            normalized = validate_geometry(self.geometry)
+            normalized = validate_geometry(self.geometry, allow_holes=True)
             if normalized["geometry"]["type"] != "Polygon":
                 raise ValueError("A field boundary must be a polygon")
             if normalized["area_ha"] > 100000:
@@ -151,6 +151,9 @@ class FieldInput(Contract):
 
 
 class Field(FieldInput):
+    farm_id: str | None = None
+    partition_revision: str | None = None
+    local_id: str | None = None
     id: str
     version: int = PydField(ge=1)
     created_at: datetime

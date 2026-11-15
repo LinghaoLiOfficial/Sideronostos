@@ -21,6 +21,8 @@ export function SiWorkspace() {
             </SiStoryLink>
             <span aria-hidden="true">/</span>
             <Link href="/si/chat">{isEnglish ? "Skip intro" : "跳过前导"}</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/si/multi-agent">{isEnglish ? "Open multi-agent" : "进入多智能体"}</Link>
           </div>
         </div>
       </section>

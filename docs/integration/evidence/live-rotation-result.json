@@ -1,0 +1,11 @@
+{
+  "environment": "synthetic verified farmer and 365-day historical weather fixture",
+  "field_name": "Rotation screenshot field a02df5df",
+  "field_url": "http://127.0.0.1:4188/field-shift?field=a7121747-e3da-5d24-9087-8383390dcbd5&step=field",
+  "rotation_status": "optimal",
+  "rotation_url": "http://127.0.0.1:4188/field-shift/rotation?run=e600e9fe-7b64-4513-a80e-2fb741646946&option=option-1",
+  "rotation_detail_url": "http://127.0.0.1:4188/si/multi-agent/results/5b251dca-6d9f-43c4-ab68-ffd66305df1e?conversation=b34d223a-b806-4b74-96cb-209b268ba953",
+  "preview_path": "../docs/integration/evidence/rotation-real-result-private-preview.png",
+  "saved_plan_url": "http://127.0.0.1:4188/field-shift/rotation?plan=1330ac16-4910-437f-a5ef-f6677c952627",
+  "saved_plan_preview_path": "../docs/integration/evidence/rotation-saved-plan-private-preview.png"
+}

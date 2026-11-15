@@ -1,12 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-} from "@testing-library/react";
+import { act, cleanup, fireEvent, screen } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { useState } from "react";
 import type { BotMode } from "@/lib/bot";
 import { Bot } from "./Bot";

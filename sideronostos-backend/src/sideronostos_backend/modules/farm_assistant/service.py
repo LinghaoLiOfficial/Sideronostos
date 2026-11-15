@@ -12,6 +12,8 @@ from ..ai.provider import StructuredInvocationError
 from ..knowledge.models import KBRelease
 from ..knowledge.store import active_release
 from ..rotation_optimizer.service import digest
+from .bot_scope import default_bot_id, scope_context
+from .chat_workflow import handle_field_chat
 from .context import freeze_context
 from .models import AssistantMessage, Conversation, FarmerPreference, utcnow
 from .pipeline import collect_evidence, generate_answer
@@ -23,6 +25,7 @@ def conversation_view(row: Conversation) -> dict[str, Any]:
     return {
         "id": row.id,
         "preset": row.preset,
+        "bot_id": row.bot_id,
         "language": row.language,
         "detail": row.detail,
         "kb_release_id": row.kb_release_id,
@@ -46,6 +49,7 @@ def message_view(row: AssistantMessage) -> dict[str, Any]:
             ],
             "selection_kind": (row.context_snapshot.get("selection") or {}).get("kind"),
             "run_id": row.context_snapshot["reference"].get("run_id"),
+            "plan_id": row.context_snapshot["reference"].get("plan_id"),
             "option_id": row.context_snapshot["reference"].get("option_id"),
         },
         "response": row.response,
@@ -93,6 +97,7 @@ class AssistantService:
         row = Conversation(
             owner_user_id=owner,
             preset=body.preset,
+            bot_id=body.bot_id or default_bot_id(body.preset),
             language=language,
             detail=detail,
             kb_release_id=release.id,
@@ -159,7 +164,7 @@ class AssistantService:
     async def preferences(self, session: AsyncSession, owner: str) -> dict[str, str]:
         pref = await session.get(FarmerPreference, owner)
         return {
-            "language": pref.language if pref else "zh",
+            "language": pref.language if pref else "en",
             "detail": pref.detail if pref else "brief",
         }
 
@@ -232,7 +237,12 @@ class AssistantService:
         )
         if (active or 0) >= 2:
             raise HTTPException(429, "Please wait for your current replies to finish")
-        context = await freeze_context(session, owner, body.context, conversation.language)
+        context = await freeze_context(
+            session, owner, body.context, conversation.language, preset=conversation.preset
+        )
+        context = scope_context(context, conversation.bot_id)
+        context["preset"] = conversation.preset
+        context["bot_id"] = conversation.bot_id
         context["language"] = conversation.language
         context["detail"] = conversation.detail
         context["kb_release_id"] = conversation.kb_release_id
@@ -310,7 +320,14 @@ class AssistantService:
         return dict(item)
 
 
-async def process_message(factory: async_sessionmaker[AsyncSession], identifier: str) -> None:
+async def process_message(
+    factory: async_sessionmaker[AsyncSession],
+    identifier: str,
+    *,
+    app: Any | None = None,
+    headers: dict[str, str] | None = None,
+    cookies: dict[str, str] | None = None,
+) -> None:
     service = AssistantService()
     evidence: dict[str, Any] | None = None
     context: dict[str, Any] = {}
@@ -348,23 +365,34 @@ async def process_message(factory: async_sessionmaker[AsyncSession], identifier:
             ]
         async with asyncio.timeout(max(0.01, seconds)):
             async with factory() as session:
-                release = await session.get(KBRelease, context["kb_release_id"])
-                if release is None or release.status != "published":
-                    raise ValueError("Pinned knowledge release unavailable")
-                evidence = await collect_evidence(session, question, context, release)
-                current = await session.get(AssistantMessage, identifier, with_for_update=True)
-                if current is None or current.status != "pending":
-                    return
-                current.evidence_snapshot = evidence
-                await session.commit()
-            response = await generate_answer(
-                question,
-                context,
-                evidence,
-                language=context["language"],
-                detail=context["detail"],
-                history=history,
-            )
+                response = await handle_field_chat(session, identifier)
+            if response is None and app is not None:
+                # Imported here because the registered tool service uses AssistantService.
+                from .orchestrator import handle_module_chat
+
+                async with factory() as session:
+                    response = await handle_module_chat(
+                        session, identifier, app, headers or {}, cookies or {}
+                    )
+            if response is None:
+                async with factory() as session:
+                    release = await session.get(KBRelease, context["kb_release_id"])
+                    if release is None or release.status != "published":
+                        raise ValueError("Pinned knowledge release unavailable")
+                    evidence = await collect_evidence(session, question, context, release)
+                    current = await session.get(AssistantMessage, identifier, with_for_update=True)
+                    if current is None or current.status != "pending":
+                        return
+                    current.evidence_snapshot = evidence
+                    await session.commit()
+                response = await generate_answer(
+                    question,
+                    context,
+                    evidence,
+                    language=context["language"],
+                    detail=context["detail"],
+                    history=history,
+                )
     except asyncio.CancelledError:
         # If the web worker exits, the persisted deadline makes this recoverable.
         raise
@@ -377,7 +405,7 @@ async def process_message(factory: async_sessionmaker[AsyncSession], identifier:
     except Exception:
         error = "assistant_unavailable"
     if error:
-        zh = context.get("language", "zh") == "zh"
+        zh = context.get("language", "en") == "zh"
         response = {
             "paragraphs": [
                 {

@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, screen } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SavedPlanDetail, serializePlan } from "./saved-plans";
 import { alternative, analysis, field } from "./fixtures.test-helper";

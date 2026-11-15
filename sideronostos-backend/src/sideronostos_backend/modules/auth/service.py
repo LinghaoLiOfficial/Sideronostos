@@ -43,7 +43,7 @@ def safe_return_path(value: str | None) -> str | None:
         or any(segment in {".", ".."} for segment in parts.path.split("/"))
         or not any(
             parts.path == root or parts.path.startswith(root + "/")
-            for root in ("/field-shift", "/workspace", "/personal")
+            for root in ("/fields", "/field-shift", "/workspace", "/personal")
         )
     ):
         raise ValueError("next must be a Field Shift, workspace, or personal destination")

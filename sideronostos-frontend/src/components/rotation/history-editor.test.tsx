@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { expect, it, vi } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import userEvent from "@testing-library/user-event";
 import type { Field } from "@/lib/api/field-shift-types";
 import type { ProfileV2 } from "@/lib/api/rotation-types";

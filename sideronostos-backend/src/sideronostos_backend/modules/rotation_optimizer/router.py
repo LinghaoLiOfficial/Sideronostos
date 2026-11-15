@@ -2,18 +2,23 @@ import csv
 import io
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Response
 from pydantic import Field, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..agri_data.service import AgriDataService
 from ..auth.dependencies import AuthPrincipal, require_verified_user
 from ..database.session import get_session
+from .comparison import compare_run_views
 from .profiles import list_profiles
 from .requests import PreflightRequest, RunRequest
 from .schemas import Contract
 from .service import RotationService
 from .settings import get_rotation_settings
+from .v3.inputs import PlanningDraft
+from .v3.inputs import RunRequest as DailyRunRequest
+from .v3.profiles import list_profiles as list_v3_profiles
+from .v3.service import readiness as v3_readiness
 
 router = APIRouter(prefix="/rotation-optimizer", tags=["rotation-optimizer"])
 User = Annotated[AuthPrincipal, Depends(require_verified_user)]
@@ -71,6 +76,35 @@ async def data_release_availability(
         "products": release["products"],
         "evidence_only": release["evidence_only"],
     }
+
+
+@router.get("/v3/profiles")
+async def daily_profiles(user: User) -> dict[str, Any]:
+    return {"items": list_v3_profiles()}
+
+
+@router.post("/v3/readiness")
+async def daily_readiness(
+    body: PlanningDraft,
+    user: User,
+    session: Session,
+    workspace_owner: Annotated[str | None, Header(alias="X-Workspace-Owner")] = None,
+) -> dict[str, Any]:
+    if workspace_owner is not None and workspace_owner != user.id:
+        raise HTTPException(409, "Workspace account changed; reload the current account")
+    return await v3_readiness(session, user.id, body)
+
+
+@router.post("/v3/runs", status_code=202)
+async def create_daily(
+    body: DailyRunRequest,
+    user: User,
+    session: Session,
+    workspace_owner: Annotated[str | None, Header(alias="X-Workspace-Owner")] = None,
+) -> dict[str, Any]:
+    if workspace_owner is not None and workspace_owner != user.id:
+        raise HTTPException(409, "Workspace account changed; reload the current account")
+    return await RotationService().create_run(session, user.id, body)
 
 
 @router.post("/runs", status_code=202)
@@ -166,46 +200,4 @@ async def plan(plan_id: str, user: User, session: Session) -> dict[str, Any]:
 async def compare(body: CompareRequest, user: User, session: Session) -> dict[str, Any]:
     a = await RotationService().get_run(session, user.id, body.first_run_id)
     b = await RotationService().get_run(session, user.id, body.second_run_id)
-    if a["id"] == b["id"]:
-        raise HTTPException(422, "Select two different completed runs")
-
-    def field_identity(run: dict[str, Any]) -> list[tuple[str, int]]:
-        return sorted((f["id"], f["version"]) for f in run["field_snapshots"])
-
-    if (
-        field_identity(a) != field_identity(b)
-        or any(a["request"][k] != b["request"][k] for k in ("start", "end", "profile_id"))
-        or a["provenance"]["weather_sha256"] != b["provenance"]["weather_sha256"]
-    ):
-        raise HTTPException(
-            422, "Runs need matching field versions, horizon, profile and weather release"
-        )
-    if a["status"] in ("pending", "running", "cancelled", "failed", "timeout_no_solution") or b[
-        "status"
-    ] in ("pending", "running", "cancelled", "failed", "timeout_no_solution"):
-        raise HTTPException(422, "Both runs need completed calculated results")
-    choices = []
-    for run, option_id in [(a, body.first_option_id), (b, body.second_option_id)]:
-        result = run["result"] or {}
-        options = [*result.get("options", []), result.get("baseline")]
-        option = next((o for o in options if o and o["id"] == option_id), None)
-        if option is None or not option.get("complete", True):
-            raise HTTPException(422, "Select a complete calculated option in each run")
-        choices.append(option)
-    before, after = [o["verification"]["totals"] for o in choices]
-    return {
-        "first_run_id": a["id"],
-        "second_run_id": b["id"],
-        "first_option_id": body.first_option_id,
-        "second_option_id": body.second_option_id,
-        "delta": {k: after[k] - before[k] for k in before},
-        "input_changes": {
-            k: {"before": a["request"][k], "after": b["request"][k]}
-            for k in a["request"]
-            if k != "idempotency_key" and a["request"][k] != b["request"][k]
-        },
-        "score_comparable": a["request"]["weights"] == b["request"]["weights"],
-        "interpretation": (
-            "second minus first; estimates under their respective scenarios, not measured outcomes"
-        ),
-    }
+    return compare_run_views(a, b, body.first_option_id, body.second_option_id)

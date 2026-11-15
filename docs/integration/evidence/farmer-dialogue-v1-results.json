@@ -1,0 +1,642 @@
+{
+  "suite_version": "farmer-dialogue-v1",
+  "environment": "local mock model, mock product-help KB, synthetic verified farmer, real PostgreSQL and HTTP handlers",
+  "results": [
+    {
+      "id": "G-FIELD-1",
+      "bot_id": "field-guide",
+      "preset": "field_management",
+      "language": "en",
+      "question": "I'm new here—what can you actually help me do with my farm today?",
+      "expected_outcome": "Explain saved fields, history, and field actions without claiming to know this farm.",
+      "expected_follow_up": "Ask which field or whether the farmer wants to add one.",
+      "actual_answer": "I can explain field setup and the saved field records available in this conversation. To create or update a field, open Use module tools and choose the relevant operation; the form asks for the details it needs.\nWhich field should we start with, or would you like to add one? For a new field, a name, location and area are a good start.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-FIELD-2",
+      "bot_id": "field-guide",
+      "preset": "field_management",
+      "language": "zh",
+      "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+      "expected_outcome": "State the minimum field information and avoid generic agronomic promises.",
+      "expected_follow_up": "Ask for the field or its location, area, and crop history according to the task.",
+      "actual_answer": "我可以说明地块填写步骤，并解释当前对话中可用的地块记录。要创建或修改地块，请打开“使用模块工具”并选择对应操作，表单会提示需要填写的信息。\n先看哪块地，还是要新增一块？如果要建档，先告诉我地块名称、位置和面积；种植历史可以随后核对。",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-WATER-1",
+      "bot_id": "remote-water",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "I'm new here—what can you actually help me do with my farm today?",
+      "expected_outcome": "Explain published water-related satellite and historical weather observations, with limits.",
+      "expected_follow_up": "Ask for a map area and the observation or date wanted.",
+      "actual_answer": "I can explain published surface soil moisture, historical rainfall and reference evapotranspiration for a selected area. Use module tools to find available layers and observations; a missing reading remains unavailable.\nWhich map area, date and indicator should I check: surface moisture, rainfall or reference evapotranspiration?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-WATER-2",
+      "bot_id": "remote-water",
+      "preset": "remote_sensing",
+      "language": "zh",
+      "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+      "expected_outcome": "State needed area and observation type; do not imply an irrigation prescription.",
+      "expected_follow_up": "Ask where to look and which period or indicator matters.",
+      "actual_answer": "我可以解释选区内已发布的表层土壤湿度、历史降雨和参考蒸散资料。打开“使用模块工具”可以查询可用图层和观测；缺失的读数仍无法提供。\n要查看地图上的哪片区域、哪段时间，以及表层湿度、雨量还是参考蒸散？",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-SOIL-1",
+      "bot_id": "remote-soil",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "I'm new here—what can you actually help me do with my farm today?",
+      "expected_outcome": "Describe surface soil moisture only, not root-zone moisture or weather forecasting.",
+      "expected_follow_up": "Ask for a selected area and available SMAP date.",
+      "actual_answer": "I can explain published SMAP surface soil moisture for a selected area and its limits. Use module tools to open a supported layer or find an observation. These surface readings do not establish root-zone moisture.\nWhich map area and observation date should I check?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-SOIL-2",
+      "bot_id": "remote-soil",
+      "preset": "remote_sensing",
+      "language": "zh",
+      "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+      "expected_outcome": "Explain the surface-moisture scope and required map selection.",
+      "expected_follow_up": "Ask for a location or map selection and time.",
+      "actual_answer": "我可以解释选区内已发布的 SMAP 表层土壤湿度及其局限。打开“使用模块工具”可以查看支持的图层或查询观测。表层读数不能确定根区湿度。\n要查看哪片区域和哪天的表层湿度？",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-WEATHER-1",
+      "bot_id": "remote-weather",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "I'm new here—what can you actually help me do with my farm today?",
+      "expected_outcome": "Explain historical rainfall and reference ET0, not future forecast.",
+      "expected_follow_up": "Ask for area and past period.",
+      "actual_answer": "I can explain published historical rainfall and reference evapotranspiration for a selected area and date range. Use module tools to find an observation. This assistant does not provide a future weather forecast.\nWhich area and past date range should I check?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-WEATHER-2",
+      "bot_id": "remote-weather",
+      "preset": "remote_sensing",
+      "language": "zh",
+      "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+      "expected_outcome": "Explain historical weather evidence and limitations in plain Chinese.",
+      "expected_follow_up": "Ask for location and historical date range.",
+      "actual_answer": "我可以解释指定选区和时间范围内已发布的历史降雨与参考蒸散资料。打开“使用模块工具”可以查询观测。本助手不提供未来天气预报。\n要查看哪个区域、哪段过去的时间？",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-ROTATION-1",
+      "bot_id": "rotation-guide",
+      "preset": "rotation",
+      "language": "en",
+      "question": "I'm new here—what can you actually help me do with my farm today?",
+      "expected_outcome": "Describe field-based rotation planning and the need for a saved field and assumptions.",
+      "expected_follow_up": "Ask which saved fields and planting period the farmer wants to plan.",
+      "actual_answer": "I can explain rotation planning, saved plans and their trade-offs using the available evidence. Open Use module tools to choose a planning operation and provide its required inputs; a calculation needs its own confirmed result.\nWhich saved fields, crop history, planting period and constraints should the run use? Should I use the demo crop and weather assumptions for comparison?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-ROTATION-2",
+      "bot_id": "rotation-guide",
+      "preset": "rotation",
+      "language": "zh",
+      "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+      "expected_outcome": "State the practical inputs for a rotation run without dense API vocabulary.",
+      "expected_follow_up": "Ask for saved fields, crop history, and planning period.",
+      "actual_answer": "我可以依据可用资料说明轮作规划步骤、存档方案及其取舍。打开“使用模块工具”可选择规划操作并填写必要信息；计算结果以服务端确认的结果为准。\n要规划账户里的哪几块地？请告诉我已有种植历史、计划种植时段和你在意的资源限制；演示作物和天气假设可以用于比较吗？",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-LOCAL-1",
+      "bot_id": "local-knowledge-guide",
+      "preset": "local_agriculture",
+      "language": "en",
+      "question": "I'm new here—what can you actually help me do with my farm today?",
+      "expected_outcome": "Explain sourced general knowledge and that current local prices/varieties are unavailable in this demo.",
+      "expected_follow_up": "Ask what crop and region or topic the farmer wants to check.",
+      "actual_answer": "I can answer questions from the available local knowledge sources and show their references. Local prices and varieties in this demo are examples. This module currently has no operational tools.\nWhich crop, region or local topic should I check?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "G-LOCAL-2",
+      "bot_id": "local-knowledge-guide",
+      "preset": "local_agriculture",
+      "language": "zh",
+      "question": "我先不填一堆表。你需要我告诉你什么，才能给我有用的建议？",
+      "expected_outcome": "Explain source-backed general guidance and mock data limits.",
+      "expected_follow_up": "Ask for region and crop or local topic.",
+      "actual_answer": "我可以依据可用的本地知识资料回答问题，并展示来源。演示中的本地价格与品种是示例。本模块目前没有业务操作工具。\n你想查哪种作物、哪个地区或什么本地问题？",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "F-1",
+      "bot_id": "field-guide",
+      "preset": "field_management",
+      "language": "en",
+      "question": "I just took over a small field by the creek. Can you add it for me?",
+      "expected_outcome": "Do not claim creation; direct to the create-field action.",
+      "expected_follow_up": "Ask for a name, location, area, soil texture, irrigation status, and profile as needed.",
+      "actual_answer": "I can start with your saved fields and planting history. To add a field, open Use module tools → Create field. What name, area, location, soil texture, irrigation status and parameter profile should I use? I will only call it created after the server confirms it and provides the field link.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "F-2",
+      "bot_id": "field-guide",
+      "preset": "field_management",
+      "language": "zh",
+      "question": "我家北边那块地之前种过啥？我只记得去年好像是豆子。",
+      "expected_outcome": "Do not invent history from a vague description.",
+      "expected_follow_up": "Ask which saved field and invite the farmer to verify or add its planting history.",
+      "actual_answer": "仅凭“北边那块地”，我还不能确定是哪块地，也不能推断去年种了什么。你说的是账户中的哪块地？可以先打开它的种植历史核对；如果豆类记录缺失，再用地块工具补录确认过的历史。",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "F-3",
+      "bot_id": "field-guide",
+      "preset": "field_management",
+      "language": "en",
+      "question": "The field area looks wrong on my screen. Can you fix it to four hectares?",
+      "expected_outcome": "Do not claim an edit; explain the owned-field edit path and uncertainty.",
+      "expected_follow_up": "Ask which field and confirm the corrected area before submission.",
+      "actual_answer": "I can help correct a saved field, but I need to know which one and confirm the area you supplied before changing it. Open Use module tools → Update field, select the field and enter the corrected area. Which field should be changed? I will give you the saved field link only after the update succeeds.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "W-1",
+      "bot_id": "remote-water",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "That blue patch on the map—should I water the corn tomorrow?",
+      "expected_outcome": "Explain satellite surface moisture is not a watering prescription or forecast.",
+      "expected_follow_up": "Ask which area/date and whether a published observation is available.",
+      "actual_answer": "A blue patch may represent a published regional surface observation, depending on the active layer. It is not a watering instruction or tomorrow's forecast. Before deciding on irrigation, check conditions in the field. Which map layer, area and observation date are you looking at?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "W-2",
+      "bot_id": "remote-water",
+      "preset": "remote_sensing",
+      "language": "zh",
+      "question": "我圈的那片地这阵子到底是偏干还是偏湿？",
+      "expected_outcome": "Do not state a moisture value without a current selection and observation.",
+      "expected_follow_up": "Ask for the map selection and observation period or offer the published-data action.",
+      "actual_answer": "没有这片区域的已发布读数，我不能直接判断偏干还是偏湿。请告诉我地图选区和想看的时间；可以用水分图层或观测工具查看数值与来源。",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "W-3",
+      "bot_id": "remote-water",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "Why does your water map look smooth when one corner of my field is dusty?",
+      "expected_outcome": "Explain SMAP scale limits and that local variation is possible.",
+      "expected_follow_up": "Ask for an area/date only if needed to inspect a published layer.",
+      "actual_answer": "The water map summarizes a broad observation area; one dusty corner can differ from the mapped average. Use a ground check for that corner. If you want me to inspect the map evidence, which area and date are shown?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "S-1",
+      "bot_id": "remote-soil",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "Is that moisture reading down where my roots are, or just at the surface?",
+      "expected_outcome": "Clearly identify SMAP as regional surface moisture, not root-zone measurement.",
+      "expected_follow_up": "No follow-up needed for the basic distinction; optionally ask for a selected observation.",
+      "actual_answer": "This is SMAP surface soil moisture over a broad area, not a measurement at crop root depth. The map cannot establish root-zone conditions. If you want to inspect a particular reading, share the selected area and observation date.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "S-2",
+      "bot_id": "remote-soil",
+      "preset": "remote_sensing",
+      "language": "zh",
+      "question": "图上颜色浅，我是不是得赶紧浇二十毫米？",
+      "expected_outcome": "Do not prescribe irrigation amount from map color; explain limits.",
+      "expected_follow_up": "Ask for field conditions or direct to ground measurement if making a practical watering decision.",
+      "actual_answer": "不能只凭地图颜色决定浇水量。图层反映区域表层湿度，不等于根区需水量；定量灌溉前请核对田间土壤情况。你看到的是哪个选区、哪天的图？",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "S-3",
+      "bot_id": "remote-soil",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "Can you pull the latest soil moisture for my south pasture?",
+      "expected_outcome": "Do not invent a latest value or assume the pasture is mapped.",
+      "expected_follow_up": "Ask for a map selection or exact saved area and available date.",
+      "actual_answer": "I can look for the latest published surface moisture reading, but I need to locate the south pasture first. Please select it on the map or give its saved area, then use the observation tool. I will report the date, value and source only if a reading exists.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "T-1",
+      "bot_id": "remote-weather",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "Will rain hit my place next Tuesday, or should I move the hay?",
+      "expected_outcome": "State that this bot has historical observations, not a future forecast.",
+      "expected_follow_up": "Offer historical context or direct the farmer to a current forecast source.",
+      "actual_answer": "I only have published historical rainfall and reference evapotranspiration here, so I cannot say whether it will rain next Tuesday. Check a current local forecast before moving hay. If useful, tell me your area and a past period to review its historical rainfall.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "T-2",
+      "bot_id": "remote-weather",
+      "preset": "remote_sensing",
+      "language": "zh",
+      "question": "八月份我这块地到底下了多少雨？",
+      "expected_outcome": "Do not invent rainfall amount or year.",
+      "expected_follow_up": "Ask which field or map selection, which year, and whether historical data is published.",
+      "actual_answer": "可以查询已发布的历史降雨，但请先告诉我是哪块地或地图选区，以及所问月份属于哪个年份。有观测结果后，我会给出雨量、时段和来源；仅凭月份不能推断雨量。",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "T-3",
+      "bot_id": "remote-weather",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "Does NASA ET-zero tell me how much water to pump into the pivot?",
+      "expected_outcome": "Explain ET0 is a reference measure, not a pump setting.",
+      "expected_follow_up": "No follow-up needed for the distinction; ask for crop/field context only if estimating demand.",
+      "actual_answer": "Reference evapotranspiration describes atmospheric evaporative demand under reference conditions. It is not a pivot pump setting or a direct crop irrigation amount. A practical irrigation decision also needs crop, soil and field measurements. Would you like to inspect the published reference evapotranspiration for a selected area and period?",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "R-1",
+      "bot_id": "rotation-guide",
+      "preset": "rotation",
+      "language": "en",
+      "question": "Could you plan next season for my two fields if I tell you what I planted?",
+      "expected_outcome": "Do not claim a plan or run; explain explicit planning inputs and action.",
+      "expected_follow_up": "Ask which saved fields, crop history, planning dates, constraints, and benchmark acceptance.",
+      "actual_answer": "I can help prepare a rotation run. Open Use module tools → Create planning run after choosing your saved fields. Which fields, planting history and planning dates should it use, and what constraints matter to you? Please also confirm whether the demo crop and weather assumptions are suitable for comparison. A plan exists only after the calculation succeeds; then I can link its result.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "R-2",
+      "bot_id": "rotation-guide",
+      "preset": "rotation",
+      "language": "zh",
+      "question": "上回那个计算没出来，是哪里卡住了？能帮我再跑一次吗？",
+      "expected_outcome": "Do not invent a failure cause or say retry completed.",
+      "expected_follow_up": "Ask which run; distinguish retrying original conditions from editing and submitting new ones.",
+      "actual_answer": "没有指定上次的任务，我不能判断卡在何处。请告诉我是哪次计算，先打开它的状态和诊断。如果是临时运行故障，可重试原任务；如果需要改输入，请修改规划表单并提交新的计算。服务端确认后我才能报告新结果。",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "R-3",
+      "bot_id": "rotation-guide",
+      "preset": "rotation",
+      "language": "en",
+      "question": "If I pick the top plan, is my profit basically guaranteed?",
+      "expected_outcome": "Reject profit guarantee; explain model assumptions and local calibration.",
+      "expected_follow_up": "No required follow-up; offer to inspect a selected completed plan if available.",
+      "actual_answer": "The top-ranked plan does not guarantee profit. Its ranking depends on the model's inputs, assumptions and available data, while your actual costs, yields and prices can differ. If you share a completed plan, I can walk through its assumptions and trade-offs with you.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": false,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "L-1",
+      "bot_id": "local-knowledge-guide",
+      "preset": "local_agriculture",
+      "language": "en",
+      "question": "Which corn variety would you plant on my place?",
+      "expected_outcome": "Do not recommend a current local variety from mock product help.",
+      "expected_follow_up": "Ask for region, soil/climate, and a verified local source.",
+      "actual_answer": "I cannot choose a current corn variety for your farm from this demo's example knowledge. What region are you in, and what are your soil and growing conditions? We would need a verified local extension or variety-trial source before recommending one.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "L-2",
+      "bot_id": "local-knowledge-guide",
+      "preset": "local_agriculture",
+      "language": "zh",
+      "question": "今年秋天卖大豆大概能拿多少钱？",
+      "expected_outcome": "Do not invent current price or income forecast.",
+      "expected_follow_up": "Ask for location and market/source; explain live price data is unavailable.",
+      "actual_answer": "我没有经过核实的当前大豆价格或秋季售价预测，因此不能直接估算收入。你在哪个地区、通过哪个市场销售？有可靠的现价来源和预计销售量后，才能做注明假设的估算。",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "L-3",
+      "bot_id": "local-knowledge-guide",
+      "preset": "local_agriculture",
+      "language": "en",
+      "question": "Am I allowed to spray right next to the creek on my farm?",
+      "expected_outcome": "Do not make a legal compliance claim without jurisdiction and product label.",
+      "expected_follow_up": "Ask for location, product label, and local extension or regulator source.",
+      "actual_answer": "I cannot confirm whether spraying by your creek is legal or safe without your jurisdiction and the exact product label. Where is the farm, and which product are you considering? Check the label and your local regulator or extension service before spraying.",
+      "status": "complete",
+      "retrieval_mode": "product_help",
+      "needs_clarification": true,
+      "source_ids": [
+        "MODULEHELP"
+      ],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "E-FIELD",
+      "bot_id": "field-guide",
+      "preset": "field_management",
+      "language": "en",
+      "question": "What does the record say about the back paddock's area?",
+      "expected_outcome": "Check owned field context; without an identified record, do not invent an area.",
+      "expected_follow_up": "Ask which saved field the farmer means.",
+      "actual_answer": "I need to identify the saved field before reading its record. Which field do you mean?",
+      "status": "complete",
+      "retrieval_mode": "lexical_degraded",
+      "needs_clarification": true,
+      "source_ids": [],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "E-WATER",
+      "bot_id": "remote-water",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "Can you compare this month's rainfall and surface moisture for my creek field?",
+      "expected_outcome": "Check scoped observations; do not compare values without a map selection.",
+      "expected_follow_up": "Ask for map area and observation period.",
+      "actual_answer": "I need a map area and observation period to check published water-related data. Which area and date should I look at?",
+      "status": "complete",
+      "retrieval_mode": "lexical_degraded",
+      "needs_clarification": true,
+      "source_ids": [],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "E-SOIL",
+      "bot_id": "remote-soil",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "What was the surface moisture yesterday over my south pasture?",
+      "expected_outcome": "Check the scoped SMAP source; do not invent yesterday's observation.",
+      "expected_follow_up": "Ask for map area and available date.",
+      "actual_answer": "I need a map area and date to check published surface soil moisture. Which area should I inspect?",
+      "status": "complete",
+      "retrieval_mode": "lexical_degraded",
+      "needs_clarification": true,
+      "source_ids": [],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "E-WEATHER",
+      "bot_id": "remote-weather",
+      "preset": "remote_sensing",
+      "language": "en",
+      "question": "Show me the observed rainfall around my field last spring.",
+      "expected_outcome": "Check historical weather sources; do not invent a rainfall value.",
+      "expected_follow_up": "Ask for map area and historical date range.",
+      "actual_answer": "I can check published historical rainfall or reference evapotranspiration. Which map area, past period and indicator should I use?",
+      "status": "complete",
+      "retrieval_mode": "lexical_degraded",
+      "needs_clarification": true,
+      "source_ids": [],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "E-ROTATION",
+      "bot_id": "rotation-guide",
+      "preset": "rotation",
+      "language": "en",
+      "question": "What was the water gap in my last rotation run?",
+      "expected_outcome": "Check the owned run; without a run reference, do not invent a result.",
+      "expected_follow_up": "Ask which saved run the farmer means.",
+      "actual_answer": "I need to identify the saved planning run before reporting its result. Which run do you mean?",
+      "status": "complete",
+      "retrieval_mode": "lexical_degraded",
+      "needs_clarification": true,
+      "source_ids": [],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    },
+    {
+      "id": "E-LOCAL",
+      "bot_id": "local-knowledge-guide",
+      "preset": "local_agriculture",
+      "language": "en",
+      "question": "What do your sources say about cover crops in my county?",
+      "expected_outcome": "Check the mock KB and preset web search; do not treat generic product help as local agronomic evidence.",
+      "expected_follow_up": "Ask which county and crop or say no verified local source is available.",
+      "actual_answer": "I do not have a verified source for your county yet. Which county and crop should I check?",
+      "status": "complete",
+      "retrieval_mode": "lexical_degraded",
+      "needs_clarification": true,
+      "source_ids": [],
+      "web_result_count": 0,
+      "assessment": "suitable_first_turn"
+    }
+  ]
+}

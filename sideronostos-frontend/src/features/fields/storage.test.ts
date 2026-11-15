@@ -10,8 +10,8 @@ function deleteWorkspaceDatabase() {
   })
 }
 
-describe("workspace storage v2", () => {
-  it("clears the v1 prototype stores during migration", async () => {
+describe("owner-scoped workspace storage", () => {
+  it("preserves the v1 prototype stores without exposing them as owned data", async () => {
     await deleteWorkspaceDatabase()
     await new Promise<void>((resolve, reject) => {
       const request = indexedDB.open("field-shift-workspace", 1)
@@ -30,6 +30,9 @@ describe("workspace storage v2", () => {
     const storage = await import("@/features/fields/storage")
     const workspace = await storage.getStoredWorkspace()
     expect(workspace).toEqual({ farms: [], fields: [] })
+    const legacy = await storage.getLegacyWorkspace()
+    expect(legacy.raw.fields).toContainEqual({ legacy: true })
+    expect(legacy.unrecognizedCount).toBe(1)
   })
 
   it("persists farms and their candidate fields", async () => {
@@ -128,4 +131,69 @@ describe("workspace storage v2", () => {
       partitionGridColumns: 3,
     })
   })
+})
+
+
+it("keeps two owners and anonymous drafts isolated even with identical local IDs", async () => {
+  const storage = await import("@/features/fields/storage")
+  const { farm, fields } = createDemoFarm()
+  await storage.replaceStoredWorkspace([farm], fields, "owner-a")
+  await storage.replaceStoredWorkspace([{ ...farm, properties: { ...farm.properties, name: "B farm" } }], fields, "owner-b")
+  expect((await storage.getStoredWorkspace("owner-a")).farms[0].properties.name).toBe(farm.properties.name)
+  expect((await storage.getStoredWorkspace("owner-b")).farms[0].properties.name).toBe("B farm")
+  expect((await storage.getStoredWorkspace("never-used-owner")).farms).toEqual([])
+  // A delayed A write always targets its captured A scope, never current B.
+  await storage.replaceStoredWorkspace([], [], "owner-a")
+  expect((await storage.getStoredWorkspace("owner-b")).fields).toHaveLength(4)
+})
+
+it("requires an explicit copy to attach anonymous drafts to an account and does not overwrite later edits", async () => {
+  const storage = await import("@/features/fields/storage")
+  const { farm, fields } = createDemoFarm()
+  await storage.replaceStoredWorkspace([farm], fields)
+  expect((await storage.getStoredWorkspace("import-owner")).farms).toEqual([])
+  const copied = await storage.importLocalWorkspace("import-owner", "anonymous")
+  expect(copied.farms).toHaveLength(1)
+  expect(copied.fields).toHaveLength(4)
+  expect(copied.farms[0].properties.id).not.toBe(farm.properties.id)
+  expect(copied.fields.every(f => f.properties.farmId === copied.farms[0].properties.id)).toBe(true)
+  copied.farms[0].properties.name = "Reviewed account farm"
+  await storage.replaceStoredWorkspace(copied.farms, copied.fields, "import-owner")
+  const again = await storage.importLocalWorkspace("import-owner", "anonymous")
+  expect(again.farms).toHaveLength(1)
+  expect(again.farms[0].properties.name).toBe("Reviewed account farm")
+  expect((await storage.getStoredWorkspace()).farms[0].properties.name).toBe(farm.properties.name)
+})
+
+it("rejects accidentally writing one owner's loaded records into another owner's scope", async () => {
+  const storage = await import("@/features/fields/storage")
+  const { farm, fields } = createDemoFarm()
+  await storage.replaceStoredWorkspace([farm], fields, "guard-a")
+  const loaded = await storage.getStoredWorkspace("guard-a")
+  await expect(storage.replaceStoredWorkspace(loaded.farms, loaded.fields, "guard-b")).rejects.toThrow(/owner/i)
+  expect((await storage.getStoredWorkspace("guard-b")).farms).toEqual([])
+})
+
+it("isolates observations by account even when local field IDs coincide", async () => {
+  const storage = await import("@/features/fields/storage")
+  const observation = { id: "same-observation", fieldId: "same-field", metric: "test", value: 3,
+    unit: "test", observedAt: "2026-01-01", sourceProduct: "test fixture",
+    evidenceKind: "synthetic" as const, spatialSupport: "field" as const,
+    nativeResolutionMeters: null, uncertainty: null }
+  await storage.putObservations([observation], "obs-a")
+  await storage.putObservations([{ ...observation, value: 9 }], "obs-b")
+  expect((await storage.getFieldObservations("same-field", "obs-a"))[0].value).toBe(3)
+  expect((await storage.getFieldObservations("same-field", "obs-b"))[0].value).toBe(9)
+  expect(await storage.getFieldObservations("same-field")).toEqual([])
+})
+
+it("does not copy an old synchronization receipt into a newly owned local import", async () => {
+  const storage = await import("./storage")
+  const { farm, fields } = createDemoFarm()
+  farm.properties.pendingSync = { idempotency_key: "old-attempt", farm: { local_id: farm.properties.id, name: farm.properties.name, geometry: farm.geometry, partition_revision: "old" }, fields: [] }
+  farm.properties.syncError = "old failure"
+  await storage.replaceStoredWorkspace([farm], fields)
+  const copied = await storage.importLocalWorkspace("receipt-import-owner", "anonymous")
+  expect(copied.farms[0].properties.pendingSync).toBeUndefined()
+  expect(copied.farms[0].properties.syncError).toBeNull()
 })

@@ -2,7 +2,16 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,17 +25,29 @@ def utcnow() -> datetime:
 class FarmerPreference(Base):
     __tablename__ = "assistant_preferences"
     owner_user_id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    language: Mapped[str] = mapped_column(String(8), default="zh")
+    language: Mapped[str] = mapped_column(String(8), default="en")
     detail: Mapped[str] = mapped_column(String(12), default="brief")
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class Conversation(Base):
     __tablename__ = "assistant_conversations"
+    __table_args__ = (
+        CheckConstraint(
+            "(preset = 'general' AND bot_id = 'general-guide') OR "
+            "(preset = 'field_management' AND bot_id = 'field-guide') OR "
+            "(preset = 'remote_sensing' AND bot_id IN "
+            "('remote-water', 'remote-soil', 'remote-weather')) OR "
+            "(preset = 'local_agriculture' AND bot_id = 'local-knowledge-guide') OR "
+            "(preset = 'rotation' AND bot_id = 'rotation-guide')",
+            name="ck_assistant_conversation_bot_preset",
+        ),
+    )
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
     preset: Mapped[str] = mapped_column(String(30), default="rotation")
-    language: Mapped[str] = mapped_column(String(8), default="zh")
+    bot_id: Mapped[str] = mapped_column(String(40), default="rotation-guide")
+    language: Mapped[str] = mapped_column(String(8), default="en")
     detail: Mapped[str] = mapped_column(String(12), default="brief")
     kb_release_id: Mapped[str] = mapped_column(ForeignKey("knowledge_releases.id"))
     next_sequence: Mapped[int] = mapped_column(Integer, default=1)
@@ -59,3 +80,41 @@ class AssistantMessage(Base):
     deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class AssistantAction(Base):
+    """Owner-scoped action state, idempotency result, and append-only audit events."""
+
+    __tablename__ = "assistant_actions"
+    __table_args__ = (
+        UniqueConstraint("conversation_id", "idempotency_key", name="uq_assistant_action_key"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("assistant_conversations.id"), index=True
+    )
+    owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
+    idempotency_key: Mapped[str] = mapped_column(String(80))
+    action: Mapped[str] = mapped_column(String(50))
+    payload_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    arguments: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    status: Mapped[str] = mapped_column(String(24))
+    outcome: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    audit_events: Mapped[list[dict[str, str]]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class AssistantPreview(Base):
+    """A private, bounded screenshot of a confirmed result page."""
+
+    __tablename__ = "assistant_previews"
+
+    workflow_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("assistant_conversations.id"), index=True
+    )
+    owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
+    png: Mapped[bytes] = mapped_column(LargeBinary)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

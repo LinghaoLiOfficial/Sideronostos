@@ -211,6 +211,7 @@ async def search_release(
     product_version: str | None = None,
     topic: str | None = None,
     source_ids: list[str] | None = None,
+    excluded_source_ids: list[str] | None = None,
     limit: int = 8,
     candidate_limit: int = 40,
 ) -> list[dict[str, Any]]:
@@ -230,6 +231,8 @@ async def search_release(
         )
     if source_ids is not None:
         conditions.append(KnowledgeChunk.source_id.in_(source_ids))
+    if excluded_source_ids:
+        conditions.append(KnowledgeChunk.source_id.not_in(excluded_source_ids))
     if topic:
         conditions.append(KnowledgeChunk.topics.contains([topic]))
     terms = " OR ".join(dict.fromkeys(tokenize(query)[:256]))

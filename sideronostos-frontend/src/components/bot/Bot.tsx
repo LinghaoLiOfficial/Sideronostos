@@ -7,8 +7,10 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { Minus } from "lucide-react";
-import type { BotIdentity, BotMode } from "@/lib/bot";
+import { BookOpen, CloudSun, Droplets, Layers3, Minus, Orbit, Sprout } from "lucide-react";
+import type { BotAvatarVariant, BotIdentity, BotMode } from "@/lib/bot";
+import type { Locale } from "@/lib/i18n/locale";
+import { useI18n } from "@/lib/i18n/provider";
 import styles from "./bot.module.css";
 
 export type BotProps = {
@@ -17,18 +19,23 @@ export type BotProps = {
   onModeChange: (mode: BotMode) => void;
   children: ReactNode;
   headerActions?: ReactNode;
+  locale?: Locale;
+  purpose?: "chat" | "details";
 };
 
-export function BotAvatar({ small = false }: { small?: boolean }) {
+export function BotAvatar({ small = false, variant }: { small?: boolean; variant?: BotAvatarVariant }) {
+  const Icon = variant === "water" ? Droplets : variant === "soil" ? Layers3 : variant === "weather" ? CloudSun : variant === "knowledge" ? BookOpen : variant === "rotation" ? Orbit : Sprout;
   return (
     <span
       aria-hidden="true"
       className={`${styles.avatar} ${small ? styles.smallAvatar : ""}`}
+      data-avatar={variant}
     >
-      <span className={styles.eyes}>
-        <i />
-        <i />
+      <span className={styles.avatarSprout} />
+      <span className={styles.avatarEyes}>
+        <i className={styles.avatarEye} /><i className={styles.avatarEye} />
       </span>
+      <Icon className={styles.avatarSymbol} strokeWidth={1.8} />
     </span>
   );
 }
@@ -40,7 +47,11 @@ export function Bot({
   onModeChange,
   children,
   headerActions,
+  locale: localeProp,
+  purpose = "chat",
 }: BotProps) {
+  const { locale: interfaceLocale, t } = useI18n();
+  const locale = localeProp ?? (interfaceLocale === "zh" ? "zh-CN" : "en");
   const id = useId();
   const panel = useRef<HTMLElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -146,8 +157,18 @@ export function Bot({
       }, 400);
   }
   const color = {
-    "--bot-accent": identity.color ?? "#7962ce",
+    "--bot-accent": identity.color ?? "#4d9b75",
   } as CSSProperties;
+  const launcherLabel = open
+    ? locale === "en"
+      ? `${identity.name}, ${purpose === "chat" ? "chat" : "details"} open`
+      : `${identity.name}，${purpose === "chat" ? "对话" : "详情"}已展开`
+    : locale === "en"
+      ? `Open ${identity.name}`
+      : `打开${identity.name}`;
+  const launcherHint = locale === "en"
+    ? purpose === "chat" ? "Tap to chat" : "View details"
+    : purpose === "chat" ? "点我聊聊" : "查看详情";
   return (
     <>
       <button
@@ -155,9 +176,7 @@ export function Bot({
         type="button"
         className={styles.launcher}
         style={color}
-        aria-label={
-          open ? `${identity.name}，对话已展开` : `打开${identity.name}`
-        }
+        aria-label={launcherLabel}
         aria-expanded={open}
         aria-controls={id}
         data-open={open}
@@ -196,10 +215,10 @@ export function Bot({
         }}
       >
         <span className={styles.petShadow} aria-hidden="true" />
-        <BotAvatar />
-        <span className={styles.petLabel}>
+        <BotAvatar variant={identity.avatar} />
+        <span className={styles.petLabel} aria-hidden={open}>
           {identity.name}
-          <span>点我聊聊</span>
+          <span>{launcherHint}</span>
         </span>
       </button>
       <section
@@ -228,16 +247,16 @@ export function Bot({
         }}
       >
         <header className={styles.header}>
-          <BotAvatar small />
+          <BotAvatar small variant={identity.avatar} />
           <div className={styles.heading}>
             <h2 id={`${id}-title`}>{identity.name}</h2>
-            <p id={`${id}-description`}>{identity.description}</p>
+            <p id={`${id}-description`}>{t(identity.description)}</p>
           </div>
           <div className={styles.headerActions}>{headerActions}</div>
           <button
             type="button"
             className={styles.iconButton}
-            aria-label={`收起${identity.name}`}
+            aria-label={locale === "en" ? `Collapse ${identity.name}` : `收起${identity.name}`}
             onClick={collapse}
           >
             <Minus size={19} />

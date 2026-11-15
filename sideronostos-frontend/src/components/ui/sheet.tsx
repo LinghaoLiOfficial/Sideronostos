@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useI18n } from "@/lib/i18n/provider"
 import { cn } from "cn"
 import { useSurfaceAppearance } from "./surface"
 import { Dialog as SheetPrimitive } from "radix-ui"
@@ -56,6 +57,7 @@ function SheetContent({
   side?: "top" | "right" | "bottom" | "left"
   showCloseButton?: boolean
 }) {
+  const { t } = useI18n()
   const { tone: surface, material } = useSurfaceAppearance()
   return (
     <SheetPortal>
@@ -82,7 +84,7 @@ function SheetContent({
             >
               <XIcon
               />
-              <span className="sr-only">关闭</span>
+              <span className="sr-only">{t("关闭")}</span>
             </Button>
           </SheetPrimitive.Close>
         )}

@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { cleanup, screen, fireEvent } from "@testing-library/react";
+import { render } from "@/test/render-zh";
 import userEvent from "@testing-library/user-event";
 import { PlannerForm } from "./planner-form";
 import { emptyDraft, saveDraft } from "./planning-model";

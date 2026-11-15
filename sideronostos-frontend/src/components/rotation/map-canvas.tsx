@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "@/lib/i18n/provider";
 import {
   useEffect,
   useLayoutEffect,
@@ -37,6 +38,8 @@ type Props = {
   onField: (field: Field) => void;
 };
 export function MapCanvas(props: Props) {
+  const { t } = useI18n();
+
   const element = useRef<HTMLDivElement>(null),
     map = useRef<Leaflet.Map | null>(null),
     library = useRef<typeof Leaflet | null>(null);
@@ -370,7 +373,7 @@ export function MapCanvas(props: Props) {
       <div
         className={styles.mapCanvas}
         ref={element}
-        aria-label="农田地图"
+        aria-label={t("农田地图")}
         role="region"
       />
       <div className={styles.mapTools}>
@@ -385,8 +388,7 @@ export function MapCanvas(props: Props) {
             }}
           >
             <Crosshair size={16} />
-            选点
-          </button>
+            {t("选点")}</button>
           <button
             type="button"
             disabled={savingPolygon}
@@ -394,35 +396,32 @@ export function MapCanvas(props: Props) {
             onClick={() => setMode("polygon")}
           >
             <Pentagon size={16} />
-            画区域
-          </button>
+            {t("画区域")}</button>
           <button
             type="button"
             disabled={!ready || savingPolygon}
             onClick={useViewport}
           >
             <LocateFixed size={16} />
-            采用当前视野
-          </button>
+            {t("采用当前视野")}</button>
         </div>
         {mode === "polygon" && (
           <div className={styles.drawingTools}>
-            <p>依次点击边界位置，至少三个顶点。{vertices.length} / 200</p>
+            <p>{t("依次点击边界位置，至少三个顶点。")}{vertices.length} / 200</p>
             <button
               type="button"
               disabled={savingPolygon || !vertices.length}
               onClick={() => setVertices((old) => old.slice(0, -1))}
             >
               <Undo2 size={15} />
-              撤回
-            </button>
+              {t("撤回")}</button>
             <button
               type="button"
               disabled={savingPolygon || vertices.length < 3}
               onClick={finishPolygon}
             >
               <Check size={15} />
-              {savingPolygon ? "正在核对区域…" : "完成区域"}
+              {savingPolygon ? t("正在核对区域…") : t("完成区域")}
             </button>
             <button
               type="button"
@@ -433,16 +432,14 @@ export function MapCanvas(props: Props) {
               }}
             >
               <X size={15} />
-              取消
-            </button>
+              {t("取消")}</button>
           </div>
         )}
         <details className={styles.coordinateTools}>
-          <summary>用坐标定位</summary>
+          <summary>{t("用坐标定位")}</summary>
           <form onSubmit={coordinates}>
             <label>
-              经度
-              <input
+              {t("经度")}<input
                 type="number"
                 step="any"
                 min="-180"
@@ -453,8 +450,7 @@ export function MapCanvas(props: Props) {
               />
             </label>
             <label>
-              纬度
-              <input
+              {t("纬度")}<input
                 type="number"
                 step="any"
                 min="-90"
@@ -465,25 +461,24 @@ export function MapCanvas(props: Props) {
               />
             </label>
             <button type="submit" disabled={savingPolygon}>
-              {mode === "polygon" ? "加入顶点" : "选择位置"}
+              {mode === "polygon" ? t("加入顶点") : t("选择位置")}
             </button>
           </form>
         </details>
         {mapError && (
           <p className={styles.mapWarning} role="status">
-            {mapError}
+            {t(mapError)}
           </p>
         )}
         {tileError && (
           <p className={styles.mapWarning} role="status">
-            部分科学图层未能加载，空白不能视为无水分。
-          </p>
+            {t("部分科学图层未能加载，空白不能视为无水分。")}</p>
         )}
       </div>
       {props.layer && (
         <div className={styles.mapLegend}>
-          <strong>表层土壤水分 · {props.layer.pass}</strong>
-          <span>{props.layer.start.slice(0, 10)} · m³/m³</span>
+          <strong>{t("表层土壤水分 · ")}{props.layer.pass}</strong>
+          <span>{props.layer.start.slice(0, 10)} {t(" · m³/m³")}</span>
           <div
             style={{
               background: `linear-gradient(to right,${props.layer.legend.colors.join(",")})`,
@@ -494,10 +489,8 @@ export function MapCanvas(props: Props) {
             <span>{props.layer.legend.max}</span>
           </p>
           <small>
-            原生格网显示 · 空白为缺测或未覆盖
-            <br />
-            区域背景，不能看作地块实测
-          </small>
+            {t("原生格网显示 · 空白为缺测或未覆盖")}<br />
+            {t("区域背景，不能看作地块实测")}</small>
         </div>
       )}
     </>

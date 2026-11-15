@@ -33,3 +33,28 @@ def test_failed_calculation_questions_retrieve_product_recovery_steps():
         assert intent == "guide"
         assert intents.retrieval_sources(question, intent) == ["HELPV2"]
     assert intents.classify("Why did my crop fail?", {}) == "learn"
+
+
+def test_daily_workflow_retrieves_its_own_versioned_help():
+    daily = {"run": {"request": {"model_version": "rotation-milp-v3.0"}}}
+    legacy = {"run": {"request": {"model_version": "rotation-milp-v2.0"}}}
+    assert intents.retrieval_sources("在哪里检查资料？", "guide", daily) == ["HELPV3"]
+    assert intents.retrieval_sources("在哪里填写旧版预算？", "guide", legacy) == ["HELPV2"]
+    assert intents.retrieval_sources("如何开始规划？", "guide", {"run": None}) == ["HELPV3"]
+
+
+def test_comparing_current_alternatives_retrieves_versioned_metric_definitions():
+    daily = {"run": {"request": {"model_version": "rotation-milp-v3.0"}}}
+    legacy = {"run": {"request": {"model_version": "rotation-milp-v2.0"}}}
+    for question in [
+        "How do both options trade off water use, estimated profit and soil contribution?",
+        "比较这些备选方案的土壤贡献和用水",
+    ]:
+        assert intents.retrieval_sources(question, "explain_current", daily) == [
+            "HELPV3",
+            "MODELV3",
+            "DATAV3",
+        ]
+        assert intents.retrieval_sources(question, "explain_current", legacy) == ["HELPV2"]
+    assert intents.retrieval_sources("豆科前茬会影响后茬吗？", "learn", daily) is None
+    assert intents.retrieval_sources("Compare two options for disease control", "learn", {}) is None

@@ -4,8 +4,11 @@ from typing import Annotated, Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, create_model, model_validator
 
+from .bot_scope import BOT_PRESETS
+
 Identifier = Annotated[str, Field(min_length=1, max_length=100)]
 Language = Literal["zh", "en"]
+Preset = Literal["general", "field_management", "remote_sensing", "local_agriculture", "rotation"]
 Detail = Literal["brief", "detailed"]
 Action = Literal["open_planner", "edit_conditions", "choose_field", "view_sources"]
 Intent = Literal["learn", "explain_current", "guide", "compare_runs", "what_if_request"]
@@ -60,6 +63,7 @@ class ContextRef(Contract):
     dates: DateWindow | None = None
     fields: list[FieldRef] = Field(default_factory=list, max_length=10)
     run_id: Identifier | None = None
+    plan_id: Identifier | None = None
     option_id: Identifier | None = None
     compare_run_id: Identifier | None = None
     compare_option_id: Identifier | None = None
@@ -68,12 +72,12 @@ class ContextRef(Contract):
 
     @model_validator(mode="after")
     def relations(self) -> Self:
-        if self.run_id and self.analysis_id:
-            raise ValueError("Choose v1 analysis or v2 run")
-        if self.option_id and not (self.run_id or self.analysis_id):
+        if (self.run_id or self.plan_id) and self.analysis_id:
+            raise ValueError("Choose a v1 analysis or a versioned optimization run")
+        if self.option_id and not (self.run_id or self.plan_id or self.analysis_id):
             raise ValueError("Option requires its run or analysis")
         if self.compare_run_id and (
-            not self.run_id or not self.option_id or not self.compare_option_id
+            not (self.plan_id or (self.run_id and self.option_id)) or not self.compare_option_id
         ):
             raise ValueError("Comparison requires explicit options in two runs")
         if self.compare_option_id and not self.compare_run_id:
@@ -84,15 +88,22 @@ class ContextRef(Contract):
 
 
 class ConversationCreate(Contract):
-    preset: Literal["rotation"] = "rotation"
-    language: Language = "zh"
+    preset: Preset = "rotation"
+    bot_id: str | None = None
+    language: Language = "en"
     detail: Detail = "brief"
+
+    @model_validator(mode="after")
+    def matching_bot(self) -> Self:
+        if self.bot_id is not None and BOT_PRESETS.get(self.bot_id) != self.preset:
+            raise ValueError("Bot identity does not match the conversation preset")
+        return self
 
 
 class MessageCreate(Contract):
     client_message_id: str = Field(min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
     text: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
-    context: ContextRef
+    context: ContextRef = Field(default_factory=lambda: ContextRef(page="map", revision=1))
 
 
 class Paragraph(Contract):
@@ -140,18 +151,30 @@ def fact_is_renderable(fact: dict[str, Any]) -> bool:
     )
 
 
-def generation_schema(fact_ids: list[str]) -> type[BaseModel]:
+def generation_schema(
+    fact_ids: list[str], evidence_ids: list[str] | None = None
+) -> type[BaseModel]:
     """Constrain numeric slots to facts actually visible in this request.
 
-    Empty contexts cannot produce placeholders. Binding still checks source IDs,
-    meaning and permissions after decoding; the schema does not establish support.
+    Empty contexts cannot produce placeholders. When citation identities are provided,
+    strict decoding accepts only those visible sources, not concatenated IDs or punctuation.
+    Binding still checks meaning and permissions; identity does not establish support.
     """
     alternatives = "|".join(re.escape("{{" + fid + "}}") for fid in sorted(set(fact_ids)))
     pattern = r"^(?:[^\d{}<>]" + ("|" + alternatives if alternatives else "") + r")+$"
+    citation_type: Any = str
+    citation_limit = 8
+    if evidence_ids is not None:
+        available_ids = tuple(sorted(set(evidence_ids)))
+        if available_ids:
+            citation_type = Literal[available_ids]
+        else:
+            citation_limit = 0
     paragraph_type = create_model(
         "ContextGenerationParagraph",
         __base__=GenerationParagraph,
         text=(str, Field(min_length=1, max_length=1200, pattern=pattern)),
+        evidence_ids=(list[citation_type], Field(default_factory=list, max_length=citation_limit)),
     )
     return create_model(
         "ContextGenerationAnswer",
@@ -161,5 +184,5 @@ def generation_schema(fact_ids: list[str]) -> type[BaseModel]:
 
 
 class PreferenceInput(Contract):
-    language: Language = "zh"
+    language: Language = "en"
     detail: Detail = "brief"

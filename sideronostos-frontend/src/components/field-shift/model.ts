@@ -51,5 +51,5 @@ export function errorMessage(error: unknown): string {
   }
   return "网络暂时不可用。输入已保留，请检查连接后重试。";
 }
-export const formatNumber = (n: number | null, decimals = 0) => n === null ? "暂无数据" : new Intl.NumberFormat("zh-CN", { maximumFractionDigits: decimals }).format(n);
-export const formatDate = (date: string | null) => date ? new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium" }).format(new Date(date)) : "未提供";
+export const formatNumber = (n: number | null, decimals = 0) => n === null ? "暂无数据" : new Intl.NumberFormat("en-US", { maximumFractionDigits: decimals }).format(n);
+export const formatDate = (date: string | null, locale: "en" | "zh" = "en") => date ? new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", { dateStyle: "medium" }).format(new Date(date)) : "未提供";

@@ -1,5 +1,7 @@
 # Field Shift v2: farmer workflow / 农场主操作与指标说明
-Version: rotation-product-help-20261113-v4. This is product documentation, not agronomic evidence. Features are usable only when their API capability and current page state confirm availability.
+Version: rotation-product-help-20261114-v5. This is product documentation, not agronomic evidence. Features are usable only when their API capability and current page state confirm availability.
+
+For field planning, save an owned field with its location, area, soil texture, irrigation availability, and planting history. A map selection sets a query area; it does not create a field. The signed-in assistant can run available module operations after the farmer supplies the required inputs, and it shows the server-confirmed result or progress link.
 
 地图选区 selection 和经营地块 planning field 是两种对象。点击一个位置、画多边形或明确采用当前视野，只会确定区域查询范围，不会自动创建地块或补全种植历史。优化只使用当前账户已保存的地块。只有经纬度时显示位置点，不根据面积编造田界。没有选区也能问“轮作是什么”；需要地块事实时，先选地块或区域。Selection is a geographic query context, not proof of farm ownership.
 <!-- section -->
@@ -10,7 +12,7 @@ Version: rotation-product-help-20261113-v4. This is product documentation, not a
 Iowa benchmark 是算法和交互验证用参数包，不代表用户已选择 Iowa 为业务试点，也没有完成当地品种校准。玉米 GDD 参考例子不能视为每个品种的保证成熟日；豌豆、燕麦的成熟阈值及日历、成本、劳力、同科间隔等含明确 benchmark 假设。继续计算前需明确接受这些假设。天气依据是 NASA POWER 2025 历史逐日数据按月日回放，不是未来天气预测。改温度或降雨得到情景 scenario，不是新的卫星观测。
 <!-- section -->
 # Calculation and stale results / 计算与重算
-点击生成后，计算作为独立任务运行。用 run ID 恢复任务；聊天不能启动优化器、改地块或保存方案。修改预算、作物、日期、灌溉条件或权重后，旧结果属于原输入，必须标记“条件已修改，尚未重算”。Drafts need explicit recomputation. 明确提交重算才产生新 run。解释方案时必须绑定 run 和 option；“这个方案”不明确时先选中。超时有解只能说“找到可行方案，尚未证明最优”，无解或失败不能展示上一轮成功结果充当新结果。
+点击生成后，计算作为独立任务运行。用 run ID 恢复任务；问答本身不会启动优化器、改地块或保存方案。已登录用户可在助手的接口操作区明确选择这些业务操作并提供所需输入，服务端确认后才显示结果。修改预算、作物、日期、灌溉条件或权重后，旧结果属于原输入，必须标记“条件已修改，尚未重算”。Drafts need explicit recomputation. 明确提交重算才产生新 run。解释方案时必须绑定 run 和 option；“这个方案”不明确时先选中。超时有解只能说“找到可行方案，尚未证明最优”，无解或失败不能展示上一轮成功结果充当新结果。
 <!-- section -->
 # Water, costs and coverage / 指标读法
 Estimated supplemental water is not measured irrigation. 估算补水缺口采用逐日 max(0, Kc×ET0−有效降雨)，没有土壤蓄水、径流、排水或灌溉效率模型，因此不是实际浇水建议。1 mm 水覆盖 1 ha 为 10 m³；总水量按地块面积与实际生长日汇总。投入是参数估算，既不是利润也不是收益预测；劳力以人日表示。cover 是面积加权生长期天数（ha-days），不含换茬占用。diversity 是各地块出现科数的面积加权和（ha-families），不是土壤健康分数。换茬期占地，但不能冒充有作物覆盖。
@@ -22,7 +24,7 @@ Estimated supplemental water is not measured irrigation. 估算补水缺口采�
 SMAP SPL3SMP_E/006 是区域表层土壤水分背景，单位 m³/m³；9 km 是网格间距，不是地块尺度准确率。原始辐射计足迹约 36 km，不能用平滑地图放大空间信息。AM 和 PM 分开，显示各自采集时间、QA 和原生格网。质量不合格、未覆盖、日期不匹配或缺测时值应为空，不是零水分。单日样本不能计算多年异常或趋势。POWER 历史天气和 SMAP 观测不能因为在同一页面就当作同一天、同一尺度的数据。当前 polygon 没有预生成面积统计时应说明缺失，不能把中心点伪装成地块平均。
 <!-- section -->
 # Sources and next steps / 来源与下一步
-聊天应先回答对经营意味着什么，再给少量依据和一个下一步。事实来源分为农户输入、计算快照、NASA 数据与文献。引用需保留资料名、版本、PDF 页或章节、适用地区和限制；只有摘要的资料不能声称已核查全文。没有足够证据时明确说缺什么，不猜数字。助手只能建议打开表单或查看现有方案；修改、重算、保存由用户在业务界面明确提交。保存后的方案应保留输入、地块版本、参数与数据来源，导出和打印也保留 benchmark 与缺测标签。
+聊天应先回答对经营意味着什么，再给少量依据和一个下一步。事实来源分为农户输入、计算快照、NASA 数据与文献。引用需保留资料名、版本、PDF 页或章节、适用地区和限制；只有摘要的资料不能声称已核查全文。没有足够证据时明确说缺什么，不猜数字。问答只解释资料；用户可在助手操作区或业务界面明确提交修改、重算或保存，完成后查看直达页面和结果截图。保存后的方案应保留输入、地块版本、参数与数据来源，导出和打印也保留 benchmark 与缺测标签。
 
 <!-- section -->
 # GDD and missing weather / 积温与温度缺测
@@ -30,7 +32,7 @@ SMAP SPL3SMP_E/006 是区域表层土壤水分背景，单位 m³/m³；9 km 是
 若某候选生长期有任何一天缺最低气温、最高气温、降雨或参考蒸散，本产品排除这个候选，并记录天气缺测的原因；不会自动插值、跳过缺测日、用零补齐，也不会让聊天补造天气。候选被排除不等于证明农场无法种植。
 <!-- section -->
 # Assistant capabilities and privacy / 助手能做什么
-轮作助手只解释当前账户有权查看的已保存资料、NASA 已发布数据、文献和完成的计算。聊天不能修改预算、启动计算、保存计划、执行代码或 SQL，也不能读取其他农户的私有资料、透露密钥或系统提示词。回复中的按钮仅打开相应页面，业务操作由农户明确提交。没有公开的其他农户资料入口。
+轮作助手的问答只解释当前账户有权查看的已保存资料、NASA 已发布数据、文献和完成的计算。已登录用户可在助手的接口操作区选择当前模块的既有接口，补全必要输入后提交业务操作；异步任务先展示进度，服务端确认完成后才展示完成状态。助手不能执行任意代码或 SQL，也不能读取其他农户的私有资料、透露密钥或系统提示词。没有公开的其他农户资料入口。
 当前模型不预测产量、增产比例、利润或实际节水；选择方案、重算或补充一个地块，都不会启用这些不存在的能力。产量和利润不能从偏好分数、估算投入或土壤水分推出。可以解释资料的一般结论及适用限制，但不能承诺实际经营收益。
 <!-- section -->
 # Save, reopen and compare / 保存、重新打开与比较
@@ -42,8 +44,8 @@ SMAP SPL3SMP_E/006 是区域表层土壤水分背景，单位 m³/m³；9 km 是
 
 <!-- section -->
 # Failed, interrupted or timed-out calculation / 计算失败、中断或超时后
-如果状态是“计算失败”“已取消”或“超时未找到方案”，在“这次计算的结果”中点击“重试原始条件”，会重试原来提交的输入，不包含后来编辑的草稿。先查看页面提供的失败信息；临时 worker/服务中断可按原条件重试，但重试不保证成功。若错误需要改输入，先在规划表单修正并点击“按当前条件重新计算”，产生新的计算。参数或气象资料不可用时，需要恢复相应资料再计算，聊天不能补造数据。没有可行解不同于服务失败：应检查条件或参数适用性，不把重复同一输入当作已放宽约束。聊天只能打开规划页面，不能替用户重试或提交。
-For a failed, cancelled or timed-out run with no feasible solution, use “重试原始条件” (Retry original conditions) in the calculation results. This retries the original submitted inputs, not later draft edits. Read the reported error first; if inputs need correction, edit them in the planner and submit a new calculation explicitly. A temporary worker interruption may be retried; a retry is not a guarantee of success. Infeasibility is different from a service failure. Missing required data must be restored; chat cannot invent it or execute a retry.
+如果状态是“计算失败”“已取消”或“超时未找到方案”，在“这次计算的结果”中点击“重试原始条件”，会重试原来提交的输入，不包含后来编辑的草稿。先查看页面提供的失败信息；临时 worker/服务中断可按原条件重试，但重试不保证成功。若错误需要改输入，先在规划表单修正并点击“按当前条件重新计算”，产生新的计算。参数或气象资料不可用时，需要恢复相应资料再计算，问答不能补造数据。没有可行解不同于服务失败：应检查条件或参数适用性，不把重复同一输入当作已放宽约束。用户也可以在助手操作区明确选择重试接口并提交必要输入。
+For a failed, cancelled or timed-out run with no feasible solution, use “重试原始条件” (Retry original conditions) in the calculation results. This retries the original submitted inputs, not later draft edits. Read the reported error first; if inputs need correction, edit them in the planner and submit a new calculation explicitly. A temporary worker interruption may be retried; a retry is not a guarantee of success. Infeasibility is different from a service failure. Missing required data must be restored; the answer stage cannot invent it. A signed-in farmer may also select the retry operation in the assistant and submit its required inputs.
 <!-- section -->
 # Estimated differences versus actual savings / 估算变化与实际节水
 此产品没有灌溉水表或实施前后用水记录，因此不计算实际节水量。未重算的草稿连新的模型估算都没有；重算以后，可比较的是两份计算的“估算补水缺口”，仍然不是实际灌溉量或实际节水。水量、投入和成熟日期都来自参数与天气情景的模型结果，不是农田实测。NASA 表层水分观测是独立的数据类型，也不能证明某方案实施后节了多少水。

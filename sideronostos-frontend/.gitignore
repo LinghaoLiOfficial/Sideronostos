@@ -1,7 +1,9 @@
 node_modules/
 .next/
+.next-*/
 out/
 coverage/
+output/
 test-results/
 playwright-report/
 .env

@@ -347,6 +347,7 @@ export type AssistantContext = {
   dates?: { start: string; end: string } | null;
   fields?: { id: string; expected_version: number }[];
   run_id?: string | null;
+  plan_id?: string | null;
   option_id?: string | null;
   compare_run_id?: string | null;
   compare_option_id?: string | null;
@@ -400,6 +401,21 @@ export type AssistantAnswer = {
   warnings?: string[];
   retrieval_mode?: string;
   kb_release_id?: string;
+  task?: AssistantTask;
+  tasks?: AssistantTask[];
+};
+export type AssistantTask = {
+  id: string;
+  status: "needs_input" | "awaiting_confirmation" | "pending" | "completed" | "failed" | "cancelled";
+  operation_id?: string;
+  title?: string;
+  missing_inputs: string[];
+  summary: Record<string, unknown> | null;
+  href: string | null;
+  result_page_url?: string | null;
+  preview_url: string | null;
+  refresh_url?: string | null;
+  execution?: Record<string, unknown> | null;
 };
 export type AssistantMessage = {
   id: string;
@@ -413,6 +429,7 @@ export type AssistantMessage = {
     selection_kind: string | null;
     run_id: string | null;
     option_id: string | null;
+    plan_id?: string | null;
   };
   response: AssistantAnswer | null;
   facts: Fact[];

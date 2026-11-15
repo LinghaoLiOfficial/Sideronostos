@@ -7,7 +7,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/fetch-si-media.mjs",
     "media:sync": "node scripts/fetch-si-media.mjs",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",

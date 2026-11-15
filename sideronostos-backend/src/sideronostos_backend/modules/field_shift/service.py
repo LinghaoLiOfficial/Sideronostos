@@ -43,13 +43,17 @@ def _validate_field(body: FieldInput) -> None:
         )
 
     from ..rotation_optimizer.profiles import get_profile as rotation_profile
+    from ..rotation_optimizer.v3.profiles import get_profile as daily_profile
 
     for event in body.history_events:
         try:
-            catalogue = rotation_profile(event.profile_id).history_catalogue
+            try:
+                known_history = set(rotation_profile(event.profile_id).history_catalogue)
+            except ValueError:
+                known_history = set(daily_profile(event.profile_id).history_catalogue)
         except ValueError as error:
             raise HTTPException(422, str(error)) from error
-        if event.crop_id not in catalogue:
+        if event.crop_id not in known_history:
             raise HTTPException(422, "Unknown crop in precise history catalogue")
 
 
@@ -57,6 +61,9 @@ def _field(record: FieldRecord) -> Field:
     return Field(
         **record.data,
         id=record.id,
+        farm_id=record.farm_id,
+        partition_revision=record.partition_revision,
+        local_id=record.local_id,
         version=record.version,
         created_at=record.created_at,
         updated_at=record.updated_at,
@@ -94,11 +101,23 @@ class FieldShiftService:
     async def get_field(self, session: AsyncSession, user_id: str, field_id: str) -> Field:
         return _field(await self._field_record(session, user_id, field_id))
 
-    async def create_field(self, session: AsyncSession, user_id: str, body: FieldInput) -> Field:
+    async def create_field(
+        self,
+        session: AsyncSession,
+        user_id: str,
+        body: FieldInput,
+        *,
+        field_id: str | None = None,
+        commit: bool = True,
+    ) -> Field:
         _validate_field(body)
-        record = FieldRecord(owner_user_id=user_id, data=body.model_dump(mode="json"))
+        values = {"id": field_id} if field_id is not None else {}
+        record = FieldRecord(owner_user_id=user_id, data=body.model_dump(mode="json"), **values)
         session.add(record)
-        await session.commit()
+        if commit:
+            await session.commit()
+        else:
+            await session.flush()
         await session.refresh(record)
         return _field(record)
 
@@ -116,6 +135,10 @@ class FieldShiftService:
             {**original.data, **body.model_dump(mode="json", exclude_unset=True)}
         )
         _validate_field(body)
+        if original.farm_id is not None:
+            from .farm_service import validate_managed_edit
+
+            body = await validate_managed_edit(session, user_id, original, body)
         record = await session.scalar(
             update(FieldRecord)
             .where(
