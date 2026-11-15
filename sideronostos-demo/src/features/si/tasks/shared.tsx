@@ -11,7 +11,7 @@ export type TaskProps = FarmerTasksProps & { scope: string };
 export const control = "mt-1 block w-full min-w-0 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-primary";
 export const primary = "inline-flex min-h-10 items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50";
 export const secondary = "inline-flex min-h-10 items-center justify-center rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50";
-export const linkStyle = "inline-flex min-h-10 items-center text-sm font-medium text-primary underline underline-offset-4";
+export const linkStyle = "inline-flex min-h-10 items-center text-sm font-medium text-foreground underline underline-offset-4";
 export const tr = (language: "en" | "zh", en: string, zh: string) => language === "zh" ? zh : en;
 
 export function readSaved<T>(key: string, initial: T): T {
