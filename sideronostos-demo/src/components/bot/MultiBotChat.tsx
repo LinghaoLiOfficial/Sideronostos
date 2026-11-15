@@ -18,7 +18,7 @@ type ErrorKind = "load" | "send" | "poll" | "delayed" | "source" | "preferences"
 
 const labels = {
   en: {
-    loading: "Loading your conversation…", empty: "Ask this specialist a question.",
+    loading: "Loading your conversation…",
     signIn: "Sign in to chat with this specialist.", signInLink: "Sign in", retry: "Try again",
     loadError: "Conversation could not be loaded.", sendError: "Message could not be sent. Your draft is safe.",
     failed: "This reply could not be completed.", delayed: "The reply is still processing. Reopen this specialist to refresh it.",
@@ -27,10 +27,10 @@ const labels = {
     source: "View source", closeSource: "Close source", older: "Load earlier messages",
     facts: "View data used", localLimit: "Prices and crop varieties are examples, not live local data.",
     weatherLimit: "This chat does not provide a live forecast.",
-    tools: "Farm tasks", toolsError: "Your tasks could not be opened. Try again.",
+    tools: "Actions", toolsError: "Actions could not be opened. Try again.",
   },
   "zh-CN": {
-    loading: "正在加载对话…", empty: "向这位助手提问。",
+    loading: "正在加载对话…",
     signIn: "登录后与这位助手对话。", signInLink: "登录", retry: "重试",
     loadError: "无法加载对话。", sendError: "消息未能发送，草稿已保留。",
     failed: "这条回复未能完成。", delayed: "回复仍在处理中。重新打开此助手可刷新状态。",
@@ -39,7 +39,7 @@ const labels = {
     source: "查看依据", closeSource: "关闭依据", older: "加载更早的消息",
     facts: "查看当时的数据", localLimit: "价格与品种数据为示例，并非实时本地数据。",
     weatherLimit: "此对话不提供实时天气预报。",
-    tools: "农场任务", toolsError: "暂时无法打开任务，请重试。",
+    tools: "操作", toolsError: "暂时无法打开操作，请重试。",
   },
 };
 
@@ -220,7 +220,6 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
   return <div className={styles.chatBody}>
     <div className={styles.messageList} aria-live="polite">
       {nextBefore !== null && <button type="button" className={styles.older} onClick={() => void loadOlder()} disabled={busy}>{l.older}</button>}
-      {messages.length === 0 && <p className={styles.empty}>{l.empty}</p>}
       {messages.map((message) => <div key={message.id} className={styles.messagePair}>
         <p className={styles.question}>{message.text}</p>
         <div className={styles.answer}>
@@ -240,10 +239,10 @@ export function MultiBotChat({ bot, locale }: { bot: CatalogBot; locale: Locale 
     {error && <p role="alert" className={styles.chatError}>{error === "send" ? l.sendError : error === "poll" ? l.pollError : error === "delayed" ? l.delayed : error === "preferences" ? l.preferencesError : error === "unavailable" ? l.unavailable : l.sourceError}</p>}
     <div className={styles.composerWrap}>
       <>
-        <button type="button" className={styles.toolToggle} disabled={toolsBusy} aria-expanded={toolsOpen} onClick={() => void openTools()}>{l.tools}</button>
+        {!toolsOpen && <button type="button" className={styles.toolToggle} disabled={toolsBusy} onClick={() => void openTools()}>{l.tools}</button>}
         {toolsError && <p role="alert" className={styles.chatError}>{l.toolsError}</p>}
         {toolsOpen && conversationId && userId && <div className={styles.toolsArea} data-task-scroll>
-          <FarmerTasks compact key={`${bot.id}:${conversationId}`} conversationId={conversationId} ensureConversation={ensureConversation} botId={bot.id} language={locale === "en" ? "en" : "zh"} userId={userId} onAsk={async (question) => { if (!await send(question)) throw new Error("Question not sent"); }} />
+          <FarmerTasks compact key={`${bot.id}:${conversationId}`} conversationId={conversationId} ensureConversation={ensureConversation} botId={bot.id} language={locale === "en" ? "en" : "zh"} userId={userId} onBack={() => setToolsOpen(false)} onAsk={async (question) => { if (!await send(question)) throw new Error("Question not sent"); }} />
         </div>}
       </>
       <BotComposer value={draft} onChange={setDraft} onSend={() => void send()} active={!busy} pending={busy} label={locale === "en" ? `Message ${bot.name.en}` : `给${bot.name["zh-CN"]}留言`} placeholder={locale === "en" ? "Ask a question…" : "说说你想了解什么…"} language={locale === "en" ? "en-US" : "zh-CN"} />

@@ -167,7 +167,7 @@ it("opens named farm records from a fresh specialist conversation", async () => 
   auth.apiRequest.mockResolvedValue({ items: [{ id: "north", name: "North meadow", area_ha: 4, latitude: 35, longitude: -90 }] });
   render(<MultiBotDock module="field-management" locale="en" />);
   await user.click(screen.getByRole("button", { name: "Open Field guide" }));
-  await user.click(await screen.findByRole("button", { name: "Farm tasks" }));
+  await user.click(await screen.findByRole("button", { name: "Actions" }));
   expect(api.createConversation).toHaveBeenCalledWith({ preset: "field_management", bot_id: "field-guide", language: "en", detail: "brief" });
   await user.click(await screen.findByRole("button", { name: "My fields" }));
   expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/si/fields?field=north&step=field");
@@ -272,14 +272,12 @@ it("shows sign-in instead of loading private history when unauthenticated", asyn
   expect(api.listConversations).not.toHaveBeenCalled();
 });
 
-it("expands the cluster and preserves localized accessible controls", () => {
+it("keeps the cluster stable on hover and expands only on the explicit control", () => {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })));
   const { container, rerender } = render(<MultiBotDock module="remote-sensing" locale="en" />);
   const dock = container.querySelector("[data-multi-bot-dock]")!;
   const cluster = container.querySelector("[data-bot-cluster]")!;
   fireEvent.pointerEnter(cluster, { pointerType: "mouse" });
-  expect(dock).toHaveAttribute("data-expanded", "true");
-  fireEvent.pointerLeave(cluster, { pointerType: "mouse" });
   expect(dock).toHaveAttribute("data-expanded", "false");
   fireEvent.click(screen.getByRole("button", { name: "3 specialists. Expand" }));
   expect(screen.getByText("Water")).toHaveAttribute("aria-hidden", "false");

@@ -1,7 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n/provider";
-import { useEffect, useId, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { ArrowUp, LoaderCircle, Mic, Square, X } from "lucide-react";
 import {
   browserRecognition,
@@ -49,7 +49,6 @@ export function BotComposer({
 
   const ownInput = useRef<HTMLTextAreaElement>(null);
   const input = inputRef ?? ownInput;
-  const id = useId();
   const [speech, setSpeech] = useState<DictationSnapshot>(idle);
   const [cancelZone, setCancelZone] = useState(false);
   const [holding, setHolding] = useState(false);
@@ -237,7 +236,6 @@ export function BotComposer({
         <textarea
           ref={input}
           aria-label={t(label)}
-          aria-describedby={`${id}-hint`}
           value={value}
           maxLength={maxLength}
           rows={2}
@@ -300,8 +298,6 @@ export function BotComposer({
           </button>
         </div>
       </form>
-      <p id={`${id}-hint`} className={styles.hint}>
-        {t("按住输入框说话 · 语音由浏览器服务转写")}</p>
       {(speech.error || notice) && (
         <p role="alert" className={styles.error}>
           {t(speech.error || notice || "")}
