@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { listFields } from "@/lib/api/field-shift";
-import { createSelection, listLayers } from "@/lib/api/rotation";
+import { createSelection } from "@/lib/api/rotation";
 import type { Geometry } from "@/lib/api/rotation-types";
 import { Input, LoadingState, NoFields, primary, secondary, Select, TaskFeedback, tr, useDraft, useLoad, useTaskExecution, type TaskProps } from "./shared";
 
@@ -19,7 +19,7 @@ function metricLabel(language: "en" | "zh", metric: string) {
 export function Observations(props: TaskProps) {
   const { botId, language, scope } = props;
   const fields = useLoad(listFields);
-  const allowed = botId === "remote-soil" ? ["surface_soil_moisture"] : botId === "remote-weather" ? ["rainfall_total", "reference_et0_total"] : Object.keys(metrics);
+  const allowed = botId === "remote-soil" ? ["surface_soil_moisture"] : botId === "remote-weather" ? ["rainfall_total", "reference_et0_total"] : ["rainfall_total", "surface_soil_moisture", "reference_et0_total"];
   const [draft, setDraft] = useDraft(`${scope}:observation`, { field: "", metric: allowed[0], start: "", end: "" });
   const [selection, setSelection] = useDraft<{ basis: string; id: string } | null>(`${scope}:selection`, null);
   const [preparing, setPreparing] = useState(false);
@@ -36,11 +36,12 @@ export function Observations(props: TaskProps) {
     }
     setPreparing(true); setError("");
     try {
-      const geometry: Geometry = selected.geometry ?? { type: "Point", coordinates: [selected.longitude, selected.latitude] };
+      // Published facts are point samples. A saved field boundary is not an area statistic.
+      const geometry: Geometry = { type: "Point", coordinates: [selected.longitude, selected.latitude] };
       const basis = JSON.stringify([selected.id, selected.version, geometry]);
       let id = selection?.basis === basis ? selection.id : undefined;
       if (!id) {
-        const created = await createSelection(geometry.type === "Point" ? "point" : "polygon", geometry, selected.version);
+        const created = await createSelection("point", geometry, selected.version);
         id = created.id; setSelection({ basis, id });
       }
       await execution.run({ kind: "action", action: "remote_sensing.fact", arguments: { selection_id: id, metric, ...(draft.start && draft.end ? { start: draft.start, end: draft.end } : {}) } });
@@ -57,10 +58,10 @@ export function Observations(props: TaskProps) {
         <Input label={tr(language, "From", "开始日期")} type="date" value={draft.start} onChange={(e) => update("start", e.target.value)} max={draft.end || undefined} />
         <Input label={tr(language, "To", "结束日期")} type="date" value={draft.end} onChange={(e) => update("end", e.target.value)} min={draft.start || undefined} />
         <p className="text-xs text-muted-foreground sm:col-span-2">{tr(language, "Leave both dates blank to use the published observation period. These are historical readings, not a forecast or an irrigation instruction.", "日期均留空时使用已发布观测时段。这是历史观测，不是天气预报或灌溉指令。")}</p>
-        {selected && !selected.geometry && <p className="text-xs text-muted-foreground sm:col-span-2">{tr(language, "I’ll check the saved field location. No field boundary has been recorded yet.", "将查询地块已保存的位置，目前尚未记录边界。")}</p>}
         <div className="sm:col-span-2"><button className={primary}>{tr(language, preparing ? "Preparing the field…" : "Check observations", preparing ? "正在准备地块…" : "查询观测")}</button></div>
       </fieldset>
     </form>}
+    {selected && <p className="text-xs text-muted-foreground">{tr(language, "The saved field location selects regional observations; values are not field boundary averages.", "地块保存的位置用于匹配区域观测；显示值不是地块边界内的平均值。")}</p>}
     {error && <p role="alert">{error}</p>}
     <TaskFeedback execution={execution} language={language} success={tr(language, `${metricLabel(language, metric)} for ${selected?.name ?? "your field"}.`, `${selected?.name ?? "地块"}的${metricLabel(language, metric)}。`)} linkLabel={tr(language, "Open observation map", "打开观测地图")}>
       {typeof fact?.value === "number" && <p className="mt-2 text-xl font-semibold">{fact.value} {fact.unit}</p>}
@@ -68,21 +69,5 @@ export function Observations(props: TaskProps) {
       {fact?.limitations?.map((limit) => <p key={limit} className="mt-1 text-xs text-muted-foreground">{limit}</p>)}
     </TaskFeedback>
     {confirmed && <button className={secondary} onClick={execution.clear}>{tr(language, "Check another observation", "查询其他观测")}</button>}
-  </div>;
-}
-
-export function ObservationMaps(props: TaskProps) {
-  const { language, botId, scope } = props;
-  const layers = useLoad(listLayers);
-  const [layer, setLayer] = useDraft(`${scope}:layer`, "");
-  const execution = useTaskExecution(props, "layer");
-  const available = layers.data?.items.filter((item) => botId !== "remote-soil" || item.source.product === "SPL3SMP_E") ?? [];
-  return <div className="space-y-3"><LoadingState state={layers} language={language} />
-    {layers.data && !available.length && <p role="status">{tr(language, "No observation maps have been published for this specialist yet. You can still check a saved field for available readings.", "这位助手暂无已发布观测地图，仍可查询已保存地块的可用读数。")}</p>}
-    {Boolean(available.length) && execution.outcome?.status !== "succeeded" && <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); void execution.run({ kind: "action", action: "remote_sensing.layer", arguments: { layer_id: layer } }); }}><fieldset disabled={execution.busy || execution.uncertain} className="space-y-3">
-      <Select label={tr(language, "Observation map", "观测地图")} required value={layer} onChange={(e) => setLayer(e.target.value)}><option value="">{tr(language, "Choose a published map", "选择已发布地图")}</option>{available.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.start} – {item.end}</option>)}</Select><button className={primary}>{tr(language, "Check map data", "查看图层资料")}</button>
-    </fieldset></form>}
-    <TaskFeedback execution={execution} language={language} success={tr(language, "The published observation data is ready here. The map page is still being prepared.", "已发布观测数据可在此查看；地图发布页仍在准备中。")} linkLabel={tr(language, "View observation map", "查看观测地图")} />
-    {execution.outcome?.status === "succeeded" && <button className={secondary} onClick={execution.clear}>{tr(language, "Choose another map", "选择其他地图")}</button>}
   </div>;
 }
