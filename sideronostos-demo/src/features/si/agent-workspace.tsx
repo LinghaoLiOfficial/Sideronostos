@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { ArrowUpRight, LoaderCircle, Menu, Plus, X } from "lucide-react";
+import { ArrowUpRight, GripVertical, LoaderCircle, Menu, Plus, X } from "lucide-react";
 import { BotComposer } from "@/components/bot/BotComposer";
 import { BotAvatar } from "@/components/bot/Bot";
 import { botCatalog, type CatalogBot, type SiBotModule } from "@/lib/bot-catalog";
@@ -13,6 +13,17 @@ import * as api from "./agent-api";
 import type { AgentConversation, AgentConversationPage, AgentDomain } from "./agent-api";
 import { FarmerTasks } from "./farmer-tasks";
 import { TaskResultCard } from "./task-result-card";
+import styles from "./agent-workspace.module.css";
+
+const assistantWidthKey = "agrisata-assistant-panel-width";
+const minAssistantWidth = 320;
+const maxAssistantWidth = 640;
+const minChatWidth = 384;
+const dividerWidth = 12;
+function fitAssistantWidth(width: number, available: number) {
+  const max = Math.max(minAssistantWidth, Math.min(maxAssistantWidth, available - minChatWidth - dividerWidth));
+  return Math.round(Math.max(minAssistantWidth, Math.min(max, width)));
+}
 
 const domains: { id: AgentDomain; en: string; zh: string }[] = [
   { id: "general", en: "All farm tasks", zh: "农场综合" },
@@ -81,6 +92,11 @@ export function AgentWorkspace() {
   const [error, setError] = useState<"request" | "failed" | null>(null);
   const [menu, setMenu] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [assistantWidth, setAssistantWidth] = useState(() => {
+    if (typeof window === "undefined") return minAssistantWidth;
+    const stored = Number(localStorage.getItem(assistantWidthKey));
+    return fitAssistantWidth(stored > 0 ? stored : window.innerWidth * 0.28, window.innerWidth);
+  });
   const [outgoing, setOutgoing] = useState<string | null>(null);
   const [source, setSource] = useState<{ title: string; text: string; url: string | null } | null>(null);
   const active = useRef<string | null>(null);
@@ -89,7 +105,16 @@ export function AgentWorkspace() {
   const retryText = useRef<string | null>(null);
   const end = useRef<HTMLDivElement>(null);
   const botNavigation = useRef<HTMLElement>(null);
+  const workspace = useRef<HTMLElement>(null);
+  const dividerDrag = useRef<{ pointerId: number; x: number; width: number } | null>(null);
   const previousLocale = useRef(locale);
+
+  function resizeAssistant(width: number) {
+    const available = workspace.current?.getBoundingClientRect().width || window.innerWidth;
+    const next = fitAssistantWidth(width, available);
+    setAssistantWidth(next);
+    localStorage.setItem(assistantWidthKey, String(next));
+  }
 
   useEffect(() => {
     let live = true;
@@ -251,9 +276,9 @@ export function AgentWorkspace() {
   }
 
   return <div className="flex h-full min-h-0 flex-col bg-background text-foreground">
-    {loading ? <div role="status" className="flex flex-1 items-center justify-center gap-2 text-muted-foreground"><LoaderCircle size={18} className="animate-spin" />{l.loading}</div> : user === null ? <main className="flex flex-1 flex-col items-center justify-center gap-4"><h1 className="text-xl font-semibold">{l.signIn}</h1><Link className="rounded-md bg-primary px-4 py-2 text-primary-foreground" href="/login?next=%2Fsi%2Fmulti-agent&authRequired=1">{l.login}</Link></main> : user === undefined ? <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4"><p role="alert" className="text-center text-sm text-destructive">{l.error}</p><button type="button" className="rounded-md bg-primary px-4 py-2 text-primary-foreground" onClick={() => { setError(null); setLoading(true); setReload((value) => value + 1); }}>{l.retry}</button></main> : <main className="relative grid min-h-0 flex-1 lg:grid-cols-[clamp(20rem,28vw,34rem)_minmax(0,1fr)]">
+    {loading ? <div role="status" className="flex flex-1 items-center justify-center gap-2 text-muted-foreground"><LoaderCircle size={18} className="animate-spin" />{l.loading}</div> : user === null ? <main className="flex flex-1 flex-col items-center justify-center gap-4"><h1 className="text-xl font-semibold">{l.signIn}</h1><Link className="rounded-md bg-primary px-4 py-2 text-primary-foreground" href="/login?next=%2Fsi%2Fmulti-agent&authRequired=1">{l.login}</Link></main> : user === undefined ? <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4"><p role="alert" className="text-center text-sm text-destructive">{l.error}</p><button type="button" className="rounded-md bg-primary px-4 py-2 text-primary-foreground" onClick={() => { setError(null); setLoading(true); setReload((value) => value + 1); }}>{l.retry}</button></main> : <main ref={workspace} className={`relative grid min-h-0 flex-1 ${styles.workspace}`} style={{ "--assistant-panel-width": `${assistantWidth}px` } as CSSProperties}>
       {menu && <button type="button" className="absolute inset-0 z-20 bg-black/50 lg:hidden" aria-label={zh ? "关闭菜单" : "Close menu"} onClick={() => setMenu(false)} />}
-      <aside className={(menu ? "translate-x-0" : "-translate-x-full") + " absolute inset-y-0 left-0 z-30 flex w-[min(26rem,90vw)] flex-col border-r border-border bg-sidebar transition-transform lg:static lg:w-auto lg:translate-x-0"} aria-label={l.title}>
+      <aside id="assistant-panel" className={(menu ? "translate-x-0" : "-translate-x-full") + " absolute inset-y-0 left-0 z-30 flex w-[min(26rem,90vw)] flex-col border-r border-border bg-sidebar transition-transform lg:static lg:w-auto lg:translate-x-0 lg:border-r-0"} aria-label={l.title}>
         <div className="flex h-16 shrink-0 items-center justify-end border-b border-border px-5 lg:hidden"><button type="button" className="inline-flex size-9 items-center justify-center rounded-full hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary" aria-label={zh ? "关闭菜单" : "Close menu"} onClick={() => setMenu(false)}><X size={19} /></button></div>
         <div className="flex items-center justify-between px-5 pb-2 pt-5"><h1 className="text-lg font-semibold tracking-tight">{l.title}</h1><button type="button" aria-label={l.newChat} title={l.newChat} onClick={() => void create()} disabled={busy} className="inline-flex size-10 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50"><Plus size={20} aria-hidden="true" /></button></div>
         <nav ref={botNavigation} aria-label={zh ? "助手身份" : "Bot identities"} className="max-h-[60%] shrink-0 overflow-y-auto overscroll-contain px-3 pb-3 pt-1">
@@ -274,6 +299,44 @@ export function AgentWorkspace() {
         <div className="border-t border-border px-5 py-3"><h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{l.history}</h2></div>
         <nav aria-label={l.history} className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{visibleItems.length === 0 ? <p className="px-3 py-4 text-sm text-muted-foreground">{l.empty}</p> : visibleItems.map((item) => <button key={item.id} type="button" onClick={() => chooseChat(item)} aria-current={id === item.id ? "page" : undefined} className={(id === item.id ? "bg-muted font-medium" : "text-muted-foreground hover:bg-muted/70") + " mb-1 flex w-full flex-col rounded-lg px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-primary"}><span className="truncate">{conversationTitle(item, locale)}</span><time className="text-xs text-muted-foreground" dateTime={item.updated_at}>{new Intl.DateTimeFormat(zh ? "zh-CN" : "en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(item.updated_at))}</time></button>)}</nav>
       </aside>
+      <div
+        role="separator"
+        aria-label={zh ? "调整助手面板宽度" : "Resize assistants panel"}
+        aria-orientation="vertical"
+        aria-controls="assistant-panel"
+        aria-valuemin={minAssistantWidth}
+        aria-valuemax={maxAssistantWidth}
+        aria-valuenow={assistantWidth}
+        aria-valuetext={`${assistantWidth} px`}
+        tabIndex={0}
+        title={zh ? "拖动或使用左右方向键调整宽度" : "Drag or use arrow keys to resize"}
+        className="group relative hidden cursor-col-resize touch-none select-none items-center justify-center bg-sidebar text-muted-foreground hover:bg-muted focus-visible:z-10 focus-visible:outline-none lg:flex"
+        onPointerDown={(event) => {
+          if (event.button !== 0) return;
+          dividerDrag.current = { pointerId: event.pointerId, x: event.clientX, width: assistantWidth };
+          event.currentTarget.setPointerCapture?.(event.pointerId);
+        }}
+        onPointerMove={(event) => {
+          const drag = dividerDrag.current;
+          if (drag && drag.pointerId === event.pointerId) resizeAssistant(drag.width + event.clientX - drag.x);
+        }}
+        onPointerUp={(event) => {
+          if (dividerDrag.current?.pointerId !== event.pointerId) return;
+          dividerDrag.current = null;
+          event.currentTarget.releasePointerCapture?.(event.pointerId);
+        }}
+        onPointerCancel={() => { dividerDrag.current = null; }}
+        onLostPointerCapture={() => { dividerDrag.current = null; }}
+        onKeyDown={(event) => {
+          const step = event.shiftKey ? 64 : 24;
+          if (event.key === "ArrowLeft") resizeAssistant(assistantWidth - step);
+          else if (event.key === "ArrowRight") resizeAssistant(assistantWidth + step);
+          else if (event.key === "Home") resizeAssistant(minAssistantWidth);
+          else if (event.key === "End") resizeAssistant(maxAssistantWidth);
+          else return;
+          event.preventDefault();
+        }}
+      ><span className="pointer-events-none flex h-10 w-5 items-center justify-center rounded-md group-hover:bg-muted group-focus-visible:bg-muted group-focus-visible:outline-2 group-focus-visible:outline-primary"><GripVertical size={16} aria-hidden="true" /></span></div>
       <section className="si-cream-surface flex min-h-0 min-w-0 flex-col" aria-label={selectedBot.name[locale]} style={{ "--bot-accent": selectedBot.color } as CSSProperties}>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-3 sm:px-6"><button type="button" className="inline-flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-primary lg:hidden" aria-label={menu ? (zh ? "关闭菜单" : "Close menu") : (zh ? "打开菜单" : "Open menu")} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X size={20} /> : <Menu size={20} />}</button><div className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar small variant={selectedBot.avatar} /><h2 className="truncate text-sm font-semibold sm:text-base">{selectedBot.name[locale]}</h2></div><Link href={moduleHome.href} aria-label={zh ? `前往${moduleHome.zh}` : `Open ${moduleHome.en}`} className="ml-auto inline-flex min-h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-border bg-card px-2.5 text-xs font-medium text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary sm:px-3 sm:text-sm"><span className="sm:hidden">{zh ? "主页" : "Home"}</span><span className="hidden sm:inline">{zh ? moduleHome.zh : moduleHome.en}</span><ArrowUpRight size={15} aria-hidden="true" /></Link></header>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8" aria-live="polite"><div className="mx-auto flex min-h-full max-w-3xl flex-col">

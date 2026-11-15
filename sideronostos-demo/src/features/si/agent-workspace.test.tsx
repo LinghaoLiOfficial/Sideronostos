@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it, vi } from "vitest";
-import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AgentWorkspace } from "./agent-workspace";
 import { setLocale } from "@/lib/i18n/locale";
@@ -31,6 +31,45 @@ afterEach(() => {
   window.history.replaceState({}, "", "/");
   setLocale("en");
   vi.clearAllMocks();
+});
+
+it("resizes the assistants panel with the keyboard and remembers its width", async () => {
+  api.listConversations.mockResolvedValue({ items: [] });
+  const user = userEvent.setup();
+  const view = render(<AgentWorkspace />);
+  const divider = await screen.findByRole("separator", { name: "Resize assistants panel" });
+  const workspace = divider.closest("main") as HTMLElement;
+  const before = Number.parseInt(workspace.style.getPropertyValue("--assistant-panel-width"), 10);
+
+  await user.click(divider);
+  await user.keyboard("{ArrowRight}");
+  const after = Number.parseInt(workspace.style.getPropertyValue("--assistant-panel-width"), 10);
+  expect(after).toBeGreaterThan(before);
+  expect(divider).toHaveAttribute("aria-valuenow", String(after));
+  expect(localStorage.getItem("agrisata-assistant-panel-width")).toBe(String(after));
+
+  view.unmount();
+  render(<AgentWorkspace />);
+  expect(await screen.findByRole("separator", { name: "Resize assistants panel" })).toHaveAttribute("aria-valuenow", String(after));
+});
+
+it("resizes the assistants panel when its divider is dragged", async () => {
+  api.listConversations.mockResolvedValue({ items: [] });
+  render(<AgentWorkspace />);
+  const divider = await screen.findByRole("separator", { name: "Resize assistants panel" });
+  const workspace = divider.closest("main") as HTMLElement;
+  const before = Number.parseInt(workspace.style.getPropertyValue("--assistant-panel-width"), 10);
+  Object.defineProperty(divider, "setPointerCapture", { configurable: true, value: vi.fn() });
+  Object.defineProperty(divider, "releasePointerCapture", { configurable: true, value: vi.fn() });
+
+  function pointer(type: string, x: number) {
+    const event = Object.assign(new MouseEvent(type, { bubbles: true, button: 0, clientX: x }), { pointerId: 1 });
+    fireEvent(divider, event);
+  }
+  pointer("pointerdown", 400);
+  pointer("pointermove", 520);
+  expect(Number.parseInt(workspace.style.getPropertyValue("--assistant-panel-width"), 10)).toBeGreaterThan(before);
+  pointer("pointerup", 520);
 });
 
 it("returns to the requested conversation instead of the most recent one", async () => {
