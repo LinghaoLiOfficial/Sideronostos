@@ -19,7 +19,7 @@ export function SiWorkspace() {
             <SiStoryLink className="si-hero-primary-link" href={rotationOverviewHref}>
               {isEnglish ? "Explore the rotation model" : "了解轮作模型"}
             </SiStoryLink>
-            <Link href="/si/multi-agent">{isEnglish ? "Open multi-agent" : "进入多智能体"}</Link>
+            <Link href="/si/multi-agent">{isEnglish ? "Start" : "进入多智能体"}</Link>
           </div>
         </div>
       </section>
