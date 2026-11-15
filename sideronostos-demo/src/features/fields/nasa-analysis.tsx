@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { AlertTriangle, MapPin, Pentagon, RefreshCw } from "lucide-react"
+import { CartesianGrid, ErrorBar, Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
 import { Button } from "@/components/ui/button"
 import { ApiError } from "@/lib/api/client"
@@ -14,19 +15,6 @@ import { useLocale } from "@/lib/i18n/locale"
 import { hasSampleFarmData, sortFarmsWithIowaFirst } from "./farm-data-scope"
 import type { FarmFeature, FieldFeature } from "@/types/workspace"
 
-function useChartWidth() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [width, setWidth] = useState(720)
-  useEffect(() => {
-    const element = ref.current
-    if (!element) return
-    const observer = new ResizeObserver(([entry]) => setWidth(Math.max(300, Math.floor(entry.contentRect.width))))
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [])
-  return { ref, width }
-}
-
 function LineChart({ title, points, series, unit, formatDate, uncertaintyKey }: {
   title: string
   points: Array<Record<string, number | string | null>>
@@ -35,9 +23,6 @@ function LineChart({ title, points, series, unit, formatDate, uncertaintyKey }: 
   formatDate: (value: string) => string
   uncertaintyKey?: string
 }) {
-  const { ref, width } = useChartWidth()
-  const height = 260
-  const plot = { left: 48, right: width - 12, top: 18, bottom: height - 42 }
   const values = points.flatMap((point) => series.flatMap((item) => {
     const value = point[item.key]
     const uncertainty = uncertaintyKey ? point[uncertaintyKey] : null
@@ -50,32 +35,38 @@ function LineChart({ title, points, series, unit, formatDate, uncertaintyKey }: 
   const minimum = Math.min(...values)
   const maximum = Math.max(...values)
   const range = maximum - minimum || 1
-  const x = (index: number) => plot.left + (points.length <= 1 ? 0 : index / (points.length - 1)) * (plot.right - plot.left)
-  const y = (value: number) => plot.bottom - ((value - minimum) / range) * (plot.bottom - plot.top)
-  const ticks = [minimum, minimum + range / 2, maximum]
-  const labelCount = Math.min(6, points.length)
-  const labels = Array.from({ length: labelCount }, (_, index) => Math.round(index * (points.length - 1) / Math.max(labelCount - 1, 1)))
-  return <section ref={ref} className="min-w-0 space-y-2" aria-label={title}>
+  const dateKey = "month" in points[0] ? "month" : "date"
+  return <section className="min-w-0 space-y-2" aria-label={title}>
     <div className="flex flex-wrap items-baseline justify-between gap-2"><h3 className="text-sm font-semibold">{title}</h3><span className="text-xs text-muted-foreground">{unit}</span></div>
-    <svg role="img" aria-label={title + ", " + unit} viewBox={"0 0 " + width + " " + height} className="block h-auto w-full overflow-visible">
-      <title>{title}</title>
-      {ticks.map((value, index) => <g key={`${value}-${index}`}><line x1={plot.left} x2={plot.right} y1={y(value)} y2={y(value)} stroke="currentColor" opacity="0.14" /><text x={plot.left - 8} y={y(value) + 4} textAnchor="end" fontSize="11" fill="currentColor" opacity="0.72">{value.toFixed(1)}</text></g>)}
-      <line x1={plot.left} x2={plot.left} y1={plot.top} y2={plot.bottom} stroke="currentColor" opacity="0.45" />
-      <line x1={plot.left} x2={plot.right} y1={plot.bottom} y2={plot.bottom} stroke="currentColor" opacity="0.45" />
-      {series.map((item) => <g key={item.key}>
-        <polyline fill="none" stroke={item.color} strokeWidth="2" points={points.flatMap((point, index) => typeof point[item.key] === "number" ? [x(index) + "," + y(point[item.key] as number)] : []).join(" ")} />
-        {points.map((point, index) => {
-          const value = point[item.key]
-          const uncertainty = uncertaintyKey ? point[uncertaintyKey] : null
-          if (typeof value !== "number") return null
-          return <g key={item.key + "-" + index}>
-            {typeof uncertainty === "number" && <><line x1={x(index)} x2={x(index)} y1={y(value - uncertainty)} y2={y(value + uncertainty)} stroke={item.color} opacity="0.7" /><line x1={x(index) - 3} x2={x(index) + 3} y1={y(value - uncertainty)} y2={y(value - uncertainty)} stroke={item.color} opacity="0.7" /><line x1={x(index) - 3} x2={x(index) + 3} y1={y(value + uncertainty)} y2={y(value + uncertainty)} stroke={item.color} opacity="0.7" /></>}
-            <circle cx={x(index)} cy={y(value)} r="2.5" fill={item.color}><title>{String(point.month ?? point.date) + " · " + item.label + ": " + value.toFixed(1) + (typeof uncertainty === "number" ? " ± " + uncertainty.toFixed(1) : "") + " " + unit}</title></circle>
-          </g>
-        })}
-      </g>)}
-      {labels.map((index) => <text key={index} x={x(index)} y={height - 14} textAnchor="middle" fontSize="11" fill="currentColor" opacity="0.72">{formatDate(String(points[index].month ?? points[index].date ?? ""))}</text>)}
-    </svg>
+    <div className="h-[260px] min-w-0" role="img" aria-label={title + ", " + unit}>
+      <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={220}>
+        <RechartsLineChart data={points} margin={{ top: 12, right: 12, bottom: 6, left: 4 }}>
+          <CartesianGrid vertical={false} stroke="currentColor" strokeOpacity={0.14} />
+          <XAxis dataKey={dateKey} tickFormatter={(value) => formatDate(String(value))} minTickGap={24} tick={{ fontSize: 11 }} axisLine={{ stroke: "currentColor", strokeOpacity: 0.4 }} tickLine={false} />
+          <YAxis domain={[minimum - range * 0.05, maximum + range * 0.05]} tickFormatter={(value) => Number(value).toFixed(1)} width={48} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+          <Tooltip
+            content={({ active, payload, label }) => {
+              if (!active || !payload?.length) return null
+              const point = payload[0].payload as Record<string, number | string | null>
+              return <div className="border border-border bg-background px-3 py-2 text-xs shadow-md">
+                <p className="mb-1 font-medium">{formatDate(String(label ?? ""))}</p>
+                {payload.map((entry) => {
+                  const value = typeof entry.value === "number" ? entry.value : Number(entry.value)
+                  const uncertainty = uncertaintyKey ? point[uncertaintyKey] : null
+                  return <p key={String(entry.dataKey)} className="tabular-nums" style={{ color: entry.color }}>
+                    {String(entry.name)}: {value.toFixed(2)} {unit}
+                    {typeof uncertainty === "number" ? ` ± ${uncertainty.toFixed(2)} ${unit}` : ""}
+                  </p>
+                })}
+              </div>
+            }}
+          />
+          {series.map((item) => <Line key={item.key} type="monotone" dataKey={item.key} name={item.label} stroke={item.color} strokeWidth={2} connectNulls={false} dot={{ r: 3, fill: item.color }} activeDot={{ r: 5 }}>
+            {uncertaintyKey ? <ErrorBar dataKey={uncertaintyKey} direction="y" width={4} stroke={item.color} /> : null}
+          </Line>)}
+        </RechartsLineChart>
+      </ResponsiveContainer>
+    </div>
     {series.length > 1 && <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs">{series.map((item) => <span key={item.key} className="flex items-center gap-2"><i className="h-0.5 w-4" style={{ backgroundColor: item.color }} />{item.label}</span>)}</div>}
     {uncertaintyKey && <p className="text-xs text-muted-foreground">Vertical bars show reported observation uncertainty.</p>}
   </section>

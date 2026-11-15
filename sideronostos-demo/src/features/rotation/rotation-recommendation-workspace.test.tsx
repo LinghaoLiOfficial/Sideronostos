@@ -16,6 +16,13 @@ vi.mock("@/components/rotation/nasa-rotation-workspace", () => ({
 it("shows the selected farm recommendations and an empty state for new farms", () => {
   render(<RotationRecommendationWorkspace />)
   expect(screen.getByTestId("recommendations")).toHaveTextContent(demoFarm.properties.id)
+  expect(screen.getByText("How the rotation recommendation model works")).toBeVisible()
+  expect(screen.getByTitle("MILP model for crop rotation optimization")).toHaveAttribute("src", "/models/crop-rotation/Complete-MILP-modeling.pdf#view=FitH")
+  const modelDetails = screen.getByText("How the rotation recommendation model works").closest("details")
+  fireEvent.click(screen.getByText("How the rotation recommendation model works"))
+  expect(modelDetails).toHaveProperty("open", true)
+  fireEvent.click(screen.getByRole("button", { name: "Back to recommendations" }))
+  expect(modelDetails).toHaveProperty("open", false)
   fireEvent.click(screen.getByRole("button", { name: /New farm/ }))
   expect(screen.getByText("This farm has no rotation recommendations yet.")).toBeVisible()
   expect(screen.queryByTestId("recommendations")).not.toBeInTheDocument()

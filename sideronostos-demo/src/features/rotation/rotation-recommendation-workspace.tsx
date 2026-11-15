@@ -8,6 +8,7 @@ import { hasSampleFarmData, sortFarmsWithIowaFirst } from "@/features/fields/far
 import { useLocale } from "@/lib/i18n/locale"
 import { ApiError } from "@/lib/api/client"
 import { FarmSelector } from "./local-knowledge-workspace"
+import { RotationModelPrinciple } from "./rotation-model-principle"
 
 export function RotationRecommendationWorkspace() {
   const { session, ready } = useWorkspaceSession()
@@ -31,6 +32,7 @@ function OwnedRotationRecommendationWorkspace({ ownerId }: { ownerId: string | n
   return <main className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
     <FarmSelector farms={farms} fields={fields} selectedFarmId={farm?.properties.id ?? null} onSelect={setSelectedFarmId} en={en} scope={en ? "Rotation recommendation scope" : "轮作推荐范围"} />
     <section className="min-h-0 min-w-0 flex-1 overflow-y-auto" aria-live="polite">
+      <RotationModelPrinciple />
       {farm && hasSampleFarmData(farm)
         ? <NasaRotationWorkspace key={farm.properties.id} farmId={farm.properties.id} hideHeader hideMap hideReleaseBar compactReleaseBar />
         : <p role="status" className="flex h-full items-center justify-center px-6 text-center text-sm text-muted-foreground">{farm
