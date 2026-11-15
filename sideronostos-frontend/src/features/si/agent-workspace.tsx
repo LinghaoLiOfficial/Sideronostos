@@ -101,16 +101,17 @@ export function AgentWorkspace() {
         const sorted = [...history.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
         setUser(account);
         setItems(sorted);
-        const requestedBot = botCatalog.find((bot) => bot.id === new URLSearchParams(window.location.search).get("bot"));
+        const query = new URLSearchParams(window.location.search);
+        const requestedBot = botCatalog.find((bot) => bot.id === query.get("bot"));
+        const requestedConversation = query.get("conversation");
         if (requestedBot) {
           setDomain(requestedBot.presetId as AgentDomain);
           setSelectedBotId(requestedBot.id);
         }
         if (sorted.length) {
           const saved = localStorage.getItem("agrisata-agent-chat:" + account.id);
-          const first = requestedBot
-            ? sorted.find((item) => conversationBot(item).id === requestedBot.id)
-            : sorted.find((item) => item.id === saved) ?? sorted[0];
+          const first = sorted.find((item) => item.id === requestedConversation && (!requestedBot || conversationBot(item).id === requestedBot.id))
+            ?? (requestedBot ? sorted.find((item) => conversationBot(item).id === requestedBot.id) : sorted.find((item) => item.id === saved) ?? sorted[0]);
           if (first) {
             active.current = first.id;
             setId(first.id);

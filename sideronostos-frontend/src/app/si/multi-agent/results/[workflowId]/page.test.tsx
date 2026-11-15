@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import AgentResultPage from "./page";
 
 const api = vi.hoisted(() => ({ getToolResult: vi.fn() }));
-vi.mock("next/navigation", () => ({ useParams: () => ({ workflowId: "workflow-1" }) }));
+vi.mock("next/navigation", () => ({ useParams: () => ({ workflowId: "workflow-1" }), useSearchParams: () => new URLSearchParams(window.location.search) }));
 vi.mock("@/features/si/agent-api", () => api);
 
 afterEach(() => { cleanup(); api.getToolResult.mockReset(); window.history.replaceState({}, "", "/"); });
@@ -17,6 +17,7 @@ it("shows request progress and lets the user retry an unavailable result", async
     href: null, content_type: null, result: { items: [{ id: "profile-1", name: "Temperate crops" }] },
   });
   render(<AgentResultPage />);
+  expect(screen.getByRole("link", { name: /Back to farm assistant/ })).toHaveAttribute("href", "/si/multi-agent?conversation=chat-1");
   expect(screen.getByRole("status")).toHaveTextContent("Loading result");
   expect(await screen.findByRole("alert")).toHaveTextContent("unavailable");
   await userEvent.click(screen.getByRole("button", { name: "Retry" }));

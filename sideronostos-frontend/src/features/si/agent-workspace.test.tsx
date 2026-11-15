@@ -28,8 +28,20 @@ vi.mock("@/lib/api/client", () => ({
 afterEach(() => {
   cleanup();
   localStorage.clear();
+  window.history.replaceState({}, "", "/");
   setLocale("en");
   vi.clearAllMocks();
+});
+
+it("returns to the requested conversation instead of the most recent one", async () => {
+  window.history.replaceState({}, "", "/si/multi-agent?conversation=chat-older1");
+  const older = { id: "chat-older1", preset: "field_management", bot_id: "field-guide", language: "en", detail: "brief", kb_release_id: "kb", created_at: "2026-11-13T08:00:00Z", updated_at: "2026-11-13T08:00:00Z" };
+  const recent = { ...older, id: "chat-recent", created_at: "2026-11-14T08:00:00Z", updated_at: "2026-11-14T08:00:00Z" };
+  api.listConversations.mockResolvedValue({ items: [recent, older] });
+  api.getConversation.mockImplementation(async (id: string) => ({ ...(id === older.id ? older : recent), messages: [], next_before_sequence: null }));
+  render(<AgentWorkspace />);
+  const history = await screen.findByRole("navigation", { name: "Conversations" });
+  await waitFor(() => expect(within(history).getByRole("button", { name: /older1/ })).toHaveAttribute("aria-current", "page"));
 });
 
 it("creates a conversation in the chosen domain and keeps it selectable in history", async () => {
@@ -49,10 +61,9 @@ it("creates a conversation in the chosen domain and keeps it selectable in histo
   expect(screen.queryByRole("link", { name: "Agrisata home" })).not.toBeInTheDocument();
   expect(screen.queryByRole("combobox", { name: "Language" })).not.toBeInTheDocument();
   const identities = screen.getByRole("navigation", { name: "Bot identities" });
-  const rail = identities.firstElementChild;
-  expect(rail).toHaveClass("space-y-1");
-  for (const name of ["Field management", "Remote sensing", "Local agriculture", "Crop rotation"]) {
-    expect(within(identities).getByRole("group", { name }).parentElement).toBe(rail);
+  expect(identities.children).toHaveLength(5);
+  for (const name of ["All farm tasks", "Field management", "Remote sensing", "Local agriculture", "Crop rotation"]) {
+    expect(within(identities).getByRole("group", { name }).parentElement).toBe(identities);
   }
   expect(within(identities).getByRole("button", { name: "Field guide" })).toBeInTheDocument();
   expect(within(identities).getAllByRole("button")).toHaveLength(7);
