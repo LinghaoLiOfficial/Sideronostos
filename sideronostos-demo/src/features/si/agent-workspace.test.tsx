@@ -211,6 +211,18 @@ it("restores an existing conversation and submits its message to that conversati
   expect(await screen.findByText("I can help with your field.")).toBeInTheDocument();
 });
 
+it("lets a farmer choose a supported follow-up from a retrieved answer", async () => {
+  const chat = { id: "water-choices", bot_id: "remote-water", preset: "remote_sensing", language: "en", detail: "brief", kb_release_id: "kb", created_at: "2026-11-14T08:00:00Z", updated_at: "2026-11-14T08:00:00Z" };
+  const message = { id: "message-choices", sequence: 1, client_message_id: "client-choices", status: "complete", text: "Check water conditions", context: { page: "map", revision: 1 }, context_labels: { fields: [], selection_kind: null, run_id: null, option_id: null }, response: { paragraphs: [{ text: "Available demo data", evidence_ids: [] }], actions: [], needs_clarification: false, suggestions: ["2024 rainfall"] }, facts: [], error_code: null, created_at: "2026-11-14T08:00:00Z", completed_at: "2026-11-14T08:00:01Z" };
+  api.listConversations.mockResolvedValue({ items: [chat] });
+  api.getConversation.mockResolvedValue({ ...chat, messages: [message], next_before_sequence: null });
+  api.sendMessage.mockResolvedValue({ ...message, id: "message-followup", sequence: 2, text: "2024 rainfall", response: { paragraphs: [{ text: "1049.312467 mm", evidence_ids: [] }], actions: [], needs_clarification: false } });
+  render(<AgentWorkspace />);
+  await userEvent.click(await screen.findByRole("button", { name: "2024 rainfall" }));
+  await waitFor(() => expect(api.sendMessage).toHaveBeenCalledWith("water-choices", expect.objectContaining({ text: "2024 rainfall" })));
+  expect(await screen.findByText("1049.312467 mm")).toBeInTheDocument();
+});
+
 it("opens a cited knowledge source from the main assistant workspace", async () => {
   const user = userEvent.setup();
   const chat = {

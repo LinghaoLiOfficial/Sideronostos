@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isDemoMode } from "@/lib/demo-mode";
 import { listFields } from "@/lib/api/field-shift";
 import { createSelection } from "@/lib/api/rotation";
 import type { Geometry } from "@/lib/api/rotation-types";
@@ -28,10 +29,12 @@ export function Observations(props: TaskProps) {
   const selected = fields.data?.items.find((item) => item.id === draft.field);
   const confirmed = execution.outcome?.status === "succeeded";
   const metric = allowed.includes(draft.metric) ? draft.metric : allowed[0];
+  const demo = isDemoMode();
+  const year = ["2022", "2023", "2024"].includes(draft.start.slice(0, 4)) ? draft.start.slice(0, 4) : "2024";
   const update = (key: keyof typeof draft, value: string) => { setError(""); setDraft((old) => ({ ...old, [key]: value })); };
   async function check() {
     if (!selected || preparing) return;
-    if (Boolean(draft.start) !== Boolean(draft.end) || (draft.start && draft.start > draft.end)) {
+    if (!demo && (Boolean(draft.start) !== Boolean(draft.end) || (draft.start && draft.start > draft.end))) {
       setError(tr(language, "Choose both dates, with the end on or after the start.", "请填写起止日期，结束日期不能早于开始日期。")); return;
     }
     setPreparing(true); setError("");
@@ -44,28 +47,30 @@ export function Observations(props: TaskProps) {
         const created = await createSelection("point", geometry, selected.version);
         id = created.id; setSelection({ basis, id });
       }
-      await execution.run({ kind: "action", action: "remote_sensing.fact", arguments: { selection_id: id, metric, ...(draft.start && draft.end ? { start: draft.start, end: draft.end } : {}) } });
+      const period = demo ? metric === "surface_soil_moisture"
+        ? { start: "2024-07-16", end: "2024-07-16" }
+        : { start: `${year}-01-01`, end: `${year}-12-31` }
+        : draft.start && draft.end ? { start: draft.start, end: draft.end } : {};
+      await execution.run({ kind: "action", action: "remote_sensing.fact", arguments: { selection_id: id, metric, ...period } });
     } catch { setError(tr(language, "The field location could not be prepared. Your choices are kept; try again.", "暂时无法加载地块位置，选择已保留，请重试。")); }
     finally { setPreparing(false); }
   }
-  const fact = execution.outcome?.result as { value?: number | null; unit?: string; limitations?: string[]; period?: { start: string; end: string } } | null;
+  const fact = execution.outcome?.result as { value?: number | null; unit?: string; limitations?: string[]; period?: { start: string; end: string }; source?: { product?: string; release_id?: string } } | null;
   return <div className="space-y-3"><LoadingState state={fields} language={language} />
     {fields.data && !fields.data.items.length && <NoFields language={language} />}
     {!confirmed && Boolean(fields.data?.items.length) && <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); void check(); }}>
       <fieldset disabled={preparing || execution.busy || execution.uncertain} className="grid min-w-0 gap-3 sm:grid-cols-2">
         <Select label={tr(language, "Which field?", "查看哪个地块？")} required value={draft.field} onChange={(e) => update("field", e.target.value)}><option value="">{tr(language, "Choose a saved field", "选择已保存地块")}</option>{fields.data?.items.map((field) => <option key={field.id} value={field.id}>{field.name} · {field.area_ha} ha · {field.latitude.toFixed(3)}, {field.longitude.toFixed(3)}</option>)}</Select>
         <Select label={tr(language, "What would you like to check?", "想查看什么？")} value={metric} onChange={(e) => update("metric", e.target.value)}>{allowed.map((key) => <option key={key} value={key}>{metricLabel(language, key)}</option>)}</Select>
-        <Input label={tr(language, "From", "开始日期")} type="date" value={draft.start} onChange={(e) => update("start", e.target.value)} max={draft.end || undefined} />
-        <Input label={tr(language, "To", "结束日期")} type="date" value={draft.end} onChange={(e) => update("end", e.target.value)} min={draft.start || undefined} />
-        <p className="text-xs text-muted-foreground sm:col-span-2">{tr(language, "Leave both dates blank to use the published observation period. These are historical readings, not a forecast or an irrigation instruction.", "日期均留空时使用已发布观测时段。这是历史观测，不是天气预报或灌溉指令。")}</p>
+        {demo ? metric === "surface_soil_moisture" ? <p className="text-xs text-muted-foreground sm:col-span-2">{tr(language, "Available demo SMAP sample: 2024-07-16. This is regional context, not a field sensor reading.", "可用的 SMAP 演示样本日期：2024-07-16。这是区域背景，并非田间传感器读数。")}</p> : <Select label={tr(language, "Available year", "可用年份")} value={year} onChange={(e) => setDraft((old) => ({ ...old, start: `${e.target.value}-01-01`, end: `${e.target.value}-12-31` }))}>{["2024", "2023", "2022"].map((value) => <option key={value} value={value}>{value}</option>)}</Select> : <><Input label={tr(language, "From", "开始日期")} type="date" value={draft.start} onChange={(e) => update("start", e.target.value)} max={draft.end || undefined} /><Input label={tr(language, "To", "结束日期")} type="date" value={draft.end} onChange={(e) => update("end", e.target.value)} min={draft.start || undefined} /></>}
         <div className="sm:col-span-2"><button className={primary}>{tr(language, preparing ? "Preparing the field…" : "Check observations", preparing ? "正在准备地块…" : "查询观测")}</button></div>
       </fieldset>
     </form>}
-    {selected && <p className="text-xs text-muted-foreground">{tr(language, "The saved field location selects regional observations; values are not field boundary averages.", "地块保存的位置用于匹配区域观测；显示值不是地块边界内的平均值。")}</p>}
     {error && <p role="alert">{error}</p>}
     <TaskFeedback execution={execution} language={language} success={tr(language, `${metricLabel(language, metric)} for ${selected?.name ?? "your field"}.`, `${selected?.name ?? "地块"}的${metricLabel(language, metric)}。`)} linkLabel={tr(language, "Open observation map", "打开观测地图")}>
       {typeof fact?.value === "number" && <p className="mt-2 text-xl font-semibold">{fact.value} {fact.unit}</p>}
       {fact?.period && <p className="mt-1 text-xs text-muted-foreground">{fact.period.start} – {fact.period.end}</p>}
+      {fact?.source?.product && <p className="mt-1 text-xs text-muted-foreground">{tr(language, "Source", "来源")}: {fact.source.product}{fact.source.release_id ? ` · ${fact.source.release_id}` : ""}</p>}
       {fact?.limitations?.map((limit) => <p key={limit} className="mt-1 text-xs text-muted-foreground">{limit}</p>)}
     </TaskFeedback>
     {confirmed && <button className={secondary} onClick={execution.clear}>{tr(language, "Check another observation", "查询其他观测")}</button>}

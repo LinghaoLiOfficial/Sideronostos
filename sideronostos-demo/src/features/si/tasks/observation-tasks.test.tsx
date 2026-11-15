@@ -14,15 +14,27 @@ it("completes the demo water observation from a saved polygon field", async () =
   expect(screen.getByLabelText("What would you like to check?")).toHaveValue("rainfall_total");
   await userEvent.click(screen.getByRole("button", { name: "Check observations" }));
   expect(await screen.findByText("1049.312467 mm")).toBeInTheDocument();
-  expect(screen.getByText(/not field boundary averages/i)).toBeInTheDocument();
+  expect(screen.getByText(/GPM_3IMERGDF/)).toBeInTheDocument();
   const selections = JSON.parse(localStorage.getItem("agrisata-demo-observation-selections") ?? "{}");
   expect(Object.values(selections)[0]).toMatchObject({ kind: "point", center: [field.longitude, field.latitude] });
 });
 
-it("explains unavailable soil moisture without losing the selected field", async () => {
+it("shows the saved field's SMAP sample in the soil action", async () => {
   render(<Observations botId="remote-soil" language="en" userId="owner" conversationId="chat" ensureConversation={async () => "chat"} onAsk={vi.fn()} scope="soil-test" />);
   await userEvent.selectOptions(await screen.findByLabelText("Which field?"), field.id);
   await userEvent.click(screen.getByRole("button", { name: "Check observations" }));
-  expect(await screen.findByText(/No published soil moisture reading is available/i)).toBeInTheDocument();
-  expect(screen.getByLabelText("Which field?")).toHaveValue(field.id);
+  expect(await screen.findByText("0.25 m³/m³")).toBeInTheDocument();
+  expect(screen.getByText(/SMAP SPL4SMGP/)).toBeInTheDocument();
+  expect(screen.getByText(/regional SMAP context/i)).toBeInTheDocument();
+});
+
+it("offers only years covered by the demo release for rainfall", async () => {
+  render(<Observations botId="remote-weather" language="en" userId="owner" conversationId="chat" ensureConversation={async () => "chat"} onAsk={vi.fn()} scope="weather-test" />);
+  await userEvent.selectOptions(await screen.findByLabelText("Which field?"), field.id);
+  const years = screen.getByRole("combobox", { name: "Available year" });
+  expect(Array.from(years.querySelectorAll("option")).map((option) => option.value)).toEqual(["2024", "2023", "2022"]);
+  expect(screen.queryByLabelText("From")).not.toBeInTheDocument();
+  await userEvent.selectOptions(years, "2023");
+  await userEvent.click(screen.getByRole("button", { name: "Check observations" }));
+  expect(await screen.findByText("873.234981 mm")).toBeInTheDocument();
 });

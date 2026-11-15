@@ -231,6 +231,7 @@ export function AgentWorkspace() {
     let chatId = id;
     if (!chatId) chatId = await create();
     if (!chatId) return;
+    const conversationId = chatId;
     setBusy(true);
     setError(null);
     setOutgoing(text);
@@ -238,19 +239,22 @@ export function AgentWorkspace() {
     retryId.current = clientId;
     retryText.current = text;
     try {
-      let message = await api.sendMessage(chatId, { client_message_id: clientId, text, context: { page: "map", revision: 1 } });
+      const message = await api.sendMessage(chatId, { client_message_id: clientId, text, context: { page: "map", revision: 1 } });
       retryId.current = null;
       retryText.current = null;
       if (active.current === chatId) {
         setDraft("");
         setPage((previous) => previous ? { ...previous, messages: [...previous.messages.filter((row) => row.id !== message.id), message] } : previous);
       }
-      for (let n = 0; message.status === "pending" && n < 20; n += 1) {
+      async function resolvePending(current: AssistantMessage, attempts: number): Promise<AssistantMessage> {
+        if (current.status !== "pending" || attempts >= 20) return current;
         await new Promise((resolve) => setTimeout(resolve, 750));
-        message = await api.getMessage(chatId, message.id);
-        if (active.current === chatId) setPage((previous) => previous ? { ...previous, messages: [...previous.messages.filter((row) => row.id !== message.id), message].sort((a, b) => a.sequence - b.sequence) } : previous);
+        const next = await api.getMessage(conversationId, current.id);
+        if (active.current === chatId) setPage((previous) => previous ? { ...previous, messages: [...previous.messages.filter((row) => row.id !== next.id), next].sort((a, b) => a.sequence - b.sequence) } : previous);
+        return resolvePending(next, attempts + 1);
       }
-      if (message.status === "pending") setError("failed");
+      const settled = await resolvePending(message, 0);
+      if (settled.status === "pending") setError("failed");
       return true;
     } catch { setError("request"); return false; }
     finally { setOutgoing(null); setBusy(false); }
@@ -342,7 +346,7 @@ export function AgentWorkspace() {
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8" aria-live="polite"><div className="mx-auto flex min-h-full max-w-3xl flex-col">
           {page?.next_before_sequence && <button type="button" className="mx-auto mb-6 text-sm text-primary" onClick={() => void older()} disabled={busy}>{l.older}</button>}
           {!page?.messages.length && !outgoing && <div className="my-auto py-12 text-center"><div className="mx-auto flex size-14 items-center justify-center" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar variant={selectedBot.avatar} /></div></div>}
-          <div className="space-y-6">{page?.messages.map((message) => <div key={message.id} className="space-y-3"><div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground">{message.text}</div><div className="max-w-[95%] rounded-2xl rounded-bl-sm bg-muted px-4 py-3 text-sm leading-7 sm:max-w-[85%]">{message.status === "pending" ? <span className="flex items-center gap-2 text-muted-foreground"><LoaderCircle size={15} className="animate-spin" />{l.pending}</span> : message.status === "failed" || message.status === "interrupted" ? <span role="alert">{l.failed}</span> : message.response ? <>{message.response.paragraphs.map((paragraph, index) => <p key={index} className="mb-2 last:mb-0">{paragraph.text}</p>)}{message.response.task && <TaskResultCard task={message.response.task} language={zh ? "zh" : "en"} />}{message.response.tasks?.map((task) => <TaskResultCard key={task.id} task={task} language={zh ? "zh" : "en"} />)}{[...new Set(message.response.paragraphs.flatMap((paragraph) => paragraph.evidence_ids))].map((evidence) => <button key={evidence} type="button" onClick={() => void openSource(message, evidence)} className="mr-2 mt-2 rounded-md border border-border px-2 py-1 text-xs text-primary">{l.source} {evidence}</button>)}{message.facts.length > 0 && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer">{zh ? "查看当时的数据" : "View data used"}</summary><dl>{message.facts.map((fact) => <div key={fact.id}><dt className="inline font-medium">{fact.label}: </dt><dd className="inline">{fact.display}</dd></div>)}</dl></details>}{message.response.actions.includes("open_planner") && <Link href="/si/fields?step=planning" className="mt-3 block text-xs text-primary underline">{zh ? "打开轮作规划" : "Open rotation planner"}</Link>}</> : null}</div></div>)}{outgoing && <div className="ml-auto w-fit max-w-[85%] rounded-2xl bg-primary/70 px-4 py-3 text-sm text-primary-foreground">{outgoing}</div>}</div><div ref={end} />
+          <div className="space-y-6">{page?.messages.map((message) => <div key={message.id} className="space-y-3"><div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground">{message.text}</div><div className="max-w-[95%] rounded-2xl rounded-bl-sm bg-muted px-4 py-3 text-sm leading-7 sm:max-w-[85%]">{message.status === "pending" ? <span className="flex items-center gap-2 text-muted-foreground"><LoaderCircle size={15} className="animate-spin" />{l.pending}</span> : message.status === "failed" || message.status === "interrupted" ? <span role="alert">{l.failed}</span> : message.response ? <>{message.response.paragraphs.map((paragraph, index) => <p key={index} className="mb-2 last:mb-0">{paragraph.text}</p>)}{message.response.task && <TaskResultCard task={message.response.task} language={zh ? "zh" : "en"} />}{message.response.tasks?.map((task) => <TaskResultCard key={task.id} task={task} language={zh ? "zh" : "en"} />)}{[...new Set(message.response.paragraphs.flatMap((paragraph) => paragraph.evidence_ids))].map((evidence) => <button key={evidence} type="button" onClick={() => void openSource(message, evidence)} className="mr-2 mt-2 rounded-md border border-border px-2 py-1 text-xs text-primary">{l.source} {evidence}</button>)}{message.facts.length > 0 && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer">{zh ? "查看当时的数据" : "View data used"}</summary><dl>{message.facts.map((fact) => <div key={fact.id}><dt className="inline font-medium">{fact.label}: </dt><dd className="inline">{fact.display}</dd></div>)}</dl></details>}{message.response.suggestions?.map((suggestion) => <button key={suggestion} type="button" disabled={busy} onClick={() => void send(suggestion)} className="mr-2 mt-2 rounded-md border border-border px-2 py-1 text-xs text-primary hover:bg-card disabled:opacity-50">{suggestion}</button>)}{message.response.actions.includes("open_planner") && <Link href="/si/fields?step=planning" className="mt-3 block text-xs text-primary underline">{zh ? "打开轮作规划" : "Open rotation planner"}</Link>}</> : null}</div></div>)}{outgoing && <div className="ml-auto w-fit max-w-[85%] rounded-2xl bg-primary/70 px-4 py-3 text-sm text-primary-foreground">{outgoing}</div>}</div><div ref={end} />
         </div></div>
         {error && <div role="alert" className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-2 text-sm text-destructive"><span>{error === "failed" ? l.failed : l.error}</span></div>}
         {source && <section aria-label={zh ? "依据详情" : "Source details"} className="mx-auto mb-2 w-[calc(100%-2rem)] max-w-3xl rounded-lg border border-border bg-card p-4 text-sm"><div className="flex justify-between gap-2"><h3 className="font-semibold">{source.title}</h3><button type="button" aria-label={zh ? "关闭依据" : "Close source"} onClick={() => setSource(null)}><X size={16} /></button></div><p className="mt-2 text-muted-foreground">{source.text}</p>{source.url && <a className="mt-2 inline-block text-primary underline" href={source.url} target="_blank" rel="noreferrer">{zh ? "打开来源" : "Open source"}</a>}</section>}

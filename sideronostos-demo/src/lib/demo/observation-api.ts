@@ -1,5 +1,6 @@
 import { iowaAnnual, iowaMonthly } from "./iowa-backend-data";
-import { demoRelease } from "./data";
+import { demoFields, demoFieldsApi, demoRelease } from "./data";
+import { createDemoObservations } from "@/features/fields/demo-data";
 
 const SELECTIONS_KEY = "agrisata-demo-observation-selections";
 const ACTIONS_KEY = "agrisata-demo-observation-actions";
@@ -26,7 +27,31 @@ function observation(action: string, args: Record<string, unknown>, language: st
     return unavailable(action, say(language, "The Iowa observations do not cover this field location.", "Iowa 观测资料未覆盖该地块位置。"));
   }
   const metric = String(args.metric ?? "");
-  if (metric === "surface_soil_moisture") return unavailable(action, say(language, "No published soil moisture reading is available for this demo field. Try rainfall or reference ET₀.", "该演示地块暂无已发布的土壤湿度读数，可查询降雨量或参考蒸散量。"));
+  if (metric === "surface_soil_moisture") {
+    const fieldIndex = demoFieldsApi().findIndex((field) =>
+      Math.abs(field.longitude - longitude) < 0.000001 && Math.abs(field.latitude - latitude) < 0.000001);
+    const sample = fieldIndex < 0 ? undefined : createDemoObservations(demoFields[fieldIndex], "2024-07-16")
+      .find((item) => item.metric === "Surface soil moisture");
+    if (!sample) return unavailable(action, say(language, "No precomputed SMAP observation is available for this field location.", "该地块位置没有预计算的 SMAP 演示观测。"));
+    if ((args.start || args.end) && (typeof args.start !== "string" || typeof args.end !== "string" ||
+      args.start > sample.observedAt || args.end < sample.observedAt || args.start > args.end)) {
+      return unavailable(action, say(language, "The precomputed SMAP sample is available only on 2024-07-16.", "预计算的 SMAP 演示样本仅有 2024-07-16 的记录。"));
+    }
+    return {
+      status: "succeeded", action,
+      text: say(language, "Precomputed demo observation found.", "已找到预计算的演示观测。"),
+      missing_fields: [], pending: null, href: null,
+      result: {
+        id: sample.id, metric, value: sample.value, unit: sample.unit,
+        period: { start: sample.observedAt, end: sample.observedAt, time_standard: "UTC" },
+        data_kind: "demo_precomputed", spatial_support: sample.spatialSupport,
+        source: { release_id: demoRelease.id, product: sample.sourceProduct },
+        limitations: language === "zh"
+          ? ["这是预计算的演示样本，并非实时检索或田间传感器读数。", "区域 SMAP 背景值不能表示单个地块的内部差异。"]
+          : ["This is a precomputed demo sample, not a live retrieval or field sensor reading.", "Regional SMAP context does not resolve variation within an individual field."],
+      },
+    };
+  }
   if (metric !== "rainfall_total" && metric !== "reference_et0_total") return unavailable(action, say(language, "This observation is not available.", "该观测项目暂无数据。"));
 
   const start = typeof args.start === "string" ? args.start : "2024-01-01";

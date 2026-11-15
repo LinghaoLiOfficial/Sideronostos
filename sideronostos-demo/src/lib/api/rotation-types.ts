@@ -447,6 +447,7 @@ export type Citation = {
 export type AssistantAnswer = {
   paragraphs: { text: string; evidence_ids: string[] }[];
   actions: AssistantAction[];
+  suggestions?: string[];
   needs_clarification: boolean;
   facts?: Fact[];
   citations?: Citation[];

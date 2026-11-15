@@ -27,7 +27,7 @@ it("returns Iowa published rain and ET0 through persistent observation actions",
   expect(et0.result).toMatchObject({ metric: "reference_et0_total", value: 1165.753116, unit: "mm" });
 });
 
-it("states missing soil evidence and rejects unsupported date slices without inventing readings", async () => {
+it("retrieves the saved field's precomputed SMAP observation with its source and date", async () => {
   const selection = await request("/agri-data/selections", "POST", {
     kind: "point", geometry: { type: "Point", coordinates: [-93.505, 42.0005] }, revision: 1,
   });
@@ -35,13 +35,32 @@ it("states missing soil evidence and rejects unsupported date slices without inv
   const soil = await request(path, "POST", {
     action: "remote_sensing.fact", arguments: { selection_id: selection.id, metric: "surface_soil_moisture" }, idempotency_key: "soil-1",
   });
-  expect(soil.status).toBe("unavailable");
-  expect(soil.text).toMatch(/soil moisture/i);
+  expect(soil).toMatchObject({
+    status: "succeeded",
+    result: {
+      metric: "surface_soil_moisture", value: 0.25, unit: "m³/m³",
+      period: { start: "2024-07-16", end: "2024-07-16" },
+      source: { release_id: "iowa-nasa-2022-2024-v1", product: "SMAP SPL4SMGP.008 · Iowa backend release" },
+    },
+  });
+  expect(soil.result.limitations.join(" ")).toMatch(/regional|demo/i);
+  expect(await request(`${path}/soil-1`)).toEqual(soil);
+});
+
+it("rejects unsupported date slices without inventing readings", async () => {
+  const selection = await request("/agri-data/selections", "POST", {
+    kind: "point", geometry: { type: "Point", coordinates: [-93.505, 42.0005] }, revision: 1,
+  });
+  const path = "/farm-assistant/conversations/chat/actions";
   const partial = await request(path, "POST", {
     action: "remote_sensing.fact", arguments: { selection_id: selection.id, metric: "rainfall_total", start: "2024-01-02", end: "2024-01-31" }, idempotency_key: "partial-1",
   });
   expect(partial.status).toBe("unavailable");
   expect(partial.text).toMatch(/complete calendar months/i);
+  const missingSoil = await request(path, "POST", {
+    action: "remote_sensing.fact", arguments: { selection_id: selection.id, metric: "surface_soil_moisture", start: "2024-08-01", end: "2024-08-31" }, idempotency_key: "soil-august",
+  });
+  expect(missingSoil.status).toBe("unavailable");
 });
 
 it("opens the published observation layer metadata from the specialist task", async () => {
