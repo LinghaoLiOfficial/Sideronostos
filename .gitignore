@@ -5,6 +5,7 @@
 data/sample/*/raw/
 
 .playwright-cli/
+my-download/
 
 # Local scientific raw files and immutable generated releases.
 /data/*
