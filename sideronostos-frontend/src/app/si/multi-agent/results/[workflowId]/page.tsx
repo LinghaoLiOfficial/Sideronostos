@@ -55,18 +55,21 @@ export default function AgentResultPage() {
   const { workflowId } = useParams<{ workflowId: string }>();
   const [result, setResult] = useState<AgentToolResult | null>(null);
   const [failed, setFailed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
+  const hasConversation = typeof window !== "undefined" && Boolean(new URLSearchParams(window.location.search).get("conversation"));
   useEffect(() => {
     const conversation = new URLSearchParams(window.location.search).get("conversation");
     let live = true;
     if (!conversation || !workflowId) {
-      queueMicrotask(() => { if (live) setFailed(true); });
+      queueMicrotask(() => { if (live) { setFailed(true); setLoading(false); } });
       return () => { live = false; };
     }
     getToolResult(conversation, workflowId).then((data) => {
-      if (live) setResult(data);
-    }).catch(() => { if (live) setFailed(true); });
+      if (live) { setResult(data); setLoading(false); }
+    }).catch(() => { if (live) { setFailed(true); setLoading(false); } });
     return () => { live = false; };
-  }, [workflowId]);
+  }, [workflowId, attempt]);
   const href = publishedHref(result?.href);
   const data = result?.result && typeof result.result === "object" ? result.result as Record<string, unknown> : null;
   const image = data && typeof data.image_base64 === "string" && result?.content_type?.startsWith("image/")
@@ -77,7 +80,8 @@ export default function AgentResultPage() {
     <div className="mx-auto max-w-4xl">
       <Link href="/si/multi-agent" className="text-sm text-primary underline">← Back to farm assistant</Link>
       <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-primary">Farm task result</p>
-      {failed && <p role="alert" className="mt-6">This result is unavailable for your account.</p>}
+      {loading && <p role="status" className="mt-6 text-sm text-muted-foreground">Loading result…</p>}
+      {failed && <div className="mt-6 space-y-3"><p role="alert">This result is unavailable for your account.</p>{hasConversation && workflowId && <button type="button" className="min-h-10 rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary" onClick={() => { setFailed(false); setLoading(true); setAttempt((value) => value + 1); }}>Retry</button>}</div>}
       {result && <div data-testid="result-ready" className="mt-2">
       <h1 className="text-3xl font-semibold">{title}</h1>
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
