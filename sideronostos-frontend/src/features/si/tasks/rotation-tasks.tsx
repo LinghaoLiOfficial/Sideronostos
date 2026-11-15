@@ -36,7 +36,7 @@ export function RotationRuns(props: TaskProps) {
   }, [runs.data, runs.reload]);
   const current = runs.data?.items.find((run) => run.id === selected);
   return <div className="space-y-3"><LoadingState state={runs} language={language} />
-    {!runs.loading && <button className={secondary} onClick={runs.reload}>{tr(language, "Refresh progress", "刷新进度")}</button>}
+    {!runs.loading && Boolean(runs.data?.items.length) && <button className={secondary} onClick={runs.reload}>{tr(language, "Refresh progress", "刷新进度")}</button>}
     {runs.data && !runs.data.items.length && <p>{tr(language, "No calculations yet. The planner will guide you through your fields, crops and resource limits.", "还没有计算记录。规划器会引导你选择地块、作物和资源限制。")}</p>}
     {current ? <><button className={secondary} onClick={() => setSelected(null)}>{tr(language, "All calculations", "所有计算")}</button><RunDetails key={current.id} {...props} run={current} refresh={runs.reload} /></> : <>
       {(runs.data?.items.length ?? 0) > 5 && <Input label={tr(language, "Find a field’s calculations", "查找地块计算")} type="search" value={query} onChange={(e) => setQuery(e.target.value)} />}

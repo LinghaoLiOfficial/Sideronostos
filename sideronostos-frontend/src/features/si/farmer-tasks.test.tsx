@@ -9,12 +9,13 @@ const field = { id: "field-7", name: "North meadow", area_ha: 4, latitude: 35, l
   created_at: "2026-01-01", updated_at: "2026-01-01" };
 const calls: { path: string; body: Record<string, unknown> }[] = [];
 let emptyFields = false;
+let emptyRuns = false;
 let actionFailure = false;
 const props = { conversationId: "chat", ensureConversation: async () => "chat", userId: "owner",
   botId: "field-guide", language: "en" as const, onAsk: vi.fn() };
 
 beforeEach(() => {
-  calls.length = 0; emptyFields = false; actionFailure = false;
+  calls.length = 0; emptyFields = false; emptyRuns = false; actionFailure = false;
   vi.stubGlobal("fetch", vi.fn(async (url: URL | string, options?: RequestInit) => {
     const path = new URL(String(url)).pathname;
     const body = options?.body ? JSON.parse(String(options.body)) : {};
@@ -28,7 +29,7 @@ beforeEach(() => {
         result: body.action === "field.create" ? { id: "field-new", name: "East field" } : { value: 0, unit: "mm", limitations: ["Historical observations only."] },
         href: body.action === "field.create" ? "/field-shift?field=field-new&step=field" : "/si/field-management?selection=selection-2" };
     }
-    if (path === "/rotation-optimizer/runs") data = { items: [{ id: "run-1", status: "running", created_at: "2026-11-01T00:00:00Z", field_snapshots: [field], request: {}, result: null }] };
+    if (path === "/rotation-optimizer/runs") data = { items: emptyRuns ? [] : [{ id: "run-1", status: "running", created_at: "2026-11-01T00:00:00Z", field_snapshots: [field], request: {}, result: null }] };
     return new Response(JSON.stringify(data), { status: 200, headers: { "Content-Type": "application/json" } });
   }));
 });
@@ -42,6 +43,15 @@ it("shows the confirmed failure reason while keeping the observation inputs", as
   await user.click(screen.getByRole("button", { name: "Check observations" }));
   expect(await screen.findByText("Please correct the inputs and try again.")).toBeInTheDocument();
   expect(screen.getByLabelText("Which field?")).toHaveValue("field-7");
+});
+
+it("does not offer progress refresh before the first calculation", async () => {
+  emptyRuns = true;
+  render(<FarmerTasks {...props} botId="rotation-guide" />);
+  await userEvent.click(screen.getByRole("button", { name: "My calculations" }));
+  expect(await screen.findByText(/No calculations yet/)).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Start a new plan" })).toHaveAttribute("href", "/si/fields?step=planning");
+  expect(screen.queryByRole("button", { name: "Refresh progress" })).not.toBeInTheDocument();
 });
 afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
