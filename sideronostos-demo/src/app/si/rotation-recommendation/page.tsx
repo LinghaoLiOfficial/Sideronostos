@@ -7,7 +7,7 @@ export const metadata = { title: "Crop Rotation Strategy Recommendation · Agris
 export default function RotationRecommendationPage() {
   return (
     <>
-      <Suspense fallback={<main role="status">正在打开轮作策略推荐…</main>}>
+      <Suspense fallback={<main role="status">Opening crop rotation recommendations…</main>}>
         <RotationRecommendationWorkspace />
       </Suspense>
       <MultiBotDock module="rotation-recommendation" />

@@ -34,7 +34,7 @@ const release = {
 } as NasaDataRelease;
 const profile = {
   id: "iowa-profile", name: "Iowa", sha256: "b".repeat(64), profile_version_id: "profile-version-1", revision: 1, region: "Iowa", scope: "benchmark", sowing_step_days: 7,
-  crops: [{ id: "maize", name: "玉米", family: "Poaceae", gdd_recipe: "draft_one_sided_v1", sow_start_mmdd: "04-15", sow_end_mmdd: "05-15", gdd_required: 1200, turnaround_days: 7, base_c: 10, upper_c: 30, max_growing_days: 180, kc: [.3, 1.2, .6], stage_fractions: [.2, .3, .3, .2], cost_usd_ha: 900, labor_days_ha: 4, parameter_origins: {} }],
+  crops: [{ id: "maize", name: "Maize / 玉米（110-day hybrid example）", family: "Poaceae", gdd_recipe: "draft_one_sided_v1", sow_start_mmdd: "04-15", sow_end_mmdd: "05-15", gdd_required: 1200, turnaround_days: 7, base_c: 10, upper_c: 30, max_growing_days: 180, kc: [.3, 1.2, .6], stage_fractions: [.2, .3, .3, .2], cost_usd_ha: 900, labor_days_ha: 4, parameter_origins: {} }],
   limitations: [], weather_release_id: "weather", weather_center: [-93.5, 42], weather_radius_km: 5,
   history_catalogue: {}, history_turnaround_days: 14, family_gaps: {}, effective_rain_fraction: .8,
   default_weights: { cover: 2, diversity: 1, water: 1, cost: .5 }, references: { cover: 1000, diversity: 10, water: 10000, cost: 10000 }, sources: {}, parameter_origins: {},
@@ -46,7 +46,7 @@ const field = {
   created_at: "2026-11-14T00:00:00Z", updated_at: "2026-11-14T00:00:00Z",
 } as Field;
 
-async function setup(items: Field[] = [field]) {
+async function setup(items: Field[] = [field], english = false) {
   const api = await import("@/lib/api/rotation");
   const fieldApi = await import("@/lib/api/field-shift");
   vi.mocked(api.listNasaDataReleases).mockResolvedValue({ items: [release] });
@@ -55,8 +55,8 @@ async function setup(items: Field[] = [field]) {
   fieldStore = [...items];
   mocks.listFields.mockImplementation(async () => ({ items: [...fieldStore] }));
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  render(<QueryClientProvider client={client}><NasaRotationWorkspace /></QueryClientProvider>);
-  await screen.findByText("NASA 历史轮作回测");
+  render(<QueryClientProvider client={client}><NasaRotationWorkspace hideHeader={english} compactReleaseBar={english} /></QueryClientProvider>);
+  await screen.findByText(english ? "NASA Historical Crop Rotation Backtest" : "NASA 历史轮作回测");
 }
 
 beforeEach(() => {
@@ -137,4 +137,12 @@ it("blocks submission and identifies transition-edge capacity growth", async () 
   expect(screen.getByText(/连接关系过多/)).toBeVisible();
   expect(screen.getByRole("button", { name: "运行 Gurobi 回测" })).toBeDisabled();
   expect(mocks.createRun).not.toHaveBeenCalled();
+});
+
+it("renders the embedded English rotation workspace without Chinese text", async () => {
+  window.localStorage.setItem("agrisata-locale", "en");
+  await setup([field], true);
+  await screen.findByText("Maize (110-day hybrid example)");
+  expect(document.body.textContent).not.toMatch(/[\u3400-\u9fff]/);
+  window.localStorage.removeItem("agrisata-locale");
 });

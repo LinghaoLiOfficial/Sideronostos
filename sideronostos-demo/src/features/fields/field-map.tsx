@@ -85,7 +85,7 @@ interface FieldMapProps {
   onError: (message: string) => void
 }
 
-const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY?.trim()
+const MAPTILER_KEY = process.env.MAPTILER_KEY?.trim()
 const CUSTOM_STYLE = process.env.NEXT_PUBLIC_MAP_STYLE_URL?.trim()
 const FALLBACK_STYLE = "https://demotiles.maplibre.org/style.json"
 const FIELD_ID_STRATEGY: IdStrategy<string | number> = {

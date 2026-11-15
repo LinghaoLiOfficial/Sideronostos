@@ -8,7 +8,7 @@ local assistant replies. It does not require the Sideronostos backend.
 
 The Vercel project uses `sideronostos-demo` as its root directory and is connected
 to this GitHub repository. Pushes to `main` create production deployments; pull
-requests create preview deployments. Set `NEXT_PUBLIC_DEMO_MODE=true`. Optional `NEXT_PUBLIC_MAPTILER_KEY` enables
+requests create preview deployments. Set `NEXT_PUBLIC_DEMO_MODE=true`. Optional `MAPTILER_KEY` enables
 place search and a hosted basemap; without it, the MapLibre fallback still shows the
 demo field boundaries. The demo includes the eight SI videos (about 622 MB) as public
 assets locally and verifies them during local builds. The video files are excluded

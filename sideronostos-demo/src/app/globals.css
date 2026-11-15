@@ -97,7 +97,7 @@ html:has(.si-theme) :is([data-slot="dialog-content"], [data-slot="sheet-content"
   --background: #fafcf7; --foreground: var(--si-cream-foreground, #23301f);
   --card: var(--si-cream, #e8ead6); --card-foreground: var(--si-cream-foreground, #23301f);
   --popover: var(--si-cream, #e8ead6); --popover-foreground: var(--si-cream-foreground, #23301f);
-  --primary: var(--si-accent, #c9e5b8); --primary-foreground: var(--si-cream-foreground, #23301f);
+  --primary: #2f6b45; --primary-foreground: #fafcf7;
   --secondary: var(--si-cream-soft, #dce2cc); --secondary-foreground: var(--si-cream-foreground, #23301f);
   --muted: var(--si-cream-soft, #dce2cc); --muted-foreground: var(--si-cream-muted, #40513c);
   --accent: #d5ddc5; --accent-foreground: var(--si-cream-foreground, #23301f);

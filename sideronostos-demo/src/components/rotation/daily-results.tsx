@@ -510,6 +510,7 @@ type Props = {
   compareRunId: string | null;
   compareOptionId: string | null;
   onCompare: (run: string | null, option: string | null) => void;
+  selectionMode?: "option" | "field";
 };
 export function DailyRunResults({
   owner,

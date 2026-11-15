@@ -7,6 +7,7 @@ import { demoRetrievalAnswer } from "./assistant-retrieval";
 const WORKSPACE_KEY = "agrisata-demo-workspace";
 const RUN_KEY = "agrisata-demo-run";
 const CHAT_KEY = "agrisata-demo-conversations";
+const KNOWLEDGE_KEY = "agrisata-demo-local-knowledge";
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { "Content-Type": "application/json" } });
 const bodyOf = (options: { body?: unknown }): Record<string, unknown> => {
   try {
@@ -42,18 +43,22 @@ async function groqAnswer(body: Record<string, unknown>, history: unknown[]) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...body, history }),
+      signal: AbortSignal.timeout(4000),
     });
     if (!response.ok) {
       const status = response.status;
-      const payload = await response.json().catch(() => ({})) as { error?: unknown };
+      await response.json().catch(() => undefined);
+      // The demo must remain usable without a working optional Groq setup.
+      // Fall back to the deterministic local answer below for missing keys,
+      // network failures, rate limits, and invalid credentials alike.
       if (status === 501) return null;
-      return { error: String(payload.error ?? "Groq request failed"), status };
+      return null;
     }
     const payload = await response.json() as { answer?: unknown };
     if (typeof payload.answer !== "string" || !payload.answer.trim()) return { error: "Groq returned an empty response", status: 502 };
     return { response: { paragraphs: [{ text: payload.answer.trim(), evidence_ids: [] }], actions: [], needs_clarification: false, facts: [], citations: [], warnings: ["回答由 Groq 生成，仅供演示参考。"] } };
   } catch {
-    return { error: "Cannot reach the Groq chat service", status: 502 };
+    return null;
   }
 }
 type DemoConversation = { id: string; preset: string; bot_id: string; language: string; detail: string; kb_release_id: string; created_at: string; updated_at: string; messages: unknown[] };
@@ -62,6 +67,22 @@ function conversationStore(): DemoConversation[] {
   try { return JSON.parse(localStorage.getItem(CHAT_KEY) ?? "[]") as DemoConversation[]; } catch { return []; }
 }
 function saveConversations(value: DemoConversation[]) { try { localStorage.setItem(CHAT_KEY, JSON.stringify(value)); } catch { /* no-op */ } }
+function localKnowledge() {
+  const fallback = () => {
+    const profile = JSON.parse(JSON.stringify(demoProfile));
+    return {
+      active: { id: "demo-kb", revision: 1, status: "published", is_active: true, sha256: "demo", profile, created_at: stamp, updated_at: stamp, published_at: stamp },
+      draft: { id: "demo-kb-draft", revision: null, status: "draft", is_active: false, sha256: "demo", profile: JSON.parse(JSON.stringify(profile)), created_at: stamp, updated_at: stamp, published_at: null },
+      versions: [],
+    };
+  };
+  if (typeof localStorage === "undefined") return fallback();
+  try {
+    const stored = JSON.parse(localStorage.getItem(KNOWLEDGE_KEY) ?? "null");
+    return stored?.active && stored?.draft ? stored : fallback();
+  } catch { return fallback(); }
+}
+function saveLocalKnowledge(value: unknown) { try { localStorage.setItem(KNOWLEDGE_KEY, JSON.stringify(value)); } catch { /* demo remains in memory */ } }
 
 export async function demoApiResponse(path: string, options: { method?: string; body?: unknown } = {}) {
   const method = options.method ?? "GET";
@@ -102,6 +123,22 @@ export async function demoApiResponse(path: string, options: { method?: string; 
   if (conversationMatch && method === "GET") { const item = conversationStore().find((value) => value.id === decodeURIComponent(conversationMatch[1])) ?? { id: conversationMatch[1], preset: "rotation", bot_id: "rotation-guide", language: "zh", detail: "brief", kb_release_id: "demo-kb", created_at: now(), updated_at: now(), messages: [] }; return json({ ...item, next_before_sequence: null }); }
   if (clean === "/farm-assistant/presets") return json({ items: [{ id: "rotation", enabled: true, name: "Crop rotation", name_en: "Crop rotation", description: "Demo assistant", color: "#8671d9" }] });
   if (clean.includes("/preferences")) return json(body);
-  if (clean === "/rotation-optimizer/local-knowledge") return json({ active: { id: "demo-kb", revision: 1, status: "published", is_active: true, sha256: "demo", profile: demoProfile, created_at: stamp, updated_at: stamp, published_at: stamp }, draft: { id: "demo-kb-draft", revision: null, status: "draft", is_active: false, sha256: "demo", profile: demoProfile, created_at: stamp, updated_at: stamp, published_at: null }, versions: [] });
+  if (clean === "/rotation-optimizer/local-knowledge" && method === "GET") return json(localKnowledge());
+  if (clean === "/rotation-optimizer/local-knowledge/draft" && method === "PUT") {
+    const catalogue = localKnowledge();
+    const draft = { ...catalogue.draft, profile: body.profile ?? catalogue.draft.profile, updated_at: now(), sha256: "demo-draft" };
+    const next = { ...catalogue, draft };
+    saveLocalKnowledge(next);
+    return json(draft);
+  }
+  if (clean === "/rotation-optimizer/local-knowledge/publish" && method === "POST") {
+    const catalogue = localKnowledge();
+    const publishedAt = now();
+    const active = { ...catalogue.draft, id: "demo-kb", revision: (catalogue.active.revision ?? 0) + 1, status: "published", is_active: true, sha256: "demo", updated_at: publishedAt, published_at: publishedAt };
+    const draft = { ...active, id: "demo-kb-draft", revision: null, status: "draft", is_active: false, published_at: null };
+    const next = { active, draft, versions: [active, ...(catalogue.versions ?? [])] };
+    saveLocalKnowledge(next);
+    return json(next);
+  }
   return json({ items: [] });
 }

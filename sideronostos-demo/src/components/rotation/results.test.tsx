@@ -2,10 +2,15 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it } from "vitest";
 import { cleanup, screen } from "@testing-library/react";
 import { render } from "@/test/render-zh";
-import { allOptions, OptionDetail, ResultCharts } from "./results";
+import { allOptions, OptionDetail, optionName, ResultCharts } from "./results";
 import type { OptionV2 } from "@/lib/api/rotation-types";
 import type { Field } from "@/lib/api/field-shift-types";
 afterEach(cleanup);
+it("translates rotation option titles for English results", () => {
+  const translate = (message: string) => ({ "轮作方案": "Rotation plan", "原本种法 / 基准": "Original planting / baseline" }[message] ?? message);
+  expect(optionName({ id: "option-1" } as OptionV2, 0, translate)).toBe("Rotation plan 1");
+  expect(optionName({ id: "baseline" } as OptionV2, 2, translate)).toBe("Original planting / baseline");
+});
 it("visualizes yearly resource use and crop seasons for the selected option", () => {
   const option = {
     id: "option-1", label: "Plan", feasible: true, seasons: [

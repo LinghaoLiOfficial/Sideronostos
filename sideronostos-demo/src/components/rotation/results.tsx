@@ -190,12 +190,12 @@ export function allOptions(run: AnyRotationRun): (OptionV2 | DailyOption)[] {
     return true;
   });
 }
-const optionName = (option: OptionV2, index?: number) =>
+export const optionName = (option: OptionV2, index: number | undefined, translate: (message: string) => string = (message) => message) =>
   option.id === "baseline"
-    ? "原本种法 / 基准"
+    ? translate("原本种法 / 基准")
     : index !== undefined
-      ? `轮作方案 ${index + 1}`
-      : option.id.replace("option-", "轮作方案 ");
+      ? `${translate("轮作方案")} ${index + 1}`
+      : option.id.replace("option-", `${translate("轮作方案")} `);
 export function OptionDetail({
   option,
   fields,
@@ -374,7 +374,56 @@ type Props = {
   compareRunId: string | null;
   compareOptionId: string | null;
   onCompare: (run: string | null, option: string | null) => void;
+  selectionMode?: "option" | "field";
 };
+
+function FieldOptionComparison({ options, fields, start, end, selectedFieldId, onSelectField }: {
+  options: OptionV2[];
+  fields: Field[];
+  start: string;
+  end: string;
+  selectedFieldId: string | null;
+  onSelectField: (id: string) => void;
+}) {
+  const { t } = useI18n();
+  const cropLabels: Record<string, string> = { maize: "玉米", oat: "燕麦", pea: "豌豆" };
+  const field = fields.find((item) => item.id === selectedFieldId) ?? fields[0];
+  if (!field) return <p className={styles.help}>{t("没有可比较的地块。")}</p>;
+  return <>
+    <label className={styles.fieldSelector}>{t("查看地块")}
+      <select value={field.id} onChange={(event) => onSelectField(event.target.value)}>
+        {fields.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+      </select>
+    </label>
+    <div className={styles.fieldComparison}>
+      {options.map((option, index) => {
+        const years = Object.values(option.verification.field_years[field.id] ?? {});
+        const totals = years.reduce((sum, year) => ({
+          water_m3: sum.water_m3 + year.water_m3,
+          cost_usd: sum.cost_usd + year.cost_usd,
+          labor_days: sum.labor_days + year.labor_days,
+          cover_ha_days: sum.cover_ha_days + year.cover_ha_days,
+        }), { water_m3: 0, cost_usd: 0, labor_days: 0, cover_ha_days: 0 });
+        const seasons = option.seasons.filter((season) => season.field_id === field.id);
+        return <article className={styles.fieldComparisonCard} key={option.id}>
+          <div className={styles.chartHeading}><h3>{optionName(option, index, t)}</h3><span>{option.feasible ? t("满足当前约束") : t("不满足约束")}</span></div>
+          <dl className={styles.metrics}>
+            <div><dt>{t("用水估计 · m³")}</dt><dd>{n(totals.water_m3)}</dd></div>
+            <div><dt>{t("投入估计 · USD")}</dt><dd>{n(totals.cost_usd)}</dd></div>
+            <div><dt>{t("劳力估计 · 人日")}</dt><dd>{n(totals.labor_days)}</dd></div>
+          </dl>
+          <ul className={styles.seasonList}>
+            {seasons.length ? seasons.map((season) => <li key={season.id}><strong>{t(cropLabels[season.crop_id] ?? season.crop_id)}</strong><span>{season.sow_date} {t("播种") } → {season.harvest_date}</span><small>{t("生长")} {season.growing_days} {t("天")} · {t("换茬占用至")} {season.occupied_until}</small></li>) : <li>{t("此方案在该地块没有种植季次。")}</li>}
+          </ul>
+          <details className={styles.details}>
+            <summary>{t("查看完整方案可视化")}</summary>
+            <OptionDetail option={option} fields={fields} start={start} end={end} />
+          </details>
+        </article>;
+      })}
+    </div>
+  </>;
+}
 function LegacyRunResults({
   owner,
   run,
@@ -387,6 +436,7 @@ function LegacyRunResults({
   compareRunId,
   compareOptionId,
   onCompare,
+  selectionMode = "option",
 }: Props) {
   const { t, locale } = useI18n();
 
@@ -395,6 +445,7 @@ function LegacyRunResults({
     [saveTarget, setSaveTarget] = useState<OptionV2 | null>(null),
     [title, setTitle] = useState(""),
     [notes, setNotes] = useState("");
+  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(run.field_snapshots[0]?.id ?? null);
   const sequence = useRef(0),
     active = useRef(run.id);
   useEffect(() => {
@@ -558,7 +609,10 @@ function LegacyRunResults({
         <p className={styles.error}>
           {t("本次未能完成计算：")}{t(run.result.error_code)}{t("。原始条件已保留。")}</p>
       )}
-      {options.length > 0 && (
+      {options.length > 0 && selectionMode === "field" && (
+        <FieldOptionComparison options={options} fields={run.field_snapshots} start={run.request.start} end={run.request.end} selectedFieldId={selectedFieldId} onSelectField={setSelectedFieldId} />
+      )}
+      {options.length > 0 && selectionMode === "option" && (
         <>
           <div
             className={styles.optionPicker}
@@ -571,7 +625,7 @@ function LegacyRunResults({
                 aria-pressed={selected?.id === option.id}
                 onClick={() => onSelect(option.id)}
               >
-                <strong>{optionName(option, index)}</strong>
+                <strong>{optionName(option, index, t)}</strong>
                 <span>{option.feasible ? t("满足当前约束") : t("不满足约束")}</span>
               </button>
             ))}
@@ -648,7 +702,7 @@ function LegacyRunResults({
                     .filter((o) => o.complete !== false)
                     .map((o, i) => (
                       <option key={o.id} value={o.id}>
-                        {optionName(o, i)}
+                        {optionName(o, i, t)}
                         {o.feasible ? "" : t("（不可行基准）")}
                       </option>
                     ))}
@@ -866,6 +920,7 @@ type UnifiedResultsProps = Omit<
   onExplain: (option: OptionV2 | DailyOption) => void;
   onUpdate: (run: AnyRotationRun) => void;
   onSaved: (plan: AnySavedPlan) => void;
+  selectionMode?: "option" | "field";
 };
 export function RunResults(props: UnifiedResultsProps) {
   if (isDailyRun(props.run))
