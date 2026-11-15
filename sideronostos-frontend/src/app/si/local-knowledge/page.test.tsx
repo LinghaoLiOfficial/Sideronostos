@@ -56,16 +56,14 @@ it("edits and saves a personal agronomy draft", async () => {
   expect(await screen.findByText("草稿已保存")).toBeVisible();
 });
 
-it("exposes crop, rule, source and immutable version views", async () => {
+it("exposes crop and rule views", async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(<QueryClientProvider client={client}><LocalKnowledgeWorkspace /></QueryClientProvider>);
   await screen.findByText("本地农业知识库");
   await userEvent.click(screen.getByRole("button", { name: /作物参数/ }));
   expect(screen.getByDisplayValue("玉米")).toBeVisible();
-  await userEvent.click(screen.getByRole("button", { name: /来源与局限/ }));
-  expect(screen.getByDisplayValue("Local extension")).toBeVisible();
-  await userEvent.click(screen.getByRole("button", { name: /版本记录/ }));
-  expect(screen.getByRole("heading", { name: "版本记录" })).toBeVisible();
+  expect(screen.queryByRole("button", { name: /来源与局限/ })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /版本记录/ })).not.toBeInTheDocument();
 });
 
 it("switches the knowledge workspace to English", async () => {
