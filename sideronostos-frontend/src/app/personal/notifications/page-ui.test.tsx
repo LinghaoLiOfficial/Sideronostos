@@ -1,6 +1,7 @@
 import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { setLocale } from "@/lib/i18n/locale";
 import NotificationsPage from "./page";
 
 const api = vi.hoisted(() => ({
@@ -49,6 +50,7 @@ const notifications = [
 let unreadCount = 1;
 
 beforeEach(() => {
+  setLocale("zh-CN");
   unreadCount = 1;
   api.getCurrentUser.mockResolvedValue({ id: "user-1", display_name: "测试用户" });
   api.listNotifications.mockImplementation(() => Promise.resolve({
@@ -80,12 +82,12 @@ describe("NotificationsPage", () => {
     expect(unreadRowButton.parentElement?.className).toContain("notification-row");
     expect(unreadRowButton.parentElement?.getAttribute("data-unread")).toBe("true");
     expect(screen.getByRole("button", { name: "查看消息：系统消息" }).parentElement?.getAttribute("data-unread")).toBe("false");
-    expect(unreadRowButton.parentElement?.getAttribute("style")).toContain("background-color: rgb(64, 35, 90)");
+    expect(unreadRowButton.parentElement?.getAttribute("style")).toContain("background-color: rgb(36, 52, 38)");
     const notificationNavLink = screen.getByRole("link", { name: /消息列表/ });
     expect(within(notificationNavLink).getByText("1")).toBeTruthy();
 
     await user.hover(unreadRowButton);
-    expect(unreadRowButton.parentElement?.getAttribute("style")).toContain("background-color: rgb(81, 39, 70)");
+    expect(unreadRowButton.parentElement?.getAttribute("style")).toContain("background-color: rgb(48, 67, 49)");
     expect(screen.queryByRole("button", { name: "查看" })).toBeNull();
 
     await user.click(unreadRowButton);

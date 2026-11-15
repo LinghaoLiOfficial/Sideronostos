@@ -1,0 +1,34 @@
+{
+  "field-harvest-original.mp4": {
+    "sha256": "3f0e0a345315bee8e340c8cd6c20890d72ca037c429d97b6ea38f970c940dda4",
+    "size": 271812307
+  },
+  "rotation-layers.mp4": {
+    "sha256": "eb15a17439aabd87119792169f9639ed93f1c3d20b01d08c284134ad3aee66b9",
+    "size": 14432975
+  },
+  "rotation-overview.mp4": {
+    "sha256": "927e9c8ee755dd02266c0581a2eb14ee55fc25418c3e8bd884f625e28d913a38",
+    "size": 72223786
+  },
+  "rotation-precipitation.mp4": {
+    "sha256": "2c1187726bab3fa45a4c0109135350b9ffd7dffaf7b5647bab2015b6d203d44a",
+    "size": 21910825
+  },
+  "rotation-storage.mp4": {
+    "sha256": "e029648dd13aed1dff09763be0ce5757a157b457fae9b57f9037684bb1416e61",
+    "size": 114487361
+  },
+  "rotation-terrain.mp4": {
+    "sha256": "8eda1fae7855f05fe91ea7509c8d2ba5d8f513366cfdfb6248f1a84af900dbf0",
+    "size": 21750337
+  },
+  "rotation-vegetation.mp4": {
+    "sha256": "ffef58f916ed117b33b983df66798246e4fc91258650a1db61e19e448ed96c8c",
+    "size": 61272380
+  },
+  "rotation-weather.mp4": {
+    "sha256": "7f56c1fcc0fa655a1625b4a773f6abca8869358a8a0883523255d2604b7bf61f",
+    "size": 42200722
+  }
+}

@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "@/lib/api/client";
+import { setLocale } from "@/lib/i18n/locale";
 import AccountPage from "./page";
 import { WorkspaceShell } from "@/components/workspace/shell";
 import PersonalPage from "../page";
@@ -28,6 +29,7 @@ vi.mock("@/lib/api/client", async (importOriginal) => ({
 }));
 
 beforeEach(() => {
+  setLocale("zh-CN");
   vi.clearAllMocks();
   mocks.pathname = "/personal/account";
   mocks.getCurrentUser.mockResolvedValue({ id: "user-123", display_name: "测试用户", email: "test@example.com", email_verified: true });

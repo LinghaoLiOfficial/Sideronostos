@@ -52,9 +52,11 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeLabel = "关闭",
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  closeLabel?: string
 }) {
   const { tone: surface, material } = useSurfaceAppearance()
   return (
@@ -81,7 +83,7 @@ function DialogContent({
             >
               <XIcon
               />
-              <span className="sr-only">关闭</span>
+              <span className="sr-only">{closeLabel}</span>
             </Button>
           </DialogPrimitive.Close>
         )}

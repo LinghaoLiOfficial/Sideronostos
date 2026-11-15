@@ -8,3 +8,5 @@ playwright-report/
 .env.*
 !.env.example
 *.tsbuildinfo
+/public/videos/si/*.mp4
+/public/videos/si/*.part

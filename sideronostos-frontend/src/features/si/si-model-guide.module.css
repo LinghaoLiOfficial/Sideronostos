@@ -1,0 +1,333 @@
+:global(html):has(.atlas) {
+  overscroll-behavior-x: none;
+}
+
+.guide {
+  --guide-gutter: clamp(20px, 6vw, 112px);
+  --guide-accent: #c9e5b8;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  padding-block-start: var(--si-header-height);
+  overflow: clip;
+  background: #0b120f;
+  color: #fafcf7;
+}
+
+.backdrop {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+}
+
+.backdrop video,
+.storyPoster {
+  width: 100%;
+  height: 100%;
+}
+
+.backdrop video {
+  object-fit: cover;
+  object-position: 49% center;
+}
+
+.storyTransition {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b120f;
+  pointer-events: none;
+}
+
+.storyPoster { background: 49% center / cover no-repeat; }
+
+.backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #080f11b5, #080f111a 25%, #080f1126 49%, #0b120ff2 100%),
+    linear-gradient(90deg, #080f11ba, #080f1140 53%, #080f110a);
+}
+
+.guide button { cursor: pointer; }
+.guide :is(a, button):focus-visible { outline: 2px solid var(--guide-accent); outline-offset: 4px; }
+
+.overview {
+  display: grid;
+  grid-template-areas: "diagram";
+  place-items: center;
+  align-content: center;
+  min-height: max(550px, calc(100svh - var(--si-header-height)));
+  padding: 12px var(--guide-gutter) clamp(22px, 4vh, 44px);
+}
+
+.guide h1 {
+  font-size: clamp(52px, 8vw, 118px);
+  line-height: .9;
+  font-weight: 700;
+  letter-spacing: -.018em;
+  text-wrap: balance;
+}
+
+.guide:global(.locale-en) h1 {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+}
+
+.guide:global(.locale-zh) h1 { font-size: clamp(38px, 6vw, 84px); line-height: 1.1; }
+.orbit {
+  grid-area: diagram;
+  position: relative;
+  width: min(100%, 1600px);
+  height: clamp(410px, calc(100svh - 128px), 880px);
+}
+
+.overview h1.overviewTitle {
+  grid-area: diagram;
+  z-index: 1;
+  margin-block-end: calc(44px + clamp(8px, 1.7vh, 20px));
+  text-align: center;
+  font-size: clamp(42px, min(6.65vw, 11vh), 112px);
+  text-shadow: 0 2px 18px #080e08d9;
+  pointer-events: none;
+}
+
+.orbit li {
+  position: absolute;
+  inset: var(--node-y) auto auto var(--node-x);
+  translate: -50% -50%;
+  --base-size: clamp(90px, min(14.6vw, 26.7vh), 255px);
+  --node-size: calc(var(--base-size) * var(--node-scale));
+  width: var(--node-size);
+  height: var(--node-size);
+}
+
+.orbitLink {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: clamp(4px, 1vh, 12px);
+  padding: clamp(8px, 1.1vw, 18px);
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 25%);
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 4px #0b120fcc;
+  transition: scale .22s ease-out, background-color .22s ease-out;
+}
+
+.orbit li:is(:hover, :focus-within) { z-index: 2; }
+.orbitLink:is(:hover, :focus-visible) {
+  scale: 1.06;
+  background-color: rgb(255 255 255 / 32%);
+}
+
+.orbit li:nth-child(1) {
+  --node-x: 5.4%;
+  --node-y: 11.6%;
+  --node-scale: 1;
+}
+.orbit li:nth-child(2) {
+  --node-x: 41.4%;
+  --node-y: 14.4%;
+  --node-scale: 1.02;
+}
+.orbit li:nth-child(3) {
+  --node-x: calc(26.7% - 1.5cm);
+  --node-y: calc(60% + 1.5cm);
+  --node-scale: 1.28;
+}
+.orbit li:nth-child(4) {
+  --node-x: 75.3%;
+  --node-y: 32.6%;
+  --node-scale: 1.17;
+}
+.orbit li:nth-child(5) {
+  --node-x: 57.6%;
+  --node-y: 84.6%;
+  --node-scale: .81;
+}
+.orbit li:nth-child(6) {
+  --node-x: 90.7%;
+  --node-y: 79.9%;
+  --node-scale: 1.12;
+}
+
+.orbitLink {
+  font-size: clamp(16px, calc(var(--base-size) * .083 + 5px), 27px);
+  font-weight: 550;
+  line-height: 1.23;
+  text-wrap: balance;
+}
+.orbitLink strong { font-weight: inherit; }
+.orbitWord { white-space: nowrap; }
+.backdrop[data-story-look="layers"]::after {
+  background: linear-gradient(180deg, #080f11bd, #0b140fb5 48%, #0b120fee 100%);
+}
+
+.atlas > .backdrop { opacity: .28; }
+.layersPage {
+  display: grid;
+  grid-template: "map drawer" minmax(550px, 1fr) "nav nav" auto / minmax(0, 1fr) minmax(340px, 31%);
+  min-height: calc(100svh - var(--si-header-height));
+  padding: 0 var(--guide-gutter) 28px;
+  gap: 1px;
+}
+
+.atlasMap {
+  position: relative;
+  grid-area: map;
+  isolation: isolate;
+  overflow: hidden;
+  background: #202c1b;
+}
+
+.atlasMap h1,
+.guide:global(.locale-zh) .atlasMap h1 {
+  position: relative;
+  z-index: 2;
+  width: fit-content;
+  margin: 25px 26px;
+  font-size: clamp(30px, 4.2vw, 60px);
+  text-shadow: 0 2px 20px #080e07;
+  pointer-events: none;
+}
+
+.drawer {
+  grid-area: drawer;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(18px, 2vw, 32px) clamp(20px, 2.1vw, 38px);
+  background: #e8ead6;
+  color: #23301f;
+  animation: drawer-enter .72s cubic-bezier(.2, .68, .24, 1) .16s both;
+}
+
+.layerDetail { animation: detail-enter .46s cubic-bezier(.2, .68, .24, 1) both; }
+.product {
+  color: #42583c;
+  font-size: clamp(18px, 1.7vw, 28px);
+  line-height: 1.12;
+  font-weight: 680;
+  text-wrap: balance;
+}
+
+.layerDetail dl { margin-block: 14px; }
+.layerDetail dt {
+  margin: 9px 0 4px;
+  padding-top: 8px;
+  border-top: 1px solid #77846b66;
+  color: #40513c;
+  font-size: 13px;
+  font-weight: 650;
+}
+.layerDetail dd { font-size: 14px; line-height: 1.47; }
+
+.equations h3 {
+  margin: 0 0 7px;
+  color: #40513c;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.equation {
+  margin-block-start: 6px;
+  padding: 7px 10px;
+  border-inline-start: 2px solid #77896a;
+  background: #dce2cc;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.equationExpression {
+  margin-block-end: 2px;
+  color: #253d29;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.layerNav {
+  display: grid;
+  grid-area: nav;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  background: #131d14;
+}
+
+.layerNav button {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  min-height: 72px;
+  padding: 10px 14px;
+  border-top: 2px solid transparent;
+  color: #ecf0e0;
+  font-size: 13px;
+  text-align: start;
+}
+
+.layerNav button + button { border-inline-start: 1px solid #e2f0e227; }
+.layerNav button:is(:hover, [aria-current]) { background: #d9ebb719; }
+.layerNav button[aria-current] { border-top-color: var(--guide-accent); }
+.layerNav span { color: var(--guide-accent); font-size: 11px; }
+
+@keyframes drawer-enter { from { opacity: 0; transform: translateX(56px); } }
+@keyframes detail-enter { from { opacity: 0; transform: translateX(14px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer, .layerDetail { animation: none; }
+  .orbitLink { transition: none; }
+  .orbitLink:is(:hover, :focus-visible) { scale: none; }
+}
+
+@media (max-width: 1000px) {
+  .layersPage { padding-inline: clamp(15px, 4vw, 40px); }
+  .layerNav button { padding-inline: 8px; }
+}
+
+@media (width > 760px) and (height < 620px) {
+  .orbit li { --base-size: clamp(90px, min(14.6vw, 23vh), 255px); }
+}
+
+@media (760px < width <= 900px) {
+  .orbit li:nth-child(1) { --node-scale: 1.13; }
+  .orbit li:nth-child(3) { --node-scale: 1.52; }
+}
+
+@media (max-width: 760px) {
+  .backdrop video { object-position: 40% center; }
+  .storyPoster { background-position: 40% center; }
+  .overview { min-height: max(530px, calc(100svh - var(--si-header-height))); padding-inline: 12px; }
+  .orbit { width: min(100%, 530px); height: clamp(530px, calc(100svh - 155px), 610px); }
+  .orbit li {
+    --base-size: clamp(100px, 26vw, 116px);
+  }
+  .orbitLink {
+    gap: 3px;
+    padding: 6px;
+    font-size: clamp(14px, calc(var(--base-size) * .135), 16px);
+    line-height: 1.12;
+  }
+  .orbit li:nth-child(3) { --node-scale: 1.48; }
+  .overview h1.overviewTitle { margin-block-end: 161px; font-size: clamp(26px, 7vw, 45px); }
+  .orbit li:nth-child(1) { --node-x: 25%; --node-y: 13%; }
+  .orbit li:nth-child(2) { --node-x: 19%; --node-y: 58%; }
+  .orbit li:nth-child(3) {
+    --node-x: max(calc(var(--node-size) / 2), 29% - 1.5cm);
+    --node-y: min(calc(100% - var(--node-size) / 2), 87% + 1.5cm);
+  }
+  .orbit li:nth-child(4) { --node-x: 73%; --node-y: 16%; }
+  .orbit li:nth-child(5) { --node-x: 81%; --node-y: 62%; }
+  .orbit li:nth-child(6) { --node-x: 72%; --node-y: 85%; }
+  .layersPage { grid-template: "map" minmax(290px, 50svh) "nav" auto "drawer" auto / minmax(0, 1fr); }
+  .layerNav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .layerNav button { min-height: 54px; }
+}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <filter id="feather" color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox">
+    <feMorphology in="SourceAlpha" operator="erode" radius=".006 .008" result="inset"/>
+    <feGaussianBlur in="inset" stdDeviation=".007 .010" result="softAlpha"/>
+    <feComposite in="SourceGraphic" in2="softAlpha" operator="in" result="softEdge"/>
+    <feFlood x=".21" y=".53" width=".26" height=".24" flood-color="white" result="seam"/>
+    <feGaussianBlur in="seam" x="0" y="0" width="1" height="1" stdDeviation=".030 .032" result="seamRegion"/>
+    <feComposite in="SourceGraphic" in2="seamRegion" operator="out" result="original"/>
+    <feComposite in="softEdge" in2="seamRegion" operator="in" result="feathered"/>
+    <feComposite in="original" in2="feathered" operator="arithmetic" k2="1" k3="1"/>
+  </filter>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1200" preserveAspectRatio="none">
+  <defs>
+    <filter id="edge" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+  </defs>
+  <path d="M -140 -120 H 1390 L 1070 950 L 986 950 L -140 320 Z" fill="white" filter="url(#edge)"/>
+</svg>
