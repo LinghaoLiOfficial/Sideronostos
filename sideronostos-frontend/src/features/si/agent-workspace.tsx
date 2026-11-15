@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { LoaderCircle, Menu, Plus, X } from "lucide-react";
+import { ArrowUpRight, LoaderCircle, Menu, Plus, X } from "lucide-react";
 import { BotComposer } from "@/components/bot/BotComposer";
 import { BotAvatar } from "@/components/bot/Bot";
-import { botCatalog, type CatalogBot } from "@/lib/bot-catalog";
+import { botCatalog, type CatalogBot, type SiBotModule } from "@/lib/bot-catalog";
 import { getCurrentUser, type AuthUser } from "@/lib/api/client";
 import { useLocale } from "@/lib/i18n/locale";
 import type { AssistantMessage, Citation, Fact } from "@/lib/api/rotation-types";
@@ -21,6 +21,13 @@ const domains: { id: AgentDomain; en: string; zh: string }[] = [
   { id: "local_agriculture", en: "Local agriculture", zh: "本地农业知识" },
   { id: "rotation", en: "Crop rotation", zh: "作物轮作" },
 ];
+const moduleHomes = {
+  general: { href: "/si", en: "SI home", zh: "SI 首页" },
+  "field-management": { href: "/si/field-management", en: "Field management", zh: "田地管理" },
+  "remote-sensing": { href: "/si/remote-sensing", en: "Remote sensing", zh: "遥感分析" },
+  "local-knowledge": { href: "/si/local-knowledge", en: "Local knowledge", zh: "本地农业知识库" },
+  "rotation-recommendation": { href: "/si/rotation-recommendation", en: "Crop rotation", zh: "轮作策略推荐" },
+} as const satisfies Record<SiBotModule, { href: string; en: string; zh: string }>;
 const labels = {
   en: { title: "Your SI assistants", history: "Conversations", newChat: "New chat", empty: "No conversations yet", start: "Start a conversation", loading: "Loading conversations…", pending: "Working on your request…", error: "Something went wrong. Your draft is safe.", failed: "This reply could not be completed.", mock: "Local prices and crop varieties are mock examples, not live local data.", source: "View source", older: "Load earlier messages", signIn: "Sign in to use your assistants", login: "Sign in", retry: "Try again" },
   zh: { title: "你的助手", history: "对话记录", newChat: "新建对话", empty: "还没有对话", start: "开始对话", loading: "正在加载对话…", pending: "正在处理你的请求…", error: "发生错误。草稿已保留。", failed: "这条回复未能完成。", mock: "价格与品种数据为模拟数据，并非实时本地数据。", source: "查看依据", older: "加载更早的消息", signIn: "登录后使用助手", login: "登录", retry: "重试" },
@@ -48,6 +55,11 @@ function safeSourceUrl(url: unknown): string | null {
     return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : null;
   } catch { return null; }
 }
+function showBotInUrl(bot: CatalogBot) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("bot", bot.id);
+  window.history.replaceState(window.history.state, "", url);
+}
 
 export function AgentWorkspace() {
   const locale = useLocale();
@@ -58,6 +70,7 @@ export function AgentWorkspace() {
   const [domain, setDomain] = useState<AgentDomain>("field_management");
   const [selectedBotId, setSelectedBotId] = useState(defaultBot("field_management").id);
   const selectedBot = botCatalog.find((bot) => bot.id === selectedBotId) ?? defaultBot(domain);
+  const moduleHome = moduleHomes[selectedBot.module];
   const visibleItems = items.filter((item) => conversationBot(item).id === selectedBot.id);
   const [id, setId] = useState<string | null>(null);
   const [page, setPage] = useState<AgentConversationPage | null>(null);
@@ -74,6 +87,7 @@ export function AgentWorkspace() {
   const retryId = useRef<string | null>(null);
   const retryText = useRef<string | null>(null);
   const end = useRef<HTMLDivElement>(null);
+  const botNavigation = useRef<HTMLElement>(null);
   const previousLocale = useRef(locale);
 
   useEffect(() => {
@@ -86,13 +100,22 @@ export function AgentWorkspace() {
         const sorted = [...history.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
         setUser(account);
         setItems(sorted);
+        const requestedBot = botCatalog.find((bot) => bot.id === new URLSearchParams(window.location.search).get("bot"));
+        if (requestedBot) {
+          setDomain(requestedBot.presetId as AgentDomain);
+          setSelectedBotId(requestedBot.id);
+        }
         if (sorted.length) {
           const saved = localStorage.getItem("agrisata-agent-chat:" + account.id);
-          const first = sorted.find((item) => item.id === saved) ?? sorted[0];
-          active.current = first.id;
-          setId(first.id);
-          setDomain(first.preset);
-          setSelectedBotId(conversationBot(first).id);
+          const first = requestedBot
+            ? sorted.find((item) => conversationBot(item).id === requestedBot.id)
+            : sorted.find((item) => item.id === saved) ?? sorted[0];
+          if (first) {
+            active.current = first.id;
+            setId(first.id);
+            setDomain(first.preset);
+            setSelectedBotId(conversationBot(first).id);
+          }
         }
       } catch (cause) {
         if (!live) return;
@@ -111,6 +134,10 @@ export function AgentWorkspace() {
     return () => { live = false; };
   }, [id]);
   useEffect(() => { end.current?.scrollIntoView?.({ block: "end" }); }, [page?.messages.length, outgoing]);
+  useEffect(() => {
+    if (!menu && window.matchMedia?.("(max-width: 1023px)").matches) return;
+    botNavigation.current?.querySelector<HTMLElement>('[aria-pressed="true"]')?.scrollIntoView?.({ block: "nearest", inline: "center" });
+  }, [selectedBotId, loading, menu]);
   useEffect(() => {
     if (previousLocale.current === locale) return;
     previousLocale.current = locale;
@@ -133,18 +160,21 @@ export function AgentWorkspace() {
   function chooseBot(bot: CatalogBot) {
     chooseDomain(bot.presetId as AgentDomain);
     setSelectedBotId(bot.id);
+    showBotInUrl(bot);
   }
   function chooseChat(item: AgentConversation) {
+    const bot = conversationBot(item);
     active.current = item.id;
     retryId.current = null;
     retryText.current = null;
     setDomain(item.preset);
-    setSelectedBotId(conversationBot(item).id);
+    setSelectedBotId(bot.id);
     setId(item.id);
     setPage(null);
     setDraft("");
     setError(null);
     setMenu(false);
+    showBotInUrl(bot);
     if (user) localStorage.setItem("agrisata-agent-chat:" + user.id, item.id);
   }
   async function create() {
@@ -216,7 +246,7 @@ export function AgentWorkspace() {
       <aside className={(menu ? "translate-x-0" : "-translate-x-full") + " absolute inset-y-0 left-0 z-30 flex w-[min(26rem,90vw)] flex-col border-r border-border bg-sidebar transition-transform lg:static lg:w-auto lg:translate-x-0"} aria-label={l.title}>
         <div className="flex h-16 shrink-0 items-center justify-end border-b border-border px-5 lg:hidden"><button type="button" className="inline-flex size-9 items-center justify-center rounded-full hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary" aria-label={zh ? "关闭菜单" : "Close menu"} onClick={() => setMenu(false)}><X size={19} /></button></div>
         <div className="flex items-center justify-between px-5 pb-2 pt-5"><h1 className="text-lg font-semibold tracking-tight">{l.title}</h1><button type="button" aria-label={l.newChat} title={l.newChat} onClick={() => void create()} disabled={busy} className="inline-flex size-10 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50"><Plus size={20} aria-hidden="true" /></button></div>
-        <nav aria-label={zh ? "助手身份" : "Bot identities"} className="shrink-0 overflow-x-auto overscroll-x-contain px-4 pb-4 pt-2">
+        <nav ref={botNavigation} aria-label={zh ? "助手身份" : "Bot identities"} className="shrink-0 overflow-x-auto overscroll-x-contain px-4 pb-4 pt-2">
           <div className="flex w-max items-stretch">{domains.map((entry, index) => <section key={entry.id} role="group" aria-label={zh ? entry.zh : entry.en} className={(index ? "border-l border-border pl-2 " : "") + "flex shrink-0 gap-1 pr-2"}>
             {botCatalog.filter((bot) => bot.presetId === entry.id).map((bot) => <button key={bot.id} type="button" aria-label={bot.name[locale]} aria-pressed={selectedBot.id === bot.id} onClick={() => chooseBot(bot)} style={{ "--bot-accent": bot.color } as CSSProperties} className={(selectedBot.id === bot.id ? "border-primary/70 bg-muted text-foreground" : "border-transparent text-muted-foreground hover:bg-muted/70 hover:text-foreground") + " flex w-24 shrink-0 flex-col items-center gap-2 rounded-2xl border px-1 py-3 text-center text-xs leading-tight focus-visible:outline-2 focus-visible:outline-primary"}><BotAvatar variant={bot.avatar} /><span className="line-clamp-2 min-h-8">{bot.name[locale]}</span></button>)}
           </section>)}</div>
@@ -225,7 +255,7 @@ export function AgentWorkspace() {
         <nav aria-label={l.history} className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{visibleItems.length === 0 ? <p className="px-3 py-4 text-sm text-muted-foreground">{l.empty}</p> : visibleItems.map((item) => <button key={item.id} type="button" onClick={() => chooseChat(item)} aria-current={id === item.id ? "page" : undefined} className={(id === item.id ? "bg-muted font-medium" : "text-muted-foreground hover:bg-muted/70") + " mb-1 flex w-full flex-col rounded-lg px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-primary"}><span className="truncate">{conversationTitle(item, locale)}</span><time className="text-xs text-muted-foreground" dateTime={item.updated_at}>{new Intl.DateTimeFormat(zh ? "zh-CN" : "en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(item.updated_at))}</time></button>)}</nav>
       </aside>
       <section className="si-cream-surface flex min-h-0 min-w-0 flex-col" aria-label={selectedBot.name[locale]} style={{ "--bot-accent": selectedBot.color } as CSSProperties}>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-3 sm:px-6"><button type="button" className="inline-flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-primary lg:hidden" aria-label={menu ? (zh ? "关闭菜单" : "Close menu") : (zh ? "打开菜单" : "Open menu")} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X size={20} /> : <Menu size={20} />}</button><div className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar small variant={selectedBot.avatar} /><h2 className="truncate text-sm font-semibold sm:text-base">{selectedBot.name[locale]}</h2></div></header>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-3 sm:px-6"><button type="button" className="inline-flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-primary lg:hidden" aria-label={menu ? (zh ? "关闭菜单" : "Close menu") : (zh ? "打开菜单" : "Open menu")} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X size={20} /> : <Menu size={20} />}</button><div className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar small variant={selectedBot.avatar} /><h2 className="truncate text-sm font-semibold sm:text-base">{selectedBot.name[locale]}</h2></div><Link href={moduleHome.href} aria-label={zh ? `前往${moduleHome.zh}` : `Open ${moduleHome.en}`} className="ml-auto inline-flex min-h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-border bg-card px-2.5 text-xs font-medium text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary sm:px-3 sm:text-sm"><span className="sm:hidden">{zh ? "主页" : "Home"}</span><span className="hidden sm:inline">{zh ? moduleHome.zh : moduleHome.en}</span><ArrowUpRight size={15} aria-hidden="true" /></Link></header>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8" aria-live="polite"><div className="mx-auto flex min-h-full max-w-3xl flex-col">
           {page?.next_before_sequence && <button type="button" className="mx-auto mb-6 text-sm text-primary" onClick={() => void older()} disabled={busy}>{l.older}</button>}
           {!page?.messages.length && !outgoing && <div className="my-auto py-12 text-center"><div className="mx-auto mb-5 flex size-14 items-center justify-center" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar variant={selectedBot.avatar} /></div><h3 className="text-2xl font-semibold">{l.start}</h3></div>}
