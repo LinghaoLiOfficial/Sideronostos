@@ -19,6 +19,6 @@ it("shows the selected farm recommendations and an empty state for new farms", (
   fireEvent.click(screen.getByRole("button", { name: /New farm/ }))
   expect(screen.getByText("This farm has no rotation recommendations yet.")).toBeVisible()
   expect(screen.queryByTestId("recommendations")).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole("button", { name: /^Iowa / }))
+  fireEvent.click(screen.getByRole("button", { name: /^Lowa Farm/ }))
   expect(screen.getByTestId("recommendations")).toHaveTextContent(demoFarm.properties.id)
 })

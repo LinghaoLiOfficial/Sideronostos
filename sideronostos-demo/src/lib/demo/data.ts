@@ -19,7 +19,7 @@ export const demoFarm: FarmFeature = {
   type: "Feature", id: DEMO_FARM_ID,
   geometry: { type: "Polygon", coordinates: [[[-93.5096888699, 41.9963549948], [-93.4901921869, 41.9963549948], [-93.4901921869, 42.0037347798], [-93.5096888699, 42.0037347798], [-93.5096888699, 41.9963549948]]] },
   properties: {
-    id: DEMO_FARM_ID, name: "Iowa", boundarySource: "imported", partitionCount: 4,
+    id: DEMO_FARM_ID, name: "Lowa Farm", boundarySource: "imported", partitionCount: 4,
     partitionMethod: "regular-grid", partitionOrientation: "cardinal", partitionGridRows: 2,
     partitionGridColumns: 2, partitionStatus: "confirmed", createdAt: stamp, updatedAt: stamp,
     sourceReleaseId: DEMO_RELEASE_ID, sampleVersion: "iowa-backend-sample-v1",

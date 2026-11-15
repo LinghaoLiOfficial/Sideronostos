@@ -30,7 +30,7 @@ describe("local knowledge farm scope", () => {
     expect(screen.getByText("This farm has no local agricultural knowledge yet.")).toBeVisible()
     expect(screen.queryByDisplayValue("Sample knowledge")).not.toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "Publish and activate" })).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole("button", { name: /^Iowa / }))
+    fireEvent.click(screen.getByRole("button", { name: /^Lowa Farm/ }))
     expect(await screen.findByDisplayValue("Sample knowledge")).toBeVisible()
   })
 })
