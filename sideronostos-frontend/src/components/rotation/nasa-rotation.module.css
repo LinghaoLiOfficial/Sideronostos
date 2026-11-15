@@ -10,6 +10,13 @@
 .releaseBar p { margin: 0; color: #cfe0d1; }
 .releaseBar dt { color: #a9c2ad; font-size: 11px; }
 .releaseBar dd { margin: 3px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+.releaseCompact { background: #203b2c; color: #fff; border-radius: 7px; padding: 12px 14px; }
+.releaseCompactTitle { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.releaseCompactTitle strong { font-size: 14px; }
+.releaseCompactTitle span { color: #cfe0d1; font-size: 11px; }
+.releaseCompact dl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.releaseCompact dt { color: #a9c2ad; font-size: 10px; }
+.releaseCompact dd { margin: 3px 0 0; font-size: 11px; font-weight: 600; overflow-wrap: anywhere; }
 .layout { display: grid; grid-template-columns: minmax(420px, 560px) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 .config, .results { display: grid; gap: 14px; }
 .section { background: #fff; border: 1px solid #dce5d7; border-radius: 7px; padding: 18px; }
@@ -64,5 +71,5 @@
 .legend div { height: 8px; }
 .mapLimit { margin-bottom: 0; font-size: 11px; }
 @media (max-width: 900px) { .releaseBar { grid-template-columns: 1fr 1fr; } .releaseBar > div:first-child { grid-column: 1 / -1; } .layout { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .header { padding: 12px 16px; align-items: flex-start; } .header nav { flex-direction: column; } .main { padding: 12px; } .releaseBar, .grid2, .grid3, .capacityGrid { grid-template-columns: 1fr; } .mapHeader { align-items: stretch; flex-direction: column; } .mapHeader label { min-width: 0; } .mapCanvas { height: 310px; } }
+@media (max-width: 560px) { .header { padding: 12px 16px; align-items: flex-start; } .header nav { flex-direction: column; } .main { padding: 12px; } .releaseBar, .releaseCompact dl, .grid2, .grid3, .capacityGrid { grid-template-columns: 1fr; } .releaseCompactTitle { align-items: flex-start; flex-direction: column; gap: 3px; } .mapHeader { align-items: stretch; flex-direction: column; } .mapHeader label { min-width: 0; } .mapCanvas { height: 310px; } }
 @media print { .config, .header nav, .actions { display: none !important; } .layout { display: block; } .releaseBar { color: #000; background: #fff; border: 1px solid #bbb; } }

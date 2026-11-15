@@ -39,6 +39,9 @@ function NavMenu({ label, items }: { label: string; items: { label: string; href
 export function SiShell({ children }: { children: ReactNode }) {
   const locale = useLocale();
   const pathname = usePathname();
+  const isMultiAgent = pathname === "/si/multi-agent";
+  const isViewportWorkspace = isMultiAgent || pathname === "/si/remote-sensing" || pathname === "/si/local-knowledge";
+  const isFixedHeader = pathname === "/si/rotation-recommendation";
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const moduleCopy: Record<string, { en: [string, string]; zh: [string, string] }> = {
@@ -73,7 +76,7 @@ export function SiShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className={`landing-page si-landing-page locale-${locale === "en" ? "en" : "zh"}`}>
+    <div className={`landing-page si-landing-page locale-${locale === "en" ? "en" : "zh"}${isViewportWorkspace ? " si-multi-agent-shell" : ""}${isFixedHeader ? " si-fixed-header-page" : ""}`}>
       <header className="landing-header">
         <div className="landing-nav-shell">
           <div className="si-brand-context">
@@ -160,7 +163,7 @@ export function SiShell({ children }: { children: ReactNode }) {
           </Button>
         </div>
       </header>
-      {children}
+      {isViewportWorkspace ? <div className="flex min-h-0 flex-1 flex-col">{children}</div> : children}
     </div>
   );
 }

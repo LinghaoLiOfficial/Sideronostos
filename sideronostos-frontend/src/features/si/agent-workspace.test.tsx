@@ -3,6 +3,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AgentWorkspace } from "./agent-workspace";
+import { setLocale } from "@/lib/i18n/locale";
 
 const api = vi.hoisted(() => ({
   listConversations: vi.fn(),
@@ -27,6 +28,7 @@ vi.mock("@/lib/api/client", () => ({
 afterEach(() => {
   cleanup();
   localStorage.clear();
+  setLocale("en");
   vi.clearAllMocks();
 });
 
@@ -43,10 +45,12 @@ it("creates a conversation in the chosen domain and keeps it selectable in histo
     messages: [], next_before_sequence: null,
   });
   render(<AgentWorkspace />);
-  expect(await screen.findByRole("heading", { name: "Your assistants" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Your SI assistants" })).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Agrisata home" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("combobox", { name: "Language" })).not.toBeInTheDocument();
   const identities = screen.getByRole("navigation", { name: "Bot identities" });
   const rail = identities.firstElementChild;
-  expect(rail).toHaveClass("flex");
+  expect(rail).toHaveClass("space-y-1");
   for (const name of ["Field management", "Remote sensing", "Local agriculture", "Crop rotation"]) {
     expect(within(identities).getByRole("group", { name }).parentElement).toBe(rail);
   }
@@ -66,7 +70,7 @@ it("creates a conversation for the selected specialist identity", async () => {
   api.listConversations.mockResolvedValue({ items: [] });
   api.createConversation.mockResolvedValue({ id: "soil-1", bot_id: "remote-soil", preset: "remote_sensing", language: "en", detail: "brief", kb_release_id: "kb", created_at: "2026-11-14T08:00:00Z", updated_at: "2026-11-14T08:00:00Z" });
   render(<AgentWorkspace />);
-  await screen.findByRole("heading", { name: "Your assistants" });
+  await screen.findByRole("heading", { name: "Your SI assistants" });
   const identities = screen.getByRole("navigation", { name: "Bot identities" });
   expect(within(within(identities).getByRole("group", { name: "Remote sensing" })).getAllByRole("button")).toHaveLength(3);
   await user.click(screen.getByRole("button", { name: "Soil specialist" }));
@@ -82,7 +86,7 @@ it("keeps multiple chat sessions available for the same assistant", async () => 
   const second = { ...first, id: "field-2", created_at: "2026-11-14T09:00:00Z", updated_at: "2026-11-14T09:00:00Z" };
   api.createConversation.mockResolvedValueOnce(first).mockResolvedValueOnce(second);
   render(<AgentWorkspace />);
-  await screen.findByRole("heading", { name: "Your assistants" });
+  await screen.findByRole("heading", { name: "Your SI assistants" });
   const create = screen.getByRole("button", { name: "New chat" });
   const history = screen.getByRole("navigation", { name: "Conversations" });
 
@@ -187,10 +191,9 @@ it("opens a cited knowledge source from the main assistant workspace", async () 
 it("keeps Chinese after a reload and labels local prices and varieties as mock", async () => {
   const user = userEvent.setup();
   api.listConversations.mockResolvedValue({ items: [] });
-  api.setPreferences.mockResolvedValue({ language: "zh", detail: "brief" });
+  setLocale("zh-CN");
   const first = render(<AgentWorkspace />);
-  await screen.findByRole("heading", { name: "Your assistants" });
-  await user.selectOptions(screen.getByRole("combobox", { name: "Language" }), "zh-CN");
+  await screen.findByRole("heading", { name: /你的助手|Your SI assistants/ });
   expect(localStorage.getItem("agrisata-locale")).toBe("zh-CN");
   first.unmount();
   render(<AgentWorkspace />);
@@ -203,20 +206,18 @@ it("recovers the conversation list after a temporary load failure", async () => 
   api.listConversations.mockRejectedValueOnce(new Error("network unavailable")).mockResolvedValueOnce({ items: [] });
   render(<AgentWorkspace />);
   expect(await screen.findByRole("alert")).toHaveTextContent("Something went wrong");
-  expect(screen.queryByRole("heading", { name: "Your assistants" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Your SI assistants" })).not.toBeInTheDocument();
   expect(screen.queryByRole("textbox", { name: "Message Field guide" })).not.toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Try again" }));
-  expect(await screen.findByRole("heading", { name: "Your assistants" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Your SI assistants" })).toBeInTheDocument();
   expect(screen.getByText("No conversations yet")).toBeInTheDocument();
 });
 
 it("renders a late load failure in the currently selected language", async () => {
-  const user = userEvent.setup();
   let fail!: (error: Error) => void;
   api.listConversations.mockReturnValue(new Promise((_, reject) => { fail = reject; }));
-  api.setPreferences.mockResolvedValue({ language: "zh", detail: "brief" });
+  setLocale("zh-CN");
   render(<AgentWorkspace />);
-  await user.selectOptions(screen.getByRole("combobox", { name: "Language" }), "zh-CN");
   await act(async () => fail(new Error("offline")));
   expect(await screen.findByRole("alert")).toHaveTextContent("发生错误。草稿已保留。");
 });

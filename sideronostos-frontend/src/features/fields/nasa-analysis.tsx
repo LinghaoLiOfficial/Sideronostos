@@ -1,10 +1,16 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { AlertTriangle, RefreshCw } from "lucide-react"
+import { AlertTriangle, MapPin, Pentagon, RefreshCw } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { ApiError } from "@/lib/api/client"
+import { useWorkspaceSession } from "@/components/rotation/use-workspace-session"
+import { featureAreaHectares, featureCentroid } from "@/features/fields/geometry"
 import type { NASAAnalysisData } from "@/features/fields/nasa-analysis-types"
+import { useOwnedWorkspace } from "@/features/fields/use-owned-workspace"
+import { cn } from "@/lib/utils"
+import type { FarmFeature, FieldFeature } from "@/types/workspace"
 
 function useChartWidth() {
   const ref = useRef<HTMLDivElement>(null)
@@ -51,7 +57,7 @@ function LineChart({ title, points, series, unit, formatDate, uncertaintyKey }: 
     <div className="flex flex-wrap items-baseline justify-between gap-2"><h3 className="text-sm font-semibold">{title}</h3><span className="text-xs text-muted-foreground">{unit}</span></div>
     <svg role="img" aria-label={title + ", " + unit} viewBox={"0 0 " + width + " " + height} className="block h-auto w-full overflow-visible">
       <title>{title}</title>
-      {ticks.map((value) => <g key={value}><line x1={plot.left} x2={plot.right} y1={y(value)} y2={y(value)} stroke="currentColor" opacity="0.14" /><text x={plot.left - 8} y={y(value) + 4} textAnchor="end" fontSize="11" fill="currentColor" opacity="0.72">{value.toFixed(1)}</text></g>)}
+      {ticks.map((value, index) => <g key={`${value}-${index}`}><line x1={plot.left} x2={plot.right} y1={y(value)} y2={y(value)} stroke="currentColor" opacity="0.14" /><text x={plot.left - 8} y={y(value) + 4} textAnchor="end" fontSize="11" fill="currentColor" opacity="0.72">{value.toFixed(1)}</text></g>)}
       <line x1={plot.left} x2={plot.left} y1={plot.top} y2={plot.bottom} stroke="currentColor" opacity="0.45" />
       <line x1={plot.left} x2={plot.right} y1={plot.bottom} y2={plot.bottom} stroke="currentColor" opacity="0.45" />
       {series.map((item) => <g key={item.key}>
@@ -77,12 +83,18 @@ function SummaryStat({ label, value, note }: { label: string; value: string; not
   return <div className="border-b py-3 sm:border-b-0 sm:border-l sm:pl-4 first:sm:border-l-0 first:sm:pl-0"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-lg font-semibold tabular-nums">{value}</p><p className="mt-1 text-xs text-muted-foreground">{note}</p></div>
 }
 
-function DataView({ data }: { data: NASAAnalysisData }) {
+function formatArea(value: number) {
+  return value < 1 ? `${Math.round(value * 10_000).toLocaleString()} m²` : `${value.toFixed(value < 100 ? 2 : 0)} ha`
+}
+
+function DataView({ data, farm, fieldCount = 0 }: { data: NASAAnalysisData; farm?: FarmFeature; fieldCount?: number }) {
   const latest = data.annual.at(-1)
+  const center = farm ? featureCentroid(farm) : null
   return <div className="h-full overflow-y-auto">
-    <div className="si-cream-surface mx-auto my-6 w-[calc(100%_-_2rem)] max-w-[1440px] space-y-8 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="si-cream-surface min-h-full w-full space-y-8 px-4 py-6 sm:px-6 lg:px-8">
       <section>
-        <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-medium uppercase text-primary">Historical observations · Iowa</p><h2 className="mt-1 text-xl font-semibold">Iowa benchmark summary</h2></div><p className="text-sm text-muted-foreground">{data.period.start} — {data.period.end}</p></div>
+        <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-medium uppercase text-muted-foreground">{farm ? `Selected farm · ${farm.properties.name}` : "Historical observations · Iowa"}</p><h2 className="mt-1 text-xl font-semibold">{farm ? `${farm.properties.name} remote sensing report` : "Iowa benchmark summary"}</h2></div><p className="text-sm text-muted-foreground">{data.period.start} — {data.period.end}</p></div>
+        {farm && center ? <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-y py-3 text-xs text-muted-foreground" aria-label="Selected farm context"><span>{formatArea(featureAreaHectares(farm))}</span><span>{fieldCount} {fieldCount === 1 ? "field" : "fields"}</span><span>{center[1].toFixed(4)}, {center[0].toFixed(4)}</span><span>Iowa historical benchmark</span></div> : null}
         <div className="mt-5 grid gap-x-5 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryStat label="GPM precipitation · 2024" value={(latest?.rain_mm.toFixed(0) ?? "—") + " mm"} note="Annual accumulation · IMERG daily" />
           <SummaryStat label="POWER reference ET₀ · 2024" value={(latest?.et0_mm.toFixed(0) ?? "—") + " mm"} note="Daily estimates summed by year" />
@@ -109,12 +121,12 @@ function DataView({ data }: { data: NASAAnalysisData }) {
         <LineChart title="GRACE/GRACE-FO liquid water equivalent anomaly" points={data.grace.rows} series={[{ key: "lwe_cm", label: "Mascon anomaly", color: "#92b9e6" }]} unit="cm LWE" formatDate={(value) => value.slice(2, 7)} uncertaintyKey="uncertainty_cm" />
         <div className="space-y-3 text-sm leading-6"><h2 className="text-base font-semibold">Coverage and interpretation</h2><p className="text-muted-foreground">POWER covers {data.coverage.power_days.toLocaleString()} of {data.coverage.expected_days.toLocaleString()} expected days. GPM has complete daily coverage for {data.coverage.gpm_days_with_full_grid.toLocaleString()} days across {data.coverage.gpm_unique_cells} grid cells.</p><p className="text-muted-foreground">GRACE nearest mascon center: {data.grace.coordinates.nearest_grid_latitude.toFixed(2)}° N, {Math.abs(data.grace.coordinates.nearest_grid_longitude > 180 ? data.grace.coordinates.nearest_grid_longitude - 360 : data.grace.coordinates.nearest_grid_longitude).toFixed(2)}° W; effective support is about {data.grace.coordinates.effective_mascon_resolution_degrees.toFixed(0)}°.</p><ul className="list-disc space-y-1 pl-5 text-xs text-muted-foreground">{data.interpretation_limits.map((limit) => <li key={limit}>{limit}</li>)}</ul></div>
       </section>
-      <p className="border-t pt-4 text-xs text-muted-foreground">Sources: NASA POWER, GPM IMERG Final Daily V07, SRTMGL1.003, GRACE/GRACE-FO JPL Mascon. Historical engineering benchmark only; not a future planting recommendation.</p>
+      <p className="border-t pt-4 text-xs text-muted-foreground">Sources: NASA POWER, GPM IMERG Final Daily V07, SRTMGL1.003, GRACE/GRACE-FO JPL Mascon. Historical Iowa engineering benchmark shown in the context of the selected farm; not a farm-specific live observation or future planting recommendation.</p>
     </div>
   </div>
 }
 
-export function NASAAnalysis() {
+export function NASAAnalysis({ farm, fieldCount }: { farm?: FarmFeature; fieldCount?: number } = {}) {
   const [data, setData] = useState<NASAAnalysisData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -134,5 +146,50 @@ export function NASAAnalysis() {
   }, [retry])
   if (loading) return <div className="flex flex-1 items-center justify-center" role="status">Loading NASA analysis…</div>
   if (error || !data) return <div className="m-auto flex max-w-xl flex-col items-start gap-3 px-6 py-10" role="alert"><AlertTriangle className="size-5 text-amber-500" /><h2 className="text-base font-semibold">NASA analysis is unavailable</h2><p className="text-sm text-muted-foreground">{error ?? "No analysis data is available."}</p><Button type="button" variant="outline" onClick={() => { setLoading(true); setRetry((value) => value + 1) }}><RefreshCw /> Retry</Button></div>
-  return <DataView data={data} />
+  return <DataView data={data} farm={farm} fieldCount={fieldCount} />
+}
+
+function FarmSelector({ farms, fields, selectedFarmId, onSelect }: {
+  farms: FarmFeature[]
+  fields: FieldFeature[]
+  selectedFarmId: string | null
+  onSelect: (farmId: string) => void
+}) {
+  return <aside className="flex min-h-0 w-full shrink-0 flex-col border-b border-sidebar-border bg-sidebar text-sidebar-foreground md:w-[clamp(16rem,18vw,22rem)] md:border-b-0 md:border-r" aria-labelledby="remote-sensing-farms-title">
+    <div className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border px-5"><div><p className="text-xs text-muted-foreground">Remote sensing scope</p><h2 id="remote-sensing-farms-title" className="mt-0.5 text-lg font-semibold tracking-tight">Farms</h2></div><span className="rounded-full bg-sidebar-accent px-2.5 py-1 text-xs font-semibold">{farms.length}</span></div>
+    <div className="flex max-h-[min(34vh,20rem)] min-h-0 gap-1 overflow-y-auto overscroll-contain p-3 md:flex-1 md:max-h-none md:flex-col">
+      {farms.length ? farms.map((farm) => {
+        const count = fields.filter((field) => field.properties.farmId === farm.properties.id).length
+        const selected = farm.properties.id === selectedFarmId
+        return <button key={farm.properties.id} type="button" aria-pressed={selected} onClick={() => onSelect(farm.properties.id)} className={cn("flex min-h-14 w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-primary", selected ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/70")}>
+          <MapPin className="size-4 shrink-0" /><span className="min-w-0"><span className="block truncate text-sm font-semibold">{farm.properties.name}</span><span className="mt-1 block truncate text-xs text-muted-foreground">{formatArea(featureAreaHectares(farm))} · {count} {count === 1 ? "field" : "fields"}</span></span>
+        </button>
+      }) : <div className="m-1 border border-dashed border-sidebar-border p-4 text-center"><Pentagon className="mx-auto size-5 text-muted-foreground" /><p className="mt-3 text-sm font-medium">No farms available</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Add or restore a farm in Field management first.</p></div>}
+    </div>
+  </aside>
+}
+
+function OwnedRemoteSensingWorkspace({ ownerId }: { ownerId: string | null }) {
+  const local = useOwnedWorkspace(ownerId, Boolean(ownerId))
+  const farms = local.workspace?.farms ?? []
+  const fields = local.workspace?.fields ?? []
+  const [selectedFarmId, setSelectedFarmId] = useState<string | null>(null)
+  const selectedFarm = farms.find((farm) => farm.properties.id === selectedFarmId) ?? farms[0] ?? null
+  const selectedFields = selectedFarm ? fields.filter((field) => field.properties.farmId === selectedFarm.properties.id) : []
+
+  if (!local.workspace) return <div className="flex flex-1 items-center justify-center" role="status">Loading farms…</div>
+  return <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+    <FarmSelector farms={farms} fields={fields} selectedFarmId={selectedFarm?.properties.id ?? null} onSelect={setSelectedFarmId} />
+    <section className="min-h-0 min-w-0 flex-1" aria-live="polite">
+      {selectedFarm ? <NASAAnalysis farm={selectedFarm} fieldCount={selectedFields.length} /> : <div className="flex h-full items-center justify-center px-6 text-center"><div><Pentagon className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 text-base font-semibold">Select a farm to view its report</h2><p className="mt-1 text-sm text-muted-foreground">Farm reports appear here after a farm is available in Field management.</p></div></div>}
+    </section>
+  </div>
+}
+
+export function RemoteSensingWorkspace() {
+  const { session, ready } = useWorkspaceSession()
+  if (!ready) return <div className="flex flex-1 items-center justify-center" role="status">Checking farm workspace…</div>
+  if (session.error && !(session.error instanceof ApiError && session.error.status === 401)) return <div className="m-auto max-w-lg px-6 py-10" role="alert"><h2 className="text-base font-semibold">Farm workspace is unavailable</h2><p className="mt-2 text-sm text-muted-foreground">The account could not be loaded. Please retry after the connection is restored.</p></div>
+  const ownerId = session.data?.email_verified ? session.data.id : null
+  return <OwnedRemoteSensingWorkspace key={ownerId ?? "anonymous"} ownerId={ownerId} />
 }

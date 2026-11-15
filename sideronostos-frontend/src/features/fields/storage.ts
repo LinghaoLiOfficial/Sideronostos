@@ -44,25 +44,33 @@ interface WorkspaceDb extends DBSchema {
   }
 }
 
-const database = openDB<WorkspaceDb>("field-shift-workspace", 3, {
-  upgrade(db) {
-    // Do not delete/recreate v1/v2 stores, including those with unknown key paths.
-    if (!db.objectStoreNames.contains("workspaces")) {
-      db.createObjectStore("workspaces", { keyPath: "scope" })
-    }
-    if (!db.objectStoreNames.contains("scopedObservations")) {
-      const observations = db.createObjectStore("scopedObservations", { keyPath: ["scope", "id"] })
-      observations.createIndex("by-owner-field", ["scope", "fieldId"])
-    }
-    if (!db.objectStoreNames.contains("imports")) {
-      db.createObjectStore("imports", { keyPath: ["scope", "source", "originalFarmId"] })
-    }
-  },
-  blocking() { void database.then(db => db.close()) },
-})
+let database: ReturnType<typeof openDB<WorkspaceDb>> | null = null
+
+function getDatabase() {
+  if (typeof indexedDB === "undefined") throw new Error("本机工作区只能在浏览器中使用。")
+  if (!database) {
+    database = openDB<WorkspaceDb>("field-shift-workspace", 3, {
+      upgrade(db) {
+        // Do not delete/recreate v1/v2 stores, including those with unknown key paths.
+        if (!db.objectStoreNames.contains("workspaces")) {
+          db.createObjectStore("workspaces", { keyPath: "scope" })
+        }
+        if (!db.objectStoreNames.contains("scopedObservations")) {
+          const observations = db.createObjectStore("scopedObservations", { keyPath: ["scope", "id"] })
+          observations.createIndex("by-owner-field", ["scope", "fieldId"])
+        }
+        if (!db.objectStoreNames.contains("imports")) {
+          db.createObjectStore("imports", { keyPath: ["scope", "source", "originalFarmId"] })
+        }
+      },
+      blocking() { void database?.then(db => db.close()) },
+    })
+  }
+  return database
+}
 
 export async function getStoredWorkspace(ownerId: string | null = null): Promise<Workspace> {
-  const stored = await (await database).get("workspaces", scopeKey(ownerId))
+  const stored = await (await getDatabase()).get("workspaces", scopeKey(ownerId))
   return { farms: (stored?.farms ?? []).map(normalizeFarm), fields: stored?.fields ?? [] }
 }
 
@@ -75,7 +83,7 @@ export async function replaceStoredWorkspace(
       throw new Error("Workspace owner mismatch; copy local drafts explicitly")
     }
   }
-  await (await database).put("workspaces", {
+  await (await getDatabase()).put("workspaces", {
     scope,
     farms: farms.map(farm => normalizeFarm({ ...farm, properties: { ...farm.properties, ownerUserId: ownerId } })),
     fields: fields.map(field => ({ ...field, properties: { ...field.properties, ownerUserId: ownerId } })),
@@ -104,7 +112,7 @@ function observation(value: unknown): value is FieldObservation {
 }
 
 export async function getLegacyWorkspace() {
-  const db = await database
+  const db = await getDatabase()
   const [farms, fields, observations]: [unknown[], unknown[], unknown[]] = await Promise.all([
     db.objectStoreNames.contains("farms") ? db.getAll("farms") : [],
     db.objectStoreNames.contains("fields") ? db.getAll("fields") : [],
@@ -134,7 +142,7 @@ export async function importLocalWorkspace(ownerId: string, source: LocalSource)
     ...(await getStoredWorkspace()),
     observations: [] as FieldObservation[],
   }
-  const db = await database
+  const db = await getDatabase()
   const transaction = db.transaction(["workspaces", "imports", "scopedObservations"], "readwrite")
   const current = await transaction.objectStore("workspaces").get(scope) ?? { scope, farms: [], fields: [] }
   for (const farm of local.farms) {
@@ -167,7 +175,7 @@ export async function importLocalWorkspace(ownerId: string, source: LocalSource)
 }
 
 export async function clearLegacyWorkspaceData() {
-  const db = await database
+  const db = await getDatabase()
   const stores = (["farms", "fields", "observations"] as const).filter(name => db.objectStoreNames.contains(name))
   if (!stores.length) return
   const transaction = db.transaction(stores, "readwrite")
@@ -177,7 +185,7 @@ export async function clearLegacyWorkspaceData() {
 
 export async function deleteStoredFarm(farmId: string, ownerId: string | null = null) {
   const scope = scopeKey(ownerId)
-  const db = await database
+  const db = await getDatabase()
   const transaction = db.transaction(["workspaces", "scopedObservations"], "readwrite")
   try {
     const workspaceStore = transaction.objectStore("workspaces")
@@ -208,13 +216,13 @@ export async function deleteStoredFarm(farmId: string, ownerId: string | null = 
 }
 
 export async function getFieldObservations(fieldId: string, ownerId: string | null = null) {
-  const rows = await (await database).getAllFromIndex("scopedObservations", "by-owner-field", [scopeKey(ownerId), fieldId])
+  const rows = await (await getDatabase()).getAllFromIndex("scopedObservations", "by-owner-field", [scopeKey(ownerId), fieldId])
   return rows.map(row => row.observation)
 }
 
 export async function putObservations(observations: FieldObservation[], ownerId: string | null = null) {
   const scope = scopeKey(ownerId)
-  const transaction = (await database).transaction("scopedObservations", "readwrite")
+  const transaction = (await getDatabase()).transaction("scopedObservations", "readwrite")
   await Promise.all([
     ...observations.map(observation => transaction.store.put({ scope, id: observation.id, fieldId: observation.fieldId, observation })),
     transaction.done,

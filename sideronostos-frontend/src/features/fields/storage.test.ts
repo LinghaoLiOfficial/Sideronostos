@@ -11,6 +11,14 @@ function deleteWorkspaceDatabase() {
 }
 
 describe("owner-scoped workspace storage", () => {
+  it("can be imported during server rendering without initializing IndexedDB", async () => {
+    vi.resetModules()
+    vi.stubGlobal("indexedDB", undefined)
+    const storage = await import("@/features/fields/storage")
+    await expect(storage.getStoredWorkspace()).rejects.toThrow("本机工作区只能在浏览器中使用。")
+    vi.unstubAllGlobals()
+  })
+
   it("preserves the v1 prototype stores without exposing them as owned data", async () => {
     await deleteWorkspaceDatabase()
     await new Promise<void>((resolve, reject) => {

@@ -344,6 +344,14 @@ html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover, .si-language-popo
   position: relative;
   background: #111714;
 }
+.si-fixed-header-page { padding-top: 72px; }
+.si-fixed-header-page > .landing-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+}
+.si-multi-agent-shell { display: flex; height: 100dvh; min-height: 0; flex-direction: column; overflow: hidden; }
+.si-multi-agent-shell > .landing-header { flex: 0 0 72px; }
 .si-header {
   position: fixed;
   z-index: 40;
@@ -979,6 +987,8 @@ html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover) :is([role="menuit
 @media (max-width: 900px) {
   .landing-header { height: 76px; }
   .si-landing-page .landing-header { height: 56px; }
+  .si-fixed-header-page { padding-top: 56px; }
+  .si-multi-agent-shell > .landing-header { flex-basis: 56px; }
   .si-landing-page .landing-nav { top: 56px; }
   .si-landing-page .landing-nav-shell { gap: 8px; }
   .si-landing-page .landing-wordmark { width: 128px; }

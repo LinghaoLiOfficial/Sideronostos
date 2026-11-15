@@ -4,6 +4,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { LocalKnowledgeCatalogue, LocalKnowledgeProfile } from "@/lib/api/rotation-types";
+import { setLocale } from "@/lib/i18n/locale";
 import { LocalKnowledgeWorkspace } from "@/features/rotation/local-knowledge-workspace";
 
 const mocks = vi.hoisted(() => ({ get: vi.fn(), save: vi.fn(), publish: vi.fn() }));
@@ -38,11 +39,12 @@ const catalogue = {
 } as LocalKnowledgeCatalogue;
 
 beforeEach(() => {
+  setLocale("zh-CN");
   mocks.get.mockResolvedValue(catalogue);
   mocks.save.mockImplementation(async (value: LocalKnowledgeProfile) => ({ ...catalogue.draft, profile: value, updated_at: "2026-11-15T01:00:00Z" }));
   mocks.publish.mockResolvedValue({ ...catalogue, active: { ...catalogue.active, revision: 2 }, draft: { ...catalogue.draft, updated_at: "2026-11-15T02:00:00Z" } });
 });
-afterEach(() => { cleanup(); vi.clearAllMocks(); });
+afterEach(() => { cleanup(); setLocale("en"); vi.clearAllMocks(); });
 
 it("edits and saves a personal agronomy draft", async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -64,4 +66,13 @@ it("exposes crop, rule, source and immutable version views", async () => {
   expect(screen.getByDisplayValue("Local extension")).toBeVisible();
   await userEvent.click(screen.getByRole("button", { name: /版本记录/ }));
   expect(screen.getByRole("heading", { name: "版本记录" })).toBeVisible();
+});
+
+it("switches the knowledge workspace to English", async () => {
+  setLocale("en");
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={client}><LocalKnowledgeWorkspace /></QueryClientProvider>);
+  expect(await screen.findByRole("heading", { name: "Local Agricultural Knowledge Base" })).toBeVisible();
+  expect(screen.getByRole("button", { name: "Crop parameters" })).toBeVisible();
+  expect(screen.getByRole("button", { name: "Save draft" })).toBeVisible();
 });

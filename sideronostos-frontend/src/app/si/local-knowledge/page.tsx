@@ -4,5 +4,9 @@ import { LocalKnowledgeWorkspace } from "@/features/rotation/local-knowledge-wor
 export const metadata = { title: "Local Agronomy Knowledge · Agrisata" };
 
 export default function LocalKnowledgePage() {
-  return <><LocalKnowledgeWorkspace /><MultiBotDock module="local-knowledge" /></>;
+  return (
+    <><main className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <LocalKnowledgeWorkspace />
+    </main><MultiBotDock module="local-knowledge" /></>
+  );
 }
