@@ -16,6 +16,13 @@ function metricLabel(language: "en" | "zh", metric: string) {
   return language === "en" ? pair[0] : pair[1];
 }
 
+function layerAllowed(botId: string, product: string | undefined) {
+  if (!["remote-water", "remote-soil", "remote-weather"].includes(botId)) return true;
+  if (product === "SPL3SMP_E") return botId !== "remote-weather";
+  const weatherLayer = product === "NASA_POWER_DAILY" || product === "NASA_POWER_DAILY_WITH_GPM" || Boolean(product?.startsWith("GPM_"));
+  return weatherLayer && botId !== "remote-soil";
+}
+
 export function Observations(props: TaskProps) {
   const { botId, language, scope } = props;
   const fields = useLoad(listFields);
@@ -76,7 +83,7 @@ export function ObservationMaps(props: TaskProps) {
   const layers = useLoad(listLayers);
   const [layer, setLayer] = useDraft(`${scope}:layer`, "");
   const execution = useTaskExecution(props, "layer");
-  const available = layers.data?.items.filter((item) => botId !== "remote-soil" || item.source.product === "SPL3SMP_E") ?? [];
+  const available = layers.data?.items.filter((item) => layerAllowed(botId, item.source?.product)) ?? [];
   return <div className="space-y-3"><LoadingState state={layers} language={language} />
     {layers.data && !available.length && <p role="status">{tr(language, "No observation maps have been published for this specialist yet. You can still check a saved field for available readings.", "这位助手暂无已发布观测地图，仍可查询已保存地块的可用读数。")}</p>}
     {Boolean(available.length) && execution.outcome?.status !== "succeeded" && <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); void execution.run({ kind: "action", action: "remote_sensing.layer", arguments: { layer_id: layer } }); }}><fieldset disabled={execution.busy || execution.uncertain} className="space-y-3">

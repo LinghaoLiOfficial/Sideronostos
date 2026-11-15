@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
-import { act, cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render as baseRender, screen, waitFor, within } from "@testing-library/react";
 import { render } from "@/test/render-zh";
+import { LocaleProvider } from "@/lib/i18n/provider";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { FieldForm } from "./field-form";
 import { EnvironmentPanel } from "./environment-panel";
@@ -9,6 +10,13 @@ import { Comparison } from "./comparison";
 import { analysis, environment, field, profile } from "./fixtures.test-helper";
 
 afterEach(() => { cleanup(); sessionStorage.clear(); });
+
+it("shows planning priorities in English when English is selected", () => {
+  baseRender(<LocaleProvider initialLocale="en"><PlanningForm field={field} profile={profile} userId="u1" onGenerate={vi.fn()} busy={false} error={null} /></LocaleProvider>);
+  expect(screen.getByRole("slider", { name: "Reduce supplemental irrigation gap" })).toBeInTheDocument();
+  expect(screen.getByText("Prioritize arrangements needing less additional water")).toBeInTheDocument();
+  expect(screen.queryByText("减少补灌缺口")).not.toBeInTheDocument();
+});
 
 describe("farmer journey", () => {
   it("retains edited field and history when server save fails", async () => {

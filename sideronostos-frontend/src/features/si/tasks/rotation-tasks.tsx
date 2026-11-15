@@ -41,8 +41,8 @@ export function RotationRuns(props: TaskProps) {
     {current ? <><button className={secondary} onClick={() => setSelected(null)}>{tr(language, "All calculations", "所有计算")}</button><RunDetails key={current.id} {...props} run={current} refresh={runs.reload} /></> : <>
       {(runs.data?.items.length ?? 0) > 5 && <Input label={tr(language, "Find a field’s calculations", "查找地块计算")} type="search" value={query} onChange={(e) => setQuery(e.target.value)} />}
       <ul className="divide-y divide-border">{runs.data?.items.filter((run) => run.field_snapshots.some((field) => field.name.toLowerCase().includes(query.toLowerCase()))).map((run) => <li key={run.id} className="space-y-1 py-3"><h4 className="font-medium">{run.field_snapshots.map((field) => field.name).join(", ") || tr(language, "Farm calculation", "农场计算")}</h4><p className="text-xs text-muted-foreground">{new Date(run.created_at).toLocaleString(language === "en" ? "en" : "zh-CN")} · <span>{statusLabel(run.status, language)}</span></p><div className="flex flex-wrap gap-4"><button className={linkStyle} onClick={() => setSelected(run.id)}>{tr(language, "View and manage calculation", "查看和管理计算")}</button></div></li>)}</ul>
+      <Link href="/si/fields?step=planning" className={linkStyle}>{tr(language, "Start a new plan", "开始新规划")}</Link>
     </>}
-    <Link href="/si/fields?step=planning" className={linkStyle}>{tr(language, "Start a new plan", "开始新规划")}</Link>
   </div>;
 }
 
