@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import Link from "next/link";
 import { ArrowUpRight, GripVertical, LoaderCircle, Menu, Plus, X } from "lucide-react";
 import { BotComposer } from "@/components/bot/BotComposer";
@@ -114,6 +114,20 @@ export function AgentWorkspace() {
     const next = fitAssistantWidth(width, available);
     setAssistantWidth(next);
     localStorage.setItem(assistantWidthKey, String(next));
+  }
+  function beginResize(event: ReactPointerEvent<HTMLElement>) {
+    if (event.button !== 0) return;
+    dividerDrag.current = { pointerId: event.pointerId, x: event.clientX, width: assistantWidth };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  }
+  function moveResize(event: ReactPointerEvent<HTMLElement>) {
+    const drag = dividerDrag.current;
+    if (drag && drag.pointerId === event.pointerId) resizeAssistant(drag.width + event.clientX - drag.x);
+  }
+  function endResize(event: ReactPointerEvent<HTMLElement>) {
+    if (dividerDrag.current?.pointerId !== event.pointerId) return;
+    dividerDrag.current = null;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
   }
 
   useEffect(() => {
@@ -282,7 +296,18 @@ export function AgentWorkspace() {
   return <div className="flex h-full min-h-0 flex-col bg-background text-foreground">
     {loading ? <div role="status" className="flex flex-1 items-center justify-center gap-2 text-muted-foreground"><LoaderCircle size={18} className="animate-spin" />{l.loading}</div> : user === null ? <main className="flex flex-1 flex-col items-center justify-center gap-4"><h1 className="text-xl font-semibold">{l.signIn}</h1><Link className="rounded-md bg-primary px-4 py-2 text-primary-foreground" href="/login?next=%2Fsi%2Fmulti-agent&authRequired=1">{l.login}</Link></main> : user === undefined ? <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4"><p role="alert" className="text-center text-sm text-destructive">{l.error}</p><button type="button" className="rounded-md bg-primary px-4 py-2 text-primary-foreground" onClick={() => { setError(null); setLoading(true); setReload((value) => value + 1); }}>{l.retry}</button></main> : <main ref={workspace} className={`relative grid min-h-0 flex-1 ${styles.workspace}`} style={{ "--assistant-panel-width": `${assistantWidth}px` } as CSSProperties}>
       {menu && <button type="button" className="absolute inset-0 z-20 bg-black/50 lg:hidden" aria-label={zh ? "关闭菜单" : "Close menu"} onClick={() => setMenu(false)} />}
-      <aside id="assistant-panel" className={(menu ? "translate-x-0" : "-translate-x-full") + " absolute inset-y-0 left-0 z-30 flex w-[min(26rem,90vw)] flex-col border-r border-border bg-sidebar transition-transform lg:static lg:w-auto lg:translate-x-0 lg:border-r-0"} aria-label={l.title}>
+      <aside id="assistant-panel" className={(menu ? "translate-x-0" : "-translate-x-full") + ` absolute inset-y-0 left-0 z-30 flex w-[min(26rem,90vw)] flex-col border-r border-border bg-sidebar transition-transform lg:relative lg:w-auto lg:translate-x-0 lg:border-r-0 ${styles.assistantPanel}`} aria-label={l.title}
+        onPointerDown={(event) => {
+          if (event.target !== event.currentTarget) return;
+          const right = event.currentTarget.getBoundingClientRect().right;
+          if (event.clientX < right - 12 || event.clientX > right) return;
+          beginResize(event);
+          event.preventDefault();
+        }}
+        onPointerMove={moveResize}
+        onPointerUp={endResize}
+        onPointerCancel={() => { dividerDrag.current = null; }}
+        onLostPointerCapture={() => { dividerDrag.current = null; }}>
         <div className="flex h-16 shrink-0 items-center justify-end border-b border-border px-5 lg:hidden"><button type="button" className="inline-flex size-9 items-center justify-center rounded-full hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary" aria-label={zh ? "关闭菜单" : "Close menu"} onClick={() => setMenu(false)}><X size={19} /></button></div>
         <div className="flex items-center justify-between px-5 pb-2 pt-5"><h1 className="text-lg font-semibold tracking-tight">{l.title}</h1><button type="button" aria-label={l.newChat} title={l.newChat} onClick={() => void create()} disabled={busy} className="inline-flex size-10 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50"><Plus size={20} aria-hidden="true" /></button></div>
         <nav ref={botNavigation} aria-label={zh ? "助手身份" : "Bot identities"} className="max-h-[60%] shrink-0 overflow-y-auto overscroll-contain px-3 pb-3 pt-1">
@@ -315,20 +340,9 @@ export function AgentWorkspace() {
         tabIndex={0}
         title={zh ? "拖动或使用左右方向键调整宽度" : "Drag or use arrow keys to resize"}
         className="group relative hidden cursor-col-resize touch-none select-none items-center justify-center bg-sidebar text-muted-foreground hover:bg-muted focus-visible:z-10 focus-visible:outline-none lg:flex"
-        onPointerDown={(event) => {
-          if (event.button !== 0) return;
-          dividerDrag.current = { pointerId: event.pointerId, x: event.clientX, width: assistantWidth };
-          event.currentTarget.setPointerCapture?.(event.pointerId);
-        }}
-        onPointerMove={(event) => {
-          const drag = dividerDrag.current;
-          if (drag && drag.pointerId === event.pointerId) resizeAssistant(drag.width + event.clientX - drag.x);
-        }}
-        onPointerUp={(event) => {
-          if (dividerDrag.current?.pointerId !== event.pointerId) return;
-          dividerDrag.current = null;
-          event.currentTarget.releasePointerCapture?.(event.pointerId);
-        }}
+        onPointerDown={beginResize}
+        onPointerMove={moveResize}
+        onPointerUp={endResize}
         onPointerCancel={() => { dividerDrag.current = null; }}
         onLostPointerCapture={() => { dividerDrag.current = null; }}
         onKeyDown={(event) => {
@@ -340,7 +354,7 @@ export function AgentWorkspace() {
           else return;
           event.preventDefault();
         }}
-      ><span className="pointer-events-none flex h-10 w-5 items-center justify-center rounded-md group-hover:bg-muted group-focus-visible:bg-muted group-focus-visible:outline-2 group-focus-visible:outline-primary"><GripVertical size={16} aria-hidden="true" /></span></div>
+      ><span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-border group-hover:bg-primary" /><span className="pointer-events-none absolute left-1/2 top-4 flex h-10 w-6 -translate-x-1/2 items-center justify-center rounded-md border border-border bg-sidebar shadow-sm group-hover:bg-muted group-focus-visible:bg-muted group-focus-visible:outline-2 group-focus-visible:outline-primary"><GripVertical size={16} aria-hidden="true" /></span></div>
       <section className="si-cream-surface flex min-h-0 min-w-0 flex-col" aria-label={selectedBot.name[locale]} style={{ "--bot-accent": selectedBot.color } as CSSProperties}>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-3 sm:px-6"><button type="button" className="inline-flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-primary lg:hidden" aria-label={menu ? (zh ? "关闭菜单" : "Close menu") : (zh ? "打开菜单" : "Open menu")} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X size={20} /> : <Menu size={20} />}</button><div className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5" style={{ "--bot-accent": selectedBot.color } as CSSProperties}><BotAvatar small variant={selectedBot.avatar} /><h2 className="truncate text-sm font-semibold sm:text-base">{selectedBot.name[locale]}</h2></div><Link href={moduleHome.href} aria-label={zh ? `前往${moduleHome.zh}` : `Open ${moduleHome.en}`} className="ml-auto inline-flex min-h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-border bg-card px-2.5 text-xs font-medium text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary sm:px-3 sm:text-sm"><span className="sm:hidden">{zh ? "主页" : "Home"}</span><span className="hidden sm:inline">{zh ? moduleHome.zh : moduleHome.en}</span><ArrowUpRight size={15} aria-hidden="true" /></Link></header>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-8" aria-live="polite"><div className="mx-auto flex min-h-full max-w-3xl flex-col">
