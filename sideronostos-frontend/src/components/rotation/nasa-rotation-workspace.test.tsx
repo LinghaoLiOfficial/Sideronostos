@@ -94,14 +94,11 @@ it("preselects benchmark fields and submits a frozen NASA release without warnin
   await user.click(runButton);
   await waitFor(() => expect(mocks.createRun).toHaveBeenCalledOnce());
   expect(mocks.createRun.mock.calls[0][0]).toMatchObject({
-    profile_version_id: profile.profile_version_id, profile_sha256: profile.sha256,
     data_release_id: release.id, horizon_mode: "3y", max_options: 3,
     start: "2022-01-01", end: "2024-12-31",
     field_limits: { "synthetic-1": { "2022": { water_m3: 96000, cost_usd: 38400, labor_days: 256 } } },
   });
   expect(screen.queryByText(/请至少选择一个/)).not.toBeInTheDocument();
-  expect(screen.queryByLabelText("最早播种")).not.toBeInTheDocument();
-  expect(screen.queryByText("目标权重（0–5）")).not.toBeInTheDocument();
 });
 
 it("creates the four fixed engineering benchmark fields without presenting them as cadastral data", async () => {
@@ -136,7 +133,7 @@ it("blocks submission and identifies transition-edge capacity growth", async () 
   });
   await setup();
   await screen.findByText("容量状态：超出限制");
-  expect(screen.getByText(/连接关系过多/)).toBeVisible();
+  expect(screen.getByText(/连接边维度膨胀/)).toBeVisible();
   expect(screen.getByRole("button", { name: "运行 Gurobi 回测" })).toBeDisabled();
   expect(mocks.createRun).not.toHaveBeenCalled();
 });

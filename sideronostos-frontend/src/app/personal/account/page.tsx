@@ -85,9 +85,9 @@ function AccountContent() {
     <Card className={styles.accountCard}>
       <CardHeader><CardTitle>{t("修改密码", "Change password")}</CardTitle><p className="text-sm text-muted-foreground">{t("修改后所有设备的登录将失效，需要重新登录", "Changing your password signs you out on all devices.")}</p></CardHeader>
       <CardContent><form onSubmit={submit} noValidate className="grid gap-5">
-        <div className="grid gap-2"><Label htmlFor="current-password">{t("当前密码", "Current password")}</Label><PasswordField locale={locale} id="current-password" autoComplete="current-password" required disabled={busy !== null} value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} /></div>
-        <div className="grid gap-2"><Label htmlFor="new-password">{t("新密码", "New password")}</Label><PasswordField locale={locale} id="new-password" autoComplete="new-password" required minLength={8} maxLength={256} disabled={busy !== null} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /></div>
-        <div className="grid gap-2"><Label htmlFor="confirm-password">{t("确认新密码", "Confirm new password")}</Label><PasswordField locale={locale} id="confirm-password" autoComplete="new-password" required maxLength={256} disabled={busy !== null} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} /></div>
+        <div className="grid gap-2"><Label htmlFor="current-password">{t("当前密码", "Current password")}</Label><PasswordField id="current-password" autoComplete="current-password" required disabled={busy !== null} value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} /></div>
+        <div className="grid gap-2"><Label htmlFor="new-password">{t("新密码", "New password")}</Label><PasswordField id="new-password" autoComplete="new-password" required minLength={8} maxLength={256} disabled={busy !== null} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /></div>
+        <div className="grid gap-2"><Label htmlFor="confirm-password">{t("确认新密码", "Confirm new password")}</Label><PasswordField id="confirm-password" autoComplete="new-password" required maxLength={256} disabled={busy !== null} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} /></div>
         <Button type="submit" disabled={busy !== null} className="justify-self-start">{busy === "password" && <LoaderCircle className="animate-spin" />}{busy === "password" ? t("正在修改", "Changing password…") : t("修改密码", "Change password")}</Button>
       </form></CardContent>
     </Card>
