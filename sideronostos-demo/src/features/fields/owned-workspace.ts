@@ -149,8 +149,8 @@ export class OwnedWorkspace {
     this.active = true; const epoch = ++this.epoch
     try {
       if (isDemoMode()) {
-        const sample = demoWorkspace()
-        const scoped = this.scoped(sample)
+        const stored = await getStoredWorkspace(this.ownerId)
+        const scoped = this.scoped(stored.farms.length ? stored : demoWorkspace())
         if (!this.active || epoch !== this.epoch) return
         this.publish({ workspace: scoped, error: null, remoteError: null, workspaceRemoteError: null, remoteConflict: false, remoteVersion: null, restoring: false, syncing: [] })
         await replaceStoredWorkspace(scoped.farms, scoped.fields, this.ownerId)

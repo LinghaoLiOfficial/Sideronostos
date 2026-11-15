@@ -1,4 +1,11 @@
 {
+  "Boundary confirmation": "边界确认",
+  "Boundaries confirmed": "边界已确认",
+  "Confirm field boundaries": "确认地块边界",
+  "The field boundaries are confirmed and locked.": "地块边界已确认并锁定。",
+  "Orange fields are candidates. Review and adjust their shared boundaries on the map, then confirm all fields in this farm.": "橙色地块为待确认候选。请在地图上核对并调整共享边界，然后确认此农场的全部地块。",
+  "Confirm all {count} fields": "确认全部 {count} 块地",
+  "Field boundaries confirmed.": "地块边界已确认。",
   "Search places": "搜索地点",
   "Select and edit fields": "选择和编辑地块",
   "Draw farm boundary": "绘制农场边界",

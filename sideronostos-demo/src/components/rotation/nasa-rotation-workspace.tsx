@@ -36,7 +36,7 @@ const SYNTHETIC_FIELDS = [
   [[-93.4998799623, 42.0000905891], [-93.4902205267, 42.000132246], [-93.4902481804, 42.0037347798], [-93.4999081608, 42.0036931176], [-93.4998799623, 42.0000905891]],
 ] as const;
 
-export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hideReleaseBar = false, compactReleaseBar = false }: { hideHeader?: boolean; hideMap?: boolean; hideReleaseBar?: boolean; compactReleaseBar?: boolean }) {
+export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hideReleaseBar = false, compactReleaseBar = false, farmId }: { hideHeader?: boolean; hideMap?: boolean; hideReleaseBar?: boolean; compactReleaseBar?: boolean; farmId?: string }) {
   const locale = useLocale();
   const en = hideHeader && locale === "en";
   const client = useQueryClient();
@@ -75,7 +75,7 @@ export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hid
     () => cropSelection ?? profile?.crops.map((crop) => crop.id) ?? [],
     [cropSelection, profile],
   );
-  const eligibleFields = useMemo(() => release ? (fields.data?.items ?? []).filter((field) => within(field, release)) : [], [fields.data, release]);
+  const eligibleFields = useMemo(() => release ? (fields.data?.items ?? []).filter((field) => (!farmId || field.farm_id === farmId) && within(field, release)) : [], [fields.data, release, farmId]);
   const chosen = useMemo(
     () => eligibleFields.filter((field) => selectedFields.includes(field.id)),
     [eligibleFields, selectedFields],
@@ -138,7 +138,7 @@ export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hid
   );
   const capacityReady = preflightCurrent && preflight.isSuccess;
   const createSyntheticFields = useCallback(async () => {
-    if (!fieldProfile || creatingSynthetic) return [];
+    if (!fieldProfile || creatingSynthetic || farmId) return [];
     setError(null); setCreatingSynthetic(true);
     try {
       const existing = new Map((fields.data?.items ?? []).map((field) => [field.name, field]));
@@ -165,26 +165,23 @@ export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hid
       return created;
     } catch (cause) { setError(errorMessage(cause)); return []; }
     finally { setCreatingSynthetic(false); }
-  }, [client, creatingSynthetic, fieldProfile, fields.data]);
+  }, [client, creatingSynthetic, fieldProfile, fields.data, farmId]);
 
   useEffect(() => {
     if (!release || !profile || !fieldProfile || !fields.isSuccess || initializedRelease.current === release.id) return;
     initializedRelease.current = release.id;
-    if (isDemoMode()) {
-      const ids = (fields.data?.items ?? []).map((field) => field.id);
+    if (isDemoMode() || farmId) {
+      const ids = (fields.data?.items ?? []).filter(field => !farmId || field.farm_id === farmId).map((field) => field.id);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedFields(ids);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGeometryConfirmed(Object.fromEntries(ids.map((id) => [id, true])));
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHistoryReviewed(Object.fromEntries(ids.map((id) => [id, true])));
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAccepted(true);
       return;
     }
     const timer = window.setTimeout(() => void createSyntheticFields(), 0);
     return () => window.clearTimeout(timer);
-  }, [createSyntheticFields, fieldProfile, fields.isSuccess, profile, release]);
+  }, [createSyntheticFields, fieldProfile, fields.isSuccess, fields.data?.items, profile, release, farmId]);
 
   useEffect(() => {
     if (!run || !["pending", "running"].includes(run.status)) return;
@@ -193,6 +190,16 @@ export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hid
       if (value.result?.options?.[0] && !selectedOption) setSelectedOption(value.result.options[0].id);
     }).catch(() => undefined), 1800);
     return () => window.clearInterval(timer);
+  }, [run, selectedOption]);
+
+  useEffect(() => {
+    if (!run) return;
+    const options = allOptions(run);
+    const first = options[0];
+    if (!first || (selectedOption && options.some((option) => option.id === selectedOption))) return;
+    // Default completed runs to their first option without overriding a valid manual selection.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedOption(first.id);
   }, [run, selectedOption]);
 
   async function submit(event: FormEvent) {
@@ -226,15 +233,16 @@ export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hid
 
   if (session.isPending) return <main className={styles.page} role="status">{en ? "Checking sign-in status…" : "正在确认登录状态…"}</main>;
   if (!session.data) return <main className={styles.page}><div className={styles.main}><p className={styles.error}>{en ? "Sign in and verify your email to continue." : "请先登录并验证邮箱。"}</p><Link href="/login?next=/field-shift/nasa-rotation">{en ? "Sign in" : "登录"}</Link></div></main>;
-  return <main className={styles.page}>
+  return <main className={hideHeader ? styles.pageEmbedded : styles.page}>
     {!hideHeader && <header className={styles.header}><Link className={styles.brand} href="/si/field-management"><Sprout /> Agrisata · NASA Rotation Lab</Link><nav><Link href="/si/field-management">地图</Link><Link href="/field-shift/rotation">轮作规划</Link><Link href="/field-shift/nasa-rotation" aria-current="page">NASA 回测</Link></nav></header>}
-    <div className={styles.main}>
+    <div className={hideHeader ? styles.embeddedMain : styles.main}>
       {!hideReleaseBar && (release ? <section className={styles.releaseBar}>
         <div><h1>{en ? "NASA Historical Crop Rotation Backtest" : "NASA 历史轮作回测"}</h1><p>{en ? "Engineering benchmark, not a weather forecast or planting prescription." : "工程 benchmark，不是未来天气预报或种植处方。"}</p></div>
         <dl><dt>{en ? "Data release" : "数据 release"}</dt><dd>{release.id}</dd></dl><dl><dt>{en ? "Knowledge version" : "知识版本"}</dt><dd>{profile?.revision ? `v${profile.revision}` : en ? "Unavailable" : "不可用"}</dd></dl><dl><dt>{en ? "Coverage" : "时间覆盖"}</dt><dd>{release.start} — {release.end}</dd></dl><dl><dt>{en ? "Complete days" : "完整日数"}</dt><dd>{release.complete_days} / {release.expected_days}</dd></dl><dl><dt>{en ? "Checksum" : "校验值"}</dt><dd>{profile?.sha256.slice(0, 12) ?? release.manifest_sha256.slice(0, 12)}…</dd></dl>
       </section> : <p className={styles.error}>尚未发布可用于轮作的 NASA release。请先运行离线发布命令。</p>)}
-      <div className={styles.layout}>
-        <form className={styles.config} onSubmit={submit}>
+      <div className={hideHeader ? `${styles.layout} ${styles.embeddedLayout}` : styles.layout}>
+        <form className={hideHeader ? `${styles.config} ${styles.embeddedConfig}` : styles.config} onSubmit={submit}>
+          {hideHeader && <div className={`${styles.actions} ${styles.stickyRun}`}><span>{capacityReady ? (en ? "Ready to run" : "预检完成，可运行") : (en ? "Preparing capacity check…" : "正在进行容量预检…")}</span><button className={styles.primary} type="submit" disabled={submitting || creatingSynthetic || !release || !capacityReady || !preflight.data?.within_capacity}>{creatingSynthetic ? (en ? "Preparing…" : "正在准备…") : submitting ? (en ? "Running…" : "正在运行…") : (en ? "Run backtest" : "运行回测")}</button></div>}
           {compactReleaseBar && release && <section className={styles.releaseCompact} aria-label={en ? "NASA release summary" : "NASA release 摘要"}>
             <div className={styles.releaseCompactTitle}><strong>{en ? "NASA historical backtest" : "NASA 历史轮作回测"}</strong><span>{en ? "Engineering benchmark" : "工程 benchmark"}</span></div>
             <dl><div><dt>{en ? "Release" : "Release"}</dt><dd>{release.id}</dd></div><div><dt>{en ? "Knowledge" : "知识版本"}</dt><dd>{profile?.revision ? `v${profile.revision}` : en ? "Unavailable" : "不可用"}</dd></div><div><dt>{en ? "Coverage" : "时间覆盖"}</dt><dd>{release.start} — {release.end}</dd></div><div><dt>{en ? "Complete days" : "完整日数"}</dt><dd>{release.complete_days} / {release.expected_days}</dd></div><div><dt>{en ? "Checksum" : "校验值"}</dt><dd>{profile?.sha256.slice(0, 12) ?? release.manifest_sha256.slice(0, 12)}…</dd></div></dl>
@@ -247,7 +255,7 @@ export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hid
           <section className={styles.section}><h2><Leaf size={16}/> {en ? "Fields and crop history" : "地块与前茬"}</h2>
             {!eligibleFields.length && <p>{creatingSynthetic ? (en ? "Preparing default Iowa benchmark fields…" : "正在准备默认 Iowa benchmark 测试地块…") : (en ? "No benchmark fields are currently available." : "当前没有可用的 benchmark 测试地块。")}</p>}
             {eligibleFields.map((field) => <div className={styles.field} key={field.id}><label className={styles.check}><input type="checkbox" checked={selectedFields.includes(field.id)} onChange={(e) => setSelectedFields((old) => e.target.checked ? [...old, field.id] : old.filter((id) => id !== field.id))}/><span><strong>{field.name}</strong><span className={styles.meta}>{field.area_ha} ha · {field.soil_texture} · {field.irrigation_available ? "可灌溉" : "旱作"} · v{field.version}</span></span></label>{selectedFields.includes(field.id) && <><label className={styles.check}><input type="checkbox" checked={Boolean(geometryConfirmed[field.id])} onChange={(e) => setGeometryConfirmed({...geometryConfirmed, [field.id]: e.target.checked})}/>边界与经营面积已核对</label><label className={styles.check}><input type="checkbox" checked={Boolean(historyReviewed[field.id])} onChange={(e) => setHistoryReviewed({...historyReviewed, [field.id]: e.target.checked})}/>前茬历史已核对</label></>}</div>)}
-            <div className={styles.actions}><button type="button" onClick={() => void createSyntheticFields()} disabled={!fieldProfile || creatingSynthetic}>{creatingSynthetic ? (en ? "Preparing…" : "正在准备…") : (en ? "Restore default test fields" : "恢复默认测试地块")}</button><Link className={styles.primary} href="/field-shift">{en ? "Create or edit fields" : "创建或编辑地块"}</Link></div>
+            <div className={styles.actions}>{!farmId && <button type="button" onClick={() => void createSyntheticFields()} disabled={!fieldProfile || creatingSynthetic}>{creatingSynthetic ? (en ? "Preparing…" : "正在准备…") : (en ? "Restore default test fields" : "恢复默认测试地块")}</button>}<Link className={styles.primary} href="/field-shift">{en ? "Create or edit fields" : "创建或编辑地块"}</Link></div>
             <p className={styles.notice}>页面默认选中 4 个约 32 ha 的合成 Iowa benchmark 地块，并完成测试数据确认；它们仅用于工程测试，不是真实地籍、权属或经营边界。用户仍可取消选择或改用自己的覆盖区内地块。</p>
           </section>
           <section className={styles.section}><h2><Sprout size={16}/> {en ? "Candidate crops (local knowledge base)" : "候选作物（本地知识库）"}</h2>
@@ -261,9 +269,10 @@ export function NasaRotationWorkspace({ hideHeader = false, hideMap = false, hid
             <label className={styles.check}><input type="checkbox" checked={advanced} onChange={(e) => setAdvanced(e.target.checked)}/>展开天气情景</label>
             {advanced && <><h3>历史天气敏感性情景</h3><div className={styles.grid2}><label>温度变化 °C<input type="number" min={-3} max={5} step=".1" value={scenario.temperature_change_c} onChange={(e) => setScenario({...scenario, temperature_change_c: Number(e.target.value)})}/></label><label>降雨变化 %<input type="number" min={-50} max={50} step="1" value={scenario.rainfall_change_pct} onChange={(e) => setScenario({...scenario, rainfall_change_pct: Number(e.target.value)})}/></label></div><p>硬约束：时间不重叠、换茬占用、同科间隔、前茬历史、灌溉可用性和年度资源容量。农艺规则由本地农业知识库维护。</p></>}
           </section>
-          <section className={styles.section}><h2><FlaskConical size={16}/> {en ? "Review and run" : "提交确认"}</h2><div className={styles.capacity} aria-live="polite"><h3>{en ? "Candidate and solver capacity preflight" : "候选与求解器容量预检"}</h3>{!preflightCurrent || preflight.isFetching ? <p>{en ? "Checking capacity…" : "正在评估容量…"}</p> : preflight.error ? <p className={styles.error}>{en ? "Capacity check failed: " : "容量评估失败："}{errorMessage(preflight.error)}</p> : preflight.data ? <><dl className={styles.capacityGrid}><div><dt>{en ? "Sowing sample" : "播种采样"}</dt><dd>{preflight.data.sampling_step_days} {en ? "days" : "天"}</dd></div><div><dt>{en ? "Estimated candidates" : "预计候选"}</dt><dd>{preflight.data.candidate_count_truncated ? ">" : ""}{preflight.data.candidate_count.toLocaleString()} / {preflight.data.limits.max_candidates.toLocaleString()}</dd></div><div><dt>{en ? "Compatible transitions" : "兼容连接关系"}</dt><dd>{preflight.data.transition_edge_count === null ? (en ? "Not evaluated" : "未评估") : `${preflight.data.transition_edge_count_truncated ? ">" : ""}${preflight.data.transition_edge_count.toLocaleString()}`}</dd></div><div><dt>{en ? "Formulation" : "模型形式"}</dt><dd>{preflight.data.formulation === "annual-layered-state-v1" ? (en ? "Annual layered model" : "年度分层模型") : (en ? "General transition graph" : "通用连接图模型")}</dd></div><div><dt>{en ? "Estimated variables" : "预计变量"}</dt><dd>{preflight.data.estimated_variable_count.toLocaleString()} / {preflight.data.limits.max_solver_variables.toLocaleString()}</dd></div><div><dt>{en ? "Estimated constraints" : "预计约束"}</dt><dd>{preflight.data.estimated_constraint_count.toLocaleString()} / {preflight.data.limits.max_solver_constraints.toLocaleString()}</dd></div></dl><p className={styles.capacityMeta}>{en ? "Solver capacity mode: " : "求解器容量模式："}{preflight.data.solver_capacity_mode === "restricted" ? "Gurobi Restricted License" : "Unrestricted"}{en ? ". The annual layered model keeps all candidates without creating a variable for every compatible transition." : "。年度分层模型保留全部候选，但不为每条兼容关系创建变量。"}</p><p className={preflight.data.within_capacity ? styles.capacityOk : styles.capacityBad}>{preflight.data.within_capacity ? (en ? "Capacity: ready to run" : "容量状态：可运行") : (en ? "Capacity: over limit" : "容量状态：超出限制")}</p>{preflight.data.violations.map((violation) => <p className={styles.capacityReason} key={violation.dimension}>{en ? `Capacity exceeded (${violation.dimension}). Reduce fields, crops, or years, or narrow sowing windows.` : violation.dimension === "candidates" ? `候选维度膨胀：${violation.factors.field_count} 个地块 × ${violation.factors.crop_count} 种作物 × ${violation.factors.year_count} 年，采样步长 ${violation.factors.sampling_step_days} 天。请减少地块、作物或年份，或收窄播种窗口。` : violation.dimension === "transition_edges" ? "连接关系过多：同一地块内可衔接季次组合超过应用容量。请收窄播种窗口，或减少作物、地块或规划年份。" : violation.dimension === "solver_variables" ? "求解器变量数超过 Restricted License 容量。当前配置无法提交，请缩小规划范围。" : "求解器约束数超过 Restricted License 容量。当前配置无法提交，请缩小规划范围。"}</p>)}</> : <p>{en ? "Select fields and crops to check capacity." : "请选择地块和作物以评估容量。"}</p>}</div><label className={styles.check}><input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>{en ? "I understand this is an engineering backtest using historical NASA data and industry benchmarks, not a forecast, yield guarantee, or planting prescription." : "我理解这是使用历史 NASA 数据和行业 benchmark 的工程回测，不是未来天气预测、收益承诺或种植处方。"}</label>{error && <p className={styles.error} role="alert">{error}</p>}<div className={styles.actions}><button className={styles.primary} disabled={submitting || creatingSynthetic || !release || !capacityReady || !preflight.data?.within_capacity}>{creatingSynthetic ? (en ? "Preparing test fields…" : "正在准备测试地块…") : submitting ? (en ? "Submitting…" : "正在提交…") : (en ? "Run Gurobi backtest" : "运行 Gurobi 回测")}</button></div></section>
+          <section className={styles.section}><h2><FlaskConical size={16}/> {en ? "Review and run" : "提交确认"}</h2><div className={styles.capacity} aria-live="polite"><h3>{en ? "Candidate and solver capacity preflight" : "候选与求解器容量预检"}</h3>{!preflightCurrent || preflight.isFetching ? <p>{en ? "Checking capacity…" : "正在评估容量…"}</p> : preflight.error ? <p className={styles.error}>{en ? "Capacity check failed: " : "容量评估失败："}{errorMessage(preflight.error)}</p> : preflight.data ? <><dl className={styles.capacityGrid}><div><dt>{en ? "Sowing sample" : "播种采样"}</dt><dd>{preflight.data.sampling_step_days} {en ? "days" : "天"}</dd></div><div><dt>{en ? "Estimated candidates" : "预计候选"}</dt><dd>{preflight.data.candidate_count_truncated ? ">" : ""}{preflight.data.candidate_count.toLocaleString()} / {preflight.data.limits.max_candidates.toLocaleString()}</dd></div><div><dt>{en ? "Compatible transitions" : "兼容连接关系"}</dt><dd>{preflight.data.transition_edge_count === null ? (en ? "Not evaluated" : "未评估") : `${preflight.data.transition_edge_count_truncated ? ">" : ""}${preflight.data.transition_edge_count.toLocaleString()}`}</dd></div><div><dt>{en ? "Formulation" : "模型形式"}</dt><dd>{preflight.data.formulation === "annual-layered-state-v1" ? (en ? "Annual layered model" : "年度分层模型") : (en ? "General transition graph" : "通用连接图模型")}</dd></div><div><dt>{en ? "Estimated variables" : "预计变量"}</dt><dd>{preflight.data.estimated_variable_count.toLocaleString()} / {preflight.data.limits.max_solver_variables.toLocaleString()}</dd></div><div><dt>{en ? "Estimated constraints" : "预计约束"}</dt><dd>{preflight.data.estimated_constraint_count.toLocaleString()} / {preflight.data.limits.max_solver_constraints.toLocaleString()}</dd></div></dl><p className={styles.capacityMeta}>{en ? "Solver capacity mode: " : "求解器容量模式："}{preflight.data.solver_capacity_mode === "restricted" ? "Gurobi Restricted License" : "Unrestricted"}{en ? ". The annual layered model keeps all candidates without creating a variable for every compatible transition." : "。年度分层模型保留全部候选，但不为每条兼容关系创建变量。"}</p><p className={preflight.data.within_capacity ? styles.capacityOk : styles.capacityBad}>{preflight.data.within_capacity ? (en ? "Capacity: ready to run" : "容量状态：可运行") : (en ? "Capacity: over limit" : "容量状态：超出限制")}</p>{preflight.data.violations.map((violation) => <p className={styles.capacityReason} key={violation.dimension}>{en ? `Capacity exceeded (${violation.dimension}). Reduce fields, crops, or years, or narrow sowing windows.` : violation.dimension === "candidates" ? `候选维度膨胀：${violation.factors.field_count} 个地块 × ${violation.factors.crop_count} 种作物 × ${violation.factors.year_count} 年，采样步长 ${violation.factors.sampling_step_days} 天。请减少地块、作物或年份，或收窄播种窗口。` : violation.dimension === "transition_edges" ? "连接关系过多：同一地块内可衔接季次组合超过应用容量。请收窄播种窗口，或减少作物、地块或规划年份。" : violation.dimension === "solver_variables" ? "求解器变量数超过 Restricted License 容量。当前配置无法提交，请缩小规划范围。" : "求解器约束数超过 Restricted License 容量。当前配置无法提交，请缩小规划范围。"}</p>)}</> : <p>{en ? "Select fields and crops to check capacity." : "请选择地块和作物以评估容量。"}</p>}</div><label className={styles.check}><input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>{en ? "I understand this is an engineering backtest using historical NASA data and industry benchmarks, not a forecast, yield guarantee, or planting prescription." : "我理解这是使用历史 NASA 数据和行业 benchmark 的工程回测，不是未来天气预测、收益承诺或种植处方。"}</label>{error && <p className={styles.error} role="alert">{error}</p>}</section>
+          {!hideHeader && <div className={styles.actions}><button className={styles.primary} type="submit" disabled={submitting || creatingSynthetic || !release || !capacityReady || !preflight.data?.within_capacity}>{creatingSynthetic ? (en ? "Preparing…" : "正在准备…") : submitting ? (en ? "Running…" : "正在运行…") : (en ? "Run Gurobi backtest" : "运行 Gurobi 回测")}</button></div>}
         </form>
-        <div className={styles.results}>
+        <div className={hideHeader ? `${styles.results} ${styles.embeddedResults}` : styles.results}>
           {!hideMap && release && <NasaReleaseMap key={release.id} release={release} fields={chosen.length ? chosen : eligibleFields} />}
           <section className={styles.section}><h2><BarChart3 size={16}/> {en ? "Run summary" : "运行摘要"}</h2><dl className={styles.summary}><div><dt>{en ? "Fields" : "地块"}</dt><dd>{chosen.length}</dd></div><div><dt>{en ? "Total area" : "总面积"}</dt><dd>{totalArea.toFixed(1)} ha</dd></div><div><dt>{en ? "Candidate crops" : "候选作物"}</dt><dd>{selectedCrops.length}</dd></div></dl>{release && <><h3>{en ? "Data product boundaries" : "数据产品边界"}</h3><div className={styles.chips}>{Object.entries(release.products).map(([name, product]) => <span key={name} className={styles.chip}>{name.toUpperCase()} · {product.model_usable ? (en ? "Model input" : "入模") : (en ? "Evidence" : "证据")}</span>)}</div><p>{release.limitations.join(" ")}</p></>}</section>
           {run ? <RunResults owner={session.data.id} run={run} changes={[]} selectedOptionId={selectedOption} onSelect={setSelectedOption} onExplain={() => undefined} onUpdate={(value) => { if (isDailyRun(value)) return; setRun(value); client.setQueryData(["nasa-rotation", "run", value.id], value); }} onSaved={() => undefined} compareRunId={null} compareOptionId={null} onCompare={() => undefined}/> : <section className={styles.section}><h2>{en ? "Not run yet" : "尚未运行"}</h2><p>{en ? "Complete the configuration to see solver status, rotation timelines, resource use, constraint checks, rejected-candidate reasons, and auditable exports." : "完成左侧配置后，结果区将显示 Gurobi 状态、方案时间轴、资源消耗、约束核验、候选拒绝原因和可审计导出。"}</p></section>}

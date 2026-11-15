@@ -4,6 +4,8 @@ import { createDemoFarm } from "./demo-data"
 import { OwnedWorkspace } from "./owned-workspace"
 
 const boundary = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn(), restore: vi.fn(), sync: vi.fn(), import: vi.fn() }))
+const demo = vi.hoisted(() => ({ enabled: false }))
+vi.mock("@/lib/demo-mode", () => ({ isDemoMode: () => demo.enabled }))
 vi.mock("./storage", () => ({ getStoredWorkspace: boundary.get, replaceStoredWorkspace: boundary.put, importLocalWorkspace: boundary.import }))
 vi.mock("@/lib/api/farms", () => ({ restoreFarms: boundary.restore, syncFarm: boundary.sync }))
 const deferred = <T,>() => { let resolve!: (value: T) => void; const promise = new Promise<T>(done => { resolve = done }); return { promise, resolve } }
@@ -21,10 +23,23 @@ function reply(request: FarmSyncInput): FarmSyncResult {
       field: { ...f.field, id: `server-${i}`, version: 1, created_at: at, updated_at: at } })) }
 }
 beforeEach(() => {
+  demo.enabled = false
   vi.resetAllMocks(); boundary.get.mockResolvedValue(fixture()); boundary.put.mockResolvedValue(undefined); boundary.restore.mockResolvedValue([])
   boundary.sync.mockImplementation(async (r: FarmSyncInput) => reply(r))
 })
 describe("owned workspace lifecycle", () => {
+  it("restores saved demo boundaries instead of replacing them with the sample", async () => {
+    demo.enabled = true
+    const saved = fixture("demo-farmer")
+    saved.farms[0].properties.name = "Reviewed farm"
+    boundary.get.mockResolvedValue(saved)
+    const store = new OwnedWorkspace("demo-farmer")
+    await store.start()
+    expect(store.getSnapshot().workspace).toEqual(saved)
+    expect(boundary.put).toHaveBeenCalledWith(saved.farms, saved.fields, "demo-farmer")
+    expect(boundary.restore).not.toHaveBeenCalled()
+    store.dispose()
+  })
   it("durably records an attempt before posting, and retries the same request after a lost reply", async () => {
     const store = new OwnedWorkspace("a"); await store.start()
     const initial = store.getSnapshot().workspace!; const farmId = initial.farms[0].properties.id

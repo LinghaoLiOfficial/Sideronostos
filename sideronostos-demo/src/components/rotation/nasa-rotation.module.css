@@ -1,10 +1,12 @@
 .page { min-height: 100dvh; background: #f4f7f1; color: #233025; font-size: 13px; }
+.pageEmbedded { height: 100%; min-height: 0; overflow: hidden; background: #f4f7f1; color: #233025; font-size: 13px; }
 .header { min-height: 72px; padding: 14px 28px; background: #fff; border-bottom: 1px solid #dce5d7; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-size: 18px; font-weight: 650; }
 .header nav { display: flex; gap: 8px; }
 .header nav a { padding: 8px 12px; border-radius: 6px; text-decoration: none; color: #52634c; }
 .header nav a[aria-current="page"] { background: #e8efe2; color: #294224; }
 .main { max-width: 1440px; margin: 0 auto; padding: 24px; }
+.embeddedMain { height: 100%; min-height: 0; max-width: none; margin: 0; padding: 14px; overflow: hidden; }
 .releaseBar { background: #203b2c; color: #fff; padding: 18px 22px; display: grid; grid-template-columns: minmax(250px, 1.5fr) repeat(4, minmax(110px, .7fr)); gap: 18px; align-items: center; border-radius: 7px; }
 .releaseBar h1 { font-size: 20px; margin: 0 0 5px; }
 .releaseBar p { margin: 0; color: #cfe0d1; }
@@ -18,7 +20,12 @@
 .releaseCompact dt { color: #a9c2ad; font-size: 10px; }
 .releaseCompact dd { margin: 3px 0 0; font-size: 11px; font-weight: 600; overflow-wrap: anywhere; }
 .layout { display: grid; grid-template-columns: minmax(420px, 560px) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
+.embeddedLayout { height: 100%; min-height: 0; grid-template-columns: minmax(380px, 500px) minmax(0, 1fr); gap: 14px; margin-top: 0; align-items: stretch; }
 .config, .results { display: grid; gap: 14px; }
+.embeddedConfig, .embeddedResults { min-height: 0; overflow-y: auto; padding-right: 4px; align-content: start; }
+.embeddedConfig { padding-bottom: 78px; }
+.stickyRun { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: -2px 0 0; padding: 10px 12px; border: 1px solid #cbd9c2; border-radius: 7px; background: rgba(248, 250, 246, .96); box-shadow: 0 5px 16px rgba(35, 48, 37, .08); }
+.stickyRun span { color: #60705b; font-size: 11px; }
 .section { background: #fff; border: 1px solid #dce5d7; border-radius: 7px; padding: 18px; }
 .section h2 { font-size: 15px; margin: 0 0 13px; display: flex; align-items: center; gap: 8px; }
 .section h3 { font-size: 13px; margin: 16px 0 8px; }
@@ -71,5 +78,6 @@
 .legend div { height: 8px; }
 .mapLimit { margin-bottom: 0; font-size: 11px; }
 @media (max-width: 900px) { .releaseBar { grid-template-columns: 1fr 1fr; } .releaseBar > div:first-child { grid-column: 1 / -1; } .layout { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .pageEmbedded { height: auto; min-height: 100%; overflow: visible; } .embeddedMain { height: auto; overflow: visible; padding: 10px; } .embeddedLayout { height: auto; grid-template-columns: 1fr; } .embeddedConfig, .embeddedResults { max-height: none; overflow: visible; padding-right: 0; } .stickyRun { position: sticky; top: 8px; } }
 @media (max-width: 560px) { .header { padding: 12px 16px; align-items: flex-start; } .header nav { flex-direction: column; } .main { padding: 12px; } .releaseBar, .releaseCompact dl, .grid2, .grid3, .capacityGrid { grid-template-columns: 1fr; } .releaseCompactTitle { align-items: flex-start; flex-direction: column; gap: 3px; } .mapHeader { align-items: stretch; flex-direction: column; } .mapHeader label { min-width: 0; } .mapCanvas { height: 310px; } }
 @media print { .config, .header nav, .actions { display: none !important; } .layout { display: block; } .releaseBar { color: #000; background: #fff; border: 1px solid #bbb; } }

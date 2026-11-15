@@ -47,6 +47,42 @@ const metricLabels: Record<keyof Metrics, string> = {
   cover_ha_days: "土地覆盖 · ha·天",
   diversity_ha_families: "科属多样性 · ha·科",
 };
+export function ResultCharts({ option, fields, start, end }: { option: OptionV2; fields: Field[]; start: string; end: string }) {
+  const { t } = useI18n();
+  const years = planningYears(start, end);
+  const yearly = years.map(year => ({ year, water: option.verification.farm_years[year]?.water_m3 ?? 0, cost: option.verification.farm_years[year]?.cost_usd ?? 0, labor: option.verification.farm_years[year]?.labor_days ?? 0 }));
+  const maxResources = Math.max(1, ...yearly.flatMap(item => [item.water, item.cost, item.labor]));
+  const crops = [...new Set(option.seasons.map(season => season.crop_id))];
+  const cropColors = ["#56834a", "#d19a43", "#458a91", "#b9664b", "#7d71a6", "#74924c"];
+  const distributions = crops.map((crop, index) => ({ crop, color: cropColors[index % cropColors.length], fields: fields.map(field => option.seasons.filter(season => season.field_id === field.id && season.crop_id === crop).length) }));
+  const maxSeasons = Math.max(1, ...fields.map(field => option.seasons.filter(season => season.field_id === field.id).length));
+  return <section className={styles.resultCharts} aria-label={t("回测数据可视化")}>
+    <div className={styles.chartSection}>
+      <div className={styles.chartHeading}><div><p>{t("规划期逐年汇总")}</p><h3>{t("年度资源消耗")}</h3></div><span>{years.length} {t("年")}</span></div>
+      <div className={styles.resourceChart} role="img" aria-label={t("年度用水、投入和劳力汇总图")}>
+        {yearly.map(item => <div className={styles.resourceYear} key={item.year}>
+          <strong>{item.year}</strong><div className={styles.resourceBars}>
+            <span title={t("用水估计 {value} m³", { value: n(item.water) })} style={{ width: `${item.water / maxResources * 100}%`, backgroundColor: "#458a91" }} />
+            <span title={t("投入估计 {value} USD", { value: n(item.cost) })} style={{ width: `${item.cost / maxResources * 100}%`, backgroundColor: "#d19a43" }} />
+            <span title={t("劳力估计 {value} 人日", { value: n(item.labor) })} style={{ width: `${item.labor / maxResources * 100}%`, backgroundColor: "#7d71a6" }} />
+          </div><div className={styles.resourceValues}><span>{t("水")}: {n(item.water)}</span><span>{t("投入")}: {n(item.cost)}</span><span>{t("劳力")}: {n(item.labor)}</span></div>
+        </div>)}
+      </div>
+      <div className={styles.chartLegend}><span><i style={{ backgroundColor: "#458a91" }} />{t("用水估计 · m³")}</span><span><i style={{ backgroundColor: "#d19a43" }} />{t("投入估计 · USD")}</span><span><i style={{ backgroundColor: "#7d71a6" }} />{t("劳力 人日")}</span></div>
+    </div>
+    <div className={styles.chartSection}>
+      <div className={styles.chartHeading}><div><p>{t("已选方案")}</p><h3>{t("各地块作物季次分布")}</h3></div><span>{option.seasons.length} {t("季")}</span></div>
+      {!fields.length || !option.seasons.length ? <p className={styles.chartEmpty}>{t("此方案没有可展示的种植季次。")}</p> : <div className={styles.cropChart} role="img" aria-label={t("各地块作物种植季次分布图")}>
+        {fields.map((field, fieldIndex) => {
+          const count = option.seasons.filter(season => season.field_id === field.id).length;
+          return <div className={styles.cropRow} key={field.id}><span className={styles.cropField}>{field.name}</span><div className={styles.cropBar} aria-hidden="true">{distributions.map(item => item.fields[fieldIndex] > 0 && <span key={item.crop} style={{ width: `${item.fields[fieldIndex] / maxSeasons * 100}%`, backgroundColor: item.color }} />)}</div><span className={styles.cropCount}>{count} {t("季")}</span></div>;
+        })}
+        <div className={styles.chartLegend}>{distributions.map(item => <span key={item.crop}><i style={{ backgroundColor: item.color }} />{t(item.crop)}</span>)}</div>
+      </div>}
+    </div>
+  </section>;
+}
+
 function violationText(code: string, fields: Field[]) {
   const [kind, first, second, third] = code.split(":");
   const resources: Record<string, string> = {
@@ -144,10 +180,15 @@ export function allOptions(run: RunV2): OptionV2[];
 export function allOptions(run: DailyRun): DailyOption[];
 export function allOptions(run: AnyRotationRun): (OptionV2 | DailyOption)[];
 export function allOptions(run: AnyRotationRun): (OptionV2 | DailyOption)[] {
+  const seen = new Set<string>();
   return [
     ...(run.result?.options ?? []),
     ...(run.result?.baseline ? [run.result.baseline] : []),
-  ];
+  ].filter(option => {
+    if (seen.has(option.id)) return false;
+    seen.add(option.id);
+    return true;
+  });
 }
 const optionName = (option: OptionV2, index?: number) =>
   option.id === "baseline"
@@ -233,6 +274,7 @@ export function OptionDetail({
         </div>
       )}
       <Timeline option={option} fields={fields} start={start} end={end} />
+      <ResultCharts option={option} fields={fields} start={start} end={end} />
       <details
         ref={evidenceDisclosure}
         className={`${styles.details} ${styles.printEvidence}`}

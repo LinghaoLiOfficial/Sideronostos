@@ -15,6 +15,13 @@ assets locally and verifies them during local builds. The video files are exclud
 from Git and Vercel uploads; the deployed app streams them from the public GitHub
 release configured by `NEXT_PUBLIC_SI_MEDIA_BASE_URL`.
 
+The SI assistant chats use Groq when `GROQ_API_KEY` is configured. Set `GROQ_API_KEY`
+and `GROQ_BASE_API` as server-only environment variables in Vercel (Production and
+Preview as needed); do not use the `NEXT_PUBLIC_` prefix. `GROQ_BASE_API` can be the
+OpenAI-compatible base URL or the full `/chat/completions` endpoint. The default model
+is `llama-3.3-70b-versatile`; override it with `GROQ_MODEL` if needed. Locally, put
+these variables in `.env.local` and restart the dev server.
+
 For local development:
 
 ```bash

@@ -2,10 +2,28 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it } from "vitest";
 import { cleanup, screen } from "@testing-library/react";
 import { render } from "@/test/render-zh";
-import { OptionDetail } from "./results";
+import { allOptions, OptionDetail, ResultCharts } from "./results";
 import type { OptionV2 } from "@/lib/api/rotation-types";
 import type { Field } from "@/lib/api/field-shift-types";
 afterEach(cleanup);
+it("visualizes yearly resource use and crop seasons for the selected option", () => {
+  const option = {
+    id: "option-1", label: "Plan", feasible: true, seasons: [
+      { id: "s1", field_id: "a", crop_id: "maize", sow_date: "2027-04-01", harvest_date: "2027-08-01", occupied_until: "2027-08-15", growing_days: 122, turnaround_days: 14, water_gap_mm: 0 },
+      { id: "s2", field_id: "a", crop_id: "soybean", sow_date: "2028-04-01", harvest_date: "2028-08-01", occupied_until: "2028-08-15", growing_days: 122, turnaround_days: 14, water_gap_mm: 0 },
+    ], verification: { farm_years: { "2027": { water_m3: 100, cost_usd: 200, labor_days: 3 }, "2028": { water_m3: 50, cost_usd: 100, labor_days: 2 } } },
+  } as unknown as OptionV2;
+  render(<ResultCharts option={option} fields={[{ id: "a", name: "North", area_ha: 5 } as Field]} start="2027-01-01" end="2028-12-31" />);
+  expect(screen.getByRole("img", { name: "年度用水、投入和劳力汇总图" })).toBeVisible();
+  expect(screen.getByRole("img", { name: "各地块作物种植季次分布图" })).toBeVisible();
+  expect(screen.getByText("North")).toBeVisible();
+  expect(screen.getByText("maize")).toBeVisible();
+});
+it("keeps legacy runs with duplicate baseline ids renderable", () => {
+  const option = { id: "demo-option-balanced", label: "Balanced", seasons: [], feasible: true, complete: true }
+  const run = { result: { options: [option], baseline: option } } as unknown as import("@/lib/api/rotation-types").RunV2
+  expect(allOptions(run)).toEqual([option])
+});
 it("does not present incomplete baseline weather as zero resources or whole-period fallow", () => {
   const option = {
     id: "baseline",

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { RemoteSensingWorkspace } from "./nasa-analysis"
 import { createDemoFarm } from "./demo-data"
 import type { FieldFeature } from "@/types/workspace"
+import { DEMO_FARM_ID } from "@/lib/demo/data"
 
 const workspace = vi.hoisted(() => ({ farms: [] as ReturnType<typeof createDemoFarm>["farm"][], fields: [] as FieldFeature[] }))
 vi.mock("@/components/rotation/use-workspace-session", () => ({
@@ -24,12 +25,13 @@ const analysis = {
 }
 
 beforeEach(() => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(analysis), { status: 200 })))
+  vi.stubGlobal("fetch", vi.fn().mockImplementation(async () => new Response(JSON.stringify(analysis), { status: 200 })))
 })
 
 describe("remote sensing farm selector", () => {
-  it("updates the report context when a farm is selected", async () => {
+  it("shows only the selected farm data and restores the sample report when switching back", async () => {
     const first = createDemoFarm(1)
+    first.farm.properties.id = DEMO_FARM_ID
     first.farm.properties.name = "North farm"
     const second = createDemoFarm(2)
     second.farm.properties.name = "South farm"
@@ -39,6 +41,10 @@ describe("remote sensing farm selector", () => {
     render(<RemoteSensingWorkspace />)
     expect(await screen.findByRole("heading", { name: "North farm remote sensing report" })).toBeVisible()
     fireEvent.click(screen.getByRole("button", { name: /South farm/ }))
-    expect(await screen.findByRole("heading", { name: "South farm remote sensing report" })).toBeVisible()
+    expect(screen.getByText("This farm has no remote sensing analysis data yet.")).toBeVisible()
+    expect(screen.queryByRole("table")).not.toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole("button", { name: /North farm/ }))
+    expect(await screen.findByRole("heading", { name: "North farm remote sensing report" })).toBeVisible()
   })
 })

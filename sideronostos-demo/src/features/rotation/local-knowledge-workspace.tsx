@@ -3,9 +3,15 @@
 import { useMemo, useState } from "react";
 import { useLocale } from "@/lib/i18n/locale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BookOpen, Check, ChevronRight, CircleHelp, Save, Sprout } from "lucide-react";
+import { BookOpen, Check, CircleHelp, MapPin, Pentagon, Save, Sprout } from "lucide-react";
 import * as api from "@/lib/api/rotation";
 import type { CropV2, LocalKnowledgeProfile, ParameterSource } from "@/lib/api/rotation-types";
+import { useWorkspaceSession } from "@/components/rotation/use-workspace-session";
+import { useOwnedWorkspace } from "@/features/fields/use-owned-workspace";
+import { featureAreaHectares } from "@/features/fields/geometry";
+import { hasSampleFarmData } from "@/features/fields/farm-data-scope";
+import { ApiError } from "@/lib/api/client";
+import type { FarmFeature, FieldFeature } from "@/types/workspace";
 
 const copy = {
   en: { title: "Local Agricultural Knowledge Base", subtitle: "Maintain local agronomic parameters, rules, and evidence for rotation planning and NASA backtesting.", loading: "Loading local agricultural knowledge base…", unavailable: "The local agricultural knowledge base is temporarily unavailable.", scope: "Local knowledge", nav: ["Overview", "Crop parameters", "Rotation rules"], version: "Current version", unsaved: "unsaved changes", save: "Save draft", publish: "Publish and activate" },
@@ -46,7 +52,29 @@ function CropEditor({ crop, onChange, onRemove }: { crop: CropV2; onChange: (val
   </article>;
 }
 
-export function LocalKnowledgeWorkspace() {
+export function FarmSelector({ farms, fields, selectedFarmId, onSelect, en, scope }: {
+  farms: FarmFeature[];
+  fields: FieldFeature[];
+  selectedFarmId: string | null;
+  onSelect: (farmId: string) => void;
+  en: boolean;
+  scope?: string;
+}) {
+  return <aside className="flex min-h-0 w-full shrink-0 flex-col border-b border-sidebar-border bg-sidebar text-sidebar-foreground md:w-[clamp(16rem,18vw,22rem)] md:border-b-0 md:border-r" aria-label={en ? "Farms" : "农场列表"}>
+    <div className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border px-5"><div><p className="text-xs text-muted-foreground">{scope ?? (en ? "Local knowledge scope" : "本地知识范围")}</p><h2 className="mt-0.5 text-lg font-semibold tracking-tight">{en ? "Farms" : "农场"}</h2></div><span className="bg-sidebar-accent px-2.5 py-1 text-xs font-semibold">{farms.length}</span></div>
+    <div className="flex max-h-[min(34vh,20rem)] min-h-0 flex-col gap-1 overflow-y-auto overscroll-contain p-3 md:flex-1 md:max-h-none">
+      {farms.length ? farms.map((farm) => {
+        const count = fields.filter((field) => field.properties.farmId === farm.properties.id).length;
+        const selected = farm.properties.id === selectedFarmId;
+        return <button key={farm.properties.id} type="button" aria-pressed={selected} onClick={() => onSelect(farm.properties.id)} className={`flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-primary ${selected ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/70"}`}>
+          <MapPin className="size-4 shrink-0" /><span className="min-w-0"><span className="block truncate text-sm font-semibold">{farm.properties.name}</span><span className="mt-1 block truncate text-xs text-muted-foreground">{featureAreaHectares(farm).toFixed(2)} ha · {count} {en ? (count === 1 ? "field" : "fields") : "个地块"}</span></span>
+        </button>;
+      }) : <div className="m-1 border border-dashed border-sidebar-border p-4 text-center"><Pentagon className="mx-auto size-5 text-muted-foreground" /><p className="mt-3 text-sm font-medium">{en ? "No farms available" : "暂无农场"}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{en ? "Add or restore a farm in Field management first." : "请先在地块管理中添加或恢复农场。"}</p></div>}
+    </div>
+  </aside>;
+}
+
+function LocalKnowledgeContent({ farmName }: { farmName: string | null }) {
   const locale = useLocale();
   const en = locale === "en";
   const ui = copy[en ? "en" : "zh"];
@@ -70,12 +98,9 @@ export function LocalKnowledgeWorkspace() {
   const addHistoryCrop = () => { let index = Object.keys(profile.history_catalogue).length + 1; while (profile.history_catalogue[`new-history-${index}`]) index += 1; setProfile({ ...profile, history_catalogue: { ...profile.history_catalogue, [`new-history-${index}`]: Object.keys(profile.family_gaps)[0] ?? "" } }); };
   const removeHistoryCrop = (crop: string) => { const values = { ...profile.history_catalogue }; delete values[crop]; setProfile({ ...profile, history_catalogue: values }); };
   return <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
-    <aside className="flex min-h-0 w-full shrink-0 flex-col border-b border-sidebar-border bg-sidebar text-sidebar-foreground md:w-[clamp(16rem,18vw,22rem)] md:border-b-0 md:border-r" aria-label={en ? "Knowledge base navigation" : "知识库导航"}>
-      <div className="flex h-16 shrink-0 items-center border-b border-sidebar-border px-5"><div><p className="text-xs text-muted-foreground">{ui.scope}</p><h1 className="mt-0.5 text-lg font-semibold tracking-tight">{en ? "Knowledge base" : "知识库"}</h1></div></div>
-      <nav className="flex max-h-[min(34vh,20rem)] min-h-0 gap-1 overflow-x-auto overscroll-contain p-3 md:flex-1 md:max-h-none md:flex-col" aria-label={en ? "Knowledge base views" : "知识库视图"}>{(["overview", "crops", "rules"] as const).map((id, index) => <button key={id} type="button" onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined} className={`flex min-h-11 shrink-0 items-center gap-3 px-3 text-left text-sm transition-colors ${tab === id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/70"}`}><ChevronRight size={15} />{ui.nav[index]}</button>)}</nav>
-    </aside>
     <div className="h-full min-h-0 min-w-0 flex-1 overflow-y-auto"><div className="si-cream-surface min-h-full w-full space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-    <header className="flex flex-col justify-between gap-5 border-b pb-6 md:flex-row md:items-end"><div><p className="text-xs font-medium uppercase text-muted-foreground">Local agronomy</p><h2 className="mt-1 text-xl font-semibold">{ui.title}</h2><p className="mt-2 max-w-2xl text-sm text-muted-foreground">{ui.subtitle}</p></div><div className="flex flex-wrap items-center gap-2"><span className="rounded-full border px-3 py-1 text-xs">{ui.version} v{catalogue.active.revision}{dirty ? ` · ${ui.unsaved}` : ""}</span><button type="button" className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50" disabled={save.isPending || !dirty} onClick={() => save.mutate()}><Save size={15} />{ui.save}</button><button type="button" title={dirty ? (en ? "Save the draft first" : "请先保存草稿") : undefined} className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm disabled:opacity-50" disabled={publish.isPending || dirty} onClick={() => publish.mutate()}><Check size={15} />{ui.publish}</button></div></header>
+    <nav className="flex w-full gap-1 overflow-x-auto border-b" aria-label={en ? "Knowledge base views" : "知识库视图"}>{(["overview", "crops", "rules"] as const).map((id, index) => <button key={id} type="button" aria-current={tab === id ? "page" : undefined} onClick={() => setTab(id)} className={`min-h-11 shrink-0 border-b-2 px-4 text-sm transition-colors ${tab === id ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>{ui.nav[index]}</button>)}</nav>
+    <header className="flex flex-col justify-between gap-5 border-b pb-6 md:flex-row md:items-end"><div><p className="text-xs font-medium uppercase text-muted-foreground">{farmName ? `${en ? "Selected farm" : "当前农场"} · ${farmName}` : "Local agronomy"}</p><h2 className="mt-1 text-xl font-semibold">{ui.title}</h2><p className="mt-2 max-w-2xl text-sm text-muted-foreground">{ui.subtitle}</p></div><div className="flex flex-wrap items-center gap-2"><span className="rounded-full border px-3 py-1 text-xs">{ui.version} v{catalogue.active.revision}{dirty ? ` · ${ui.unsaved}` : ""}</span><button type="button" className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50" disabled={save.isPending || !dirty} onClick={() => save.mutate()}><Save size={15} />{ui.save}</button><button type="button" title={dirty ? (en ? "Save the draft first" : "请先保存草稿") : undefined} className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm disabled:opacity-50" disabled={publish.isPending || dirty} onClick={() => publish.mutate()}><Check size={15} />{ui.publish}</button></div></header>
     {message && <div className="mt-5 flex items-center gap-2 border border-primary/40 bg-accent px-3 py-2 text-sm"><Check size={15} />{message}</div>}
       <section className="min-w-0">
         {tab === "overview" && <div className="grid gap-5 md:grid-cols-3"><div className="border p-5"><Sprout className="text-primary" /><p className="mt-4 text-xs text-muted-foreground">{en ? "Crops" : "作物"}</p><strong className="text-2xl">{profile.crops.length}</strong></div><div className="border p-5"><BookOpen className="text-primary" /><p className="mt-4 text-xs text-muted-foreground">{en ? "Evidence sources" : "证据来源"}</p><strong className="text-2xl">{sourceEntries.length}</strong></div><div className="border p-5"><CircleHelp className="text-primary" /><p className="mt-4 text-xs text-muted-foreground">{en ? "Current validation hash" : "当前校验值"}</p><strong className="block truncate pt-1 font-mono text-sm">{catalogue.draft.sha256}</strong></div><div className="border p-5 md:col-span-3"><h2 className="font-medium">{en ? "Configuration" : "配置说明"}</h2><div className="mt-4 grid gap-3 sm:grid-cols-2"><label className="grid gap-1 text-xs"><span className="text-muted-foreground">{en ? "Knowledge base name" : "知识库名称"}</span><input className="h-9 rounded-md border bg-background px-2" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} /></label><label className="grid gap-1 text-xs"><span className="text-muted-foreground">{en ? "Applicable region" : "适用地区"}</span><input className="h-9 rounded-md border bg-background px-2" value={profile.region} onChange={(e) => setProfile({ ...profile, region: e.target.value })} /></label><label className="grid gap-1 text-xs sm:col-span-2"><span className="text-muted-foreground">{en ? "General limitations (one per line)" : "总体局限（每行一项）"}</span><textarea className="min-h-24 rounded-md border bg-background p-2" value={profile.limitations.join("\n")} onChange={(e) => setProfile({ ...profile, limitations: e.target.value.split("\n") })} /></label></div><p className="mt-5 text-sm leading-6 text-muted-foreground">{en ? "NASA backtesting reads only the currently published version. System-managed applicability:" : "NASA 回测只读取当前发布版本。系统管理的适用性信息："} {profile.scope} · {profile.weather_release_id} · {en ? "center" : "中心"} {profile.weather_center.join(", ")} · {en ? "radius" : "半径"} {profile.weather_radius_km} km.</p></div></div>}
@@ -83,5 +108,29 @@ export function LocalKnowledgeWorkspace() {
         {tab === "rules" && <div className="border p-5"><h2 className="font-medium">{en ? "Rotation rules and objectives" : "轮作规则与目标"}</h2><div className="mt-5 grid gap-4 sm:grid-cols-2"><NumberField label={en ? "Unknown history turnaround days" : "未知历史换茬日"} value={profile.history_turnaround_days} onChange={(value) => setProfile({ ...profile, history_turnaround_days: value })} /><NumberField label={en ? "Sowing sampling step (days)" : "播种采样步长（日）"} value={profile.sowing_step_days} onChange={(value) => setProfile({ ...profile, sowing_step_days: value })} /><NumberField label={en ? "Effective rainfall fraction" : "有效降雨比例"} value={profile.effective_rain_fraction} step="0.01" onChange={(value) => setProfile({ ...profile, effective_rain_fraction: value })} /></div><div className="mt-7 flex items-center justify-between border-t pt-5"><h3 className="text-sm font-medium">{en ? "Family gaps (days)" : "科属间隔（日）"}</h3><button type="button" className="text-xs text-primary" onClick={addFamily}>{en ? "Add family" : "新增科属"}</button></div>{Object.entries(profile.family_gaps).map(([family, days]) => <div className="mt-3 flex items-center gap-3" key={family}><input className="h-9 flex-1 rounded-md border bg-background px-2 text-sm" value={family} readOnly /><input className="h-9 w-36 rounded-md border bg-background px-2 text-sm" type="number" value={days} onChange={(e) => setProfile({ ...profile, family_gaps: { ...profile.family_gaps, [family]: Number(e.target.value) } })} /><button type="button" className="text-xs text-destructive" onClick={() => removeFamily(family)}>{en ? "Delete" : "删除"}</button></div>)}<div className="mt-7 flex items-center justify-between border-t pt-5"><h3 className="text-sm font-medium">{en ? "Historical crop catalogue" : "历史作物目录"}</h3><button type="button" className="text-xs text-primary" onClick={addHistoryCrop}>{en ? "Add historical crop" : "新增历史作物"}</button></div><div className="mt-3 grid gap-2 sm:grid-cols-2">{Object.entries(profile.history_catalogue).map(([crop, family]) => <div className="grid grid-cols-[1fr_1fr_auto] gap-2 text-xs" key={crop}><input className="h-8 rounded-md border bg-background px-2" value={crop} readOnly /><input className="h-8 rounded-md border bg-background px-2" value={family} onChange={(e) => setProfile({ ...profile, history_catalogue: { ...profile.history_catalogue, [crop]: e.target.value } })} /><button type="button" className="text-destructive" onClick={() => removeHistoryCrop(crop)}>{en ? "Delete" : "删除"}</button></div>)}</div><h3 className="mt-7 border-t pt-5 text-sm font-medium">{en ? "Default objective weights and reference scales" : "默认目标权重与参考尺度"}</h3><div className="mt-3 grid gap-3 sm:grid-cols-2">{Object.entries(profile.default_weights).map(([key, value]) => <div className="grid grid-cols-2 gap-2" key={key}><NumberField label={`${key} ${en ? "weight" : "权重"}`} value={value} step="0.5" onChange={(next) => setProfile({ ...profile, default_weights: { ...profile.default_weights, [key]: next } })} /><NumberField label={`${key} ${en ? "reference scale" : "参考尺度"}`} value={profile.references[key as keyof typeof profile.references]} onChange={(next) => setProfile({ ...profile, references: { ...profile.references, [key]: next } })} /></div>)}</div><details className="mt-6 border-t pt-5 text-xs"><summary className="cursor-pointer text-muted-foreground">{en ? "Rule parameter source bindings" : "规则参数来源绑定"}</summary><div className="mt-3 grid gap-2 sm:grid-cols-2">{Object.entries(profile.parameter_origins).map(([key, source]) => <label className="grid gap-1" key={key}><span className="text-muted-foreground">{key}</span><input className="h-8 rounded-md border bg-background px-2" value={source} onChange={(e) => setProfile({ ...profile, parameter_origins: { ...profile.parameter_origins, [key]: e.target.value } })} /></label>)}</div></details></div>}
       </section>
     </div></div>
+  </div>;
+}
+
+export function LocalKnowledgeWorkspace() {
+  const { session, ready } = useWorkspaceSession();
+  const ownerId = session.data?.email_verified ? session.data.id : null;
+  if (!ready) return <div className="flex flex-1 items-center justify-center" role="status">Checking farm workspace…</div>;
+  if (session.error && !(session.error instanceof ApiError && session.error.status === 401)) return <div className="m-auto max-w-lg px-6 py-10" role="alert"><h2 className="text-base font-semibold">Farm workspace is unavailable</h2></div>;
+  return <OwnedLocalKnowledgeWorkspace key={ownerId ?? "anonymous"} ownerId={ownerId} />;
+}
+
+function OwnedLocalKnowledgeWorkspace({ ownerId }: { ownerId: string | null }) {
+  const local = useOwnedWorkspace(ownerId, Boolean(ownerId));
+  const farms = local.workspace?.farms ?? [];
+  const fields = local.workspace?.fields ?? [];
+  const [selectedFarmId, setSelectedFarmId] = useState<string | null>(null);
+  const selectedFarm = farms.find((farm) => farm.properties.id === selectedFarmId) ?? farms[0] ?? null;
+  const en = useLocale() === "en";
+  if (!local.workspace) return <div className="flex flex-1 items-center justify-center" role="status">{en ? "Loading farms…" : "正在加载农场…"}</div>;
+  return <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+    <FarmSelector farms={farms} fields={fields} selectedFarmId={selectedFarm?.properties.id ?? null} onSelect={setSelectedFarmId} en={en} />
+    <section className="min-h-0 min-w-0 flex-1" aria-live="polite">
+      {selectedFarm ? hasSampleFarmData(selectedFarm) ? <LocalKnowledgeContent key={selectedFarm.properties.id} farmName={selectedFarm.properties.name} /> : <p role="status" className="flex h-full items-center justify-center px-6 text-center text-sm text-muted-foreground">{en ? "This farm has no local agricultural knowledge yet." : "该农场暂无本地农业知识。"}</p> : <div className="flex h-full items-center justify-center px-6 text-center"><div><Pentagon className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 text-base font-semibold">{en ? "Select a farm" : "选择农场"}</h2><p className="mt-1 text-sm text-muted-foreground">{en ? "Farm-specific knowledge will appear here." : "选择农场以查看本地知识。"}</p></div></div>}
+    </section>
   </div>;
 }

@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   createField: vi.fn(), createRun: vi.fn(), listFields: vi.fn(), preflightRotation: vi.fn(),
 }));
 let fieldStore: Field[] = [];
+vi.mock("@/lib/demo-mode", () => ({ isDemoMode: () => false }));
 vi.mock("@/lib/api/client", () => ({ getCurrentUser: vi.fn().mockResolvedValue({ id: "owner-1" }) }));
 vi.mock("@/lib/api/field-shift", () => ({
   listFields: mocks.listFields, createField: mocks.createField, listProfiles: vi.fn(),

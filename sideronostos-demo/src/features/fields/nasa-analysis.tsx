@@ -10,6 +10,8 @@ import { featureAreaHectares, featureCentroid } from "@/features/fields/geometry
 import type { NASAAnalysisData } from "@/features/fields/nasa-analysis-types"
 import { useOwnedWorkspace } from "@/features/fields/use-owned-workspace"
 import { cn } from "@/lib/utils"
+import { useLocale } from "@/lib/i18n/locale"
+import { hasSampleFarmData } from "./farm-data-scope"
 import type { FarmFeature, FieldFeature } from "@/types/workspace"
 
 function useChartWidth() {
@@ -170,6 +172,7 @@ function FarmSelector({ farms, fields, selectedFarmId, onSelect }: {
 }
 
 function OwnedRemoteSensingWorkspace({ ownerId }: { ownerId: string | null }) {
+  const en = useLocale() === "en"
   const local = useOwnedWorkspace(ownerId, Boolean(ownerId))
   const farms = local.workspace?.farms ?? []
   const fields = local.workspace?.fields ?? []
@@ -181,7 +184,7 @@ function OwnedRemoteSensingWorkspace({ ownerId }: { ownerId: string | null }) {
   return <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
     <FarmSelector farms={farms} fields={fields} selectedFarmId={selectedFarm?.properties.id ?? null} onSelect={setSelectedFarmId} />
     <section className="min-h-0 min-w-0 flex-1" aria-live="polite">
-      {selectedFarm ? <NASAAnalysis farm={selectedFarm} fieldCount={selectedFields.length} /> : <div className="flex h-full items-center justify-center px-6 text-center"><div><Pentagon className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 text-base font-semibold">Select a farm to view its report</h2><p className="mt-1 text-sm text-muted-foreground">Farm reports appear here after a farm is available in Field management.</p></div></div>}
+      {selectedFarm ? hasSampleFarmData(selectedFarm) ? <NASAAnalysis key={selectedFarm.properties.id} farm={selectedFarm} fieldCount={selectedFields.length} /> : <p role="status" className="flex h-full items-center justify-center px-6 text-center text-sm text-muted-foreground">{en ? "This farm has no remote sensing analysis data yet." : "该农场暂无遥感分析数据。"}</p> : <div className="flex h-full items-center justify-center px-6 text-center"><div><Pentagon className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 text-base font-semibold">Select a farm to view its report</h2><p className="mt-1 text-sm text-muted-foreground">Farm reports appear here after a farm is available in Field management.</p></div></div>}
     </section>
   </div>
 }

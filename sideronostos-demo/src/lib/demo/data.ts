@@ -73,8 +73,15 @@ export const demoPreflight: RotationPreflight = {
 };
 
 export function demoRun(request: unknown): RunV2 {
+  const input = (request && typeof request === "object" ? request : {}) as Partial<RotationInput>
+  const normalizedRequest = {
+    start: "2022-01-01",
+    end: "2024-12-31",
+    ...input,
+    scenario: { temperature_change_c: 0, rainfall_change_pct: 0, ...(input.scenario ?? {}) },
+  } as RotationInput
   const seasons = demoFields.flatMap((field, index) => [{ id: `season-${field.properties.id}`, field_id: field.properties.id, crop_id: index % 2 ? "soybean" : "maize", family: index % 2 ? "legume" : "cereal", sow_date: "2027-05-01", harvest_date: "2027-09-25", occupied_until: "2027-10-10", growing_days: 147, turnaround_days: 14, water_gap_mm: 38 }]);
   const verification = { valid: true, violations: [], totals: { water_m3: 12500, cost_usd: 10120, labor_days: 42, cover_ha_days: 8200, diversity_ha_families: 4 }, farm_years: {}, field_years: {}, objective: 0.86 };
   const option = { id: "demo-option-balanced", label: "Balanced Iowa rotation", seasons, feasible: true, complete: true, verification, solver: { status: "optimal", objective: 0.86, bound: 0.86, gap: 0, runtime_seconds: 0.04, solution_count: 1, optimality_scope: "demo fixture" } };
-  return { id: "demo-run-1", job_id: "demo-job-1", status: "succeeded", generation: 1, created_at: stamp, updated_at: stamp, request: (request ?? {}) as RotationInput, field_snapshots: demoFieldsApi(), provenance: { profile_id: DEMO_PROFILE_ID, profile_sha256: demoProfile.sha256, weather_release_id: DEMO_RELEASE_ID, weather_sha256: "demo-weather", benchmark_scope: "Iowa demonstration benchmark", limitations: ["This is a precomputed demonstration result."], sources: {}, parameter_origins: { demo: "precomputed" }, data_release_id: DEMO_RELEASE_ID, data_release_sha256: demoRelease.manifest_sha256, data_release: demoRelease }, result: { status: "succeeded", options: [option, { ...option, id: "demo-option-cover", label: "Cover-first rotation" }], baseline: option, candidate_count: 84, transition_edge_count: 48, capacity: demoPreflight, limitations: ["Demonstration result; not a planting prescription."], data_release_id: DEMO_RELEASE_ID, options_requested: 2, options_generated: 2 } };
+  return { id: "demo-run-1", job_id: "demo-job-1", status: "succeeded", generation: 1, created_at: stamp, updated_at: stamp, request: normalizedRequest, field_snapshots: demoFieldsApi(), provenance: { profile_id: DEMO_PROFILE_ID, profile_sha256: demoProfile.sha256, weather_release_id: DEMO_RELEASE_ID, weather_sha256: "demo-weather", benchmark_scope: "Iowa demonstration benchmark", limitations: ["This is a precomputed demonstration result."], sources: {}, parameter_origins: { demo: "precomputed" }, data_release_id: DEMO_RELEASE_ID, data_release_sha256: demoRelease.manifest_sha256, data_release: demoRelease }, result: { status: "succeeded", options: [option, { ...option, id: "demo-option-cover", label: "Cover-first rotation" }], baseline: { ...option, id: "baseline", label: "Baseline rotation" }, candidate_count: 84, transition_edge_count: 48, capacity: demoPreflight, limitations: ["Demonstration result; not a planting prescription."], data_release_id: DEMO_RELEASE_ID, options_requested: 2, options_generated: 2 } };
 }

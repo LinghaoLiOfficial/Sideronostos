@@ -14,12 +14,36 @@ function workspace() {
 function saveWorkspace(value: unknown) { try { localStorage.setItem(WORKSPACE_KEY, JSON.stringify(value)); } catch { /* demo remains in memory */ } }
 function run() {
   if (typeof localStorage === "undefined") return demoRun({});
-  try { return JSON.parse(localStorage.getItem(RUN_KEY) ?? "null") ?? demoRun({}); } catch { return demoRun({}); }
+  try {
+    const saved = JSON.parse(localStorage.getItem(RUN_KEY) ?? "null") as ReturnType<typeof demoRun> | null
+    if (!saved) return demoRun({})
+    return { ...saved, request: { ...saved.request, scenario: saved.request?.scenario ?? { temperature_change_c: 0, rainfall_change_pct: 0 } } }
+  } catch { return demoRun({}); }
 }
 function assistantAnswer(text: string) {
   const lower = text.toLowerCase();
   if (lower.includes("水") || lower.includes("moisture")) return { paragraphs: [{ text: "Iowa 示例区的土壤水分处于可管理范围。Field 3 的灌溉余量最低，建议在播种前复核田间持水量。", evidence_ids: ["demo-soil-moisture"] }], actions: ["view_sources"], needs_clarification: false, facts: [{ id: "demo-soil-moisture", key: "soil_moisture", label: "表层土壤水分", value: 0.27, unit: "m³/m³", display: "0.27 m³/m³", source: { release_id: "demo" }, limitations: ["合成演示指标"] }] };
   return { paragraphs: [{ text: "基于 Iowa benchmark，建议在玉米和大豆之间轮换，并保留燕麦作为覆盖作物候选。当前演示方案优先平衡水量、覆盖天数和作物科属多样性。", evidence_ids: ["demo-rotation-rule"] }], actions: ["open_planner"], needs_clarification: false, facts: [], citations: [], warnings: ["这是预计算的演示回复，不是实时农艺处方。"] };
+}
+async function groqAnswer(body: Record<string, unknown>, history: unknown[]) {
+  try {
+    const response = await fetch("/api/groq-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...body, history }),
+    });
+    if (!response.ok) {
+      const status = response.status;
+      const payload = await response.json().catch(() => ({})) as { error?: unknown };
+      if (status === 501) return null;
+      return { error: String(payload.error ?? "Groq request failed"), status };
+    }
+    const payload = await response.json() as { answer?: unknown };
+    if (typeof payload.answer !== "string" || !payload.answer.trim()) return { error: "Groq returned an empty response", status: 502 };
+    return { response: { paragraphs: [{ text: payload.answer.trim(), evidence_ids: [] }], actions: [], needs_clarification: false, facts: [], citations: [], warnings: ["回答由 Groq 生成，仅供演示参考。"] } };
+  } catch {
+    return { error: "Cannot reach the Groq chat service", status: 502 };
+  }
 }
 type DemoConversation = { id: string; preset: string; bot_id: string; language: string; detail: string; kb_release_id: string; created_at: string; updated_at: string; messages: unknown[] };
 function conversationStore(): DemoConversation[] {
@@ -58,7 +82,7 @@ export async function demoApiResponse(path: string, options: { method?: string; 
   if (clean === "/farm-assistant/conversations" && method === "GET") return json({ items: conversationStore() });
   if (clean === "/farm-assistant/conversations" && method === "POST") { const item = { id: `demo-chat-${Date.now()}`, preset: body.preset ?? "rotation", bot_id: body.bot_id ?? "rotation-guide", language: body.language ?? "zh", detail: "brief", kb_release_id: "demo-kb", created_at: now(), updated_at: now(), messages: [] }; const all = [item, ...conversationStore()]; saveConversations(all); return json(item); }
   const conversationMatch = clean.match(/^\/farm-assistant\/conversations\/([^/]+)(?:\/messages)?(?:\/([^/]+))?$/);
-  if (conversationMatch && clean.endsWith("/messages") && method === "POST") { const id = decodeURIComponent(conversationMatch[1]); const message = { id: `demo-message-${Date.now()}`, sequence: 1, client_message_id: body.client_message_id ?? "demo", status: "complete", text: body.text ?? "", context: body.context ?? { page: "map", revision: 1 }, context_labels: { fields: [], selection_kind: null, run_id: null, option_id: null, plan_id: null }, response: assistantAnswer(body.text ?? ""), facts: [], error_code: null, created_at: now(), completed_at: now() }; const all = conversationStore().map((item) => item.id === id ? { ...item, updated_at: now(), messages: [...(item.messages ?? []), message] } : item); saveConversations(all); return json(message); }
+  if (conversationMatch && clean.endsWith("/messages") && method === "POST") { const id = decodeURIComponent(conversationMatch[1]); const conversation = conversationStore().find((item) => item.id === id); const history = (conversation?.messages ?? []).flatMap((item) => { const row = item as { text?: unknown; response?: { paragraphs?: Array<{ text?: unknown }> } }; const answer = row.response?.paragraphs?.map((paragraph) => paragraph.text).filter((value): value is string => typeof value === "string").join("\n"); return [typeof row.text === "string" ? { role: "user", content: row.text } : null, answer ? { role: "assistant", content: answer } : null].filter(Boolean); }); const groq = await groqAnswer({ text: body.text ?? "", bot_id: conversation?.bot_id ?? "general-guide", language: conversation?.language ?? "zh" }, history); if (groq?.error) return json({ error: { code: "groq_failed", message: groq.error, request_id: "demo-groq", details: null } }, groq.status); const message = { id: `demo-message-${Date.now()}`, sequence: (conversation?.messages?.length ?? 0) + 1, client_message_id: body.client_message_id ?? "demo", status: "complete", text: body.text ?? "", context: body.context ?? { page: "map", revision: 1 }, context_labels: { fields: [], selection_kind: null, run_id: null, option_id: null, plan_id: null }, response: groq?.response ?? assistantAnswer(body.text ?? ""), facts: [], error_code: null, created_at: now(), completed_at: now() }; const all = conversationStore().map((item) => item.id === id ? { ...item, updated_at: now(), messages: [...(item.messages ?? []), message] } : item); saveConversations(all); return json(message); }
   if (conversationMatch && method === "GET") { const item = conversationStore().find((value) => value.id === decodeURIComponent(conversationMatch[1])) ?? { id: conversationMatch[1], preset: "rotation", bot_id: "rotation-guide", language: "zh", detail: "brief", kb_release_id: "demo-kb", created_at: now(), updated_at: now(), messages: [] }; return json({ ...item, next_before_sequence: null }); }
   if (clean === "/farm-assistant/presets") return json({ items: [{ id: "rotation", enabled: true, name: "Crop rotation", name_en: "Crop rotation", description: "Demo assistant", color: "#8671d9" }] });
   if (clean.includes("/preferences")) return json(body);
