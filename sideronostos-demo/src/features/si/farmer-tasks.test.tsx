@@ -97,7 +97,7 @@ it("offers module destinations instead of water observations to the general assi
 it("lets a farmer choose a saved field by name and opens its actual page", async () => {
   render(<FarmerTasks {...props} />);
   await userEvent.click(screen.getByRole("button", { name: "My fields" }));
-  expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
+  expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/si/field-management?field=field-7");
   expect(screen.queryByText(/GET \/|POST \/|analysis_id/)).not.toBeInTheDocument();
 });
 
