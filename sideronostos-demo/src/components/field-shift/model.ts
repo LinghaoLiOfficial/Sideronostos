@@ -1,5 +1,6 @@
 import { ApiError } from "@/lib/api/client";
 import type { Field, FieldInput, PlanningInputs } from "@/lib/api/field-shift-types";
+import { translate, type Translator } from "@/lib/i18n/translate";
 
 export type FieldDraft = Omit<FieldInput, "area_ha" | "latitude" | "longitude" | "history"> & { area_ha: string; latitude: string; longitude: string; history: { year: string; crop_id: string }[]; expected_version?: number };
 export type PlanningDraft = Omit<PlanningInputs, "start_year" | "max_irrigation_mm" | "max_cost_usd_ha" | "max_labor_days_ha"> & { start_year: string; max_irrigation_mm: string; max_cost_usd_ha: string; max_labor_days_ha: string };
@@ -41,15 +42,16 @@ export function parsePlanningDraft(draft: PlanningDraft, cropIds: string[], hist
   return { value: { ...draft, start_year: year, max_irrigation_mm: Number(draft.max_irrigation_mm), max_cost_usd_ha: Number(draft.max_cost_usd_ha), max_labor_days_ha: Number(draft.max_labor_days_ha) } };
 }
 
-export function errorMessage(error: unknown): string {
+export function errorMessage(error: unknown, t: Translator = (message, values) => translate("zh", message, values)): string {
   if (error instanceof ApiError) {
-    if (error.status === 409) return "这块地已在其他页面更新。你的输入仍保留，请载入最新地块后核对并重试。";
-    if (error.status === 401) return "登录已失效。请重新登录；本页草稿会保留。";
-    if (error.status === 403) return "当前账户没有访问这份资料的权限。";
-    if (error.status === 422) return `请检查输入：${error.message}`;
-    return `暂时无法完成，请重试。${error.message}（参考编号 ${error.error.request_id}）`;
+    if (error.status === 409) return t("这块地已在其他页面更新。你的输入仍保留，请载入最新地块后核对并重试。");
+    if (error.status === 401) return t("登录已失效。请重新登录；本页草稿会保留。");
+    if (error.status === 403) return t("当前账户没有访问这份资料的权限。");
+    const detail = t(error.message);
+    if (error.status === 422) return t("请检查输入：{detail}", { detail });
+    return t("暂时无法完成，请重试。{detail}（参考编号 {id}）", { detail, id: error.error.request_id });
   }
-  return "网络暂时不可用。输入已保留，请检查连接后重试。";
+  return t("网络暂时不可用。输入已保留，请检查连接后重试。");
 }
 export const formatNumber = (n: number | null, decimals = 0) => n === null ? "暂无数据" : new Intl.NumberFormat("en-US", { maximumFractionDigits: decimals }).format(n);
 export const formatDate = (date: string | null, locale: "en" | "zh" = "en") => date ? new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", { dateStyle: "medium" }).format(new Date(date)) : "未提供";

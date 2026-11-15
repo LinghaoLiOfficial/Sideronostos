@@ -2,8 +2,6 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  border-bottom: 1px solid #e8ead630;
-  background: #0b120ff0;
   color: #fafcf7;
 }
 
@@ -30,13 +28,9 @@
 }
 
 .page {
-  min-height: calc(100svh - 65px);
+  flex: 1;
   padding: clamp(32px, 5vh, 62px) clamp(24px, 6vw, 112px) 64px;
   color: #fafcf7;
-  background:
-    linear-gradient(115deg, #0b120ff5 10%, #0b120fbe 60%, #0b120fc9),
-    linear-gradient(0deg, #0b120f 5%, transparent 95%),
-    #0b120f url("/images/si/rotation-overview-poster.webp") 58% center / cover fixed;
 }
 
 .layout {

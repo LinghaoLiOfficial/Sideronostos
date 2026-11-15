@@ -1,0 +1,85 @@
+.si-agronomy-page {
+  --si-agronomy-header-height: 64px;
+  min-height: 100svh;
+}
+
+.si-agronomy-page > .si-header {
+  position: sticky;
+  top: 0;
+  padding-block-start: 0;
+}
+
+.si-agronomy-page .si-header-row {
+  min-height: var(--si-agronomy-header-height);
+  padding: 0 clamp(16px, 5vw, 88px);
+}
+
+.si-agronomy-main {
+  width: min(100%, 1660px);
+  min-height: calc(100svh - var(--si-agronomy-header-height));
+  margin-inline: auto;
+  padding: clamp(24px, 5vh, 56px) clamp(16px, 5vw, 88px) 84px;
+}
+
+.si-agronomy-layout {
+  display: grid;
+  gap: clamp(24px, 3.5vw, 60px);
+  align-items: start;
+}
+
+.si-agronomy-farms {
+  border-bottom: 1px solid #e8ead633;
+  color: var(--si-light);
+}
+
+.si-agronomy-heading { margin-block-end: clamp(18px, 2.8vw, 32px); }
+
+.si-agronomy-heading h1 {
+  margin: 0;
+  color: var(--si-light);
+  font-size: clamp(34px, 5.5vw, 76px);
+  font-weight: 700;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+html:lang(en) .si-agronomy-heading h1 {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+}
+
+.si-agronomy-heading p {
+  max-width: 62ch;
+  margin-block-start: 10px;
+  color: var(--si-light-muted);
+  font-size: clamp(.875rem, 1.25vw, 1rem);
+  line-height: 1.6;
+}
+
+html:has(.si-theme) .si-agronomy-panel.si-cream-surface {
+  --primary: #40513c;
+  --primary-foreground: #fff;
+  --ring: #40513c;
+  --background: #f8f9ef;
+  --border: #aeb89d;
+  border: 1px solid var(--border);
+  color: var(--si-cream-foreground, #23301f);
+}
+
+.si-agronomy-panel :is(input, select, textarea) { min-width: 0; max-width: 100%; }
+
+@media (min-width: 768px) {
+  .si-agronomy-layout { grid-template-columns: clamp(154px, 16vw, 230px) minmax(0, 1fr); }
+  .si-agronomy-farms {
+    position: sticky;
+    top: calc(var(--si-agronomy-header-height) + 24px);
+    padding-inline-end: 12px;
+    border-bottom: 0;
+    border-inline-end: 1px solid #e8ead633;
+  }
+}
+
+@media (max-width: 600px) {
+  .si-agronomy-page { --si-agronomy-header-height: 92px; }
+  .si-agronomy-page .si-header-user-name { display: none; }
+}

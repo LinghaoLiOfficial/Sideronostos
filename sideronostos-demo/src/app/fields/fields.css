@@ -3,12 +3,24 @@
   --fields-map-control-text: var(--si-cream-foreground, #23301f);
 }
 
+.fields-photo-panel {
+  --fields-cream-overlay: color-mix(in srgb, var(--si-cream, #e8ead6) 20%, transparent);
+  background:
+    linear-gradient(var(--fields-cream-overlay), var(--fields-cream-overlay)),
+    var(--site-farm-photo) 58% center / cover fixed #afb5a3;
+  background-blend-mode: normal, screen;
+}
+
 .fields-app-embedded,
 .si-fields-workspace-loading {
   height: calc(100dvh - 72px);
 }
 
 @media (max-width: 900px) {
+  .fields-photo-panel[data-slot="sheet-content"] {
+    background-attachment: scroll;
+  }
+
   .fields-app-embedded,
   .si-fields-workspace-loading {
     height: calc(100dvh - 56px);

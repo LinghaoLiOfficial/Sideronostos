@@ -1,7 +1,8 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { siVideoUrl } from "./si-media";
 
-export function SiOrbitBackground({ storyMedia = false }: { storyMedia?: boolean }) {
+export function SiOrbitBackground({ storyMedia = false, children }: { storyMedia?: boolean; children?: ReactNode }) {
   return (
     <div className="si-hero-background" aria-hidden="true" data-si-story-media={storyMedia ? "" : undefined}>
       <div className="si-hero-scene">
@@ -15,6 +16,7 @@ export function SiOrbitBackground({ storyMedia = false }: { storyMedia?: boolean
             playsInline
           />
         </div>
+        {children}
         <Image
           src="/images/si/orbit-annotated-cutout.webp"
           alt=""

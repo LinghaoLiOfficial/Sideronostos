@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react"
+import type { ReactNode } from "react"
 import { expect, it, vi } from "vitest"
 import { RotationRecommendationWorkspace } from "./rotation-recommendation-workspace"
 import { demoFarm } from "@/lib/demo/data"
@@ -10,7 +11,7 @@ vi.mock("@/features/fields/use-owned-workspace", () => ({
   useOwnedWorkspace: () => ({ workspace: { farms: [demoFarm, { ...demoFarm, properties: { ...demoFarm.properties, id: "new-farm", name: "New farm" } }], fields: [] } }),
 }))
 vi.mock("@/components/rotation/nasa-rotation-workspace", () => ({
-  NasaRotationWorkspace: ({ farmId }: { farmId: string }) => <div data-testid="recommendations">{farmId}</div>,
+  NasaRotationWorkspace: ({ farmId, overview }: { farmId: string; overview?: ReactNode }) => <>{overview}<div data-testid="recommendations">{farmId}</div></>,
 }))
 
 it("shows the selected farm recommendations and an empty state for new farms", () => {

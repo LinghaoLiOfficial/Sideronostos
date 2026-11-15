@@ -65,3 +65,46 @@ test("uses the same compact module menu size on business pages", async ({ page }
   await expect(menu).toHaveCSS("width", "280px");
   await expect(item).toHaveCSS("font-size", "14px");
 });
+
+test("reaches the bottom of the crop parameters and rotation rules with the scroll wheel", async ({ page }) => {
+  await page.goto("/si/local-knowledge");
+  const views = page.getByRole("navigation", { name: "Knowledge base views" });
+  await expect(page.getByRole("heading", { name: "Configuration" })).toHaveCSS("color", palette.creamText);
+  for (const [tab, bottom] of [
+    ["Crop parameters", "Parameter source bindings"],
+    ["Rotation rules", "Rule parameter source bindings"],
+  ]) {
+    await views.getByRole("button", { name: tab, exact: true }).click();
+    const end = page.getByText(bottom, { exact: true }).last();
+    await expect(end).not.toBeInViewport();
+    const viewport = page.viewportSize()!;
+    await page.mouse.move(viewport.width * .65, viewport.height * .8);
+    await page.mouse.wheel(0, 12000);
+    await expect(end).toBeInViewport();
+    await expect(page.getByRole("button", { name: "Module", exact: true })).toBeInViewport();
+  }
+});
+
+test("keeps the transparent home header and shares the six modules across the app", async ({ page }) => {
+  for (const route of ["/si", "/personal/account", "/si/field-management", "/si/remote-sensing", "/si/local-knowledge", "/si/rotation-recommendation"]) {
+    await page.goto(route);
+    const header = page.getByRole("banner");
+    await expect(header).toHaveCSS("background-color", route === "/si" ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.2)");
+    await expect(header).toHaveCSS("border-bottom-width", "0px");
+    const toggle = page.getByRole("button", { name: "Open menu" });
+    if (await toggle.isVisible()) await toggle.click();
+    await page.getByRole("button", { name: "Module", exact: true }).click();
+    const menu = page.getByRole("menu");
+    await expect(menu.getByRole("menuitem")).toHaveText([
+      "Multi-Agent System",
+      "Field Management",
+      "Remote Sensing Analysis",
+      "Local Agricultural Knowledge Base",
+      "Crop Rotation Strategy Recommendation",
+      "Explore the rotation model",
+    ]);
+    await expect(menu.getByRole("menuitem").last()).toHaveAttribute("href", "/si/introduction");
+  }
+  await page.getByRole("menuitem", { name: "Explore the rotation model" }).click();
+  await expect(page).toHaveURL(/\/si\/introduction$/);
+});

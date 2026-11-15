@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { dataLayers } from "@/features/si/si-data-layers";
-import { SiModelGuide } from "@/features/si/si-model-guide";
+import { SiLayerGuide } from "@/features/si/si-layer-guide";
 
 export { metadata } from "../page";
 
@@ -15,5 +15,5 @@ export default async function RotationModelLayerPage({ params }: {
   const index = dataLayers.findIndex(({ id }) => id === layer);
   if (index < 0) notFound();
 
-  return <SiModelGuide key={layer} showLayers initialLayerIndex={index} />;
+  return <SiLayerGuide key={layer} initialLayerIndex={index} />;
 }

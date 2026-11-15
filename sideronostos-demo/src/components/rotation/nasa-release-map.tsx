@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type * as Leaflet from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useI18n } from "@/lib/i18n/provider";
 import { apiBlob } from "@/lib/api/client";
 import * as api from "@/lib/api/rotation";
 import type { Field } from "@/lib/api/field-shift-types";
@@ -13,6 +14,7 @@ import styles from "./nasa-rotation.module.css";
 type Props = { release: NasaDataRelease; fields: Field[] };
 
 export function NasaReleaseMap({ release, fields }: Props) {
+  const { t } = useI18n();
   const [layerId, setLayerId] = useState(release.layers[0]?.id ?? "");
   const [tileError, setTileError] = useState(false);
   const element = useRef<HTMLDivElement>(null);
@@ -96,11 +98,11 @@ export function NasaReleaseMap({ release, fields }: Props) {
 
   const selected = release.layers.find((layer) => layer.id === layerId);
   return <section className={styles.mapSection} aria-labelledby="release-map-heading">
-    <div className={styles.mapHeader}><div><h2 id="release-map-heading">NASA release 图层</h2><p>本地图只读取已发布的本地 COG，不在浏览器中请求 NASA。</p></div><label>图层<select value={layerId} onChange={(event) => setLayerId(event.target.value)} disabled={!release.layers.length}>{release.layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.id}</option>)}</select></label></div>
-    <div className={styles.mapCanvas} ref={element} role="region" aria-label="NASA 数据图层与 Iowa benchmark 地块" />
-    {selected && <div className={styles.layerMeta}><span>{selected.product.toUpperCase()}</span><span>{selected.unit}</span><span>{selected.time ?? `${release.start} — ${release.end}`}</span><span>{selected.spatial_support ?? selected.native_resolution ?? selected.resolution ?? "见 release manifest"}</span></div>}
+    <div className={styles.mapHeader}><div><h2 id="release-map-heading">{t("NASA release 图层")}</h2><p>{t("本地图只读取已发布的本地 COG，不在浏览器中请求 NASA。")}</p></div><label>{t("图层")}<select value={layerId} onChange={(event) => setLayerId(event.target.value)} disabled={!release.layers.length}>{release.layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.id}</option>)}</select></label></div>
+    <div className={styles.mapCanvas} ref={element} role="region" aria-label={t("NASA 数据图层与 Iowa benchmark 地块")} />
+    {selected && <div className={styles.layerMeta}><span>{selected.product.toUpperCase()}</span><span>{selected.unit}</span><span>{selected.time ?? `${release.start} — ${release.end}`}</span><span>{selected.spatial_support ?? selected.native_resolution ?? selected.resolution ?? t("见 release manifest")}</span></div>}
     {manifest.data && <div className={styles.legend}><div style={{ background: `linear-gradient(to right, ${manifest.data.legend.colors.join(",")})` }} /><span>{manifest.data.legend.min}</span><span>{manifest.data.legend.max}</span></div>}
-    {(tileError || manifest.isError) && <p className={styles.error} role="alert">科学图层未能加载；空白表示缺测、未覆盖或本地资源不可用，不能解释为数值为零。</p>}
-    <p className={styles.mapLimit}>可视化重采样不会提高原生信息尺度。GPM、SMAP 和 GRACE 是区域背景，不代表田块内精细测量。</p>
+    {(tileError || manifest.isError) && <p className={styles.error} role="alert">{t("科学图层未能加载；空白表示缺测、未覆盖或本地资源不可用，不能解释为数值为零。")}</p>}
+    <p className={styles.mapLimit}>{t("可视化重采样不会提高原生信息尺度。GPM、SMAP 和 GRACE 是区域背景，不代表田块内精细测量。")}</p>
   </section>;
 }

@@ -3,7 +3,7 @@
 .app button { min-height: 42px; }
 .app input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); flex: 0 0 auto; }
 .app input[type="range"] { width: 100%; min-height: 30px; accent-color: var(--primary); cursor: pointer; }
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 78px; padding: 16px max(24px, calc((100vw - 1480px) / 2)); border-bottom: 1px solid var(--border); }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 78px; padding: 16px max(24px, calc((100vw - 1480px) / 2)); }
 .brandGroup { display: flex; align-items: center; gap: 20px; }
 .productName { padding-left: 20px; border-left: 1px solid var(--border); font-size: 14px; letter-spacing: .02em; }
 .userLink { color: var(--muted-foreground); font-size: 13px; }

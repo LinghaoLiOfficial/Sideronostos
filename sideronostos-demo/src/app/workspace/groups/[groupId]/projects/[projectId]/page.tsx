@@ -75,7 +75,7 @@ export default function GroupProjectPage() {
   if (status === "loading" || !project) return <main className="gallery-surface flex min-h-screen items-center justify-center"><LoaderCircle className="size-6 animate-spin" /></main>;
 
   return <main className="gallery-surface flex min-h-screen flex-col">
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 bg-[#191020]/70 px-4 backdrop-blur-xl sm:px-8">
+    <header className="site-topbar flex h-16 shrink-0 items-center justify-between px-4 sm:px-8">
       <div className="flex min-w-0 items-center gap-3"><Button asChild variant="ghost" size="icon" aria-label="返回任务规划"><Link href={`/workspace/groups/${groupId}?tab=projects`}><ArrowLeft /></Link></Button><div className="min-w-0"><h1 className="truncate text-sm font-medium">{groupName}</h1><p className="text-xs text-muted-foreground">任务规划 · 甘特图</p></div></div>
       <div className="flex items-center gap-2 text-xs text-muted-foreground" aria-live="polite">
         {status === "saving" && <><LoaderCircle className="size-3 animate-spin" />保存中</>}

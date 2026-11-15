@@ -1,7 +1,7 @@
-import { SiModelGuide } from "@/features/si/si-model-guide";
+import { SiLayerGuide } from "@/features/si/si-layer-guide";
 
 export const metadata = { title: "Crop Rotation Model Layers · Agrisata" };
 
 export default function RotationModelLayersPage() {
-  return <SiModelGuide showLayers />;
+  return <SiLayerGuide />;
 }

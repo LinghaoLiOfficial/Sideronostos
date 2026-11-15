@@ -1,5 +1,5 @@
 import { MultiBotDock } from "@/components/bot/MultiBotDock";
-import { RotationRecommendationWorkspace } from "@/features/rotation/rotation-recommendation-workspace";
+import { RotationRecommendationLoading, RotationRecommendationWorkspace } from "@/features/rotation/rotation-recommendation-workspace";
 import { Suspense } from "react";
 
 export const metadata = { title: "Crop Rotation Strategy Recommendation · Agrisata" };
@@ -7,7 +7,7 @@ export const metadata = { title: "Crop Rotation Strategy Recommendation · Agris
 export default function RotationRecommendationPage() {
   return (
     <>
-      <Suspense fallback={<main role="status">Opening crop rotation recommendations…</main>}>
+      <Suspense fallback={<RotationRecommendationLoading />}>
         <RotationRecommendationWorkspace />
       </Suspense>
       <MultiBotDock module="rotation-recommendation" />

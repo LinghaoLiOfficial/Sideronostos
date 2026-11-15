@@ -14,7 +14,7 @@ export function FieldsShell({ children, user, fieldId, plannerHref, embedded = f
 
   return (
     <div className={`fields-app flex ${embedded ? "fields-app-embedded h-[calc(100dvh-72px)]" : "h-dvh"} min-h-0 flex-col overflow-hidden bg-background text-foreground`}>
-      {!embedded && <header className="grid shrink-0 grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 border-b border-border bg-sidebar px-3 py-2 sm:flex sm:min-h-16 sm:justify-between sm:px-6">
+      {!embedded && <header className="site-topbar grid shrink-0 grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-3 py-2 sm:flex sm:min-h-16 sm:justify-between sm:px-6">
         <div className="flex min-w-0 items-center gap-4">
           <Link href="/si/field-management" aria-label={t("Agrisata home")} className="flex shrink-0 items-center"><BrandLogo priority className="w-24 sm:w-36" /></Link>
           <div className="hidden min-w-0 lg:block"><p className="text-sm font-medium">{t("Field intelligence")}</p><p className="text-[11px] text-muted-foreground">{t("World map and farm partition workspace")}</p></div>

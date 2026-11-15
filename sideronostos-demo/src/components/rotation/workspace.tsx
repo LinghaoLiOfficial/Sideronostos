@@ -81,7 +81,7 @@ function Header({
   const { t } = useI18n();
 
   return (
-    <header className={styles.header}>
+    <header className={"site-topbar " + styles.header}>
       <Link className={styles.brand} href="/si/field-management">
         <Sprout size={25} />
         <span>

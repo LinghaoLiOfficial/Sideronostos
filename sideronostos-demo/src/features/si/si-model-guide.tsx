@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useLocale } from "@/lib/i18n/locale";
 import { dataLayers } from "./si-data-layers";
-import { layerEquations } from "./si-layer-equations";
+import type { MathTextPart, RenderedLayer } from "./si-layer-guide";
 import { SiLayerScene } from "./si-layer-scene";
 import { siVideoUrl } from "./si-media";
 import { rotationLayersHref as layersHref, SiStoryLink, useSiStoryTransition } from "./si-story-link";
@@ -12,14 +12,24 @@ import styles from "./si-model-guide.module.css";
 const swipeThreshold = 48;
 const swipeIdleMs = 200;
 
-export function SiModelGuide({ showLayers = false, initialLayerIndex = 0 }: {
-  showLayers?: boolean;
-  initialLayerIndex?: number;
-}) {
+function MathText({ parts }: { parts: MathTextPart[] }) {
+  return parts.map((part, index) => "mathHtml" in part
+    ? <span key={index} dangerouslySetInnerHTML={{ __html: part.mathHtml }} />
+    : <Fragment key={index}>{part.text}</Fragment>);
+}
+
+type GuideProps = { showLayers?: false } | {
+  showLayers: true;
+  initialLayerIndex: number;
+  renderedLayers: RenderedLayer[];
+};
+
+export function SiModelGuide(props: GuideProps) {
+  const showLayers = props.showLayers === true;
   const locale = useLocale();
   const isEnglish = locale === "en";
   const language = isEnglish ? "en" : "zh";
-  const [activeIndex, setActiveIndex] = useState(initialLayerIndex);
+  const [activeIndex, setActiveIndex] = useState(props.showLayers ? props.initialLayerIndex : 0);
   const guideRef = useRef<HTMLElement>(null);
   const active = dataLayers[activeIndex];
   const chapter = active[language];
@@ -37,6 +47,8 @@ export function SiModelGuide({ showLayers = false, initialLayerIndex = 0 }: {
 
     function swipe(event: WheelEvent) {
       if (event.ctrlKey) return;
+      const equation = event.target instanceof Element ? event.target.closest("[data-layer-equation]") : null;
+      if (equation && equation.scrollWidth > equation.clientWidth) return;
 
       const time = performance.now();
       if (time - lastWheelTime >= swipeIdleMs) {
@@ -80,7 +92,7 @@ export function SiModelGuide({ showLayers = false, initialLayerIndex = 0 }: {
           playsInline
         />
       </div>
-      {showLayers ? (
+      {props.showLayers ? (
         <section className={styles.layersPage} aria-labelledby="model-layers-title">
           <div className={styles.atlasMap}>
             <SiLayerScene key={active.id} layer={active.id} />
@@ -93,16 +105,16 @@ export function SiModelGuide({ showLayers = false, initialLayerIndex = 0 }: {
                 <dt>{isEnglish ? "What it measures" : "获取的观测"}</dt>
                 <dd>{chapter.observes}</dd>
                 <dt>{isEnglish ? "Model parameter estimates" : "对应建模参数估计"}</dt>
-                <dd>{chapter.estimates}</dd>
+                <dd><MathText parts={props.renderedLayers[activeIndex].estimates[language]} /></dd>
                 <dt>{isEnglish ? "Use and limitations" : "使用边界"}</dt>
                 <dd>{chapter.boundary}</dd>
               </dl>
               <section className={styles.equations} aria-labelledby="layer-equations-title">
                 <h3 id="layer-equations-title">{isEnglish ? "Model equations" : "模型公式"}</h3>
-                {layerEquations[active.id].map((equation) => (
-                  <div key={equation.expression} className={styles.equation}>
-                    <p className={styles.equationExpression}>{equation.expression}</p>
-                    <p>{equation[language]}</p>
+                {props.renderedLayers[activeIndex].equations.map((equation) => (
+                  <div key={equation.latex} className={styles.equation}>
+                    <div className={styles.equationExpression} data-layer-equation dangerouslySetInnerHTML={{ __html: equation.html }} />
+                    <p><MathText parts={equation[language]} /></p>
                   </div>
                 ))}
               </section>

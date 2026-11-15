@@ -148,7 +148,7 @@ function FarmSelector({ farms, fields, selectedFarmId, onSelect }: {
   selectedFarmId: string | null
   onSelect: (farmId: string) => void
 }) {
-  return <aside className="flex min-h-0 w-full shrink-0 flex-col border-b border-sidebar-border bg-sidebar text-sidebar-foreground md:w-[clamp(16rem,18vw,22rem)] md:border-b-0 md:border-r" aria-labelledby="remote-sensing-farms-title">
+  return <aside className="flex min-h-0 w-full shrink-0 flex-col border-b border-sidebar-border bg-[var(--site-black-overlay)] text-sidebar-foreground md:w-[clamp(16rem,18vw,22rem)] md:border-b-0 md:border-r" aria-labelledby="remote-sensing-farms-title">
     <div className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border px-5"><div><p className="text-xs text-muted-foreground">Remote sensing scope</p><h2 id="remote-sensing-farms-title" className="mt-0.5 text-lg font-semibold tracking-tight">Farms</h2></div><span className="rounded-full bg-sidebar-accent px-2.5 py-1 text-xs font-semibold">{farms.length}</span></div>
     <div className="flex max-h-[min(34vh,20rem)] min-h-0 gap-1 overflow-y-auto overscroll-contain p-3 md:flex-1 md:max-h-none md:flex-col">
       {farms.length ? farms.map((farm) => {

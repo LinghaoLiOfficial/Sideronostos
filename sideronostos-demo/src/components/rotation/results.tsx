@@ -1,6 +1,7 @@
 "use client";
 import { useI18n } from "@/lib/i18n/provider";
-import { useEffect, useRef, useState } from "react";
+import type { Translator } from "@/lib/i18n/translate";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Download, MessageCircle, Printer, Save } from "lucide-react";
 import {
@@ -48,7 +49,8 @@ const metricLabels: Record<keyof Metrics, string> = {
   diversity_ha_families: "科属多样性 · ha·科",
 };
 export function ResultCharts({ option, fields, start, end }: { option: OptionV2; fields: Field[]; start: string; end: string }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const seasonsLabel = (count: number) => locale === "en" ? `${count} ${count === 1 ? "season" : "seasons"}` : `${count} 季`;
   const years = planningYears(start, end);
   const yearly = years.map(year => ({ year, water: option.verification.farm_years[year]?.water_m3 ?? 0, cost: option.verification.farm_years[year]?.cost_usd ?? 0, labor: option.verification.farm_years[year]?.labor_days ?? 0 }));
   const maxResources = Math.max(1, ...yearly.flatMap(item => [item.water, item.cost, item.labor]));
@@ -58,7 +60,7 @@ export function ResultCharts({ option, fields, start, end }: { option: OptionV2;
   const maxSeasons = Math.max(1, ...fields.map(field => option.seasons.filter(season => season.field_id === field.id).length));
   return <section className={styles.resultCharts} aria-label={t("回测数据可视化")}>
     <div className={styles.chartSection}>
-      <div className={styles.chartHeading}><div><p>{t("规划期逐年汇总")}</p><h3>{t("年度资源消耗")}</h3></div><span>{years.length} {t("年")}</span></div>
+      <div className={styles.chartHeading}><div><p>{t("规划期逐年汇总")}</p><h3>{t("年度资源消耗")}</h3></div><span>{years.length} {locale === "en" && years.length !== 1 ? "years" : t("年")}</span></div>
       <div className={styles.resourceChart} role="img" aria-label={t("年度用水、投入和劳力汇总图")}>
         {yearly.map(item => <div className={styles.resourceYear} key={item.year}>
           <strong>{item.year}</strong><div className={styles.resourceBars}>
@@ -71,11 +73,11 @@ export function ResultCharts({ option, fields, start, end }: { option: OptionV2;
       <div className={styles.chartLegend}><span><i style={{ backgroundColor: "#458a91" }} />{t("用水估计 · m³")}</span><span><i style={{ backgroundColor: "#d19a43" }} />{t("投入估计 · USD")}</span><span><i style={{ backgroundColor: "#7d71a6" }} />{t("劳力 人日")}</span></div>
     </div>
     <div className={styles.chartSection}>
-      <div className={styles.chartHeading}><div><p>{t("已选方案")}</p><h3>{t("各地块作物季次分布")}</h3></div><span>{option.seasons.length} {t("季")}</span></div>
+      <div className={styles.chartHeading}><div><p>{t("已选方案")}</p><h3>{t("各地块作物季次分布")}</h3></div><span>{seasonsLabel(option.seasons.length)}</span></div>
       {!fields.length || !option.seasons.length ? <p className={styles.chartEmpty}>{t("此方案没有可展示的种植季次。")}</p> : <div className={styles.cropChart} role="img" aria-label={t("各地块作物种植季次分布图")}>
         {fields.map((field, fieldIndex) => {
           const count = option.seasons.filter(season => season.field_id === field.id).length;
-          return <div className={styles.cropRow} key={field.id}><span className={styles.cropField}>{field.name}</span><div className={styles.cropBar} aria-hidden="true">{distributions.map(item => item.fields[fieldIndex] > 0 && <span key={item.crop} style={{ width: `${item.fields[fieldIndex] / maxSeasons * 100}%`, backgroundColor: item.color }} />)}</div><span className={styles.cropCount}>{count} {t("季")}</span></div>;
+          return <div className={styles.cropRow} key={field.id}><span className={styles.cropField}>{field.name}</span><div className={styles.cropBar} aria-hidden="true">{distributions.map(item => item.fields[fieldIndex] > 0 && <span key={item.crop} style={{ width: `${item.fields[fieldIndex] / maxSeasons * 100}%`, backgroundColor: item.color }} />)}</div><span className={styles.cropCount}>{seasonsLabel(count)}</span></div>;
         })}
         <div className={styles.chartLegend}>{distributions.map(item => <span key={item.crop}><i style={{ backgroundColor: item.color }} />{t(item.crop)}</span>)}</div>
       </div>}
@@ -83,7 +85,7 @@ export function ResultCharts({ option, fields, start, end }: { option: OptionV2;
   </section>;
 }
 
-function violationText(code: string, fields: Field[]) {
+function violationText(code: string, fields: Field[], t: Translator) {
   const [kind, first, second, third] = code.split(":");
   const resources: Record<string, string> = {
     water_m3: "补水量",
@@ -91,9 +93,9 @@ function violationText(code: string, fields: Field[]) {
     labor_days: "劳力",
   };
   if (kind === "farm_resource")
-    return `${first} 年的农场${resources[second] ?? "资源用量"}超过年度上限。`;
+    return t("{year} 年的农场{resource}超过年度上限。", { year: first, resource: t(resources[second] ?? "资源用量") });
   if (kind === "field_resource")
-    return `${fields.find((f) => f.id === first)?.name ?? "该地块"}在 ${second} 年的${resources[third] ?? "资源用量"}超过地块上限。`;
+    return t("{field}在 {year} 年的{resource}超过地块上限。", { field: fields.find((f) => f.id === first)?.name ?? t("该地块"), year: second, resource: t(resources[third] ?? "资源用量") });
   const labels: Record<string, string> = {
     required_crop: "该地块要求种植作物，但此种法没有安排。",
     horizon: "种植或换茬占用超出规划日期。",
@@ -114,7 +116,7 @@ function violationText(code: string, fields: Field[]) {
     water_coefficient: "逐日用水系数未通过复核。",
     first_maturity_day: "成熟日期未通过逐日复核。",
   };
-  return labels[kind] ?? "此项未通过核验，请查看导出的完整依据。";
+  return t(labels[kind] ?? "此项未通过核验，请查看导出的完整依据。");
 }
 const inputLabels: Record<string, string> = {
   fields: "地块与历史",
@@ -152,8 +154,8 @@ export function ComparisonSummary({
               (k) => t(inputLabels[k] ?? "其他条件"),
             ),
           ),
-        ].join("、") || t("输入相同"))}
-        。
+        ].join(t("、")) || t("输入相同"))}
+        {t("。")}
         {!comparison.score_comparable &&
           t("偏好已改变，两个目标分数不能直接比较。")}
       </p>
@@ -265,10 +267,10 @@ export function OptionDetail({
           <strong>{t("此种法不满足当前约束")}</strong>
           <ul>
             {option.verification.violations.map((v, i) => (
-              <li key={i}>{violationText(v, fields)}</li>
+              <li key={i}>{violationText(v, fields, t)}</li>
             ))}
             {option.input_errors?.map((v, i) => (
-              <li key={"input" + i}>{t(violationText(v.reason, fields))}</li>
+              <li key={"input" + i}>{violationText(v.reason, fields, t)}</li>
             ))}
           </ul>
         </div>
@@ -377,13 +379,14 @@ type Props = {
   selectionMode?: "option" | "field";
 };
 
-function FieldOptionComparison({ options, fields, start, end, selectedFieldId, onSelectField }: {
+function FieldOptionComparison({ options, fields, start, end, selectedFieldId, onSelectField, renderActions }: {
   options: OptionV2[];
   fields: Field[];
   start: string;
   end: string;
   selectedFieldId: string | null;
   onSelectField: (id: string) => void;
+  renderActions: (option: OptionV2) => ReactNode;
 }) {
   const { t } = useI18n();
   const cropLabels: Record<string, string> = { maize: "玉米", oat: "燕麦", pea: "豌豆" };
@@ -418,6 +421,7 @@ function FieldOptionComparison({ options, fields, start, end, selectedFieldId, o
           <details className={styles.details}>
             <summary>{t("查看完整方案可视化")}</summary>
             <OptionDetail option={option} fields={fields} start={start} end={end} />
+            {renderActions(option)}
           </details>
         </article>;
       })}
@@ -440,7 +444,7 @@ function LegacyRunResults({
 }: Props) {
   const { t, locale } = useI18n();
 
-  const [error, setError] = useState<string | null>(null),
+  const [error, setError] = useState<{ cause: unknown } | null>(null),
     [actionBusy, setActionBusy] = useState(false),
     [saveTarget, setSaveTarget] = useState<OptionV2 | null>(null),
     [title, setTitle] = useState(""),
@@ -499,13 +503,27 @@ function LegacyRunResults({
       await fn();
     } catch (cause) {
       if (active.current === id && sequence.current === seq)
-        setError(errorMessage(cause));
+        setError({ cause });
     } finally {
       if (active.current === id && sequence.current === seq)
         setActionBusy(false);
     }
   }
   const isActive = ["pending", "running"].includes(run.status);
+  function renderOptionActions(option: OptionV2) {
+    return <div className={styles.actions}>
+      <button className={styles.primary} onClick={() => onExplain(option)}>
+        <MessageCircle size={15} />{t("解释这个方案")}
+      </button>
+      <button disabled={!option.feasible || actionBusy} onClick={() => {
+        setTitle(`${run.field_snapshots[0]?.name ?? t("轮作")} · ${run.request.start}`);
+        setNotes("");
+        setSaveTarget(option);
+      }}>
+        <Save size={14} />{t("保存此方案")}
+      </button>
+    </div>;
+  }
   return (
     <section
       className={styles.resultsSection}
@@ -518,7 +536,7 @@ function LegacyRunResults({
           <h2 id="results-title">{t("这次计算的结果")}</h2>
           <p>
             {run.request.start}—{run.request.end} ·{" "}
-            {run.field_snapshots.map((f) => f.name).join("、")}
+            {run.field_snapshots.map((f) => f.name).join(t("、"))}
           </p>
         </div>
         <span className={styles.status} role="status">
@@ -527,7 +545,7 @@ function LegacyRunResults({
       </div>
       {changes.length > 0 && (
         <p className={styles.notice}>
-          {t("条件已修改，尚未重算：")}{t(changes.map((k) => t(changeLabels[k])).join("、"))}
+          {t("条件已修改，尚未重算：")}{changes.map((k) => t(changeLabels[k])).join(t("、"))}
           {t("。下面仍是上次提交时的结果。")}</p>
       )}
       <div className={styles.actions}>
@@ -594,7 +612,7 @@ function LegacyRunResults({
       </div>
       {error && (
         <p role="alert" className={styles.error}>
-          {t(error)}
+          {errorMessage(error.cause, t)}
         </p>
       )}
       {isActive && (
@@ -610,7 +628,10 @@ function LegacyRunResults({
           {t("本次未能完成计算：")}{t(run.result.error_code)}{t("。原始条件已保留。")}</p>
       )}
       {options.length > 0 && selectionMode === "field" && (
-        <FieldOptionComparison options={options} fields={run.field_snapshots} start={run.request.start} end={run.request.end} selectedFieldId={selectedFieldId} onSelectField={setSelectedFieldId} />
+        <>
+          <FieldOptionComparison options={options} fields={run.field_snapshots} start={run.request.start} end={run.request.end} selectedFieldId={selectedFieldId} onSelectField={setSelectedFieldId} renderActions={renderOptionActions} />
+          <PrintBasis request={run.request} provenance={run.provenance} />
+        </>
       )}
       {options.length > 0 && selectionMode === "option" && (
         <>
@@ -639,26 +660,7 @@ function LegacyRunResults({
                 end={run.request.end}
               />
               <PrintBasis request={run.request} provenance={run.provenance} />
-              <div className={styles.actions}>
-                <button
-                  className={styles.primary}
-                  onClick={() => onExplain(selected)}
-                >
-                  <MessageCircle size={15} />
-                  {t("解释这个方案")}</button>
-                <button
-                  disabled={!selected.feasible || actionBusy}
-                  onClick={() => {
-                    setTitle(
-                      `${run.field_snapshots[0]?.name ?? t("轮作")} · ${run.request.start}`,
-                    );
-                    setNotes("");
-                    setSaveTarget(selected);
-                  }}
-                >
-                  <Save size={14} />
-                  {t("保存此方案")}</button>
-              </div>
+              {renderOptionActions(selected)}
             </>
           ) : (
             <p className={styles.help}>
@@ -717,7 +719,7 @@ function LegacyRunResults({
           {comparison.isFetching && <p role="status">{t("正在核对两份快照…")}</p>}
           {comparison.error && (
             <p role="alert" className={styles.error}>
-              {t(errorMessage(comparison.error))}
+              {errorMessage(comparison.error, t)}
             </p>
           )}
           {comparison.data && selected && second && (
@@ -750,7 +752,7 @@ function LegacyRunResults({
             ...run.provenance.limitations,
             ...(run.result?.limitations ?? []),
           ].map((v, i) => (
-            <li key={i}>{v}</li>
+            <li key={i}>{t(v)}</li>
           ))}
         </ul>
       </details>
@@ -803,7 +805,7 @@ function LegacyRunResults({
             </label>
             {error && (
               <p role="alert" className={styles.error}>
-                {t(error)}
+                {errorMessage(error.cause, t)}
               </p>
             )}
             <button
@@ -841,7 +843,7 @@ function PrintBasis({
       <p>
         {t("使用历史天气重放，不是未来天气预报。温度调整")}{" "}
         {n(request.scenario.temperature_change_c)} {t(" °C； 降雨调整")}{" "}
-        {n(request.scenario.rainfall_change_pct)}%。
+        {n(request.scenario.rainfall_change_pct)}%{t("。")}
       </p>
       {provenance.benchmark_scope === "benchmark_not_locally_calibrated" && (
         <p>

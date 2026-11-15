@@ -57,7 +57,7 @@ function AgricultureHeader({ muted, onMute }: { muted: boolean; onMute: () => vo
       <Button variant="ghost" size="icon" aria-label={muted ? "Unmute page" : "Mute page"} onClick={onMute}>{muted ? <MicOff /> : <Volume2 />}</Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild><Button variant="secondary" size="sm">En <ChevronDown /></Button></DropdownMenuTrigger>
-        <DropdownMenuContent align="end"><DropdownMenuItem>English</DropdownMenuItem><DropdownMenuItem>中文</DropdownMenuItem></DropdownMenuContent>
+        <DropdownMenuContent align="end"><DropdownMenuItem>English</DropdownMenuItem><DropdownMenuItem>Simplified Chinese</DropdownMenuItem></DropdownMenuContent>
       </DropdownMenu>
       <Button className="ag-mobile-menu" variant="ghost" size="icon" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen((value) => !value)}>{menuOpen ? <X /> : <Menu />}</Button>
     </div>

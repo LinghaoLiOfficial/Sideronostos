@@ -49,8 +49,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, #080f11b5, #080f111a 25%, #080f1126 49%, #0b120ff2 100%),
-    linear-gradient(90deg, #080f11ba, #080f1140 53%, #080f110a);
+    linear-gradient(180deg, #080f1180, #080f111a 25%, #080f1126 49%, #0b120fc9 100%),
+    linear-gradient(90deg, #080f1194, #080f1133 53%, #080f110a);
 }
 
 .guide button { cursor: pointer; }
@@ -168,10 +168,10 @@
 .orbitLink strong { font-weight: inherit; }
 .orbitWord { white-space: nowrap; }
 .backdrop[data-story-look="layers"]::after {
-  background: linear-gradient(180deg, #080f11bd, #0b140fb5 48%, #0b120fee 100%);
+  background: linear-gradient(180deg, #080f1194, #0b140f8c 48%, #0b120fc4 100%);
 }
 
-.atlas > .backdrop { opacity: .28; }
+.atlas > .backdrop { opacity: .42; }
 .layersPage {
   display: grid;
   grid-template: "map drawer" minmax(550px, 1fr) "nav nav" auto / minmax(0, 1fr) minmax(340px, 31%);
@@ -237,6 +237,7 @@
 }
 
 .equation {
+  container-type: inline-size;
   margin-block-start: 6px;
   padding: 7px 10px;
   border-inline-start: 2px solid #77896a;
@@ -246,14 +247,16 @@
 }
 
 .equationExpression {
-  margin-block-end: 2px;
+  margin-block-end: 5px;
+  padding-block: 3px 2px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
   color: #253d29;
-  font-family: ui-monospace, Consolas, monospace;
-  font-size: 13px;
-  font-weight: 650;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
+  font-size: clamp(.75rem, 4.1cqi, 1rem);
 }
+
+.equationExpression :global(.katex-display) { margin: 0; width: max-content; min-width: 100%; }
+.equationExpression :global(.katex) { font-size: 1em; }
 
 .layerNav {
   display: grid;

@@ -52,6 +52,9 @@ importers:
       kanx-mindmap:
         specifier: 0.1.5
         version: 0.1.5(patch_hash=6fa06ec7786703d521a0e15d22f32ef07e09dfe36dafb4939a2857b1d2794eda)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(immer@11.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.7.0(react@19.2.4))
+      katex:
+        specifier: 0.19.1
+        version: 0.19.1
       leaflet:
         specifier: 1.9.4
         version: 1.9.4
@@ -2707,6 +2710,10 @@ packages:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
     engines: {node: '>=20'}
 
+  commander@15.1.0:
+    resolution: {integrity: sha512-cgnQ88TRrWcC7pVq46RzJVRMktu3W2RcbnoidnfBsl1bmDCBwJS/udcIZpKoCrbAYYaCqsz1yZCVIgbIaU3ddQ==}
+    engines: {node: '>=22.12.0'}
+
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
@@ -3837,6 +3844,10 @@ packages:
     peerDependencies:
       react: '>=18 <20'
       react-dom: '>=18 <20'
+
+  katex@0.19.1:
+    resolution: {integrity: sha512-jG8uKntjSEcm2EpQOh0XturpPuuC9r3Sq5HLHdsFdWZT27E672SF19QEi+of0/YeOy15lDgRhKvr5614uRrEfA==}
+    hasBin: true
 
   kdbush@4.1.0:
     resolution: {integrity: sha512-e9vurzrXJQrFX6ckpHP3bvj5l+9CnYzkxDNnNQ1h2QTqdWsUAJgXiKdGNcOa1EY85dU8KbQ+z/FdQdB7P+9yfQ==}
@@ -7957,6 +7968,8 @@ snapshots:
 
   commander@14.0.3: {}
 
+  commander@15.1.0: {}
+
   concat-map@0.0.1: {}
 
   conf@10.2.0:
@@ -9257,6 +9270,10 @@ snapshots:
       - '@types/react-dom'
       - immer
       - use-sync-external-store
+
+  katex@0.19.1:
+    dependencies:
+      commander: 15.1.0
 
   kdbush@4.1.0: {}
 

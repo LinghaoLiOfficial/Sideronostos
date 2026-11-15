@@ -78,7 +78,7 @@ export function RotationTimeline({
                     <span>
                       {s.sow_date} {t(" 播种 → ")}{s.harvest_date} {t(" 预计成熟")}</span>
                     <small>
-                      {t("生长 ")}{s.growing_days} {t(" 天 · 换茬占用至 ")}{s.occupied_until}（
+                      {t("生长 ")}{s.growing_days} {t(" 天 · 换茬占用至 ")}{s.occupied_until}{t("（")}
                       {s.turnaround_days} {t(" 天）")}</small>
                   </li>
                 ))}

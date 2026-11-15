@@ -59,8 +59,7 @@ it("edits and saves a personal agronomy draft", async () => {
 it("exposes crop and rule views", async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(<QueryClientProvider client={client}><LocalKnowledgeWorkspace /></QueryClientProvider>);
-  await screen.findByText("本地农业知识库");
-  await userEvent.click(screen.getByRole("button", { name: /作物参数/ }));
+  await userEvent.click(await screen.findByRole("button", { name: /作物参数/ }));
   expect(screen.getByDisplayValue("玉米")).toBeVisible();
   expect(screen.queryByRole("button", { name: /来源与局限/ })).not.toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /版本记录/ })).not.toBeInTheDocument();
@@ -71,6 +70,6 @@ it("switches the knowledge workspace to English", async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(<QueryClientProvider client={client}><LocalKnowledgeWorkspace /></QueryClientProvider>);
   expect(await screen.findByRole("heading", { name: "Local Agricultural Knowledge Base" })).toBeVisible();
-  expect(screen.getByRole("button", { name: "Crop parameters" })).toBeVisible();
+  expect(await screen.findByRole("button", { name: "Crop parameters" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Save draft" })).toBeVisible();
 });

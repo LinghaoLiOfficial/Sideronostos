@@ -73,7 +73,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cn("flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground", active && "brand-gradient-soft border border-primary/25 text-pink-50")}><Icon className="size-4" /><span className="flex-1">{item.label}</span></Link>;
   });
   return <main className="gallery-surface flex h-screen flex-col overflow-hidden">
-    <header className="border-b border-white/10 bg-[#191020]/70 backdrop-blur-xl"><div className="mx-auto flex h-16 max-w-[1500px] items-center justify-between px-5 sm:px-8">
+    <header className="site-topbar"><div className="mx-auto flex h-16 max-w-[1500px] items-center justify-between px-5 sm:px-8">
       <Link href="/workspace/files" aria-label="Agrisata workspace" className="flex items-center"><BrandLogo priority className="w-40 sm:w-44" /></Link>
       {user && <Link href="/personal/notifications" aria-label={`个人中心：${user.display_name}`} className="flex shrink-0 items-center justify-center gap-3 rounded-md px-4 py-2 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-primary sm:min-w-36"><Avatar className="size-8"><AvatarFallback>{user.display_name.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar><span className="hidden text-sm sm:block">{user.display_name}</span></Link>}
     </div></header>
@@ -94,8 +94,8 @@ function PersonalShell({ pathname, user, unread, children }: {
   const language = locale === "en" ? "en" : "zh";
 
   return (
-    <>
-      <header className={personalStyles.header}>
+    <div className="site-farm-backdrop flex min-h-svh flex-col">
+      <header className={cn("site-topbar", personalStyles.header)}>
         <div className={personalStyles.headerRow}>
           <Link href="/workspace/files" aria-label={language === "en" ? "Agrisata workspace" : "Agrisata 工作区"}>
             <BrandLogo priority className="w-40 sm:w-44" />
@@ -129,6 +129,6 @@ function PersonalShell({ pathname, user, unread, children }: {
           <section className={personalStyles.content}>{children}</section>
         </div>
       </main>
-    </>
+    </div>
   );
 }

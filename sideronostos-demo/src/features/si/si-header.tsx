@@ -1,98 +1,26 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getCurrentUser, type AuthUser } from "@/lib/api/client";
+import { isDemoMode } from "@/lib/demo-mode";
 import { useLocale, type Locale } from "@/lib/i18n/locale";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { SiLanguageMenu } from "./si-language-menu";
+import { SiModuleMenu } from "./si-module-menu";
 import { rotationLayersHref, rotationOverviewHref, SiStoryLink } from "./si-story-link";
-
-function NavMenu({ isEnglish, items, modelPage }: {
-  isEnglish: boolean;
-  items: { label: string; href: string }[];
-  modelPage: string | undefined;
-}) {
-  const [modelExpanded, setModelExpanded] = useState(false);
-  const modelOptionsId = useId();
-
-  return (
-    <DropdownMenu onOpenChange={(open) => { if (!open) setModelExpanded(false); }}>
-      <DropdownMenuTrigger className="si-header-control">
-        {isEnglish ? "Module" : "模块"}<ChevronDown size={15} aria-hidden="true" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="si-header-menu" align="center" sideOffset={16}>
-        {items.map((item) => (
-          <DropdownMenuItem key={item.href} asChild>
-            <SiStoryLink href={item.href}>{item.label}</SiStoryLink>
-          </DropdownMenuItem>
-        ))}
-        <DropdownMenuItem
-          className="si-header-model-trigger"
-          aria-expanded={modelExpanded}
-          aria-controls={modelExpanded ? modelOptionsId : undefined}
-          onSelect={(event) => {
-            event.preventDefault();
-            setModelExpanded((expanded) => !expanded);
-          }}
-        >
-          {isEnglish ? "Explore the rotation model" : "了解轮作模型"}
-          <ChevronDown aria-hidden="true" />
-        </DropdownMenuItem>
-        {modelExpanded && (
-          <DropdownMenuGroup id={modelOptionsId} className="si-header-model-options">
-            <DropdownMenuItem asChild>
-              <SiStoryLink href={rotationOverviewHref} aria-current={modelPage === rotationOverviewHref ? "page" : undefined}>
-                {isEnglish ? "Overview" : "总览"}
-              </SiStoryLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <SiStoryLink href={rotationLayersHref} aria-current={modelPage === rotationLayersHref ? "page" : undefined}>
-                {isEnglish ? "Model layers" : "分层讲解"}
-              </SiStoryLink>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
 
 export function SiPrimaryNavigation({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const isEnglish = locale === "en";
-  const modelPage = isLayersRoute(pathname) ? rotationLayersHref : pathname === rotationOverviewHref ? rotationOverviewHref : undefined;
   return (
     <nav className="si-header-nav" aria-label={isEnglish ? "Primary navigation" : "主导航"}>
       <SiStoryLink className="si-header-control" href="/si" aria-current={pathname === "/si" ? "page" : undefined}>{isEnglish ? "Home" : "首页"}</SiStoryLink>
-      <NavMenu
-        isEnglish={isEnglish}
-        modelPage={modelPage}
-        items={isEnglish
-          ? [
-            { label: "Multi-Agent System", href: "/si/multi-agent" },
-            { label: "Field Management", href: "/si/field-management" },
-            { label: "Remote Sensing Analysis", href: "/si/remote-sensing" },
-            { label: "Local Agricultural Knowledge Base", href: "/si/local-knowledge" },
-          ]
-          : [
-            { label: "多智能体", href: "/si/multi-agent" },
-            { label: "田地管理", href: "/si/field-management" },
-            { label: "遥感分析", href: "/si/remote-sensing" },
-            { label: "本地农业知识库", href: "/si/local-knowledge" },
-          ]}
-      />
-      <SiLanguageMenu locale={locale} />
+      <SiModuleMenu locale={locale} />
+      <SiLanguageMenu locale={locale} showLabel={pathname === "/si"} />
     </nav>
   );
 }
@@ -106,18 +34,20 @@ export function SiHeader() {
   const locale = useLocale();
   const isEnglish = locale === "en";
   const isHome = pathname === "/si";
+  const showProfile = !isHome || !isDemoMode();
   const showLayers = isLayersRoute(pathname);
   const backHref = showLayers ? rotationOverviewHref : pathname === rotationOverviewHref ? "/si" : undefined;
   const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
+    if (!showProfile) return;
     let active = true;
     getCurrentUser().then((value) => { if (active) setUser(value); }).catch(() => undefined);
     return () => { active = false; };
-  }, []);
+  }, [showProfile]);
 
   return (
-    <header className="si-header">
+    <header className={`site-topbar si-header${isHome ? " si-header-home" : ""}`}>
       <div className="si-header-row">
         <div className="si-header-brand">
           {backHref && (
@@ -135,7 +65,7 @@ export function SiHeader() {
         </div>
         <SiPrimaryNavigation locale={locale} />
         <div className="si-header-end">
-          {user && (
+          {showProfile && user && (
             <Link
               href="/personal/notifications"
               aria-label={isEnglish ? `Profile: ${user.display_name}` : `个人中心：${user.display_name}`}

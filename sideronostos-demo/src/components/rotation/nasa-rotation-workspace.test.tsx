@@ -46,7 +46,8 @@ const field = {
   created_at: "2026-11-14T00:00:00Z", updated_at: "2026-11-14T00:00:00Z",
 } as Field;
 
-async function setup(items: Field[] = [field], english = false) {
+async function setup(items: Field[] = [field], english = false, embedded = english) {
+  window.localStorage.setItem("agrisata-locale", english ? "en" : "zh-CN");
   const api = await import("@/lib/api/rotation");
   const fieldApi = await import("@/lib/api/field-shift");
   vi.mocked(api.listNasaDataReleases).mockResolvedValue({ items: [release] });
@@ -55,7 +56,7 @@ async function setup(items: Field[] = [field], english = false) {
   fieldStore = [...items];
   mocks.listFields.mockImplementation(async () => ({ items: [...fieldStore] }));
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  render(<QueryClientProvider client={client}><NasaRotationWorkspace hideHeader={english} compactReleaseBar={english} /></QueryClientProvider>);
+  render(<QueryClientProvider client={client}><NasaRotationWorkspace hideHeader={embedded} compactReleaseBar={embedded} /></QueryClientProvider>);
   await screen.findByText(english ? "NASA Historical Crop Rotation Backtest" : "NASA 历史轮作回测");
 }
 
@@ -83,7 +84,10 @@ beforeEach(() => {
     return created;
   });
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  window.localStorage.removeItem("agrisata-locale");
+});
 
 it("preselects benchmark fields and submits a frozen NASA release without warnings", async () => {
   await setup(); const user = userEvent.setup();
@@ -139,10 +143,8 @@ it("blocks submission and identifies transition-edge capacity growth", async () 
   expect(mocks.createRun).not.toHaveBeenCalled();
 });
 
-it("renders the embedded English rotation workspace without Chinese text", async () => {
-  window.localStorage.setItem("agrisata-locale", "en");
-  await setup([field], true);
+it.each([true, false])("renders the English rotation workspace without Chinese text (embedded: %s)", async (embedded) => {
+  await setup([field], true, embedded);
   await screen.findByText("Maize (110-day hybrid example)");
   expect(document.body.textContent).not.toMatch(/[\u3400-\u9fff]/);
-  window.localStorage.removeItem("agrisata-locale");
 });

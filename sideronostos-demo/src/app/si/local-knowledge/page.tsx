@@ -5,7 +5,7 @@ export const metadata = { title: "Local Agronomy Knowledge · Agrisata" };
 
 export default function LocalKnowledgePage() {
   return (
-    <><main className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <><main className="si-agronomy-main">
       <LocalKnowledgeWorkspace />
     </main><MultiBotDock module="local-knowledge" /></>
   );

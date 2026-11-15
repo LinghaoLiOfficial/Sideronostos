@@ -62,7 +62,7 @@ function FileEditor({ loaded: { organizationId, file, tree, vocabulary }, backHr
     else { setLeaving(false); toast.error("保存失败，请重试后返回"); }
   }
   return <main className="gallery-surface flex h-dvh min-h-0 flex-col overflow-hidden">
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 bg-[#191020]/70 px-4 backdrop-blur-xl sm:px-8">
+    <header className="site-topbar flex h-16 shrink-0 items-center justify-between px-4 sm:px-8">
       <div className="flex min-w-0 items-center gap-3"><Button asChild variant="ghost" size="icon" aria-label="返回文件管理"><Link href={backHref} aria-disabled={leaving} onClick={(event) => { event.preventDefault(); void back(); }}><ArrowLeft /></Link></Button><div className="min-w-0"><h1 className="truncate text-sm font-medium">{file.name}</h1><p className="text-xs text-muted-foreground">{file.type === "vocabulary" ? "词汇库" : "Mindmap"}</p></div></div>
       <div className="flex items-center gap-2 text-xs text-muted-foreground" role="status">{status === "saving" && <><LoaderCircle className="size-3 animate-spin" />保存中</>}{status === "saved" && <><Check className="size-3 text-emerald-300" />已保存</>}{status === "error" && <><X className="size-3 text-destructive" />保存失败<Button variant="ghost" size="sm" onClick={() => { void flush(); }}><RefreshCw />重试</Button></>}</div>
     </header>
