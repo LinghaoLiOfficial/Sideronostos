@@ -32,7 +32,7 @@ from sideronostos_backend.modules.farm_assistant.service import AssistantService
 from sideronostos_backend.modules.field_shift.models import FarmRecord, FieldRecord
 from sideronostos_backend.modules.knowledge.models import KBActivation, KBRelease
 
-DOMAINS = ("field_management", "remote_sensing", "local_agriculture", "rotation")
+DOMAINS = ("general", "field_management", "remote_sensing", "local_agriculture", "rotation")
 
 
 @pytest_asyncio.fixture
@@ -94,7 +94,7 @@ async def assistant_db():
     await engine.dispose()
 
 
-def test_four_domains_are_creatable_and_new_users_default_to_english():
+def test_five_domains_are_creatable_and_new_users_default_to_english():
     assert {item["id"] for item in enabled_presets()} == set(DOMAINS)
     for preset in DOMAINS:
         body = ConversationCreate(preset=preset)
