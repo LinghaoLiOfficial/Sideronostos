@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Globe2 } from "lucide-react";
+import { Globe2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +20,6 @@ export function SiLanguageMenu({ locale, align = "center" }: { locale: Locale; a
         aria-label={isEnglish ? "Language: English" : "语言：简体中文"}
       >
         <Globe2 size={16} aria-hidden="true" />
-        {isEnglish ? "English" : "简体中文"}
-        <ChevronDown size={15} aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="si-header-menu" align={align} sideOffset={16}>
         <DropdownMenuRadioGroup value={locale} onValueChange={(value) => setLocale(value as Locale)}>
