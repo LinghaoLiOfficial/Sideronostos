@@ -1,5 +1,5 @@
 import { createDemoObservations } from "@/features/fields/demo-data";
-import { demoFields, demoRelease } from "./data";
+import { demoFields, demoProfile, demoRelease } from "./data";
 import { iowaAnnual } from "./iowa-backend-data";
 
 const answer = (text: string, suggestions: string[] = []) => ({
@@ -8,9 +8,32 @@ const answer = (text: string, suggestions: string[] = []) => ({
 });
 
 export function demoRetrievalAnswer(question: string, botId: string, language: string) {
-  if (!['remote-water', 'remote-soil', 'remote-weather'].includes(botId)) return null;
+  if (!['remote-water', 'remote-soil', 'remote-weather', 'local-knowledge-guide'].includes(botId)) return null;
   const zh = language === 'zh';
   const text = question.toLowerCase();
+  if (botId === 'local-knowledge-guide') {
+    const cropNames = zh
+      ? ['玉米播种窗口', '春燕麦播种窗口', '干籽豌豆播种窗口']
+      : ['Maize sowing window', 'Spring oat sowing window', 'Dry field pea sowing window'];
+    if (/price|market|variety|cultivar|价格|行情|品种/.test(text)) return answer(zh
+      ? 'Iowa 演示参数包没有实时作物价格或当前品种资料。可查询参数包中的玉米、春燕麦或干籽豌豆播种窗口；这些是未按地块校准的工程基准。'
+      : 'The Iowa demo profile has no live crop price or current variety feed. You can check its maize, spring oat, or dry field pea sowing windows; these are uncalibrated benchmark settings.', cropNames);
+    const cropId = /maize|corn|玉米/.test(text) ? 'maize'
+      : /\boat\b|燕麦/.test(text) ? 'oat'
+      : /\bpea\b|豌豆/.test(text) ? 'pea' : null;
+    const crop = demoProfile.crops.find((item) => item.id === cropId);
+    if (crop) {
+      const calendar = demoProfile.sources[crop.parameter_origins.calendar];
+      const date = (value: string) => zh ? `${Number(value.slice(0, 2))}月${Number(value.slice(3))}日`
+        : `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][Number(value.slice(0, 2)) - 1]} ${Number(value.slice(3))}`;
+      return answer(zh
+        ? `${crop.name}的演示播种窗口为 ${date(crop.sow_start_mmdd)}至${date(crop.sow_end_mmdd)}。来源：${calendar?.title ?? 'Iowa benchmark'}（${demoProfile.id}）。这是未按当地地块或品种校准的工程基准，不是种植建议。`
+        : `${crop.name} demo sowing window: ${date(crop.sow_start_mmdd)} to ${date(crop.sow_end_mmdd)}. Source: ${calendar?.title ?? 'Iowa benchmark'} (${demoProfile.id}). This is an uncalibrated engineering benchmark, not a planting recommendation.`);
+    }
+    return answer(zh
+      ? `Iowa 演示参数包（${demoProfile.id}）可查询玉米、春燕麦和干籽豌豆的播种窗口；数据未按地块校准。请选择一项。`
+      : `The Iowa demo profile (${demoProfile.id}) contains sowing windows for maize, spring oat, and dry field pea. The settings are not locally calibrated. Choose a topic.`, cropNames);
+  }
   const rain = /rain|precip|降雨|降水/.test(text);
   const et0 = /et[₀0]|evapo|蒸散/.test(text);
   const soil = /moisture|smap|土壤水分|土壤湿度/.test(text);

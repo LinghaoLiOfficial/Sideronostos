@@ -56,3 +56,25 @@ it("offers supported metrics and years for an unspecified water request", async 
     "2024 rainfall", "2024 reference ET₀", "Field 1 soil moisture in 2024",
   ]);
 });
+
+it("retrieves a crop calendar from the published Iowa demo profile", async () => {
+  const message = await ask("local-knowledge-guide", "When can I sow maize?");
+  const answer = message.response.paragraphs[0].text;
+  expect(answer).toContain("Apr 20");
+  expect(answer).toContain("May 18");
+  expect(answer).toContain("iowa-benchmark-20261114-v2");
+  expect(answer).toContain("benchmark");
+});
+
+it("offers only knowledge topics backed by the demo profile", async () => {
+  const message = await ask("local-knowledge-guide", "What local knowledge can you check?");
+  expect(message.response.suggestions).toEqual([
+    "Maize sowing window", "Spring oat sowing window", "Dry field pea sowing window",
+  ]);
+});
+
+it("does not fabricate a current crop price from the demo profile", async () => {
+  const message = await ask("local-knowledge-guide", "What is the current soybean price?");
+  expect(message.response.paragraphs[0].text).toMatch(/no live.*price/i);
+  expect(message.response.suggestions).toContain("Maize sowing window");
+});
