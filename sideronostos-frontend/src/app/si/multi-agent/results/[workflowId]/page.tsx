@@ -75,6 +75,7 @@ export default function AgentResultPage() {
   const image = data && typeof data.image_base64 === "string" && result?.content_type?.startsWith("image/")
     ? `data:${result.content_type};base64,${data.image_base64}` : null;
   const facts = factRows(data);
+  const factCount = Array.isArray(data?.facts) ? data.facts.filter((fact) => !!fact && typeof fact === "object" && !Array.isArray(fact)).length : 0;
   const title = facts ? "Published observations for your selected area" : result?.title;
   return <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-8">
     <div className="mx-auto max-w-4xl">
@@ -87,9 +88,9 @@ export default function AgentResultPage() {
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
         <p className="text-sm text-muted-foreground">{result.status === "completed" ? "Task complete" : `Status: ${result.status}`}</p>
         {href && <Link href={href} className="mt-3 inline-block font-semibold text-primary underline">Open original module page ↗</Link>}
-        {Array.isArray(data?.items) && <p className="mt-4 font-medium">{data.items.length} records returned</p>}
+        {Array.isArray(data?.items) && <p className="mt-4 font-medium">{data.items.length} records returned{data.items.length > 8 && " · showing first 8"}</p>}
         {facts && <>
-          <p className="mt-4 font-medium">{facts.length} published observations</p>
+          <p className="mt-4 font-medium">{factCount} published observations{factCount > facts.length && ` · showing first ${facts.length}`}</p>
           {facts.length > 0 ? <ul className="mt-3 space-y-2">{facts}</ul>
             : <p className="mt-3 text-sm text-muted-foreground">No published observations cover this selection and period.</p>}
         </>}

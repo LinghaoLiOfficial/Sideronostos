@@ -23,3 +23,28 @@ it("shows request progress and lets the user retry an unavailable result", async
   expect(await screen.findByRole("heading", { name: "Crop profiles" })).toBeInTheDocument();
   expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 });
+
+it("shows the total and visible count when a result list is shortened", async () => {
+  window.history.replaceState({}, "", "/si/multi-agent/results/workflow-1?conversation=chat-1");
+  api.getToolResult.mockResolvedValue({
+    id: "workflow-1", operation_id: "list_profiles", title: "Crop profiles", status: "completed",
+    href: null, content_type: null,
+    result: { items: Array.from({ length: 9 }, (_, index) => ({ id: `profile-${index + 1}`, name: `Profile ${index + 1}` })) },
+  });
+  render(<AgentResultPage />);
+  expect(await screen.findByText("9 records returned · showing first 8")).toBeInTheDocument();
+  expect(screen.getByText("Profile 8")).toBeInTheDocument();
+  expect(screen.queryByText("Profile 9")).not.toBeInTheDocument();
+});
+
+it("shows the total observation count when only twelve facts are visible", async () => {
+  window.history.replaceState({}, "", "/si/multi-agent/results/workflow-1?conversation=chat-1");
+  api.getToolResult.mockResolvedValue({
+    id: "workflow-1", operation_id: "remote_sensing.fact", title: "Observations", status: "completed",
+    href: null, content_type: null,
+    result: { facts: Array.from({ length: 13 }, (_, index) => ({ id: `fact-${index + 1}`, metric: "rainfall_total", value: index + 1, unit: "mm" })) },
+  });
+  render(<AgentResultPage />);
+  expect(await screen.findByText("13 published observations · showing first 12")).toBeInTheDocument();
+  expect(screen.queryByText("Historical rainfall: 13 mm")).not.toBeInTheDocument();
+});
