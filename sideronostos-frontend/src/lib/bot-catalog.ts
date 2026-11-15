@@ -21,15 +21,15 @@ export type CatalogBot = {
 };
 
 export const modulePalette = {
-  general: { bot: "#739069", highlight: "#98ae8e" },
-  "field-management": { bot: "#828a65", highlight: "#a5ab82" },
+  general: { bot: "#55936d", highlight: "#87b299" },
+  "field-management": { bot: "#9b9550", highlight: "#b9b47c" },
   "remote-sensing": {
-    bot: "#698692",
-    highlight: "#91aab0",
-    variants: { water: "#638b9b", soil: "#977a5d", weather: "#7888a1" },
+    bot: "#5c7ea5",
+    highlight: "#9fb5ca",
+    variants: { water: "#2d7598", soil: "#5c7ea5", weather: "#a3b8d0" },
   },
-  "local-knowledge": { bot: "#9a8464", highlight: "#b6a07c" },
-  "rotation-recommendation": { bot: "#857a99", highlight: "#a39ab3" },
+  "local-knowledge": { bot: "#b07148", highlight: "#c69775" },
+  "rotation-recommendation": { bot: "#8a6ba7", highlight: "#aa92be" },
 } as const satisfies Record<SiBotModule, {
   bot: string;
   highlight: string;

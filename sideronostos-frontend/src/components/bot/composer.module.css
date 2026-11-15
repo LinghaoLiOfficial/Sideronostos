@@ -88,13 +88,6 @@
   outline: 2px solid var(--bot-accent, #4d9b75);
   outline-offset: 2px;
 }
-.hint {
-  margin: 8px 2px 0;
-  text-align: center;
-  font-size: 10px;
-  line-height: 1.5;
-  color: #77717f;
-}
 .voiceStatus {
   display: flex;
   align-items: center;

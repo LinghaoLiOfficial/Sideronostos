@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { ChevronDown, GripVertical } from "lucide-react";
+import Link from "next/link";
+import { ArrowUpRight, ChevronDown, GripVertical } from "lucide-react";
 import { Bot, BotAvatar } from "./Bot";
 import { MultiBotChat } from "./MultiBotChat";
 import { botsForModule, type CatalogBot, type SiBotModule } from "@/lib/bot-catalog";
@@ -172,6 +173,7 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
             purpose="chat"
             mode="chat"
             onModeChange={(mode) => { if (mode === "collapsed") collapseChat(); }}
+            headerActions={<Link href={`/si/multi-agent?bot=${encodeURIComponent(selected.id)}`} className={styles.workspaceLink} aria-label={locale === "en" ? `Open ${selected.name.en} in multi-agent workspace` : `在多智能体工作台打开${selected.name["zh-CN"]}`}><span>{locale === "en" ? "Multi-agent" : "多智能体"}</span><ArrowUpRight size={14} aria-hidden="true" /></Link>}
           >
             <MultiBotChat bot={selected} locale={locale} />
           </Bot>
