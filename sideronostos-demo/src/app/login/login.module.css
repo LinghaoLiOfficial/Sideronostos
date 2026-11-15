@@ -1,0 +1,107 @@
+.page {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: calc(var(--si-header-height) + 24px) clamp(16px, 5vw, 80px) 40px;
+  overflow: clip;
+  background: #0b120f;
+}
+
+.page :global(.si-hero-scene) {
+  --si-background-shade: 15%;
+}
+
+.page .form {
+  --card-spacing: clamp(22px, 3vw, 36px);
+  --card: transparent;
+  --card-foreground: #fafcf7;
+  --foreground: #fafcf7;
+  --muted-foreground: #e1e8db;
+  --primary: #40513c;
+  --primary-foreground: #fafcf7;
+  --input: #e1e8db80;
+  --field: #0b120fb8;
+  --ring: #c9e5b8;
+  --muted: #26332b;
+  --destructive: #8c3029;
+  width: min(100%, 440px);
+  min-width: 0;
+  color-scheme: dark;
+  border-color: transparent;
+  border-radius: 0;
+  text-shadow: 0 1px 5px #000d;
+}
+
+.title {
+  font-size: clamp(34px, 4.5vw, 58px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.form:global(.locale-en) .title {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+}
+
+.context {
+  margin-top: 6px;
+  color: var(--muted-foreground);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.form :is([data-slot="input"], [data-slot="button"], [data-slot="alert"]) {
+  border-radius: .25rem;
+}
+
+.form input:autofill {
+  box-shadow: 0 0 0 50px #17221b inset;
+  -webkit-text-fill-color: var(--foreground);
+}
+
+.form input:autofill:focus-visible { outline: 2px solid var(--ring); }
+
+.form [data-slot="alert"] {
+  background: #f3ded4;
+  border-color: #d8aca1;
+  text-shadow: none;
+}
+
+.register {
+  color: #e1f2d7;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: .3em;
+}
+
+.register:is(:hover, :focus-visible) { color: #fff; }
+
+@media (width > 760px) {
+  .page {
+    --form-rise: clamp(0px, (100svh - 610px) / 2, 3cm);
+    padding-block-start: calc(var(--si-header-height) + 24px + var(--form-rise));
+    padding-block-end: calc(40px + var(--form-rise));
+  }
+
+  .page .form {
+    translate: clamp(0px, (100vw - 440px) / 2 - 24px, 14cm) calc(-1 * var(--form-rise));
+  }
+}
+
+@media (max-width: 760px) {
+  .page :global(.si-hero-background) {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .page :global(.si-hero-scene) {
+    top: 0;
+    width: max(100%, calc(100svh * 1.64));
+    height: 100%;
+    transform: translateX(-50%);
+  }
+}

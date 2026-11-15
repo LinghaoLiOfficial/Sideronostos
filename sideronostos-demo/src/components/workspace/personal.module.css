@@ -1,0 +1,186 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid #e8ead630;
+  background: #0b120ff0;
+  color: #fafcf7;
+}
+
+.headerRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding-inline: clamp(24px, 6vw, 112px);
+}
+
+.profile {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .9rem;
+}
+
+@media (max-width: 600px) {
+  .headerRow { grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; }
+  .profile { grid-area: 1 / 2; }
+}
+
+.page {
+  min-height: calc(100svh - 65px);
+  padding: clamp(32px, 5vh, 62px) clamp(24px, 6vw, 112px) 64px;
+  color: #fafcf7;
+  background:
+    linear-gradient(115deg, #0b120ff5 10%, #0b120fbe 60%, #0b120fc9),
+    linear-gradient(0deg, #0b120f 5%, transparent 95%),
+    #0b120f url("/images/si/rotation-overview-poster.webp") 58% center / cover fixed;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: clamp(150px, 15vw, 222px) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(18px, 4vw, 68px);
+  max-width: 1536px;
+  margin-inline: auto;
+}
+
+.navigation {
+  position: sticky;
+  top: 97px;
+  display: grid;
+  gap: 10px;
+  padding-inline-end: 16px;
+  border-inline-end: 1px solid #e8ead630;
+}
+
+.navigation a {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: #e2e8d9;
+  font-size: .94rem;
+  text-underline-offset: .4em;
+}
+
+.navigation a:is([aria-current="page"], :hover, :focus-visible) {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.navigation .unread,
+.content .accountCard [data-slot="badge"][data-variant="secondary"],
+.dialog [data-slot="badge"][data-variant="secondary"] {
+  background: #c9e5b8;
+  color: #23301f;
+}
+
+.title {
+  color: #fafcf7;
+  font-size: clamp(38px, 5.6vw, 82px);
+  font-weight: 700;
+  line-height: .98;
+}
+
+.page:global(.locale-en) .title {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+}
+
+.page:global(.locale-zh) .title {
+  font-size: clamp(34px, 4.4vw, 68px);
+  line-height: 1.15;
+}
+
+.content {
+  min-width: 0;
+  --muted-foreground: #bfcbb8;
+  --primary: #c9e5b8;
+  --ring: #c9e5b8;
+}
+
+.list {
+  overflow: hidden;
+  border: 1px solid #d8e5cb3b;
+  background: #131d14ed;
+}
+
+.content [data-slot="alert"],
+.dialog [data-slot="alert"] {
+  background: #321f1d;
+  border-color: #ff949446;
+  border-radius: .25rem;
+}
+
+.notificationIcon { color: #c9e5b8; }
+.unreadDot { flex: none; background: #c9e5b8; }
+
+.content .accountCard {
+  --card-spacing: clamp(18px, 2vw, 28px);
+  --card: #e8ead6;
+  --card-foreground: #23301f;
+  --foreground: #23301f;
+  --muted-foreground: #4b5c44;
+  --primary: #40513c;
+  --primary-foreground: #fff;
+  --input: #a1ad91;
+  --field: #f8f9ef;
+  --border: #b6bfa5;
+  --ring: #40513c;
+  --muted: #dce2cc;
+  color-scheme: light;
+  border-radius: 0;
+}
+
+.accountCard [data-slot="card-title"] { font-size: 1.15rem; font-weight: 650; }
+.accountCard [data-slot="input"] { border-radius: .25rem; }
+.accountCard [data-slot="button"][data-variant="destructive"] {
+  color: #8c3029;
+  background: #8c30291a;
+}
+.accountCard [data-slot="button"][data-variant="destructive"]:hover { background: #8c30292b; }
+
+.content [data-slot="button"],
+.dialog [data-slot="button"] { border-radius: .25rem; }
+
+.content [data-slot="button"][data-variant="outline"],
+.dialog [data-slot="button"][data-variant="outline"] {
+  border-color: #c9e5b84f;
+  color: #edf4e8;
+}
+
+.content [data-slot="button"][data-variant="outline"]:hover,
+.dialog [data-slot="button"][data-variant="outline"]:hover { background: #c9e5b824; }
+
+.dialog:global([data-slot="dialog-content"]) {
+  --popover: #172218;
+  --border: #c9e5b84f;
+  --muted: #d0e7c329;
+  --muted-foreground: #c5d0be;
+  --primary: #c9e5b8;
+  --ring: #c9e5b8;
+  --subtle: #c9e5b80c;
+  overflow-y: auto;
+  max-height: calc(100dvh - 36px);
+  overscroll-behavior: contain;
+  border-radius: 0;
+}
+
+@media (max-width: 760px) {
+  .page { padding-inline: 18px; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .navigation {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    padding-inline-end: 0;
+    border-inline-end: none;
+    border-block-end: 1px solid #e8ead630;
+  }
+}

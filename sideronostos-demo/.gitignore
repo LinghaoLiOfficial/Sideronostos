@@ -1,0 +1,16 @@
+node_modules/
+.next/
+.next-*/
+out/
+coverage/
+output/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+/public/videos/si/*.part
+/public/videos/si/*.mp4
+.vercel
+.env*

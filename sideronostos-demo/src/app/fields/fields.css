@@ -1,0 +1,63 @@
+.fields-app {
+  --fields-map-control: var(--si-cream, #e8ead6);
+  --fields-map-control-text: var(--si-cream-foreground, #23301f);
+}
+
+.fields-app-embedded,
+.si-fields-workspace-loading {
+  height: calc(100dvh - 72px);
+}
+
+@media (max-width: 900px) {
+  .fields-app-embedded,
+  .si-fields-workspace-loading {
+    height: calc(100dvh - 56px);
+  }
+}
+
+.fields-app .maplibregl-map {
+  font-family: var(--font-sans), sans-serif;
+}
+
+.fields-app .maplibregl-ctrl-group {
+  overflow: hidden;
+  border: 1px solid #15171122;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px #0003;
+}
+
+.fields-app .maplibregl-ctrl-group button {
+  background-color: var(--fields-map-control);
+}
+
+.fields-app .maplibregl-ctrl-group button span {
+  filter: none;
+}
+
+.fields-app .maplibregl-ctrl-attrib {
+  color: var(--fields-map-control-text);
+  font-size: 10px;
+}
+
+.fields-app .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+
+.fields-app .maplibregl-ctrl-top-right {
+  top: 0;
+}
+
+.fields-app input[type="range"] {
+  accent-color: var(--primary);
+}
+
+.fields-app .bg-white {
+  color: var(--fields-map-control-text);
+}
+
+/* Keep the assistant above the map, clear of map controls and the mobile data tray. */
+.fields-assistant { position: absolute; inset: 0 42px 40px 0; pointer-events: none; z-index: 30; }
+.fields-assistant > * { pointer-events: auto; }
+.fields-app [aria-label="地块资料与同步"] input,
+.fields-app [aria-label="地块资料与同步"] select { min-width: 0; max-width: 100%; }
+@media (max-width: 700px) { .fields-assistant { right: 38px; bottom: 40px; } }

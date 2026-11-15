@@ -1,0 +1,1043 @@
+"use client";
+import { useI18n } from "@/lib/i18n/provider";
+import { LanguageSwitch } from "@/components/language-switch";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import { buildAssistantContext } from "./assistant-context";
+import { useWorkspaceNavigation } from "./use-workspace-navigation";
+import { useScienceQueries } from "./use-science-queries";
+import { useRotationSnapshots } from "./use-rotation-snapshots";
+import { useWorkspaceSession } from "./use-workspace-session";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, ArrowRight, Layers, Map, Plus, Sprout } from "lucide-react";
+import { Surface } from "@/components/ui/surface";
+import { ApiError, type AuthUser } from "@/lib/api/client";
+import * as fieldsApi from "@/lib/api/field-shift";
+import * as api from "@/lib/api/rotation";
+import * as dailyApi from "@/lib/api/daily";
+import * as farmsApi from "@/lib/api/farms";
+import {
+  isDailyRun,
+  type AnyRotationRun,
+  type DailyDraft,
+} from "@/lib/api/daily-types";
+import type { Field } from "@/lib/api/field-shift-types";
+import type {
+  ChangedCondition,
+  Geometry,
+  RegionSelection,
+  ScienceFact,
+} from "@/lib/api/rotation-types";
+import { observationWindow, scienceSourceName } from "./workspace-state";
+import { AssistantDock } from "./assistant-dock";
+import {
+  labels,
+  dataStatus,
+  missingReason,
+  readableUnit,
+} from "./science-presentation";
+import { MapCanvas } from "./map-canvas";
+import { PlannerForm } from "./planner-form";
+import { allOptions, RunResults, SavedPlan } from "./results";
+import { fieldInput, formatValue as n, runStatus } from "./planning-model";
+import { errorMessage } from "../field-shift/model";
+import styles from "./workspace.module.css";
+
+function Notice({ children }: { children: ReactNode }) {
+  return (
+    <p className={styles.notice} role="status">
+      {children}
+    </p>
+  );
+}
+function QueryError({ error, retry }: { error: unknown; retry: () => void }) {
+  const { t } = useI18n();
+
+  return (
+    <div className={styles.error} role="alert">
+      {t(errorMessage(error))}{" "}
+      <button type="button" onClick={retry}>
+        {t("重试")}</button>
+    </div>
+  );
+}
+function Header({
+  mode,
+  user,
+  search = "",
+}: {
+  mode: "map" | "rotation";
+  user?: AuthUser;
+  search?: string;
+}) {
+  const { t } = useI18n();
+
+  return (
+    <header className={styles.header}>
+      <Link className={styles.brand} href="/si/field-management">
+        <Sprout size={25} />
+        <span>
+          {t("Agrisata ")}<small>{t("FIELD SHIFT")}</small>
+        </span>
+      </Link>
+      <nav aria-label={t("Field Shift 工作区")}>
+        <Link
+          aria-current={mode === "map" ? "page" : undefined}
+          href={`/si/field-management${search ? "?" + search : ""}`}
+        >
+          <Map size={16} />
+          {t("地图")}</Link>
+        <Link
+          aria-current={mode === "rotation" ? "page" : undefined}
+          href={`/field-shift/rotation${search ? "?" + search : ""}`}
+        >
+          <Sprout size={16} />
+          {t("轮作规划")}
+        </Link>
+        <Link href="/field-shift/nasa-rotation">
+          <Layers size={16} />
+          {t("NASA 回测")}
+        </Link>
+      </nav>
+      <LanguageSwitch />
+      <Link
+        className={styles.account}
+        href={user ? "/personal/account" : "/field-shift"}
+      >
+        {user?.display_name ?? t("地块管理")}
+      </Link>
+    </header>
+  );
+}
+export function RotationWorkspace({ mode }: { mode: "map" | "rotation" }) {
+  const { t } = useI18n();
+
+  const search = useSearchParams();
+  const { session, ready } = useWorkspaceSession();
+  if (!ready)
+    return (
+      <Surface tone="light" className={styles.app}>
+        <Header mode={mode} />
+        <main className={styles.empty} role="status">
+          {t("正在确认登录状态…")}</main>
+      </Surface>
+    );
+  if (
+    (session.error instanceof ApiError && session.error.status === 401) ||
+    (session.data && !session.data.email_verified)
+  )
+    return (
+      <Surface tone="light" className={styles.app}>
+        <Header mode={mode} />
+        <main className={styles.empty}>
+          <Sprout size={38} />
+          <h1>{t("从你的地块，开始下一轮种植")}</h1>
+          <p>{t("登录后可以查看区域数据、比较轮作，并保存你的计划。")}</p>
+          {session.data && !session.data.email_verified && (
+            <p>{t("请先完成邮箱验证。")}</p>
+          )}
+          <Link
+            className={styles.primary}
+            href={`/login?next=${encodeURIComponent(`/field-shift/${mode}?${search}`)}`}
+          >
+            {t("登录并继续 ")}<ArrowRight size={16} />
+          </Link>
+        </main>
+      </Surface>
+    );
+  if (session.error || !session.data)
+    return (
+      <Surface tone="light" className={styles.app}>
+        <Header mode={mode} />
+        <main className={styles.empty}>
+          <QueryError
+            error={session.error}
+            retry={() => void session.refetch()}
+          />
+        </main>
+      </Surface>
+    );
+  return (
+    <OwnerWorkspace key={session.data.id} owner={session.data} mode={mode} />
+  );
+}
+function OwnerWorkspace({
+  owner,
+  mode,
+}: {
+  owner: AuthUser;
+  mode: "map" | "rotation";
+}) {
+  const { t, locale } = useI18n();
+
+  const navigation = useWorkspaceNavigation(mode === "map" ? "/si/field-management" : "/field-shift/rotation");
+  const {
+    search,
+    latestSearch,
+    revision: contextRevision,
+    setRevision: setContextRevision,
+  } = navigation;
+  const client = useQueryClient();
+  const requestedField = search.get("field"),
+    selectionId = search.get("selection"),
+    requestedRunId = search.get("run"),
+    optionId = search.get("option"),
+    planId = search.get("plan"),
+    compareId = search.get("compare"),
+    compareOptionId = search.get("compareOption");
+  const [selectionError, setSelectionError] = useState<string | null>(null),
+    [selecting, setSelecting] = useState(false);
+  const layerId = search.get("layer") ?? "";
+  const window = observationWindow(
+    search.get("obsStart"),
+    search.get("obsEnd"),
+  );
+  const dates = window.dates;
+  const dateBasis = `${search.get("obsStart") ?? ""}:${search.get("obsEnd") ?? ""}`;
+  const [dateDraft, setDateDraft] = useState<{
+    basis: string;
+    start: string;
+    end: string;
+  } | null>(null);
+  const dateStart =
+    dateDraft?.basis === dateBasis ? dateDraft.start : (dates?.start ?? "");
+  const dateEnd =
+    dateDraft?.basis === dateBasis ? dateDraft.end : (dates?.end ?? "");
+
+  const { run, saved, runId } = useRotationSnapshots(
+    owner.id,
+    requestedRunId,
+    planId,
+  );
+  const draftBasis = `${runId ?? "new"}:${planId ?? ""}`;
+  const [draftContext, setDraftContext] = useState<{
+    basis: string;
+    changes: ChangedCondition[];
+    fields: DailyDraft["fields"];
+  } | null>(null);
+  const changes =
+    draftContext?.basis === draftBasis ? draftContext.changes : [];
+  const draftFields =
+    draftContext?.basis === draftBasis ? draftContext.fields : [];
+  const [openRequest, setOpenRequest] = useState<{
+      id: number;
+      text: string;
+    }>(),
+    [boundaryBusy, setBoundaryBusy] = useState(false),
+    [boundaryMessage, setBoundaryMessage] = useState<string | null>(null),
+    [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const selectionSeq = useRef(0),
+    abort = useRef<AbortController | null>(null),
+    mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    const selectionCounter = selectionSeq;
+    return () => {
+      mounted.current = false;
+      selectionCounter.current++;
+      abort.current?.abort();
+    };
+  }, []);
+  const fields = useQuery({
+    queryKey: ["field-shift", owner.id, "fields"],
+    queryFn: fieldsApi.listFields,
+    retry: false,
+  });
+  const profiles = useQuery({
+    queryKey: ["rotation", owner.id, "profiles"],
+    queryFn: api.listRotationProfiles,
+    retry: false,
+    staleTime: 300000,
+  });
+  const dailyProfiles = useQuery({
+    queryKey: ["rotation", owner.id, "v3-profiles"],
+    queryFn: () => dailyApi.listDailyProfiles(owner.id),
+    enabled: mode === "rotation",
+    retry: false,
+    staleTime: 300000,
+  });
+  const farms = useQuery({
+    queryKey: ["rotation", owner.id, "farm-headers"],
+    queryFn: () => farmsApi.listFarms(undefined, owner.id),
+    enabled: mode === "rotation",
+    retry: false,
+  });
+  const selectedField = fields.data?.items.find((f) => f.id === requestedField);
+  const { selection, facts, layers, manifest } = useScienceQueries(
+    owner.id,
+    selectionId,
+    layerId,
+    dates,
+  );
+  const plans = useQuery({
+    queryKey: ["rotation", owner.id, "plans"],
+    queryFn: () => dailyApi.listAllPlans(owner.id),
+    enabled: mode === "rotation",
+    retry: false,
+  });
+  const history = useQuery({
+    queryKey: ["rotation", owner.id, "all-runs"],
+    queryFn: () => dailyApi.listAllRuns(owner.id),
+    enabled: mode === "rotation",
+    retry: false,
+  });
+  function navigate(patch: Record<string, string | null>, nextMode = mode) {
+    navigation.navigate(patch, nextMode === "map" ? "/si/field-management" : "/field-shift/rotation");
+  }
+  async function selectRegion(
+    kind: RegionSelection["kind"],
+    geometry: Geometry,
+  ) {
+    const sequence = ++selectionSeq.current;
+    abort.current?.abort();
+    abort.current = new AbortController();
+    setSelecting(true);
+    setSelectionError(null);
+    setBoundaryMessage(null);
+    try {
+      const selected = await api.createSelection(
+        kind,
+        geometry,
+        contextRevision + 1,
+        abort.current.signal,
+      );
+      if (!mounted.current || sequence !== selectionSeq.current) return false;
+      client.setQueryData(
+        ["rotation", owner.id, "selection", selected.id],
+        selected,
+      );
+      navigate({ selection: selected.id });
+      return true;
+    } catch (cause) {
+      if (mounted.current && sequence === selectionSeq.current)
+        setSelectionError(
+          kind === "polygon" &&
+            cause instanceof ApiError &&
+            cause.status === 422
+            ? t("区域未能保存。请检查边界是否交叉、范围是否过大或顶点过多；顶点已保留，可以撤回修正。")
+            : errorMessage(cause),
+        );
+      return false;
+    } finally {
+      if (mounted.current && sequence === selectionSeq.current)
+        setSelecting(false);
+    }
+  }
+  function selectField(field: Field) {
+    selectionSeq.current++;
+    abort.current?.abort();
+    setSelecting(false);
+    setBoundaryMessage(null);
+    navigate({ field: field.id });
+  }
+  const updateField = useCallback(
+    (field: Field) => {
+      if (!mounted.current) return;
+      client.setQueryData<{ items: Field[] }>(
+        ["field-shift", owner.id, "fields"],
+        (old) => ({
+          items: (old?.items ?? []).map((f) =>
+            f.id === field.id && f.version <= field.version ? field : f,
+          ),
+        }),
+      );
+      setContextRevision((value) => value + 1);
+    },
+    [client, owner.id, setContextRevision],
+  );
+  async function saveBoundary() {
+    if (
+      !selectedField ||
+      selectedField.farm_id ||
+      selection.data?.kind !== "polygon"
+    )
+      return;
+    const origin = { field: selectedField.id, selection: selection.data.id };
+    setBoundaryBusy(true);
+    setBoundaryMessage(null);
+    try {
+      const field = await fieldsApi.updateField(
+        selectedField.id,
+        { ...fieldInput(selectedField), geometry: selection.data.geometry },
+        selectedField.version,
+      );
+      if (!mounted.current) return;
+      updateField(field);
+      const params = new URLSearchParams(latestSearch.current);
+      if (
+        params.get("field") === origin.field &&
+        params.get("selection") === origin.selection
+      )
+        setBoundaryMessage(
+          t("边界已保存。经营面积保持你填写的数值，地块版本已更新。"),
+        );
+    } catch (cause) {
+      if (mounted.current) setBoundaryMessage(errorMessage(cause));
+    } finally {
+      if (mounted.current) setBoundaryBusy(false);
+    }
+  }
+  function updateRun(value: AnyRotationRun) {
+    client.setQueryData(["rotation", owner.id, "run", value.id], value);
+    void client.invalidateQueries({
+      queryKey: ["rotation", owner.id, "all-runs"],
+    });
+    if (mounted.current && latestSearch.current === search.toString())
+      navigate({
+        run: value.id,
+        option: null,
+        plan: null,
+        compare: null,
+        compareOption: null,
+      });
+  }
+  const onDraft = useCallback(
+    (next: ChangedCondition[], chosen: DailyDraft["fields"]) => {
+      const value = { basis: draftBasis, changes: next, fields: chosen };
+      setDraftContext((old) =>
+        JSON.stringify(old) === JSON.stringify(value) ? old : value,
+      );
+      setContextRevision((value) => value + 1);
+    },
+    [setContextRevision, draftBasis],
+  );
+  const fieldStale =
+    run.data?.field_snapshots.some((snapshot) => {
+      const current = fields.data?.items.find((f) => f.id === snapshot.id);
+      return !current || current.version !== snapshot.version;
+    }) ?? false;
+  const visibleChanges: ChangedCondition[] =
+    fieldStale && !changes.includes("fields")
+      ? [...changes, "fields"]
+      : changes;
+  const hasRun = Boolean(
+      run.data && (!planId || saved.data?.run_id === run.data.id),
+    ),
+    actualOption =
+      run.data &&
+      allOptions(run.data).find(
+        (o) => o.id === (planId ? saved.data?.option_id : optionId),
+      );
+  const mapSearch = new URLSearchParams(search.toString());
+  if (hasRun && run.data) {
+    mapSearch.set("run", run.data.id);
+    if (actualOption) mapSearch.set("option", actualOption.id);
+    if (!mapSearch.has("field") && run.data.field_snapshots[0])
+      mapSearch.set("field", run.data.field_snapshots[0].id);
+  }
+  const context = buildAssistantContext({
+    revision: contextRevision,
+    page: mode,
+    selection: selection.data
+      ? { id: selection.data.id, revision: selection.data.revision }
+      : null,
+    dates,
+    fields:
+      mode === "rotation"
+        ? draftFields.filter((f) =>
+            fields.data?.items.some(
+              (current) =>
+                current.id === f.id && current.version === f.expected_version,
+            ),
+          )
+        : selectedField
+          ? [{ id: selectedField.id, expected_version: selectedField.version }]
+          : [],
+    runId: hasRun ? run.data!.id : null,
+    optionId: actualOption?.id,
+    compareRunId: compareId,
+    compareOptionId,
+    saved: Boolean(planId),
+    planId: hasRun ? planId : null,
+    changes: visibleChanges,
+  });
+  const contextLabel = [
+    hasRun
+      ? run.data!.field_snapshots.map((f) => f.name).join("、")
+      : (selectedField?.name ?? t("未选择经营地块")),
+    selection.data
+      ? t("地图{0} {1}", { "0": { point: "选点", polygon: "区域", viewport: "视野" }[selection.data.kind], "1": selection.data.center.map((v) => n(v, 3)).join(", ") })
+      : t("未选地图区域"),
+    actualOption
+      ? actualOption.id === "baseline"
+        ? t("基准种法")
+        : actualOption.id.replace("option-", t("方案 "))
+      : hasRun
+        ? t("未选择方案")
+        : "",
+    dates ? `${dates.start}—${dates.end}` : t("全部已发布观测"),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  function applyDates(event: FormEvent) {
+    event.preventDefault();
+    const next = observationWindow(dateStart, dateEnd);
+    if (!next.dates) {
+      setSelectionError(next.error ?? t("请填写观测起止日期。"));
+      return;
+    }
+    navigate({ obsStart: dateStart, obsEnd: dateEnd });
+    setSelectionError(null);
+  }
+  const dataSidebar = (
+    <>
+      <section className={styles.sidebarSection}>
+        <p className={styles.eyebrow}>{t("YOUR LAND, YOUR DECISIONS")}</p>
+        <h1>{t("先了解这片土地")}</h1>
+        <p className={styles.help}>{t("查看已准备的数据，再讨论下一轮种植。")}</p>
+        <label>
+          {t("我的经营地块")}<select
+            value={selectedField?.id ?? ""}
+            onChange={(e) => {
+              const f = fields.data?.items.find((f) => f.id === e.target.value);
+              if (f) selectField(f);
+              else navigate({ field: null });
+            }}
+          >
+            <option value="">{t("选择已有地块")}</option>
+            {fields.data?.items.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name} · {f.area_ha} {t(" ha")}</option>
+            ))}
+          </select>
+        </label>
+        {fields.isPending && <p role="status">{t("正在读取地块…")}</p>}
+        {fields.error && (
+          <QueryError
+            error={fields.error}
+            retry={() => void fields.refetch()}
+          />
+        )}
+        <div className={styles.sidebarLinks}>
+          <Link href={`/field-shift?field=${selectedField?.id ?? "new"}`}>
+            {selectedField ? t("编辑地块与历史") : t("创建地块")} <Plus size={13} />
+          </Link>
+          <Link href={`/field-shift/rotation?${search}`}>
+            {t("开始轮作规划 ")}<ArrowRight size={13} />
+          </Link>
+        </div>
+        {requestedField && !selectedField && !fields.isPending && (
+          <Notice>{t("此地块当前不可用，请重新选择。")}</Notice>
+        )}
+      </section>
+      <section className={styles.sidebarSection}>
+        <h2>
+          <Layers size={16} />
+          {t("已发布数据")}</h2>
+        <label>
+          {t("地图图层")}<select
+            value={layerId}
+            onChange={(e) => navigate({ layer: e.target.value || null })}
+          >
+            <option value="">{t("仅显示底图")}</option>
+            {layers.data?.items.map((layer) => (
+              <option key={layer.id} value={layer.id}>
+                {t("SMAP 表层土壤水分 · ")}{layer.pass} · {layer.start.slice(0, 10)}
+              </option>
+            ))}
+          </select>
+        </label>
+        {layers.error && (
+          <QueryError
+            error={layers.error}
+            retry={() => void layers.refetch()}
+          />
+        )}
+        {window.error && (
+          <Notice>
+            {t(window.error)}{t("当前显示全部已发布观测，请重新应用日期。")}</Notice>
+        )}
+        <details className={styles.details}>
+          <summary>{t("按观测日期筛选数据")}</summary>
+          <form onSubmit={applyDates}>
+            <div className={styles.twoColumns}>
+              <label>
+                {t("开始")}<input
+                  type="date"
+                  value={dateStart}
+                  required
+                  onChange={(e) =>
+                    setDateDraft({
+                      basis: dateBasis,
+                      start: e.target.value,
+                      end: dateEnd,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                {t("结束")}<input
+                  type="date"
+                  value={dateEnd}
+                  min={dateStart}
+                  required
+                  onChange={(e) =>
+                    setDateDraft({
+                      basis: dateBasis,
+                      start: dateStart,
+                      end: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </div>
+            <div className={styles.actions}>
+              <button>{t("应用日期")}</button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDateDraft(null);
+                  setSelectionError(null);
+                  navigate({ obsStart: null, obsEnd: null });
+                }}
+              >
+                {t("查看全部")}</button>
+            </div>
+          </form>
+        </details>
+        <p className={styles.help}>
+          {t("图层日期与查询日期分别显示。2025 年历史天气和 2026 年卫星观测是不同资料，不表示未来预报。")}</p>
+      </section>
+      <section className={styles.sidebarSection}>
+        <h2>{t("所选区域的资料")}</h2>
+        {selecting && <p role="status">{t("正在保存选区…")}</p>}
+        {selectionError && (
+          <p className={styles.error} role="alert">
+            {t(selectionError)}
+          </p>
+        )}
+        {selection.error && (
+          <QueryError
+            error={selection.error}
+            retry={() => void selection.refetch()}
+          />
+        )}{" "}
+        {!selectionId && !selecting && (
+          <p className={styles.help}>
+            {t("点击地图选点、画一个区域，或明确采用当前视野。仅拖动地图不会改变助手的选区。")}</p>
+        )}
+        {selection.data && (
+          <>
+            <div className={styles.selectionMeta}>
+              <strong>
+                {
+                  {
+                    point: t("地图选点"),
+                    polygon: t("手绘区域"),
+                    viewport: t("已采用的视野"),
+                  }[selection.data.kind]
+                }
+              </strong>
+              <span>
+                {selection.data.center.map((v) => n(v, 4)).join(", ")}
+              </span>
+              {selection.data.area_ha != null && (
+                <span>{t("几何面积 ")}{n(selection.data.area_ha, 2)} {t(" ha")}</span>
+              )}
+              <button
+                type="button"
+                className={styles.linkButton}
+                onClick={() => {
+                  selectionSeq.current++;
+                  abort.current?.abort();
+                  setSelecting(false);
+                  navigate({ selection: null });
+                }}
+              >
+                {t("清除选区")}</button>
+            </div>
+            {selection.data.kind === "polygon" &&
+              selectedField &&
+              !selectedField.farm_id && (
+                <details className={styles.details}>
+                  <summary>{t("将区域保存为「")}{selectedField.name}{t("」的边界")}</summary>
+                  <p className={styles.help}>
+                    {t("经营面积：")}{n(selectedField.area_ha, 2)} {t(" ha；绘制面积：")}{n(selection.data.area_ha, 2)}{" "}
+                    {t("ha。保存只更新边界与版本，请在地块管理中核对面积。")}</p>
+                  <button
+                    type="button"
+                    disabled={boundaryBusy}
+                    onClick={() => void saveBoundary()}
+                  >
+                    {boundaryBusy ? t("正在保存…") : t("保存为此地块边界")}
+                  </button>
+                </details>
+              )}
+            {boundaryMessage && <Notice>{boundaryMessage}</Notice>}
+          </>
+        )}
+        {facts.isFetching && <p role="status">{t("正在读取已发布的区域事实…")}</p>}
+        {facts.error && (
+          <QueryError error={facts.error} retry={() => void facts.refetch()} />
+        )}{" "}
+        {facts.data?.facts.map((fact, index) => (
+          <ScienceRow key={fact.id + ":" + index} fact={fact} />
+        ))}
+        {facts.data?.unavailable.map((missing, index) => (
+          <Notice key={index}>
+            <strong>
+              {scienceSourceName(
+                missing.release_id,
+                layers.data?.items ?? [],
+                profiles.data?.items ?? [],
+              )}
+              ：
+            </strong>{" "}
+            {t(missingReason[missing.reason] ?? t("该范围暂无适用资料。"))}
+            {t(!missingReason[missing.reason] && missing.detail
+              ? ` · ${missing.detail}`
+              : "")}
+          </Notice>
+        ))}
+        {facts.data &&
+          !facts.data.facts.length &&
+          !facts.data.unavailable.length && (
+            <Notice>{t("该区域与日期没有已发布的资料。缺测不能解释为零。")}</Notice>
+          )}
+      </section>
+      <p className={styles.sidebarFooter}>
+        {t("初始地图停在研发天气样本附近，尚未确定业务试点。")}</p>
+    </>
+  );
+  const dailyRun = run.data && isDailyRun(run.data) ? run.data : undefined;
+  const legacyRun = run.data && !isDailyRun(run.data) ? run.data : undefined;
+  const profile = dailyRun
+    ? dailyProfiles.data?.items.find(
+        (p) =>
+          p.id === dailyRun.request.profile_id &&
+          p.sha256 === dailyRun.provenance.profile_sha256,
+      )
+    : dailyProfiles.data?.items[0];
+  let planningBody: ReactNode;
+  if (planId) {
+    planningBody = (
+      <>
+        {saved.isPending ? (
+          <p role="status">{t("正在恢复保存时的计划…")}</p>
+        ) : saved.error ? (
+          <QueryError error={saved.error} retry={() => void saved.refetch()} />
+        ) : saved.data ? (
+          <div data-testid="result-ready">
+            <SavedPlan plan={saved.data} />
+          </div>
+        ) : null}
+        <button
+          type="button"
+          onClick={() =>
+            navigate({
+              plan: null,
+              run: runId,
+              option: saved.data?.option_id ?? null,
+            })
+          }
+        >
+          {t("返回规划")}</button>
+      </>
+    );
+  } else {
+    planningBody = (
+      <>
+        {legacyRun ? (
+          <Notice>
+            {t("这是旧版 v2 计算，保留当时的输入、指标与结果。新规划使用逐日 v3 模型。")}<button
+              type="button"
+              onClick={() =>
+                navigate({
+                  run: null,
+                  option: null,
+                  plan: null,
+                  compare: null,
+                  compareOption: null,
+                })
+              }
+            >
+              {t("开始新的逐日规划")}</button>
+          </Notice>
+        ) : dailyProfiles.isPending ||
+          farms.isPending ||
+          fields.isPending ||
+          Boolean(runId && run.isPending) ? (
+          <p role="status">{t("正在恢复你的规划资料…")}</p>
+        ) : dailyProfiles.error || farms.error || fields.error ? (
+          <QueryError
+            error={dailyProfiles.error ?? farms.error ?? fields.error}
+            retry={() => {
+              void dailyProfiles.refetch();
+              void farms.refetch();
+              void fields.refetch();
+            }}
+          />
+        ) : dailyRun && !profile ? (
+          <Notice>
+            {t("当时的逐日参数包已不可用或已更新。下方仍显示原始计算快照；如需新计算，请先开始新规划并核对当前参数。")}<button
+              type="button"
+              onClick={() =>
+                navigate({
+                  run: null,
+                  option: null,
+                  plan: null,
+                  compare: null,
+                  compareOption: null,
+                })
+              }
+            >
+              {t("开始新的逐日规划")}</button>
+          </Notice>
+        ) : profile ? (
+          <PlannerForm
+            key={`${owner.id}:${profile.id}:${profile.sha256}`}
+            version="v3"
+            owner={owner.id}
+            profile={profile}
+            fields={fields.data?.items ?? []}
+            farms={farms.data?.items ?? []}
+            run={dailyRun}
+            selectedFieldId={selectedField?.id}
+            onRun={updateRun}
+            onDraft={onDraft}
+            onFieldSaved={updateField}
+          />
+        ) : (
+          <Notice>{t("当前没有可用的逐日农艺参数包。")}</Notice>
+        )}
+        {run.error && (
+          <QueryError error={run.error} retry={() => void run.refetch()} />
+        )}
+        {run.data && (
+          <div
+            data-testid={
+              ["optimal", "feasible", "infeasible"].includes(run.data.status)
+                ? "result-ready"
+                : undefined
+            }
+          >
+            <RunResults
+              key={run.data.id}
+              owner={owner.id}
+              run={run.data}
+              changes={visibleChanges}
+              selectedOptionId={optionId}
+              onSelect={(id) => navigate({ option: id })}
+              onExplain={(option) => {
+                navigate({ option: option.id });
+                setOpenRequest({
+                  id: Date.now(),
+                  text: t("请解释这个方案的主要取舍，以及我需要核对什么。"),
+                });
+              }}
+              onUpdate={updateRun}
+              onSaved={(plan) => {
+                client.setQueryData(
+                  ["rotation", owner.id, "plan", plan.id],
+                  plan,
+                );
+                void client.invalidateQueries({
+                  queryKey: ["rotation", owner.id, "plans"],
+                });
+                setSavedMessage(t("计划已保存，包含本次输入、结果与来源。"));
+                navigate({ plan: plan.id });
+              }}
+              compareRunId={compareId}
+              compareOptionId={compareOptionId}
+              onCompare={(id, option) =>
+                navigate({ compare: id, compareOption: option })
+              }
+            />
+          </div>
+        )}
+      </>
+    );
+  }
+  return (
+    <Surface tone="light" className={styles.app}>
+      <Header mode={mode} user={owner} search={mapSearch.toString()} />
+      <div
+        className={mode === "map" ? styles.mapLayout : styles.planningLayout}
+      >
+        <main
+          className={
+            mode === "map" ? styles.mapSidebar : styles.planningContent
+          }
+        >
+          {mode === "map" ? (
+            dataSidebar
+          ) : (
+            <>
+              <div className={styles.planningNavigation}>
+                <Link href={`/si/field-management?${mapSearch}`}>
+                  <ArrowLeft size={14} />
+                  {t("返回地图")}</Link>
+                <details>
+                  <summary>{t("计算与已存计划")}</summary>
+                  <label>
+                    {t("计算历史")}<select
+                      value={runId ?? ""}
+                      onChange={(e) =>
+                        navigate({
+                          run: e.target.value || null,
+                          option: null,
+                          plan: null,
+                          compare: null,
+                          compareOption: null,
+                        })
+                      }
+                    >
+                      <option value="">{t("新规划")}</option>
+                      {history.data?.items.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {new Date(item.created_at).toLocaleString(locale === "zh" ? "zh-CN" : "en-US")} ·{" "}
+                          {isDailyRun(item) ? "v3" : "v2"} ·{" "}
+                          {t(runStatus[
+                            item.id === run.data?.id
+                              ? run.data.status
+                              : item.status
+                          ] ?? item.status)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    {t("已存计划")}<select
+                      value={planId ?? ""}
+                      onChange={(e) => {
+                        const chosen = plans.data?.items.find(
+                          (p) => p.id === e.target.value,
+                        );
+                        navigate({
+                          plan: chosen?.id ?? null,
+                          ...(chosen
+                            ? {
+                                run: chosen.run_id,
+                                option: chosen.option_id,
+                                compare: null,
+                                compareOption: null,
+                              }
+                            : {}),
+                        });
+                      }}
+                    >
+                      <option value="">{t("选择已存计划")}</option>
+                      {plans.data?.items.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.title}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {(history.error || plans.error) && (
+                    <QueryError
+                      error={history.error ?? plans.error}
+                      retry={() => {
+                        void history.refetch();
+                        void plans.refetch();
+                      }}
+                    />
+                  )}
+                </details>
+              </div>
+              {savedMessage && <Notice>{savedMessage}</Notice>}
+              {planningBody}
+            </>
+          )}
+        </main>
+        <section className={styles.mapStage} aria-label={t("地图与轮作助手")}>
+          <MapCanvas
+            fields={fields.data?.items ?? []}
+            selectedField={selectedField}
+            selection={selection.data ?? null}
+            layer={manifest.data ?? null}
+            onSelect={selectRegion}
+            onField={selectField}
+          />
+          {manifest.error && (
+            <div className={styles.mapError}>
+              <QueryError
+                error={manifest.error}
+                retry={() => void manifest.refetch()}
+              />
+            </div>
+          )}
+          {mode === "rotation" && (
+            <div className={styles.mapSummary}>{t("正在规划")}{" "}
+              {run.data ? run.data.field_snapshots.length : draftFields.length}{" "}{t("个经营地块 · 地图选区用于查询背景")}</div>
+          )}
+          <AssistantDock
+            ownerId={owner.id}
+            context={context}
+            contextLabel={contextLabel}
+            contextPending={
+              selecting ||
+              Boolean((runId || planId) && !hasRun) ||
+              Boolean(selectionId && !selection.data)
+            }
+            openRequest={openRequest}
+            onAction={(action) => {
+              if (action === "open_planner" || action === "edit_conditions") {
+                navigate({ plan: null }, "rotation");
+                setTimeout(
+                  () => document.getElementById("planning-conditions")?.focus(),
+                  50,
+                );
+              } else if (action === "choose_field")
+                navigation.navigate({}, "/si/field-management");
+            }}
+          />
+        </section>
+      </div>
+    </Surface>
+  );
+}
+
+function ScienceRow({ fact }: { fact: ScienceFact }) {
+  const { t } = useI18n();
+
+  return (
+    <article className={styles.scienceRow}>
+      <div>
+        <strong>
+          {t(labels[fact.metric] ?? fact.metric)}
+          {fact.pass ? ` · ${fact.pass}` : ""}
+        </strong>
+        <b>
+          {t(fact.value == null
+            ? t("暂无有效值")
+            : `${n(fact.value, 4)} ${readableUnit(fact.unit)}`)}
+        </b>
+      </div>
+      <p>
+        {fact.period?.start?.slice(0, 10)}—{fact.period?.end?.slice(0, 10)} ·{" "}
+        {t(dataStatus[fact.status] ?? t("资料状态待核对"))}
+      </p>
+      <details>
+        <summary>{t("来源与限制")}</summary>
+        <p>
+          {String(
+            fact.source.product ?? fact.source.release_id ?? fact.data_kind,
+          )}
+        </p>
+        {fact.acquired_at && <p>{t("采集时间：")}{fact.acquired_at}</p>}
+        {fact.retrieval_qual_flag != null && (
+          <p>{t("检索质量标记：")}{fact.retrieval_qual_flag}</p>
+        )}
+        <ul>
+          {fact.limitations.map((v, i) => (
+            <li key={i}>{v}</li>
+          ))}
+        </ul>
+        {typeof fact.source.url === "string" &&
+          /^https?:\/\//.test(fact.source.url) && (
+            <a href={fact.source.url} target="_blank" rel="noreferrer">
+              {t("原始来源")}</a>
+          )}
+      </details>
+    </article>
+  );
+}

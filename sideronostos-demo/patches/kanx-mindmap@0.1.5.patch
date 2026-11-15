@@ -1,0 +1,81 @@
+diff --git a/README.md b/README.md
+index 515ca8c03bc250ad96ef761484d83dced2af5e52..ce9730b2199129f76ee8aa70d4c6928a5e285f12 100644
+--- a/README.md
++++ b/README.md
+@@ -133,7 +133,7 @@ export function CustomEditor() {
+ 
+ `parseDocument` 同时接受 v1 文本文档并迁移为 v2；它会校验版本、唯一根、父子引用、重复引用、循环和节点可达性，并移除未知字段。JSON 只保存图片资源引用和显示元数据，不包含图片二进制。粘贴图片需要资源库仍可访问对应 `assetId`；跨浏览器导入时若资源不存在，会显示无文案占位。
+ 
+-选中主题后按 `Ctrl/Cmd + V` 可将剪贴板中的第一张图片创建为新的子主题。图片主题可以继续添加子主题、移动、折叠、删除和撤销；单选图片时可拖动右下角手柄按比例调整宽度（80–1200px）。默认图片资源使用所有编辑器实例共享的 IndexedDB，也可以注入资源适配器：
++选中主题后按 `Ctrl/Cmd + V` 可将剪贴板中的第一张图片创建为新的子主题。图片主题可以继续添加子主题、移动、折叠、删除和撤销；单选图片时可拖动右下角手柄按比例调整宽度（80–2400px）。默认图片资源使用所有编辑器实例共享的 IndexedDB，也可以注入资源适配器：
+ 
+ ```tsx
+ <MindMapEditor assetStore={{
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 32bade5ba9cf55b7246c5cf5179ccccb98a1e444..70d948e48bf1f152a6f3db1c9c3e73c01b7cc847 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -142,7 +142,7 @@ var import_zustand = require("zustand");
+ var validImage = (image) => {
+   if (!image || typeof image !== "object") return false;
+   const value = image;
+-  return typeof value.assetId === "string" && value.assetId.trim().length > 0 && typeof value.width === "number" && Number.isFinite(value.width) && value.width >= 80 && value.width <= 1200 && typeof value.aspectRatio === "number" && Number.isFinite(value.aspectRatio) && value.aspectRatio > 0;
++  return typeof value.assetId === "string" && value.assetId.trim().length > 0 && typeof value.width === "number" && Number.isFinite(value.width) && value.width >= 80 && value.width <= 2400 && typeof value.aspectRatio === "number" && Number.isFinite(value.aspectRatio) && value.aspectRatio > 0;
+ };
+ function serializeDocument(tree) {
+   return { version: 2, tree: structuredClone(tree) };
+@@ -202,7 +202,7 @@ function applyCommand(tree, command) {
+       n.text = text;
+     }
+     if (command.type === "resizeImage") {
+-      if (n.kind !== "image" || !Number.isFinite(command.width) || command.width < 80 || command.width > 1200 || command.width === n.image.width)
++      if (n.kind !== "image" || !Number.isFinite(command.width) || command.width < 80 || command.width > 2400 || command.width === n.image.width)
+         return tree;
+       n.image.width = command.width;
+     }
+@@ -1118,9 +1118,9 @@ function ImageTopic({ id, assetId, aspectRatio, visible: visible2 }) {
+         className: "image-resize-handle nodrag nopan",
+         position: "bottom-right",
+         minWidth: 80,
+-        maxWidth: 1200,
++        maxWidth: 2400,
+         minHeight: 80 / aspectRatio,
+-        maxHeight: 1200 / aspectRatio,
++        maxHeight: 2400 / aspectRatio,
+         keepAspectRatio: true,
+         onResizeEnd: (_, params) => store.getState().execute({ type: "resizeImage", id, width: Math.round(params.width) })
+       }
+diff --git a/dist/index.js b/dist/index.js
+index 4303fe60d240cf47dcf7bcc788cbcf6c43d157e3..9f8afc865c6d2366d8970561714f5e1c28fcbf52 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -127,7 +127,7 @@ import { useStore } from "zustand";
+ var validImage = (image) => {
+   if (!image || typeof image !== "object") return false;
+   const value = image;
+-  return typeof value.assetId === "string" && value.assetId.trim().length > 0 && typeof value.width === "number" && Number.isFinite(value.width) && value.width >= 80 && value.width <= 1200 && typeof value.aspectRatio === "number" && Number.isFinite(value.aspectRatio) && value.aspectRatio > 0;
++  return typeof value.assetId === "string" && value.assetId.trim().length > 0 && typeof value.width === "number" && Number.isFinite(value.width) && value.width >= 80 && value.width <= 2400 && typeof value.aspectRatio === "number" && Number.isFinite(value.aspectRatio) && value.aspectRatio > 0;
+ };
+ function serializeDocument(tree) {
+   return { version: 2, tree: structuredClone(tree) };
+@@ -187,7 +187,7 @@ function applyCommand(tree, command) {
+       n.text = text;
+     }
+     if (command.type === "resizeImage") {
+-      if (n.kind !== "image" || !Number.isFinite(command.width) || command.width < 80 || command.width > 1200 || command.width === n.image.width)
++      if (n.kind !== "image" || !Number.isFinite(command.width) || command.width < 80 || command.width > 2400 || command.width === n.image.width)
+         return tree;
+       n.image.width = command.width;
+     }
+@@ -1111,9 +1111,9 @@ function ImageTopic({ id, assetId, aspectRatio, visible: visible2 }) {
+         className: "image-resize-handle nodrag nopan",
+         position: "bottom-right",
+         minWidth: 80,
+-        maxWidth: 1200,
++        maxWidth: 2400,
+         minHeight: 80 / aspectRatio,
+-        maxHeight: 1200 / aspectRatio,
++        maxHeight: 2400 / aspectRatio,
+         keepAspectRatio: true,
+         onResizeEnd: (_, params) => store.getState().execute({ type: "resizeImage", id, width: Math.round(params.width) })
+       }

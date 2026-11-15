@@ -1,0 +1,84 @@
+.answerText {
+  margin: 0 0 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.citations {
+  display: flex;
+  gap: 5px;
+  margin: 0 0 12px;
+}
+.citations button {
+  min-width: 25px;
+  height: 25px;
+  border: 0;
+  border-radius: 8px;
+  color: #536946;
+  background: #f0f4eb;
+  font-size: 10px;
+  cursor: pointer;
+}
+.facts {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 10px;
+  margin-top: 12px;
+  font-size: 11px;
+}
+.facts summary {
+  cursor: pointer;
+  color: #56694c;
+}
+.facts dl {
+  max-height: 230px;
+  overflow: auto;
+}
+.facts dl > div {
+  padding: 5px 0;
+  border-bottom: 1px solid #edf0e9;
+}
+.facts dt {
+  color: var(--muted-foreground);
+}
+.facts dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.evidenceDisclosure {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.evidenceDisclosure > summary {
+  width: fit-content;
+  cursor: pointer;
+  padding: 7px 0;
+}
+.evidenceDisclosure[open] > summary {
+  margin-bottom: 7px;
+}
+.revealAll {
+  color: var(--muted-foreground);
+  background: none;
+  border: 0;
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 12px;
+}
+.revealAll:hover {
+  color: var(--foreground);
+}
+.replyCursor {
+  display: inline-block;
+  width: 5px;
+  height: 1em;
+  margin-left: 4px;
+  border-radius: 2px;
+  background: var(--foreground);
+  vertical-align: -0.1em;
+}
+.revealAll:focus-visible,
+.evidenceDisclosure summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}

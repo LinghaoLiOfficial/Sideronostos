@@ -1,0 +1,48 @@
+.scene {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landscape,
+.atmosphere {
+  position: absolute;
+  inset: 0;
+}
+
+.landscapeVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.landscapePoster,
+.landscapeVideo {
+  object-fit: cover;
+  filter: var(--landscape-filter, none);
+}
+
+.landscapePoster { display: none; }
+
+.scene::after {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  background: linear-gradient(180deg, #0a130ed1, transparent 28%, transparent 87%, #0b170f99);
+  content: "";
+}
+
+.atmosphere { background: var(--layer-light, transparent); }
+
+.scene[data-layer="vegetation"] {
+  --landscape-filter: brightness(.78) saturate(.92);
+  --layer-light: radial-gradient(ellipse at 50% 84%, #94aa462a, transparent 65%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landscapeVideo { display: none; }
+  .landscapePoster { display: block; }
+}
