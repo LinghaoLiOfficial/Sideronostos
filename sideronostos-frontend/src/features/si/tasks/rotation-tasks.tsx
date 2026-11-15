@@ -80,16 +80,3 @@ function RunDetails(props: TaskProps & { run: AnyRotationRun; refresh: () => voi
     <TaskFeedback execution={execution} language={language} success={tr(language, "Your request has been confirmed. Open the result for its current state.", "请求已确认，打开结果可查看当前状态。")} linkLabel={tr(language, "Open result", "打开结果")} />
   </div>;
 }
-
-export function ComparePlans({ userId, language, scope }: TaskProps) {
-  const plans = useLoad(() => listAllPlans(userId));
-  const [choice, setChoice] = useDraft(`${scope}:compare`, { first: "", second: "" });
-  const first = plans.data?.items.find((plan) => plan.id === choice.first);
-  const second = plans.data?.items.find((plan) => plan.id === choice.second);
-  const comparable = first && second && first.id !== second.id;
-  return <div className="space-y-3"><LoadingState state={plans} language={language} />{plans.data && (plans.data.items.length < 2 ? <p>{tr(language, "Save two plans first, then compare their water use, crop choices and trade-offs.", "先保存两个计划，即可比较用水、作物和取舍。")}</p> : <>
-    <p className="text-xs text-muted-foreground">{tr(language, "Choose two saved plans. The comparison page will check whether their methods and scores can be compared.", "选择两个已保存计划，比较页面会检查计算方法和评分是否可比。")}</p>
-    {(["first", "second"] as const).map((key) => <Select key={key} label={tr(language, key === "first" ? "First plan" : "Second plan", key === "first" ? "第一个计划" : "第二个计划")} value={choice[key]} onChange={(e) => setChoice({ ...choice, [key]: e.target.value })}><option value="">{tr(language, "Choose a saved plan", "选择已保存计划")}</option>{plans.data?.items.map((plan) => <option disabled={plan.id === choice[key === "first" ? "second" : "first"]} key={plan.id} value={plan.id}>{plan.title} · {plan.created_at.slice(0, 10)}</option>)}</Select>)}
-    {comparable && <p role="status" className="rounded-lg bg-muted p-3">{tr(language, "The published comparison page is being prepared. Your selected plans remain saved.", "方案已保存；发布版比较页面仍在准备中。")}</p>}
-  </>)}</div>;
-}

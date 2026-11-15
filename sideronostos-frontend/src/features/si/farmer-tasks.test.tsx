@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FarmerTasks } from "./farmer-tasks";
 
@@ -8,15 +8,13 @@ const field = { id: "field-7", name: "North meadow", area_ha: 4, latitude: 35, l
   soil_texture: "loam", irrigation_available: true, profile_id: "demo", history: [], version: 3,
   created_at: "2026-01-01", updated_at: "2026-01-01" };
 const calls: { path: string; body: Record<string, unknown> }[] = [];
-let failWrite = false;
 let emptyFields = false;
 let actionFailure = false;
-let publishedLayers: { id: string; title: string; start: string; end: string; source: { product: string } }[] = [];
 const props = { conversationId: "chat", ensureConversation: async () => "chat", userId: "owner",
   botId: "field-guide", language: "en" as const, onAsk: vi.fn() };
 
 beforeEach(() => {
-  calls.length = 0; failWrite = false; emptyFields = false; actionFailure = false; publishedLayers = [];
+  calls.length = 0; emptyFields = false; actionFailure = false;
   vi.stubGlobal("fetch", vi.fn(async (url: URL | string, options?: RequestInit) => {
     const path = new URL(String(url)).pathname;
     const body = options?.body ? JSON.parse(String(options.body)) : {};
@@ -25,9 +23,7 @@ beforeEach(() => {
     if (path === "/field-shift/fields") data = { items: emptyFields ? [] : [field] };
     if (path === "/field-shift/profiles") data = { items: [{ id: "demo", name: "Crop example", is_demo: true, crops: [] }] };
     if (path === "/agri-data/selections") data = { id: "selection-2", revision: 3, geometry: body.geometry };
-    if (path === "/agri-data/layers") data = { items: publishedLayers };
     if (path.endsWith("/actions") && options?.method === "POST") {
-      if (failWrite) { failWrite = false; throw new TypeError("Network lost"); }
       data = { status: actionFailure ? "failed" : "succeeded", action: body.action, text: actionFailure ? "Please correct the inputs and try again." : "Confirmed by the server.", missing_fields: [], pending: null,
         result: body.action === "field.create" ? { id: "field-new", name: "East field" } : { value: 0, unit: "mm", limitations: ["Historical observations only."] },
         href: body.action === "field.create" ? "/field-shift?field=field-new&step=field" : "/si/field-management?selection=selection-2" };
@@ -35,20 +31,6 @@ beforeEach(() => {
     if (path === "/rotation-optimizer/runs") data = { items: [{ id: "run-1", status: "running", created_at: "2026-11-01T00:00:00Z", field_snapshots: [field], request: {}, result: null }] };
     return new Response(JSON.stringify(data), { status: 200, headers: { "Content-Type": "application/json" } });
   }));
-});
-
-it("only offers observation maps permitted for the water specialist", async () => {
-  publishedLayers = [
-    { id: "hls", title: "HLS vegetation", start: "2025-01-01", end: "2025-01-31", source: { product: "HLSL30" } },
-    { id: "smap", title: "SMAP moisture", start: "2025-01-01", end: "2025-01-31", source: { product: "SPL3SMP_E" } },
-    { id: "gpm", title: "GPM rain", start: "2025-01-01", end: "2025-01-31", source: { product: "GPM_3IMERGDF" } },
-  ];
-  render(<FarmerTasks {...props} botId="remote-water" />);
-  await userEvent.click(screen.getByRole("button", { name: "Explore observation maps" }));
-  const maps = await screen.findByLabelText("Observation map");
-  expect(within(maps).queryByRole("option", { name: /HLS vegetation/ })).not.toBeInTheDocument();
-  expect(within(maps).getByRole("option", { name: /SMAP moisture/ })).toBeInTheDocument();
-  expect(within(maps).getByRole("option", { name: /GPM rain/ })).toBeInTheDocument();
 });
 
 it("shows the confirmed failure reason while keeping the observation inputs", async () => {
@@ -63,35 +45,39 @@ it("shows the confirmed failure reason while keeping the observation inputs", as
 });
 afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
+it("opens field creation and saved planting plans in their published workspaces", () => {
+  render(<FarmerTasks {...props} />);
+  expect(screen.getByRole("link", { name: "Add a field" })).toHaveAttribute("href", "/si/fields?field=new&step=field");
+  expect(screen.getByRole("link", { name: "My planting plans" })).toHaveAttribute("href", "/si/fields?step=saved");
+  expect(screen.queryByRole("button", { name: "Add a field" })).not.toBeInTheDocument();
+});
+
+it("opens field editing and history in the same published field page", async () => {
+  render(<FarmerTasks {...props} />);
+  await userEvent.click(screen.getByRole("button", { name: "My fields" }));
+  expect(await screen.findByRole("link", { name: "Edit details" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
+  expect(screen.getByRole("link", { name: "Planting history" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
+});
+
+it("hides unfinished comparison and map actions", () => {
+  const rotation = render(<FarmerTasks {...props} botId="rotation-guide" />);
+  expect(screen.queryByRole("button", { name: "Compare saved plans" })).not.toBeInTheDocument();
+  rotation.unmount();
+  render(<FarmerTasks {...props} botId="remote-water" />);
+  expect(screen.queryByRole("button", { name: "Explore observation maps" })).not.toBeInTheDocument();
+});
+
+it("opens the local knowledge workspace instead of a second question form", () => {
+  render(<FarmerTasks {...props} botId="local-knowledge-guide" />);
+  expect(screen.getByRole("link", { name: "Ask about my area" })).toHaveAttribute("href", "/si/local-knowledge");
+  expect(screen.queryByRole("button", { name: "Ask about my area" })).not.toBeInTheDocument();
+});
+
 it("lets a farmer choose a saved field by name and opens its actual page", async () => {
   render(<FarmerTasks {...props} />);
   await userEvent.click(screen.getByRole("button", { name: "My fields" }));
   expect(await screen.findByRole("link", { name: "Open North meadow" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
   expect(screen.queryByText(/GET \/|POST \/|analysis_id/)).not.toBeInTheDocument();
-});
-
-it("preserves field input and retries an uncertain creation with the same key", async () => {
-  const user = userEvent.setup();
-  const view = render(<FarmerTasks {...props} />);
-  await user.click(screen.getByRole("button", { name: "Add a field" }));
-  await user.type(await screen.findByLabelText("Field name"), "East field");
-  await user.type(screen.getByLabelText("Area (ha)"), "2");
-  await user.type(screen.getByLabelText("Latitude"), "35");
-  await user.type(screen.getByLabelText("Longitude"), "-90");
-  await user.selectOptions(screen.getByLabelText("Crop settings"), "demo");
-  failWrite = true;
-  await user.click(screen.getByRole("button", { name: "Save field" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent(/confirm|connection/i);
-  expect(screen.queryByRole("link", { name: "Open saved field" })).not.toBeInTheDocument();
-  view.unmount();
-  render(<FarmerTasks {...props} />);
-  expect(await screen.findByLabelText("Field name")).toHaveValue("East field");
-  await user.click(screen.getByRole("button", { name: /Check again/ }));
-  expect(await screen.findByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/si/fields?field=field-new&step=field");
-  const writes = calls.filter((c) => c.body.action === "field.create");
-  expect(writes).toHaveLength(2);
-  expect(writes[0].body.idempotency_key).toBe(writes[1].body.idempotency_key);
-  expect(writes[1].body.arguments).toMatchObject({ name: "East field", area_ha: 2, latitude: 35, longitude: -90, profile_id: "demo" });
 });
 
 it.each([
@@ -148,52 +134,6 @@ it("keeps the new-plan link out of a calculation's save form", async () => {
   expect(screen.queryByRole("link", { name: "Start a new plan" })).not.toBeInTheDocument();
 });
 
-it("asks local knowledge with the farmer's region and crop, without implying live prices", async () => {
-  const user = userEvent.setup();
-  render(<FarmerTasks {...props} botId="local-knowledge-guide" />);
-  await user.click(screen.getByRole("button", { name: "Ask about my area" }));
-  await user.type(screen.getByLabelText("Region or nearest town"), "Nakuru, Kenya");
-  await user.type(screen.getByLabelText("Crop"), "Maize");
-  await user.type(screen.getByLabelText("Your question"), "Which planting dates should I consider?");
-  await user.click(screen.getByRole("button", { name: "Ask local knowledge" }));
-  await waitFor(() => expect(props.onAsk).toHaveBeenCalledWith(expect.stringContaining("Nakuru, Kenya")));
-  expect(props.onAsk.mock.calls[0][0]).toContain("Maize");
-  expect(screen.queryByText("Task completed")).not.toBeInTheDocument();
-});
-
-it("edits the selected owned field with its version and preserves its planting history", async () => {
-  const base = fetch;
-  const writes: Record<string, unknown>[] = [];
-  const history = [{ year: 2025, crop_id: "maize" }];
-  let savedField = { ...field, history };
-  vi.stubGlobal("fetch", async (url: URL | string, init?: RequestInit) => {
-    const path = new URL(String(url)).pathname;
-    if (path === "/field-shift/fields") return Response.json({ items: [savedField] });
-    if (path.endsWith("/operations") && init?.method === "POST") {
-      writes.push(JSON.parse(String(init.body)));
-      savedField = { ...savedField, area_ha: 5, version: savedField.version + 1 };
-      return Response.json({ status: "succeeded", operation_id: "edit", text: "Saved", result: savedField, href: "/field-shift?field=field-7&step=field" });
-    }
-    if (path.endsWith("/operations")) return Response.json({ items: [{ operation_id: "edit", method: "PATCH", path: "/field-shift/fields/{field_id}" }] });
-    return base(url, init);
-  });
-  const user = userEvent.setup();
-  render(<FarmerTasks {...props} />);
-  await user.click(screen.getByRole("button", { name: "My fields" }));
-  await user.click(await screen.findByRole("button", { name: "Edit details" }));
-  const area = await screen.findByLabelText("Area (ha)");
-  await user.clear(area); await user.type(area, "5");
-  await user.click(screen.getByRole("button", { name: "Save changes" }));
-  expect(await screen.findByRole("link", { name: "Open saved field" })).toHaveAttribute("href", "/si/fields?field=field-7&step=field");
-  expect(writes[0]).toMatchObject({ path_params: { field_id: "field-7" }, body: { area_ha: 5, expected_version: 3, history } });
-  await user.click(screen.getByRole("button", { name: "Back to my fields" }));
-  await user.click(await screen.findByRole("button", { name: "Edit details" }));
-  expect(await screen.findByLabelText("Area (ha)")).toHaveValue(5);
-  await user.click(screen.getByRole("button", { name: "Save changes" }));
-  await waitFor(() => expect(writes).toHaveLength(2));
-  expect(writes[1]).toMatchObject({ body: { expected_version: 4 } });
-});
-
 it("requires an explicit stop confirmation and never presents an accepted cancellation as completion", async () => {
   const base = fetch;
   let writes = 0;
@@ -220,28 +160,4 @@ it("requires an explicit stop confirmation and never presents an accepted cancel
   expect(writes).toBe(1);
   expect(screen.getByText(/Stopping this calculation/)).toBeInTheDocument();
   expect(screen.queryByText("Task completed")).not.toBeInTheDocument();
-});
-
-it("keeps local input for retry after a send failure", async () => {
-  const user = userEvent.setup();
-  const onAsk = vi.fn().mockRejectedValue(new Error("offline"));
-  render(<FarmerTasks {...props} botId="local-knowledge-guide" onAsk={onAsk} />);
-  await user.click(screen.getByRole("button", { name: "Ask about my area" }));
-  await user.type(screen.getByLabelText("Region or nearest town"), "Nakuru");
-  await user.type(screen.getByLabelText("Crop"), "Maize");
-  await user.type(screen.getByLabelText("Your question"), "Which local sources are available?");
-  await user.click(screen.getByRole("button", { name: "Ask local knowledge" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent("Your input is kept");
-  expect(screen.getByLabelText("Region or nearest town")).toHaveValue("Nakuru");
-});
-
-it("isolates unfinished forms by account and conversation", async () => {
-  const user = userEvent.setup();
-  const first = render(<FarmerTasks {...props} />);
-  await user.click(screen.getByRole("button", { name: "Add a field" }));
-  await user.type(await screen.findByLabelText("Field name"), "Private field draft");
-  first.unmount();
-  render(<FarmerTasks {...props} userId="another-owner" />);
-  await user.click(screen.getByRole("button", { name: "Add a field" }));
-  expect(await screen.findByLabelText("Field name")).toHaveValue("");
 });
