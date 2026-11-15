@@ -272,14 +272,12 @@ it("shows sign-in instead of loading private history when unauthenticated", asyn
   expect(api.listConversations).not.toHaveBeenCalled();
 });
 
-it("expands the cluster and preserves localized accessible controls", () => {
+it("keeps the cluster stable on hover and expands only on the explicit control", () => {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })));
   const { container, rerender } = render(<MultiBotDock module="remote-sensing" locale="en" />);
   const dock = container.querySelector("[data-multi-bot-dock]")!;
   const cluster = container.querySelector("[data-bot-cluster]")!;
   fireEvent.pointerEnter(cluster, { pointerType: "mouse" });
-  expect(dock).toHaveAttribute("data-expanded", "true");
-  fireEvent.pointerLeave(cluster, { pointerType: "mouse" });
   expect(dock).toHaveAttribute("data-expanded", "false");
   fireEvent.click(screen.getByRole("button", { name: "3 specialists. Expand" }));
   expect(screen.getByText("Water")).toHaveAttribute("aria-hidden", "false");

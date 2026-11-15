@@ -81,10 +81,11 @@
 .avatars {
   display: flex;
   align-items: center;
+  gap: 4px;
   min-width: 0;
   max-width: min(70vw, 600px);
   overflow-x: auto;
-  padding: 4px 1px 4px 17px;
+  padding: 4px 1px;
   scrollbar-width: none;
 }
 .avatars::-webkit-scrollbar { display: none; }
@@ -95,16 +96,14 @@
   flex: none;
   width: 49px;
   height: 49px;
-  margin-left: -25px;
+  margin-left: 0;
   padding: 3px;
   border: 1px solid transparent;
   border-radius: 17px;
   background: transparent;
   cursor: pointer;
-  transition: transform 180ms ease, margin-left 180ms ease, width 180ms ease, height 180ms ease;
+  transition: transform 180ms ease, width 180ms ease, height 180ms ease;
 }
-.botButton:first-child { margin-left: 0; }
-.root[data-expanded="true"] .botButton + .botButton { margin-left: 4px; }
 .root[data-expanded="true"] .botButton { width: 74px; height: 68px; align-content: start; border-color: #ffffff18; background: #ffffff0a; }
 .botButton:hover, .botButton:focus-visible { transform: translateY(-2px); border-color: var(--si-divider, #77846b66); background: #ffffff12; z-index: 2; }
 .botButton :global(span[data-avatar]) { width: 39px; height: 38px; box-shadow: none; }

@@ -79,9 +79,6 @@ export function MultiBotDock({ module, locale: localeOverride }: { module: SiBot
         data-bot-cluster
         style={{ "--dock-right": `${position.right}px`, "--dock-bottom": `${position.bottom}px` } as CSSProperties}
         hidden={selected !== null}
-        onPointerEnter={(event) => {
-          if (event.pointerType === "mouse" && window.matchMedia?.("(hover: hover) and (pointer: fine)").matches) setExpanded(true);
-        }}
         onPointerLeave={(event) => {
           if (!event.currentTarget.contains(document.activeElement)) setExpanded(false);
         }}
