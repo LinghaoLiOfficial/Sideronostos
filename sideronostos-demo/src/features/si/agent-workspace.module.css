@@ -2,6 +2,25 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+.assistantPanel {
+  background: rgb(11 18 15 / 82%);
+}
+
+@media (max-width: 63.99rem) {
+  .assistantPanel {
+    background: rgb(11 18 15 / 94%);
+  }
+}
+
+.photoWorkspace .conversationPanel {
+  background: transparent;
+  color: var(--si-light);
+}
+
+:global(.si-theme) .photoWorkspace .composerSurface {
+  background: var(--si-cream);
+}
+
 @media (min-width: 64rem) {
   .workspace {
     grid-template-columns: minmax(20rem, min(var(--assistant-panel-width, 28vw), 40rem, calc(100% - 24.75rem))) 0.75rem minmax(0, 1fr);

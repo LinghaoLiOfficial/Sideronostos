@@ -352,6 +352,13 @@ html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover, .si-language-popo
 }
 .si-multi-agent-shell { display: flex; height: 100dvh; min-height: 0; flex-direction: column; overflow: hidden; }
 .si-multi-agent-shell > .landing-header { flex: 0 0 72px; }
+.si-agent-photo-backdrop {
+  background-color: var(--si-ink);
+  background-image: linear-gradient(rgb(0 0 0 / 50%), rgb(0 0 0 / 50%)), url("/images/si/rotation-overview-poster.webp");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
 .si-header {
   position: fixed;
   z-index: 40;

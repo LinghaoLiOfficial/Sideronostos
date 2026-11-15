@@ -23,7 +23,7 @@ export default function SiLayout({ children }: { children: ReactNode }) {
 
   if (pathname === "/si/fields") return <div className="si-theme">{children}</div>;
 
-  if (localModuleRoutes.has(pathname)) return <div className="si-theme"><SiShell>{children}</SiShell></div>;
+  if (localModuleRoutes.has(pathname) || pathname.startsWith("/si/multi-agent/")) return <div className="si-theme"><SiShell>{children}</SiShell></div>;
 
   return (
     <div className="si-theme">

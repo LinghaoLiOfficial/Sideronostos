@@ -77,7 +77,7 @@ export default function AgentResultPage() {
   const facts = factRows(data);
   const factCount = Array.isArray(data?.facts) ? data.facts.filter((fact) => !!fact && typeof fact === "object" && !Array.isArray(fact)).length : 0;
   const title = facts ? "Published observations for your selected area" : result?.title;
-  return <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-8">
+  return <main className="si-agent-photo-backdrop min-h-screen px-4 py-8 text-white sm:px-8">
     <div className="mx-auto max-w-4xl">
       <Link href={conversation ? `/si/multi-agent?conversation=${encodeURIComponent(conversation)}` : "/si/multi-agent"} className="text-sm text-primary underline">← Back to farm assistant</Link>
       <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-primary">Farm task result</p>
@@ -85,9 +85,9 @@ export default function AgentResultPage() {
       {failed && <div className="mt-6 space-y-3"><p role="alert">This result is unavailable for your account.</p>{hasConversation && workflowId && <button type="button" className="min-h-10 rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary" onClick={() => { setFailed(false); setLoading(true); setAttempt((value) => value + 1); }}>Retry</button>}</div>}
       {result && <div data-testid="result-ready" className="mt-2">
       <h1 className="text-3xl font-semibold">{title}</h1>
-      <section className="mt-6 rounded-xl border border-border bg-card p-5">
+      <section className="si-cream-surface mt-6 rounded-xl border border-border bg-card p-5">
         <p className="text-sm text-muted-foreground">{result.status === "completed" ? "Task complete" : `Status: ${result.status}`}</p>
-        {href && <Link href={href} className="mt-3 inline-block font-semibold text-primary underline">Open original module page ↗</Link>}
+        {href && <Link href={href} className="mt-3 inline-block font-semibold text-foreground underline">Open original module page ↗</Link>}
         {Array.isArray(data?.items) && <p className="mt-4 font-medium">{data.items.length} records returned{data.items.length > 8 && " · showing first 8"}</p>}
         {facts && <>
           <p className="mt-4 font-medium">{factCount} published observations{factCount > facts.length && ` · showing first ${facts.length}`}</p>
