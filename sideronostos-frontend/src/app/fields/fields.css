@@ -3,6 +3,18 @@
   --fields-map-control-text: #151711;
 }
 
+.fields-app-embedded,
+.si-fields-workspace-loading {
+  height: calc(100dvh - 72px);
+}
+
+@media (max-width: 900px) {
+  .fields-app-embedded,
+  .si-fields-workspace-loading {
+    height: calc(100dvh - 56px);
+  }
+}
+
 .fields-app .maplibregl-map {
   font-family: var(--font-sans), sans-serif;
 }
@@ -32,7 +44,7 @@
 }
 
 .fields-app .maplibregl-ctrl-top-right {
-  top: 52px;
+  top: 0;
 }
 
 .fields-app input[type="range"] {

@@ -45,6 +45,13 @@ describe("owner-scoped workspace storage", () => {
     expect(workspace.fields.every((field) => field.properties.farmId === farm.properties.id)).toBe(true)
   })
 
+  it("keeps owner-scoped workspace usable without deleting the legacy archive", async () => {
+    const storage = await import("@/features/fields/storage")
+    const { farm, fields } = createDemoFarm()
+    await storage.replaceStoredWorkspace([farm], fields)
+    await expect(storage.getStoredWorkspace()).resolves.toMatchObject({ farms: [farm], fields })
+  })
+
   it("deletes a farm, its fields, and field observations in one operation", async () => {
     const storage = await import("@/features/fields/storage")
     const first = createDemoFarm()

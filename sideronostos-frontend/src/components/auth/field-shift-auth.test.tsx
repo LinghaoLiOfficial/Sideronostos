@@ -42,6 +42,7 @@ describe("Field Shift account entry", () => {
     for (const next of ["https://evil.test", "//evil.test", "/\\evil.test", "/%5Cevil.test", "/%2Fevil.test", "/field-shift\n"]) expect(safeNextPath(next)).toBe("/workspace/files");
     expect(registrationNextPath("/personal/account")).toBe("/personal/account");
     expect(registrationNextPath("/unrelated-route")).toBe("/workspace/files");
+    expect(registrationNextPath("/si/field-management")).toBe("/si/field-management");
   });
   it("matches the verification backend's return-path rules without removing safe query and hash values", () => {
     for (const next of ["/workspace/../field-shift", "/field-shift/./plan", "/field-shift/%70lan", "/field-shift/%2e%2e/personal", `/field-shift?x=${"a".repeat(2048)}`]) expect(registrationNextPath(next)).toBe("/workspace/files");

@@ -9,7 +9,7 @@ import * as fieldsApi from "@/lib/api/field-shift";
 import * as api from "@/lib/api/rotation";
 import { isDailyRun } from "@/lib/api/daily-types";
 import type { Field } from "@/lib/api/field-shift-types";
-import type { NasaDataRelease, RotationInput, RotationPreflightInput, RotationWeights, RunV2 } from "@/lib/api/rotation-types";
+import type { NasaDataRelease, RotationInput, RotationPreflightInput, RunV2 } from "@/lib/api/rotation-types";
 import { errorMessage } from "../field-shift/model";
 import { allOptions, RunResults } from "./results";
 import { NasaReleaseMap } from "./nasa-release-map";
@@ -17,12 +17,6 @@ import styles from "./nasa-rotation.module.css";
 
 type Horizon = "1y" | "2y" | "3y";
 type ResourcePreset = "dryland" | "irrigated";
-const WEIGHT_LABELS: Record<keyof RotationWeights, string> = {
-  cover: "土地覆盖",
-  diversity: "科属多样性",
-  water: "节水",
-  cost: "降低成本",
-};
 const within = (field: Field, release: NasaDataRelease) => {
   const [west, south, east, north] = release.bounds;
   const points: [number, number][] = [[field.longitude, field.latitude]];
@@ -53,8 +47,7 @@ export function NasaRotationWorkspace() {
   const [historyReviewed, setHistoryReviewed] = useState<Record<string, boolean>>({});
   const [geometryConfirmed, setGeometryConfirmed] = useState<Record<string, boolean>>({});
   const [cropSelection, setCropSelection] = useState<string[] | null>(null);
-  const [windows, setWindows] = useState<Record<string, [string, string]>>({});
-  const [weights, setWeights] = useState<RotationWeights>({ cover: 2, diversity: 1, water: 1, cost: .5 });
+  const weights = null;
   const [scenario, setScenario] = useState({ temperature_change_c: 0, rainfall_change_pct: 0 });
   const [preset, setPreset] = useState<ResourcePreset>("irrigated");
   const [requireCrop, setRequireCrop] = useState(true);
@@ -102,7 +95,7 @@ export function NasaRotationWorkspace() {
     if (!release || !profile || !chosen.length || !selectedCrops.length) return null;
     const start = release.start.slice(0, 4) + "-01-01";
     return {
-      profile_id: profile.id,
+      profile_id: profile.id, profile_version_id: profile.profile_version_id, profile_sha256: profile.sha256,
       fields: chosen.map((field) => ({
         id: field.id,
         expected_version: field.version,
@@ -111,14 +104,15 @@ export function NasaRotationWorkspace() {
       start,
       end: `${Number(start.slice(0, 4)) + Number(horizon[0]) - 1}-12-31`,
       allowed_crop_ids: selectedCrops,
-      sow_windows: Object.fromEntries(
-        Object.entries(windows).filter(([id]) => selectedCrops.includes(id)),
-      ),
+      sow_windows: Object.fromEntries(selectedCrops.map((id) => {
+        const crop = profile.crops.find((item) => item.id === id)!;
+        return [id, [crop.sow_start_mmdd, crop.sow_end_mmdd]];
+      })),
       scenario,
       data_release_id: release.id,
       horizon_mode: horizon,
     };
-  }, [chosen, horizon, profile, release, requireCrop, scenario, selectedCrops, windows]);
+  }, [chosen, horizon, profile, release, requireCrop, scenario, selectedCrops]);
   const preflightKey = preflightInput ? JSON.stringify(preflightInput) : "";
   useEffect(() => {
     const timer = window.setTimeout(
@@ -191,17 +185,19 @@ export function NasaRotationWorkspace() {
     if (!chosen.length) return setError("请至少选择一个位于 NASA 快照覆盖区内的地块。");
     if (chosen.some((field) => !historyReviewed[field.id] || !geometryConfirmed[field.id])) return setError("请逐块确认边界和前茬历史。");
     if (!selectedCrops.length) return setError("请至少选择一种候选作物。");
-    if (!Object.values(weights).some((value) => value > 0)) return setError("至少一个目标权重必须大于 0。");
     if (!accepted) return setError("请确认历史回测和 benchmark 假设后再运行。");
     if (!capacityReady) return setError("请等待候选容量评估完成。");
     if (!preflight.data.within_capacity) return setError("当前候选规模超过服务器容量，请按容量诊断收窄配置。");
     const start = release.start.slice(0, 4) + "-01-01";
     const end = `${Number(start.slice(0, 4)) + Number(horizon[0]) - 1}-12-31`;
     const request: RotationInput = {
-      idempotency_key: crypto.randomUUID(), profile_id: profile.id,
+      idempotency_key: crypto.randomUUID(), profile_id: profile.id, profile_version_id: profile.profile_version_id, profile_sha256: profile.sha256,
       fields: chosen.map((field) => ({ id: field.id, expected_version: field.version, require_crop: requireCrop, history_reviewed: true })),
       start, end, allowed_crop_ids: selectedCrops,
-      sow_windows: Object.fromEntries(Object.entries(windows).filter(([id]) => selectedCrops.includes(id))),
+      sow_windows: Object.fromEntries(selectedCrops.map((id) => {
+        const crop = profile.crops.find((item) => item.id === id)!;
+        return [id, [crop.sow_start_mmdd, crop.sow_end_mmdd]];
+      })),
       farm_limits: limits, field_limits: fieldLimits, weights, scenario, baseline: [],
       accept_benchmark_assumptions: true, data_release_id: release.id, horizon_mode: horizon,
       max_options: maxOptions, solver_time_limit_seconds: solverSeconds,
@@ -219,7 +215,7 @@ export function NasaRotationWorkspace() {
     <div className={styles.main}>
       {release ? <section className={styles.releaseBar}>
         <div><h1>NASA 历史轮作回测</h1><p>工程 benchmark，不是未来天气预报或种植处方。</p></div>
-        <dl><dt>数据 release</dt><dd>{release.id}</dd></dl><dl><dt>时间覆盖</dt><dd>{release.start} — {release.end}</dd></dl><dl><dt>完整日数</dt><dd>{release.complete_days} / {release.expected_days}</dd></dl><dl><dt>校验值</dt><dd>{release.manifest_sha256.slice(0, 12)}…</dd></dl>
+        <dl><dt>数据 release</dt><dd>{release.id}</dd></dl><dl><dt>知识版本</dt><dd>{profile?.revision ? `v${profile.revision}` : "不可用"}</dd></dl><dl><dt>时间覆盖</dt><dd>{release.start} — {release.end}</dd></dl><dl><dt>完整日数</dt><dd>{release.complete_days} / {release.expected_days}</dd></dl><dl><dt>校验值</dt><dd>{profile?.sha256.slice(0, 12) ?? release.manifest_sha256.slice(0, 12)}…</dd></dl>
       </section> : <p className={styles.error}>尚未发布可用于轮作的 NASA release。请先运行离线发布命令。</p>}
       <div className={styles.layout}>
         <form className={styles.config} onSubmit={submit}>
@@ -234,23 +230,24 @@ export function NasaRotationWorkspace() {
             <div className={styles.actions}><button type="button" onClick={() => void createSyntheticFields()} disabled={!fieldProfile || creatingSynthetic}>{creatingSynthetic ? "正在准备…" : "恢复默认测试地块"}</button><Link className={styles.primary} href="/field-shift">创建或编辑地块</Link></div>
             <p className={styles.notice}>页面默认选中 4 个约 32 ha 的合成 Iowa benchmark 地块，并完成测试数据确认；它们仅用于工程测试，不是真实地籍、权属或经营边界。用户仍可取消选择或改用自己的覆盖区内地块。</p>
           </section>
-          <section className={styles.section}><h2><Sprout size={16}/> 候选作物与农艺参数</h2>
-            {profile?.crops.map((crop) => <div className={styles.crop} key={crop.id}><label className={styles.check}><input type="checkbox" checked={selectedCrops.includes(crop.id)} onChange={(e) => setCropSelection(e.target.checked ? [...selectedCrops, crop.id] : selectedCrops.filter((id) => id !== crop.id))}/><span><strong>{crop.name}</strong><span className={styles.meta}>{crop.family} · GDD {crop.gdd_required} · {crop.sow_start_mmdd}—{crop.sow_end_mmdd}</span></span></label>{selectedCrops.includes(crop.id) && <div className={styles.grid2}><label>最早播种<input type="text" value={windows[crop.id]?.[0] ?? crop.sow_start_mmdd} onChange={(e) => setWindows({...windows, [crop.id]: [e.target.value, windows[crop.id]?.[1] ?? crop.sow_end_mmdd]})}/></label><label>最晚播种<input type="text" value={windows[crop.id]?.[1] ?? crop.sow_end_mmdd} onChange={(e) => setWindows({...windows, [crop.id]: [windows[crop.id]?.[0] ?? crop.sow_start_mmdd, e.target.value]})}/></label></div>}<div className={styles.chips}><span className={styles.chip}>基温 {crop.base_c}°C</span><span className={styles.chip}>上限 {crop.upper_c}°C</span><span className={styles.chip}>最长 {crop.max_growing_days} 天</span><span className={styles.chip}>Kc {crop.kc.join("/")}</span><span className={styles.chip}>${crop.cost_usd_ha}/ha</span><span className={styles.chip}>{crop.labor_days_ha} 人日/ha</span></div></div>)}
+          <section className={styles.section}><h2><Sprout size={16}/> 候选作物（本地知识库）</h2>
+            <p className={styles.notice}>播期、GDD、Kc、生育阶段、成本和劳力参数由当前发布的本地农业知识版本提供。修改请前往 <Link href="/si/local-knowledge">本地农业知识库</Link>。</p>
+            {profile?.crops.map((crop) => <div className={styles.crop} key={crop.id}><label className={styles.check}><input type="checkbox" checked={selectedCrops.includes(crop.id)} onChange={(e) => setCropSelection(e.target.checked ? [...selectedCrops, crop.id] : selectedCrops.filter((id) => id !== crop.id))}/><span><strong>{crop.name}</strong><span className={styles.meta}>{crop.family} · GDD {crop.gdd_required} · 播期 {crop.sow_start_mmdd}—{crop.sow_end_mmdd}</span></span></label><div className={styles.chips}><span className={styles.chip}>基温 {crop.base_c}°C</span><span className={styles.chip}>上限 {crop.upper_c}°C</span><span className={styles.chip}>最长 {crop.max_growing_days} 天</span><span className={styles.chip}>Kc {crop.kc.join("/")}</span><span className={styles.chip}>${crop.cost_usd_ha}/ha</span><span className={styles.chip}>{crop.labor_days_ha} 人日/ha</span></div></div>)}
           </section>
           <section className={styles.section}><h2><Settings2 size={16}/> 资源、约束与目标</h2>
             <div className={styles.grid2}><label>资源预设<select value={preset} onChange={(e) => setPreset(e.target.value as ResourcePreset)}><option value="irrigated">灌溉 benchmark（300 mm）</option><option value="dryland">旱作 benchmark（补水上限 0）</option></select></label><label>种植要求<select value={String(requireCrop)} onChange={(e) => setRequireCrop(e.target.value === "true")}><option value="true">每块地至少一季</option><option value="false">允许全期休耕</option></select></label></div>
             {years.map((year) => <div className={styles.grid3} key={year}><label>{year} 水量 m³<input type="number" min={0} value={limits[year]?.water_m3 ?? 0} onChange={(e) => setLimitOverrides({...limitOverrides, [year]: {...limits[year], water_m3: Number(e.target.value)}})}/></label><label>{year} 成本 USD<input type="number" min={0} value={limits[year]?.cost_usd ?? 0} onChange={(e) => setLimitOverrides({...limitOverrides, [year]: {...limits[year], cost_usd: Number(e.target.value)}})}/></label><label>{year} 劳力 人日<input type="number" min={0} value={limits[year]?.labor_days ?? 0} onChange={(e) => setLimitOverrides({...limitOverrides, [year]: {...limits[year], labor_days: Number(e.target.value)}})}/></label></div>)}
             {chosen.length > 0 && <details><summary>地块年度资源上限</summary>{chosen.map((field) => <div className={styles.field} key={field.id}><strong>{field.name}</strong><span className={styles.meta}>{field.area_ha} ha · {field.irrigation_available ? "可灌溉" : "无灌溉设施，默认补水为 0"}</span>{years.map((year) => { const value = fieldLimits[field.id][year]; return <div className={styles.grid3} key={year}><label>{year} 水量 m³<input type="number" min={0} value={value.water_m3} onChange={(e) => setFieldLimitOverrides({...fieldLimitOverrides, [field.id]: {...fieldLimitOverrides[field.id], [year]: {...value, water_m3: Number(e.target.value)}}})}/></label><label>{year} 成本 USD<input type="number" min={0} value={value.cost_usd} onChange={(e) => setFieldLimitOverrides({...fieldLimitOverrides, [field.id]: {...fieldLimitOverrides[field.id], [year]: {...value, cost_usd: Number(e.target.value)}}})}/></label><label>{year} 劳力 人日<input type="number" min={0} value={value.labor_days} onChange={(e) => setFieldLimitOverrides({...fieldLimitOverrides, [field.id]: {...fieldLimitOverrides[field.id], [year]: {...value, labor_days: Number(e.target.value)}}})}/></label></div>})}</div>)}</details>}
-            <label className={styles.check}><input type="checkbox" checked={advanced} onChange={(e) => setAdvanced(e.target.checked)}/>展开高级目标与天气情景</label>
-            {advanced && <><h3>目标权重（0–5）</h3><div className={styles.grid2}>{(Object.keys(WEIGHT_LABELS) as (keyof RotationWeights)[]).map((key) => <label key={key}>{WEIGHT_LABELS[key]}<input type="number" min={0} max={5} step=".5" value={weights[key]} onChange={(e) => setWeights({...weights, [key]: Number(e.target.value)})}/></label>)}</div><h3>历史天气敏感性情景</h3><div className={styles.grid2}><label>温度变化 °C<input type="number" min={-3} max={5} step=".1" value={scenario.temperature_change_c} onChange={(e) => setScenario({...scenario, temperature_change_c: Number(e.target.value)})}/></label><label>降雨变化 %<input type="number" min={-50} max={50} step="1" value={scenario.rainfall_change_pct} onChange={(e) => setScenario({...scenario, rainfall_change_pct: Number(e.target.value)})}/></label></div><p>硬约束：时间不重叠、换茬占用、同科间隔、前茬历史、灌溉可用性和年度资源容量。土壤养分、市场价格与设备能力当前未建模。</p></>}
+            <label className={styles.check}><input type="checkbox" checked={advanced} onChange={(e) => setAdvanced(e.target.checked)}/>展开天气情景</label>
+            {advanced && <><h3>历史天气敏感性情景</h3><div className={styles.grid2}><label>温度变化 °C<input type="number" min={-3} max={5} step=".1" value={scenario.temperature_change_c} onChange={(e) => setScenario({...scenario, temperature_change_c: Number(e.target.value)})}/></label><label>降雨变化 %<input type="number" min={-50} max={50} step="1" value={scenario.rainfall_change_pct} onChange={(e) => setScenario({...scenario, rainfall_change_pct: Number(e.target.value)})}/></label></div><p>硬约束：时间不重叠、换茬占用、同科间隔、前茬历史、灌溉可用性和年度资源容量。农艺规则由本地农业知识库维护。</p></>}
           </section>
-          <section className={styles.section}><h2><FlaskConical size={16}/> 提交确认</h2><div className={styles.capacity} aria-live="polite"><h3>候选容量预检</h3>{!preflightCurrent || preflight.isFetching ? <p>正在评估容量…</p> : preflight.error ? <p className={styles.error}>容量评估失败：{errorMessage(preflight.error)}</p> : preflight.data ? <><dl className={styles.summary}><div><dt>播种采样</dt><dd>{preflight.data.sampling_step_days} 天</dd></div><div><dt>预计候选</dt><dd>{preflight.data.candidate_count_truncated ? ">" : ""}{preflight.data.candidate_count.toLocaleString()} / {preflight.data.limits.max_candidates.toLocaleString()}</dd></div><div><dt>预计连接边</dt><dd>{preflight.data.transition_edge_count === null ? "未评估" : `${preflight.data.transition_edge_count_truncated ? ">" : ""}${preflight.data.transition_edge_count.toLocaleString()} / ${preflight.data.limits.max_transition_edges.toLocaleString()}`}</dd></div></dl><p className={preflight.data.within_capacity ? styles.capacityOk : styles.capacityBad}>{preflight.data.within_capacity ? "容量状态：可运行" : "容量状态：超出限制"}</p>{preflight.data.violations.map((violation) => <p className={styles.capacityReason} key={violation.dimension}>{violation.dimension === "candidates" ? `候选维度膨胀：${violation.factors.field_count} 个地块 × ${violation.factors.crop_count} 种作物 × ${violation.factors.year_count} 年，采样步长 ${violation.factors.sampling_step_days} 天。请减少地块、作物或年份，或收窄播种窗口。` : "连接边维度膨胀：同一地块内可衔接季次组合过多。请收窄播种窗口，或减少作物、地块或规划年份。"}</p>)}</> : <p>请选择地块和作物以评估容量。</p>}</div><label className={styles.check}><input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>我理解这是使用历史 NASA 数据和行业 benchmark 的工程回测，不是未来天气预测、收益承诺或种植处方。</label>{error && <p className={styles.error} role="alert">{error}</p>}<div className={styles.actions}><button className={styles.primary} disabled={submitting || creatingSynthetic || !release || !capacityReady || !preflight.data?.within_capacity}>{creatingSynthetic ? "正在准备测试地块…" : submitting ? "正在提交…" : "运行 Gurobi 回测"}</button></div></section>
+          <section className={styles.section}><h2><FlaskConical size={16}/> 提交确认</h2><div className={styles.capacity} aria-live="polite"><h3>候选与求解器容量预检</h3>{!preflightCurrent || preflight.isFetching ? <p>正在评估容量…</p> : preflight.error ? <p className={styles.error}>容量评估失败：{errorMessage(preflight.error)}</p> : preflight.data ? <><dl className={styles.capacityGrid}><div><dt>播种采样</dt><dd>{preflight.data.sampling_step_days} 天</dd></div><div><dt>预计候选</dt><dd>{preflight.data.candidate_count_truncated ? ">" : ""}{preflight.data.candidate_count.toLocaleString()} / {preflight.data.limits.max_candidates.toLocaleString()}</dd></div><div><dt>兼容连接关系</dt><dd>{preflight.data.transition_edge_count === null ? "未评估" : `${preflight.data.transition_edge_count_truncated ? ">" : ""}${preflight.data.transition_edge_count.toLocaleString()}`}</dd></div><div><dt>模型形式</dt><dd>{preflight.data.formulation === "annual-layered-state-v1" ? "年度分层模型" : "通用连接图模型"}</dd></div><div><dt>预计变量</dt><dd>{preflight.data.estimated_variable_count.toLocaleString()} / {preflight.data.limits.max_solver_variables.toLocaleString()}</dd></div><div><dt>预计约束</dt><dd>{preflight.data.estimated_constraint_count.toLocaleString()} / {preflight.data.limits.max_solver_constraints.toLocaleString()}</dd></div></dl><p className={styles.capacityMeta}>求解器容量模式：{preflight.data.solver_capacity_mode === "restricted" ? "Gurobi Restricted License" : "Unrestricted"}。年度分层模型保留全部候选，但不为每条兼容关系创建变量。</p><p className={preflight.data.within_capacity ? styles.capacityOk : styles.capacityBad}>{preflight.data.within_capacity ? "容量状态：可运行" : "容量状态：超出限制"}</p>{preflight.data.violations.map((violation) => <p className={styles.capacityReason} key={violation.dimension}>{violation.dimension === "candidates" ? `候选维度膨胀：${violation.factors.field_count} 个地块 × ${violation.factors.crop_count} 种作物 × ${violation.factors.year_count} 年，采样步长 ${violation.factors.sampling_step_days} 天。请减少地块、作物或年份，或收窄播种窗口。` : violation.dimension === "transition_edges" ? "连接关系过多：同一地块内可衔接季次组合超过应用容量。请收窄播种窗口，或减少作物、地块或规划年份。" : violation.dimension === "solver_variables" ? "求解器变量数超过 Restricted License 容量。当前配置无法提交，请缩小规划范围。" : "求解器约束数超过 Restricted License 容量。当前配置无法提交，请缩小规划范围。"}</p>)}</> : <p>请选择地块和作物以评估容量。</p>}</div><label className={styles.check}><input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>我理解这是使用历史 NASA 数据和行业 benchmark 的工程回测，不是未来天气预测、收益承诺或种植处方。</label>{error && <p className={styles.error} role="alert">{error}</p>}<div className={styles.actions}><button className={styles.primary} disabled={submitting || creatingSynthetic || !release || !capacityReady || !preflight.data?.within_capacity}>{creatingSynthetic ? "正在准备测试地块…" : submitting ? "正在提交…" : "运行 Gurobi 回测"}</button></div></section>
         </form>
         <div className={styles.results}>
           {release && <NasaReleaseMap key={release.id} release={release} fields={chosen.length ? chosen : eligibleFields} />}
           <section className={styles.section}><h2><BarChart3 size={16}/> 运行摘要</h2><dl className={styles.summary}><div><dt>地块</dt><dd>{chosen.length}</dd></div><div><dt>总面积</dt><dd>{totalArea.toFixed(1)} ha</dd></div><div><dt>候选作物</dt><dd>{selectedCrops.length}</dd></div></dl>{release && <><h3>数据产品边界</h3><div className={styles.chips}>{Object.entries(release.products).map(([name, product]) => <span key={name} className={styles.chip}>{name.toUpperCase()} · {product.model_usable ? "入模" : "证据"}</span>)}</div><p>{release.limitations.join(" ")}</p></>}</section>
           {run ? <RunResults owner={session.data.id} run={run} changes={[]} selectedOptionId={selectedOption} onSelect={setSelectedOption} onExplain={() => undefined} onUpdate={(value) => { if (isDailyRun(value)) return; setRun(value); client.setQueryData(["nasa-rotation", "run", value.id], value); }} onSaved={() => undefined} compareRunId={null} compareOptionId={null} onCompare={() => undefined}/> : <section className={styles.section}><h2>尚未运行</h2><p>完成左侧配置后，结果区将显示 Gurobi 状态、方案时间轴、资源消耗、约束核验、候选拒绝原因和可审计导出。</p></section>}
-          {run?.result && <section className={styles.section}><h2>模型诊断</h2><dl className={styles.summary}><div><dt>候选数</dt><dd>{run.result.candidate_count ?? "—"}</dd></div><div><dt>返回方案</dt><dd>{allOptions(run).length}</dd></div><div><dt>求解上限</dt><dd>{run.result.solver_time_limit_seconds ?? solverSeconds}s</dd></div></dl><h3>候选拒绝原因</h3>{Object.entries(run.result.rejected_by_reason ?? {}).length ? <ul>{Object.entries(run.result.rejected_by_reason ?? {}).map(([reason, count]) => <li key={reason}>{reason}: {count}</li>)}</ul> : <p>暂无拒绝候选诊断。</p>}</section>}
+          {run?.result && <section className={styles.section}><h2>模型诊断</h2><dl className={styles.summary}><div><dt>候选数</dt><dd>{run.result.candidate_count ?? "—"}</dd></div><div><dt>返回方案</dt><dd>{allOptions(run).length}</dd></div><div><dt>求解上限</dt><dd>{run.result.solver_time_limit_seconds ?? solverSeconds}s</dd></div></dl>{run.result.capacity && <p>模型形式：{run.result.capacity.formulation === "annual-layered-state-v1" ? "年度分层模型" : "通用连接图模型"}；预计 {run.result.capacity.estimated_variable_count} 个变量、{run.result.capacity.estimated_constraint_count} 个约束。</p>}<h3>候选拒绝原因</h3>{Object.entries(run.result.rejected_by_reason ?? {}).length ? <ul>{Object.entries(run.result.rejected_by_reason ?? {}).map(([reason, count]) => <li key={reason}>{reason}: {count}</li>)}</ul> : <p>暂无拒绝候选诊断。</p>}</section>}
         </div>
       </div>
     </div>

@@ -5,8 +5,9 @@ from datetime import date, timedelta
 from sideronostos_backend.modules.rotation_optimizer.capacity import CapacityLimits, capacity_report
 from sideronostos_backend.modules.rotation_optimizer.prepare import generate_candidates
 from sideronostos_backend.modules.rotation_optimizer.profiles import get_profile
-from sideronostos_backend.modules.rotation_optimizer.schemas import PlanningField
+from sideronostos_backend.modules.rotation_optimizer.schemas import PlanningField, Problem
 from sideronostos_backend.modules.rotation_optimizer.settings import RotationSettings
+from sideronostos_backend.modules.rotation_optimizer.solver import solve
 
 
 def fixture(field_count: int = 4):
@@ -94,3 +95,39 @@ def test_capacity_limits_are_environment_settings(monkeypatch) -> None:
     settings = RotationSettings()
     assert settings.max_candidates == 3210
     assert settings.max_transition_edges == 65432
+
+
+def test_annual_layered_formulation_matches_graph_without_transition_variables() -> None:
+    profile, fields, weather, request = fixture(1)
+    request["end"] = "2023-12-31"
+    end = date.fromisoformat(request["end"])
+    prepared = generate_candidates(
+        profile=profile,
+        fields=fields,
+        start=date.fromisoformat(request["start"]),
+        end=end,
+        weather={day: value for day, value in weather.items() if day <= end},
+        allowed_crop_ids=request["allowed_crop_ids"],
+        max_candidates=2000,
+    )
+    problem = Problem(
+        start=request["start"],
+        end=request["end"],
+        fields=fields,
+        candidates=prepared["candidates"],
+        family_gaps=profile.family_gaps,
+        weights=profile.default_weights,
+        references=profile.references,
+    )
+    graph = solve(problem, formulation="candidate-graph-v1")
+    annual = solve(
+        problem,
+        formulation="annual-layered-state-v1",
+        max_solver_variables=2000,
+        max_solver_constraints=2000,
+    )
+    assert graph["status"] == annual["status"] == "optimal"
+    assert annual["objective"] == graph["objective"]
+    assert annual["transition_variable_count"] == 0
+    assert annual["variable_count"] < graph["variable_count"]
+    assert annual["constraint_count"] < 2000

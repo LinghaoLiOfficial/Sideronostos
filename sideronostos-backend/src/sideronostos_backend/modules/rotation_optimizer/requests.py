@@ -39,6 +39,8 @@ class BaselineSeason(Contract):
 class RunRequest(Contract):
     idempotency_key: str = Field(min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
     profile_id: Identifier
+    profile_version_id: Identifier | None = None
+    profile_sha256: Annotated[str, Field(pattern=r"^[a-f0-9]{64}$")] | None = None
     fields: list[FieldChoice] = Field(min_length=1, max_length=10)
     start: date
     end: date
@@ -57,6 +59,8 @@ class RunRequest(Contract):
 
     @model_validator(mode="after")
     def complete_request(self) -> Self:
+        if (self.profile_version_id is None) != (self.profile_sha256 is None):
+            raise ValueError("Profile version ID and checksum must be supplied together")
         if not 0 <= (self.end - self.start).days <= 1095 or not 2000 <= self.start.year <= 2197:
             raise ValueError("Planning horizon must be ordered and at most three years")
         if (self.data_release_id is None) != (self.horizon_mode is None):
@@ -107,6 +111,8 @@ class RunRequest(Contract):
 
 class PreflightRequest(Contract):
     profile_id: Identifier
+    profile_version_id: Identifier | None = None
+    profile_sha256: Annotated[str, Field(pattern=r"^[a-f0-9]{64}$")] | None = None
     fields: list[CapacityFieldChoice] = Field(min_length=1, max_length=10)
     start: date
     end: date
@@ -118,6 +124,8 @@ class PreflightRequest(Contract):
 
     @model_validator(mode="after")
     def complete_preflight(self) -> Self:
+        if (self.profile_version_id is None) != (self.profile_sha256 is None):
+            raise ValueError("Profile version ID and checksum must be supplied together")
         if not 0 <= (self.end - self.start).days <= 1095 or not 2000 <= self.start.year <= 2197:
             raise ValueError("Planning horizon must be ordered and at most three years")
         if (self.data_release_id is None) != (self.horizon_mode is None):

@@ -62,6 +62,18 @@ class FieldRecord(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class FieldWorkspaceRecord(Base):
+    """One optimistic, owner-scoped map workspace document per account."""
+
+    __tablename__ = "field_shift_workspaces"
+
+    owner_user_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    data: Mapped[dict[str, Any]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class AnalysisRecord(Base):
     __tablename__ = "field_shift_analyses"
 

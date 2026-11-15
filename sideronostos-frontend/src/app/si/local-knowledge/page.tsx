@@ -1,8 +1,8 @@
-import { SiBlankPage } from "@/features/si";
 import { MultiBotDock } from "@/components/bot/MultiBotDock";
+import { LocalKnowledgeWorkspace } from "@/features/rotation/local-knowledge-workspace";
 
-export const metadata = { title: "Local Agricultural Knowledge Base · Agrisata" };
+export const metadata = { title: "Local Agronomy Knowledge · Agrisata" };
 
 export default function LocalKnowledgePage() {
-  return <><SiBlankPage /><MultiBotDock module="local-knowledge" /></>;
+  return <><LocalKnowledgeWorkspace /><MultiBotDock module="local-knowledge" /></>;
 }

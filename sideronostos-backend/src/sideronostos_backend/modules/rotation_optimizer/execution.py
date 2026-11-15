@@ -60,10 +60,16 @@ def execute_snapshot(
     raw_limits = snapshot.get("capacity") or {
         "max_candidates": LEGACY_MAX_CANDIDATES,
         "max_transition_edges": LEGACY_MAX_TRANSITION_EDGES,
+        "solver_capacity_mode": "unrestricted",
+        "max_solver_variables": 2000,
+        "max_solver_constraints": 2000,
     }
     limits = CapacityLimits(
         max_candidates=int(raw_limits["max_candidates"]),
         max_transition_edges=int(raw_limits["max_transition_edges"]),
+        solver_capacity_mode=str(raw_limits.get("solver_capacity_mode", "unrestricted")),
+        max_solver_variables=int(raw_limits.get("max_solver_variables", 2000)),
+        max_solver_constraints=int(raw_limits.get("max_solver_constraints", 2000)),
     )
     profile, fields, weather, prepared = prepare_snapshot_candidates(snapshot, limits)
     capacity = capacity_report(
@@ -105,6 +111,17 @@ def execute_snapshot(
             cancelled=cancelled,
             exclude_sets=excluded,
             max_transition_edges=limits.max_transition_edges,
+            formulation=str(capacity["formulation"]),
+            max_solver_variables=(
+                limits.max_solver_variables
+                if limits.solver_capacity_mode == "restricted"
+                else None
+            ),
+            max_solver_constraints=(
+                limits.max_solver_constraints
+                if limits.solver_capacity_mode == "restricted"
+                else None
+            ),
         )
         results.append(result)
         selected_ids = result.get("selected_ids") or []

@@ -18,6 +18,7 @@ from .schemas import (
     SavedPlan,
 )
 from .service import FieldShiftService
+from .workspace import FieldWorkspaceService, WorkspacePut, WorkspaceView
 
 router = APIRouter(prefix="/field-shift", tags=["field-shift"])
 User = Annotated[AuthPrincipal, Depends(require_verified_user)]
@@ -52,6 +53,21 @@ async def list_fields(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> dict[str, object]:
     return {"items": await FieldShiftService().list_fields(session, user.id)}
+
+
+@router.get("/workspace", response_model=WorkspaceView)
+async def get_workspace(user: User, session: Session) -> WorkspaceView:
+    return await FieldWorkspaceService().get_or_create(session, user.id)
+
+
+@router.put("/workspace", response_model=WorkspaceView)
+async def put_workspace(body: WorkspacePut, user: User, session: Session) -> WorkspaceView:
+    return await FieldWorkspaceService().replace(session, user.id, body)
+
+
+@router.post("/workspace/sample", response_model=WorkspaceView)
+async def restore_workspace_sample(user: User, session: Session) -> WorkspaceView:
+    return await FieldWorkspaceService().restore_sample(session, user.id)
 
 
 @router.post("/fields", status_code=201, response_model=Field)

@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -45,3 +45,31 @@ class SavedOptimizationPlan(Base):
     title: Mapped[str] = mapped_column(String(120))
     data: Mapped[dict[str, Any]] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class LocalAgronomyVersion(Base):
+    __tablename__ = "local_agronomy_versions"
+    __table_args__ = (
+        Index(
+            "uq_local_agronomy_owner_draft",
+            "owner_user_id",
+            unique=True,
+            postgresql_where=text("status = 'draft'"),
+        ),
+        Index(
+            "uq_local_agronomy_owner_active",
+            "owner_user_id",
+            unique=True,
+            postgresql_where=text("is_active"),
+        ),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    owner_user_id: Mapped[str] = mapped_column(String(36), index=True)
+    revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(16))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=False)
+    data: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    sha256: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

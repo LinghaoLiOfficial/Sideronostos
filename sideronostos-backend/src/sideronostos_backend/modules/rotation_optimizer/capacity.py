@@ -6,10 +6,12 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
+from .annual_milp import FORMULATION as ANNUAL_FORMULATION
+from .annual_milp import annual_size_estimate, annual_structure
 from .candidates import historical_weather, replay_weather
 from .prepare import generate_candidates
 from .profiles import ProfileV2
-from .schemas import Candidate, PlanningField
+from .schemas import Candidate, PlanningField, Problem
 
 LEGACY_MAX_CANDIDATES = 240
 LEGACY_MAX_TRANSITION_EDGES = 1200
@@ -20,11 +22,17 @@ PREFLIGHT_RECIPE = "rotation-capacity-preflight-v1"
 class CapacityLimits:
     max_candidates: int
     max_transition_edges: int
+    solver_capacity_mode: str = "unrestricted"
+    max_solver_variables: int = 2000
+    max_solver_constraints: int = 2000
 
-    def as_dict(self) -> dict[str, int]:
+    def as_dict(self) -> dict[str, int | str]:
         return {
             "max_candidates": self.max_candidates,
             "max_transition_edges": self.max_transition_edges,
+            "solver_capacity_mode": self.solver_capacity_mode,
+            "max_solver_variables": self.max_solver_variables,
+            "max_solver_constraints": self.max_solver_constraints,
         }
 
 
@@ -159,6 +167,34 @@ def capacity_report(
         )
     start = date.fromisoformat(str(request["start"]))
     end = date.fromisoformat(str(request["end"]))
+    problem = Problem(
+        start=start,
+        end=end,
+        fields=fields,
+        candidates=prepared["candidates"],
+        family_gaps=profile.family_gaps,
+        weights=profile.default_weights,
+        references=profile.references,
+    )
+    annual = annual_structure(problem)
+    formulation = ANNUAL_FORMULATION if annual.eligible else "candidate-graph-v1"
+    if annual.eligible:
+        model_size = annual_size_estimate(problem, annual)
+    else:
+        family_count = sum(
+            len(
+                {
+                    candidate.family
+                    for candidate in problem.candidates
+                    if candidate.field_id == field.id
+                }
+            )
+            for field in fields
+        )
+        model_size = {
+            "variables": len(problem.candidates) * 3 + (edges or 0) + len(fields) + family_count,
+            "constraints": len(problem.candidates) * 3 + (edges or 0) * 2 + 100,
+        }
     violations = capacity_violations(
         candidate_count=candidate_count,
         candidate_count_truncated=candidate_truncated,
@@ -170,6 +206,39 @@ def capacity_report(
         year_count=end.year - start.year + 1,
         sampling_step_days=profile.sowing_step_days,
     )
+    if limits.solver_capacity_mode == "restricted":
+        if model_size["variables"] > limits.max_solver_variables:
+            violations.append(
+                {
+                    "dimension": "solver_variables",
+                    "count": model_size["variables"],
+                    "limit": limits.max_solver_variables,
+                    "truncated": False,
+                    "factors": {"formulation": formulation},
+                    "message": (
+                        "Estimated model variables exceed the configured solver license capacity."
+                    ),
+                    "suggestion": (
+                        "Use the annual layered formulation or narrow the planning inputs."
+                    ),
+                }
+            )
+        if model_size["constraints"] > limits.max_solver_constraints:
+            violations.append(
+                {
+                    "dimension": "solver_constraints",
+                    "count": model_size["constraints"],
+                    "limit": limits.max_solver_constraints,
+                    "truncated": False,
+                    "factors": {"formulation": formulation},
+                    "message": (
+                        "Estimated model constraints exceed the configured solver license capacity."
+                    ),
+                    "suggestion": (
+                        "Use the annual layered formulation or narrow the planning inputs."
+                    ),
+                }
+            )
     return {
         "recipe": PREFLIGHT_RECIPE,
         "profile_id": profile.id,
@@ -179,6 +248,12 @@ def capacity_report(
         "rejected_candidate_count": rejected_count(prepared),
         "transition_edge_count": edges,
         "transition_edge_count_truncated": edges_truncated,
+        "formulation": formulation,
+        "formulation_eligible": annual.eligible,
+        "formulation_ineligible_reason": annual.reason,
+        "estimated_variable_count": model_size["variables"],
+        "estimated_constraint_count": model_size["constraints"],
+        "solver_capacity_mode": limits.solver_capacity_mode,
         "limits": limits.as_dict(),
         "within_capacity": not violations,
         "violations": violations,

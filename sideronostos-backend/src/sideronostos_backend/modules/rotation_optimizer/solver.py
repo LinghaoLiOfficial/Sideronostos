@@ -35,6 +35,9 @@ def solve(
     exclude: list[str] | None = None,
     exclude_sets: list[list[str]] | None = None,
     max_transition_edges: int | None = None,
+    formulation: str = "candidate-graph-v1",
+    max_solver_variables: int | None = None,
+    max_solver_constraints: int | None = None,
 ) -> dict[str, Any]:
     if not math.isfinite(time_limit) or not 0 < time_limit <= 120:
         raise ValueError("Invalid solver time limit")
@@ -65,10 +68,29 @@ def solve(
         with gp.Env(empty=True) as env:
             env.setParam("OutputFlag", 0)
             env.start()
-            model, variables, transition_edges = build_model(
-                problem, env, max_transition_edges=max_transition_edges
+            model, variables, model_info = build_model(
+                problem,
+                env,
+                max_transition_edges=max_transition_edges,
+                formulation=formulation,
             )
             with model:
+                if max_solver_variables is not None and model.NumVars > max_solver_variables:
+                    return {
+                        **base,
+                        "error_code": "solver_variable_capacity_exceeded",
+                        "variable_count": model.NumVars,
+                        "constraint_count": model.NumConstrs,
+                        **model_info,
+                    }
+                if max_solver_constraints is not None and model.NumConstrs > max_solver_constraints:
+                    return {
+                        **base,
+                        "error_code": "solver_constraint_capacity_exceeded",
+                        "variable_count": model.NumVars,
+                        "constraint_count": model.NumConstrs,
+                        **model_info,
+                    }
                 model.Params.TimeLimit = time_limit
                 model.Params.Threads = 1
                 model.Params.Seed = 0
@@ -94,7 +116,7 @@ def solve(
                     runtime_seconds=model.Runtime,
                     variable_count=model.NumVars,
                     constraint_count=model.NumConstrs,
-                    transition_edge_count=transition_edges,
+                    **model_info,
                     mip_gap_tolerance=1e-6,
                 )
                 if status == "infeasible":

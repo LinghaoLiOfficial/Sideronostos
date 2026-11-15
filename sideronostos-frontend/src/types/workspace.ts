@@ -14,6 +14,7 @@ export interface FarmProperties {
   partitionRevision?: string
   expectedFieldCount?: number
   partitionMetadataKnown?: boolean
+  conflictOfFarmId?: string
   syncError?: string | null
   pendingSync?: import("@/lib/api/farms").FarmSyncInput
   id: string
@@ -27,6 +28,8 @@ export interface FarmProperties {
   partitionStatus: "draft" | "confirmed"
   createdAt: string
   updatedAt: string
+  sourceReleaseId?: string | null
+  sampleVersion?: string | null
 }
 
 export type FarmFeature = Feature<Polygon, FarmProperties>

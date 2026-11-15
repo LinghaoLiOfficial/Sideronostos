@@ -90,6 +90,19 @@ function feature(value: unknown): value is FarmFeature | FieldFeature {
     && typeof item.properties?.name === "string"
 }
 
+function observation(value: unknown): value is FieldObservation {
+  if (!value || typeof value !== "object") return false
+  const item = value as Partial<FieldObservation>
+  return typeof item.id === "string" && typeof item.fieldId === "string"
+    && typeof item.metric === "string" && typeof item.value === "number"
+    && typeof item.unit === "string" && typeof item.observedAt === "string"
+    && typeof item.sourceProduct === "string"
+    && ["observed", "precomputed", "synthetic"].includes(String(item.evidenceKind))
+    && ["field", "regional-background"].includes(String(item.spatialSupport))
+    && (item.nativeResolutionMeters === null || typeof item.nativeResolutionMeters === "number")
+    && (item.uncertainty === null || typeof item.uncertainty === "string")
+}
+
 export async function getLegacyWorkspace() {
   const db = await database
   const [farms, fields, observations]: [unknown[], unknown[], unknown[]] = await Promise.all([
@@ -101,9 +114,15 @@ export async function getLegacyWorkspace() {
     feature(item) && "partitionCount" in item.properties).map(normalizeFarm)
   const recognizedFields = fields.filter((item): item is FieldFeature =>
     feature(item) && "farmId" in item.properties)
+  const recognizedObservations = observations.filter(observation)
+  const knownFieldIds = new Set(recognizedFields.map(field => field.properties.id))
+  const skippedObservationCount = recognizedObservations.filter(item => !knownFieldIds.has(item.fieldId)).length
+    + observations.length - recognizedObservations.length
+  const skippedCount = farms.length + fields.length - recognizedFarms.length - recognizedFields.length
+    + skippedObservationCount
   return {
-    farms: recognizedFarms, fields: recognizedFields,
-    unrecognizedCount: farms.length + fields.length - recognizedFarms.length - recognizedFields.length,
+    farms: recognizedFarms, fields: recognizedFields, observations: recognizedObservations,
+    unrecognizedCount: skippedCount,
     raw: { farms, fields, observations },
   }
 }
@@ -111,22 +130,49 @@ export async function getLegacyWorkspace() {
 /** Explicit, atomic copy. Repeating it never overwrites an already-imported farm. */
 export async function importLocalWorkspace(ownerId: string, source: LocalSource): Promise<Workspace> {
   const scope = scopeKey(ownerId)
-  const local = source === "legacy" ? await getLegacyWorkspace() : await getStoredWorkspace()
+  const local = source === "legacy" ? await getLegacyWorkspace() : {
+    ...(await getStoredWorkspace()),
+    observations: [] as FieldObservation[],
+  }
   const db = await database
-  const transaction = db.transaction(["workspaces", "imports"], "readwrite")
+  const transaction = db.transaction(["workspaces", "imports", "scopedObservations"], "readwrite")
   const current = await transaction.objectStore("workspaces").get(scope) ?? { scope, farms: [], fields: [] }
   for (const farm of local.farms) {
     const key: [string, LocalSource, string] = [scope, source, farm.properties.id]
-    if (await transaction.objectStore("imports").get(key)) continue
-    const copied = copyLocalFarm(farm, local.fields, ownerId)
-    const farmId = copied.farm.properties.id
-    current.farms.push(copied.farm)
-    current.fields.push(...copied.fields)
-    await transaction.objectStore("imports").put({ scope, source, originalFarmId: farm.properties.id, targetFarmId: farmId })
+    const imported = await transaction.objectStore("imports").get(key)
+    let targetFarmId = imported?.targetFarmId
+    const sourceFields = local.fields.filter(field => field.properties.farmId === farm.properties.id)
+    let targetFields: FieldFeature[]
+    if (imported) {
+      targetFields = current.fields.filter(field => field.properties.farmId === targetFarmId)
+    } else {
+      const copied = copyLocalFarm(farm, local.fields, ownerId)
+      targetFarmId = copied.farm.properties.id
+      targetFields = copied.fields
+      current.farms.push(copied.farm)
+      current.fields.push(...copied.fields)
+      await transaction.objectStore("imports").put({ scope, source, originalFarmId: farm.properties.id, targetFarmId })
+    }
+    const fieldIds = new Map(sourceFields.map((field, index) => [field.properties.id, targetFields[index]?.properties.id]))
+    for (const item of local.observations.filter(value => fieldIds.has(value.fieldId))) {
+      const targetFieldId = fieldIds.get(item.fieldId)
+      if (!targetFieldId) continue
+      const copiedObservation = { ...item, id: `${source}:${farm.properties.id}:${item.id}`, fieldId: targetFieldId }
+      await transaction.objectStore("scopedObservations").put({ scope, id: copiedObservation.id, fieldId: targetFieldId, observation: copiedObservation })
+    }
   }
   await transaction.objectStore("workspaces").put(current)
   await transaction.done
   return { farms: current.farms, fields: current.fields }
+}
+
+export async function clearLegacyWorkspaceData() {
+  const db = await database
+  const stores = (["farms", "fields", "observations"] as const).filter(name => db.objectStoreNames.contains(name))
+  if (!stores.length) return
+  const transaction = db.transaction(stores, "readwrite")
+  for (const name of stores) transaction.objectStore(name).clear()
+  await transaction.done
 }
 
 export async function deleteStoredFarm(farmId: string, ownerId: string | null = null) {

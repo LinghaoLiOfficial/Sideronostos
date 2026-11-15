@@ -133,7 +133,7 @@ it("blocks submission and identifies transition-edge capacity growth", async () 
   });
   await setup();
   await screen.findByText("容量状态：超出限制");
-  expect(screen.getByText(/连接边维度膨胀/)).toBeVisible();
+  expect(screen.getByText(/连接关系过多/)).toBeVisible();
   expect(screen.getByRole("button", { name: "运行 Gurobi 回测" })).toBeDisabled();
   expect(mocks.createRun).not.toHaveBeenCalled();
 });

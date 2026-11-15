@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { AlertTriangle, RefreshCw } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { NASAAnalysisMap } from "@/features/fields/nasa-analysis-map"
 import type { NASAAnalysisData } from "@/features/fields/nasa-analysis-types"
 
 function useChartWidth() {
@@ -106,7 +105,6 @@ function DataView({ data }: { data: NASAAnalysisData }) {
         </div>
         <p className="max-w-4xl text-xs leading-5 text-muted-foreground">Precipitation minus reference ET₀ is a regional climatic indicator, not crop water stress or irrigation demand. POWER is point support and is not interpolated to a raster.</p>
       </section>
-      <NASAAnalysisMap data={data} />
       <section className="grid gap-8 lg:grid-cols-2">
         <LineChart title="GRACE/GRACE-FO liquid water equivalent anomaly" points={data.grace.rows} series={[{ key: "lwe_cm", label: "Mascon anomaly", color: "#92b9e6" }]} unit="cm LWE" formatDate={(value) => value.slice(2, 7)} uncertaintyKey="uncertainty_cm" />
         <div className="space-y-3 text-sm leading-6"><h2 className="text-base font-semibold">Coverage and interpretation</h2><p className="text-muted-foreground">POWER covers {data.coverage.power_days.toLocaleString()} of {data.coverage.expected_days.toLocaleString()} expected days. GPM has complete daily coverage for {data.coverage.gpm_days_with_full_grid.toLocaleString()} days across {data.coverage.gpm_unique_cells} grid cells.</p><p className="text-muted-foreground">GRACE nearest mascon center: {data.grace.coordinates.nearest_grid_latitude.toFixed(2)}° N, {Math.abs(data.grace.coordinates.nearest_grid_longitude > 180 ? data.grace.coordinates.nearest_grid_longitude - 360 : data.grace.coordinates.nearest_grid_longitude).toFixed(2)}° W; effective support is about {data.grace.coordinates.effective_mascon_resolution_degrees.toFixed(0)}°.</p><ul className="list-disc space-y-1 pl-5 text-xs text-muted-foreground">{data.interpretation_limits.map((limit) => <li key={limit}>{limit}</li>)}</ul></div>

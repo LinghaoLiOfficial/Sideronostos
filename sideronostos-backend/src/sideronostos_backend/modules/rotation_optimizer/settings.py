@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field
 
@@ -11,6 +12,9 @@ class RotationSettings(EnvironmentSettings):
     max_pending_per_owner: int = Field(default=3, ge=1, le=10)
     max_candidates: int = Field(default=2000, ge=1, le=100000)
     max_transition_edges: int = Field(default=50000, ge=1, le=2000000)
+    solver_capacity_mode: Literal["restricted", "unrestricted"] = "restricted"
+    max_solver_variables: int = Field(default=2000, ge=1, le=10000000)
+    max_solver_constraints: int = Field(default=2000, ge=1, le=10000000)
     default_profile_id: str = Field(default="iowa-benchmark-20261114-v2", min_length=1)
 
 

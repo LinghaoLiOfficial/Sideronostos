@@ -114,22 +114,23 @@ function Timeline({ date, playing, onDate, onPlaying }: { date: string; playing:
   return <div className="flex h-[72px] shrink-0 items-center gap-3 border-t bg-neutral-950 px-3 text-white"><Button type="button" size="icon" variant="ghost" onClick={() => onPlaying(!playing)} className="text-white" aria-label={t(playing ? "Pause timeline" : "Play timeline")}>{playing ? <Pause /> : <Play />}</Button><Button type="button" size="icon" variant="ghost" onClick={() => onDate(shiftDate(date, -1))} aria-label={t("上一天的 GIBS 图层")} className="hidden text-white sm:inline-flex"><ChevronLeft /></Button><div className="min-w-0 flex-1"><p className="text-[10px] text-neutral-400">{t("GIBS display date · 图层日期")}</p><input aria-label={t("GIBS 显示日期时间轴")} type="range" min={new Date("2015-03-31T12:00:00Z").getTime()} max={new Date(`${TODAY}T12:00:00Z`).getTime()} step={86_400_000} value={new Date(`${date}T12:00:00Z`).getTime()} onChange={(event) => onDate(toIsoDate(new Date(Number(event.target.value))))} className="mt-2 w-full accent-emerald-500" /></div><Button type="button" size="icon" variant="ghost" onClick={() => onDate(shiftDate(date, 1))} aria-label={t("下一天的 GIBS 图层")} disabled={date >= TODAY} className="hidden text-white sm:inline-flex"><ChevronRight /></Button><label className="flex h-10 items-center gap-2 border border-white/20 px-2 text-xs"><CalendarDays className="hidden size-4 sm:block" /><input aria-label={t("GIBS 显示日期")} type="date" min="2015-03-31" max={TODAY} value={date} onChange={(event) => onDate(event.target.value)} className="w-[7.2rem] bg-transparent [color-scheme:dark]" /></label></div>
 }
 
-export function FieldsWorkspace() {
+export function FieldsWorkspace({ embedded = false, remote = false }: { embedded?: boolean; remote?: boolean }) {
   const { t } = useI18n();
 
   const { session, ready } = useWorkspaceSession()
-  if (!ready) return <FieldsShell><p className="m-auto" role="status">{t("正在确认登录状态…")}</p></FieldsShell>
-  if (session.error && !(session.error instanceof ApiError && session.error.status === 401)) return <FieldsShell><div className="m-auto p-6" role="alert"><p>{t("登录状态暂时无法确认，请重试。")}</p><Button onClick={() => void session.refetch()}>{t("重新连接")}</Button></div></FieldsShell>
+  if (!ready) return <FieldsShell embedded={embedded}><p className="m-auto" role="status">{t("正在确认登录状态…")}</p></FieldsShell>
+  if (session.error && !(session.error instanceof ApiError && session.error.status === 401)) return <FieldsShell embedded={embedded}><div className="m-auto p-6" role="alert"><p>{t("登录状态暂时无法确认，请重试。")}</p><Button onClick={() => void session.refetch()}>{t("重新连接")}</Button></div></FieldsShell>
   const user = session.data?.email_verified ? session.data : null
-  return <OwnedFieldsWorkspace key={user?.id ?? "anonymous"} owner={user} unverified={Boolean(session.data && !session.data.email_verified)} />
+  if (remote && !user) return <FieldsShell embedded={embedded}><div className="m-auto flex max-w-lg flex-col items-start gap-3 p-6"><p role="status">{t("登录并验证邮箱后可使用账号田地工作区。")}</p><Button asChild><a href={`/login?next=${encodeURIComponent("/si/field-management")}`}>{t("登录")}</a></Button></div></FieldsShell>
+  return <OwnedFieldsWorkspace key={user?.id ?? "anonymous"} owner={user} unverified={Boolean(session.data && !session.data.email_verified)} embedded={embedded} remote={remote} />
 }
 
-function OwnedFieldsWorkspace({ owner, unverified }: { owner: AuthUser | null; unverified: boolean }) {
+function OwnedFieldsWorkspace({ owner, unverified, embedded, remote }: { owner: AuthUser | null; unverified: boolean; embedded: boolean; remote: boolean }) {
   const { t } = useI18n();
 
   const ownerId = owner?.id ?? null
   const [workspaceView, setWorkspaceView] = useState<"map" | "analysis">("map")
-  const local = useOwnedWorkspace(ownerId), { store } = local
+  const local = useOwnedWorkspace(ownerId, remote), { store } = local
   const client = useQueryClient()
   const [settings, setSettings] = useState(() => loadSettings(ownerId))
   const farms = local.workspace?.farms ?? null, fields = local.workspace?.fields ?? []
@@ -248,7 +249,7 @@ function OwnedFieldsWorkspace({ owner, unverified }: { owner: AuthUser | null; u
   function openImport() { importRef.current?.click() }
   function selectFarm(farm: FarmFeature) { setSelectedFarmId(farm.properties.id); selectLocal(null) }
   function selectField(field: FieldFeature) { selectLocal(field.properties.id); mapRef.current?.selectField(field) }
-  if (farms === null) return <FieldsShell user={owner}><div className="m-auto p-4">{local.error ? <><p role="alert">{t(local.error)}</p><Button onClick={() => void store.start()}>{t("重试读取本机草稿")}</Button></> : <p role="status">{t("正在读取农场…")}</p>}</div></FieldsShell>
+  if (farms === null) return <FieldsShell user={owner} embedded={embedded}><div className="m-auto p-4">{local.error ? <><p role="alert">{t(local.error)}</p><Button onClick={() => void store.start()}>{t("重试读取本机草稿")}</Button></> : <p role="status">{t("正在读取农场…")}</p>}</div></FieldsShell>
 
   const changeLayer = (id: string, state: LayerState) => setSettings((current) => ({ ...current, layers: { ...current.layers, [id]: state } }))
   const showPartition = selectedFarm?.properties.partitionStatus === "draft"
@@ -256,10 +257,10 @@ function OwnedFieldsWorkspace({ owner, unverified }: { owner: AuthUser | null; u
     if (!selectedFarm) return
     setFarms((current) => current?.map((farm) => farm.properties.id === selectedFarm.properties.id ? { ...farm, properties: { ...farm.properties, partitionCount: count } } : farm) ?? [])
   }
-  const syncPanel = <WorkspaceSyncPanel store={store} restoring={local.restoring} remoteError={local.remoteError} farm={selectedFarm} fields={selectedFarmFields} syncing={Boolean(selectedFarm && local.syncing.includes(selectedFarm.properties.id))} />
+  const syncPanel = <WorkspaceSyncPanel store={store} restoring={local.restoring} remoteError={local.remoteError} workspaceRemoteError={local.workspaceRemoteError} remoteConflict={local.remoteConflict} accountWorkspace={remote} onResolveRemote={choice => store.resolveAccountConflict(choice)} onRestoreSample={() => store.restoreAccountSample()} farm={selectedFarm} fields={selectedFarmFields} syncing={Boolean(selectedFarm && local.syncing.includes(selectedFarm.properties.id))} />
   const completion = selectedFarm && selectedField && <FieldCompletionPanel key={selectedField.properties.id} farm={selectedFarm} field={selectedField} ownerId={ownerId} store={store} syncing={local.syncing.includes(selectedFarm.properties.id)} plannerHref={context.navigation.href({ field: selectedField.properties.backendFieldId ?? null }, "/field-shift/rotation")} onDirtyChange={onFormDirty} onSaved={saved => { context.navigation.navigate({ field: saved.id }); client.setQueryData<typeof saved>(["field-shift", ownerId, "field", saved.id], current => current && current.version > saved.version ? current : saved); void client.invalidateQueries({ queryKey: ["field-shift", ownerId, "fields"] }) }} />
   const evidence = <FieldsEvidencePanel context={context} ownerId={ownerId} mapRef={mapRef} onMapInteraction={() => setMobilePanel(null)} />
-  return <FieldsShell user={owner} fieldId={selectedField?.properties.backendFieldId} plannerHref={context.navigation.href({}, "/field-shift/rotation")}>
+  return <FieldsShell user={owner} fieldId={selectedField?.properties.backendFieldId} plannerHref={context.navigation.href({}, "/field-shift/rotation")} embedded={embedded}>
     {unverified && <p role="status" className="border-b bg-amber-50 px-4 py-2 text-xs text-amber-950">{t("请先验证邮箱。此时绘制的内容保留为匿名本机草稿。")}</p>}
     {local.error && <p role="alert" className="border-b bg-red-50 px-4 py-2 text-xs text-red-800">{local.error}</p>}
     <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b px-3 sm:px-4"><div className="min-w-0"><h1 aria-label={t(workspaceView === "map" ? "Farm partition map" : "NASA data analysis")} className="text-lg font-semibold">{workspaceView === "map" ? <><span className="hidden sm:inline">{t("Farm partition map")}</span><span className="sm:hidden">{t("Farm map")}</span></> : <><span className="hidden sm:inline">{t("NASA data analysis")}</span><span className="sm:hidden">{t("NASA analysis")}</span></>}</h1><p className="hidden text-xs text-muted-foreground sm:block">{t(workspaceView === "map" ? "Draw a farm range, review generated fields, then confirm the complete partition." : "Historical NASA observations for the Iowa benchmark area.")}</p></div><div className="flex shrink-0 items-center gap-2"><div role="tablist" aria-label={t("Field workspace view")} className="flex border p-0.5"><button type="button" role="tab" id="fields-map-tab" aria-label={t("Map")} aria-controls="fields-map-panel" aria-selected={workspaceView === "map"} onClick={() => setWorkspaceView("map")} className={cn("flex h-9 items-center gap-1 px-2 text-xs sm:px-3", workspaceView === "map" && "bg-foreground text-background")}><MapIcon /><span className="hidden sm:inline">{t("Map")}</span></button><button type="button" role="tab" id="fields-analysis-tab" aria-label={t("NASA analysis")} aria-controls="fields-analysis-panel" aria-selected={workspaceView === "analysis"} onClick={() => setWorkspaceView("analysis")} className={cn("flex h-9 items-center gap-1 px-2 text-xs sm:px-3", workspaceView === "analysis" && "bg-foreground text-background")}><BarChart3 /><span className="hidden sm:inline">{t("NASA analysis")}</span><span className="sm:hidden">{t("NASA")}</span></button></div>{workspaceView === "map" && <><div className="hidden border p-0.5 lg:flex"><button type="button" onClick={() => setSettings((current) => ({ ...current, basemap: "satellite" }))} className={cn("flex h-8 items-center gap-1 px-3 text-xs", settings.basemap === "satellite" && "bg-foreground text-background")}><Satellite />{t("Satellite")}</button><button type="button" onClick={() => setSettings((current) => ({ ...current, basemap: "streets" }))} className={cn("flex h-8 items-center gap-1 px-3 text-xs", settings.basemap === "streets" && "bg-foreground text-background")}><MapIcon />{t("Streets")}</button></div><Button type="button" size="sm" onClick={drawFarm} aria-label={t("Add farm")}><Plus /><span className="hidden sm:inline">{t("Add farm")}</span></Button></>}</div></header>

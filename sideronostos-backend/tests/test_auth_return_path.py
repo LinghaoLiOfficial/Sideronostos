@@ -70,6 +70,7 @@ def verification_client(monkeypatch):
         "/workspace/files/abc",
         "/personal/account",
         "/fields?field=owned-1&selection=area-1#data",
+        "/si/field-management",
     ],
 )
 def test_email_preserves_escaped_safe_destination(verification_client, route, destination):

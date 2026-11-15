@@ -24,6 +24,9 @@ import type {
   RotationPreflight,
   RotationPreflightInput,
   RotationProfileCatalogue,
+  LocalKnowledgeCatalogue,
+  LocalKnowledgeProfile,
+  LocalKnowledgeVersion,
   RunV2,
   SavedV2,
   ScienceLayer,
@@ -60,6 +63,22 @@ export const getLayerManifest = (value: string) =>
   apiRequest<LayerManifest>(`/agri-data/layers/${id(value)}/manifest`);
 export const listRotationProfiles = () =>
   apiRequest<RotationProfileCatalogue>("/rotation-optimizer/profiles");
+
+export const getLocalKnowledge = () =>
+  apiRequest<LocalKnowledgeCatalogue>("/rotation-optimizer/local-knowledge");
+
+export const saveLocalKnowledgeDraft = (profile: LocalKnowledgeProfile, expectedUpdatedAt: string) =>
+  apiRequest<LocalKnowledgeVersion>("/rotation-optimizer/local-knowledge/draft", {
+    method: "PUT", body: { profile, expected_updated_at: expectedUpdatedAt },
+  });
+
+export const publishLocalKnowledge = (expectedUpdatedAt: string) =>
+  apiRequest<LocalKnowledgeCatalogue>("/rotation-optimizer/local-knowledge/publish", {
+    method: "POST", body: { expected_updated_at: expectedUpdatedAt },
+  });
+
+export const getLocalKnowledgeVersion = (revision: number) =>
+  apiRequest<LocalKnowledgeVersion>(`/rotation-optimizer/local-knowledge/versions/${revision}`);
 export const preflightRotation = (body: RotationPreflightInput) =>
   apiRequest<RotationPreflight>("/rotation-optimizer/preflight", {
     method: "POST",

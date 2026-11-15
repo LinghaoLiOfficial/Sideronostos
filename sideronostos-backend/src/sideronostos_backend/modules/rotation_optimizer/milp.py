@@ -6,14 +6,29 @@ from typing import Any
 import gurobipy as gp
 from gurobipy import GRB
 
+from .annual_milp import FORMULATION as ANNUAL_FORMULATION
+from .annual_milp import annual_structure, build_annual_model
 from .capacity import compatible_arcs
 from .coefficients import resources
 from .schemas import Problem
 
 
 def build_model(
-    problem: Problem, env: gp.Env, *, max_transition_edges: int | None = None
-) -> tuple[gp.Model, dict[str, Any], int]:
+    problem: Problem,
+    env: gp.Env,
+    *,
+    max_transition_edges: int | None = None,
+    formulation: str = "candidate-graph-v1",
+) -> tuple[gp.Model, dict[str, Any], dict[str, Any]]:
+    if formulation == ANNUAL_FORMULATION:
+        structure = annual_structure(problem)
+        model, variables = build_annual_model(problem, env, structure)
+        return model, variables, {
+            "formulation": ANNUAL_FORMULATION,
+            "transition_variable_count": 0,
+        }
+    if formulation != "candidate-graph-v1":
+        raise ValueError("Unknown MILP formulation")
     model = gp.Model("rotation-v2", env=env)
     x = {c.id: model.addVar(vtype=GRB.BINARY, name=f"x:{c.id}") for c in problem.candidates}
     field_map = {f.id: f for f in problem.fields}
@@ -100,4 +115,7 @@ def build_model(
         GRB.MAXIMIZE,
     )
     model.update()
-    return model, x, edges_count
+    return model, x, {
+        "formulation": "candidate-graph-v1",
+        "transition_variable_count": edges_count,
+    }

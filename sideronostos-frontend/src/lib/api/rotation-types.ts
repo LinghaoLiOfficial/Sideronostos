@@ -82,6 +82,7 @@ export type CropV2 = {
   id: string;
   name: string;
   family: string;
+  gdd_recipe: "draft_one_sided_v1" | "bounded_both_v1";
   sow_start_mmdd: string;
   sow_end_mmdd: string;
   gdd_required: number;
@@ -95,22 +96,33 @@ export type CropV2 = {
   labor_days_ha: number;
   parameter_origins: Record<string, string>;
 };
+export type ParameterSource = {
+  kind: "reference" | "benchmark_assumption";
+  title: string;
+  url: string | null;
+  applicability: string;
+  limitations: string[];
+};
 export type ProfileV2 = {
   id: string;
   name: string;
+  region: string;
   scope: string;
   sha256: string;
+  profile_version_id?: string;
+  revision?: number;
   crops: CropV2[];
   limitations: string[];
   weather_release_id: string;
   weather_center: [number, number];
   weather_radius_km: number;
   history_catalogue: Record<string, string>;
+  history_turnaround_days: number;
+  family_gaps: Record<string, number>;
+  effective_rain_fraction: number;
   default_weights: RotationWeights;
-  sources: Record<
-    string,
-    { title: string; url: string | null; kind: string; limitations?: string[] }
-  >;
+  references: RotationWeights;
+  sources: Record<string, ParameterSource>;
   parameter_origins: Record<string, string>;
   sowing_step_days: number;
 };
@@ -121,6 +133,8 @@ export type RotationProfileCatalogue = {
 export type RotationInput = {
   idempotency_key: string;
   profile_id: string;
+  profile_version_id?: string;
+  profile_sha256?: string;
   fields: {
     id: string;
     expected_version: number;
@@ -145,6 +159,8 @@ export type RotationInput = {
 export type RotationPreflightInput = Pick<
   RotationInput,
   | "profile_id"
+  | "profile_version_id"
+  | "profile_sha256"
   | "start"
   | "end"
   | "allowed_crop_ids"
@@ -160,15 +176,20 @@ export type RotationPreflightInput = Pick<
   }>;
 };
 export type CapacityViolation = {
-  dimension: "candidates" | "transition_edges";
+  dimension:
+    | "candidates"
+    | "transition_edges"
+    | "solver_variables"
+    | "solver_constraints";
   count: number;
   limit: number;
   truncated: boolean;
   factors: {
-    field_count: number;
-    crop_count: number;
-    year_count: number;
-    sampling_step_days: number;
+    field_count?: number;
+    crop_count?: number;
+    year_count?: number;
+    sampling_step_days?: number;
+    formulation?: string;
   };
   message: string;
   suggestion: string;
@@ -177,15 +198,46 @@ export type RotationPreflight = {
   recipe: string;
   profile_id: string;
   profile_sha256: string;
+  profile_version_id: string;
   sampling_step_days: number;
   candidate_count: number;
   candidate_count_truncated: boolean;
   rejected_candidate_count: number;
   transition_edge_count: number | null;
   transition_edge_count_truncated: boolean;
-  limits: { max_candidates: number; max_transition_edges: number };
+  formulation: string;
+  formulation_eligible: boolean;
+  formulation_ineligible_reason: string | null;
+  estimated_variable_count: number;
+  estimated_constraint_count: number;
+  solver_capacity_mode: "restricted" | "unrestricted";
+  limits: {
+    max_candidates: number;
+    max_transition_edges: number;
+    solver_capacity_mode: "restricted" | "unrestricted";
+    max_solver_variables: number;
+    max_solver_constraints: number;
+  };
   within_capacity: boolean;
   violations: CapacityViolation[];
+};
+
+export type LocalKnowledgeProfile = Omit<ProfileV2, "sha256" | "profile_version_id" | "revision">;
+export type LocalKnowledgeVersion = {
+  id: string;
+  revision: number | null;
+  status: "draft" | "published";
+  is_active: boolean;
+  sha256: string;
+  profile: LocalKnowledgeProfile;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+export type LocalKnowledgeCatalogue = {
+  active: LocalKnowledgeVersion;
+  draft: LocalKnowledgeVersion;
+  versions: LocalKnowledgeVersion[];
 };
 export type NasaDataRelease = {
   id: string;

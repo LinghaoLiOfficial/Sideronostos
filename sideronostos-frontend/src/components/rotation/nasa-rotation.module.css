@@ -38,6 +38,11 @@
 .error { background: #fff0ed; color: #8b3028 !important; }
 .capacity { border: 1px solid #dce5d7; background: #f8faf6; padding: 12px; margin-bottom: 12px; }
 .capacity h3 { margin-top: 0; }
+.capacityGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.capacityGrid div { padding: 9px; background: #fff; border: 1px solid #e1e8dc; }
+.capacityGrid dt { font-size: 10px; color: #75816f; }
+.capacityGrid dd { margin: 3px 0 0; font-weight: 650; }
+.capacityMeta { margin: 10px 0 0; font-size: 11px; }
 .capacityOk, .capacityBad { margin: 10px 0 0; padding: 8px 10px; font-weight: 650; }
 .capacityOk { background: #e5f3e4; color: #285b2d !important; }
 .capacityBad { background: #fff0ed; color: #8b3028 !important; }
@@ -59,5 +64,5 @@
 .legend div { height: 8px; }
 .mapLimit { margin-bottom: 0; font-size: 11px; }
 @media (max-width: 900px) { .releaseBar { grid-template-columns: 1fr 1fr; } .releaseBar > div:first-child { grid-column: 1 / -1; } .layout { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .header { padding: 12px 16px; align-items: flex-start; } .header nav { flex-direction: column; } .main { padding: 12px; } .releaseBar, .grid2, .grid3 { grid-template-columns: 1fr; } .mapHeader { align-items: stretch; flex-direction: column; } .mapHeader label { min-width: 0; } .mapCanvas { height: 310px; } }
+@media (max-width: 560px) { .header { padding: 12px 16px; align-items: flex-start; } .header nav { flex-direction: column; } .main { padding: 12px; } .releaseBar, .grid2, .grid3, .capacityGrid { grid-template-columns: 1fr; } .mapHeader { align-items: stretch; flex-direction: column; } .mapHeader label { min-width: 0; } .mapCanvas { height: 310px; } }
 @media print { .config, .header nav, .actions { display: none !important; } .layout { display: block; } .releaseBar { color: #000; background: #fff; border: 1px solid #bbb; } }

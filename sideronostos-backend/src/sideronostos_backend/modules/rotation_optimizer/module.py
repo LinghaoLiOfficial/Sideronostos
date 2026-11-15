@@ -1,6 +1,6 @@
 from ...core.modules import JobTypeSpec, MigrationDescriptor, ModuleSpec
 from .jobs import optimize_handler
-from .models import OptimizationRun, SavedOptimizationPlan
+from .models import LocalAgronomyVersion, OptimizationRun, SavedOptimizationPlan
 from .router import router
 from .settings import get_rotation_settings
 
@@ -8,7 +8,7 @@ module = ModuleSpec(
     name="rotation_optimizer",
     requires=("database", "auth", "field_shift", "agri_data", "jobs"),
     routers=(router,),
-    models=(OptimizationRun, SavedOptimizationPlan),
+    models=(OptimizationRun, SavedOptimizationPlan, LocalAgronomyVersion),
     migrations=(MigrationDescriptor("rotation_optimizer"),),
     job_handlers=(
         JobTypeSpec(

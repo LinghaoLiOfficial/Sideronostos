@@ -19,8 +19,9 @@ from ..field_shift.schemas import Field as FieldSnapshot
 from ..jobs.models import Job, JobStatus
 from ..jobs.service import JobService
 from .capacity import CapacityLimits, analyze_snapshot_capacity
+from .local_knowledge import LocalKnowledgeService
 from .models import OptimizationRun, SavedOptimizationPlan, utcnow
-from .profiles import get_profile, profile_hash
+from .profiles import profile_hash
 from .requests import PreflightRequest, RunRequest, resolve_history
 from .schemas import PlanningField
 from .settings import get_rotation_settings
@@ -78,15 +79,19 @@ class RotationService:
         return CapacityLimits(
             max_candidates=settings.max_candidates,
             max_transition_edges=settings.max_transition_edges,
+            solver_capacity_mode=settings.solver_capacity_mode,
+            max_solver_variables=settings.max_solver_variables,
+            max_solver_constraints=settings.max_solver_constraints,
         )
 
     async def preflight(
         self, session: AsyncSession, owner: str, body: PreflightRequest
     ) -> dict[str, Any]:
-        try:
-            profile = get_profile(body.profile_id)
-        except ValueError as error:
-            raise HTTPException(422, str(error)) from error
+        profile, profile_version = await LocalKnowledgeService().resolve(
+            session, owner, body.profile_version_id, body.profile_sha256
+        )
+        if body.profile_id != profile.id:
+            raise HTTPException(409, "The selected profile differs from the active local agronomy")
         fields: list[dict[str, Any]] = []
         planning: list[dict[str, Any]] = []
         distances: list[dict[str, Any]] = []
@@ -194,6 +199,7 @@ class RotationService:
         }
         report = analyze_snapshot_capacity(snapshot, self._capacity_limits())
         report["profile_sha256"] = profile_hash(profile)
+        report["profile_version_id"] = profile_version.id
         return report
 
     async def create_run(
@@ -264,10 +270,11 @@ class RotationService:
         self, session: AsyncSession, owner: str, body: RunRequest
     ) -> dict[str, Any]:
         payload = body.model_dump(mode="json")
-        try:
-            profile = get_profile(body.profile_id)
-        except ValueError as error:
-            raise HTTPException(422, str(error)) from error
+        profile, profile_version = await LocalKnowledgeService().resolve(
+            session, owner, body.profile_version_id, body.profile_sha256
+        )
+        if body.profile_id != profile.id:
+            raise HTTPException(409, "The selected profile differs from the active local agronomy")
         fields = []
         planning = []
         distances = []
@@ -380,6 +387,8 @@ class RotationService:
             "weather": weather,
             "provenance": {
                 "profile_id": profile.id,
+                "profile_version_id": profile_version.id,
+                "profile_revision": profile_version.revision,
                 "profile_sha256": profile_hash(profile),
                 "weather_release_id": weather["release_id"],
                 "weather_sha256": weather["manifest_sha256"],

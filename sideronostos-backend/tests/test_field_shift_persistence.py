@@ -110,6 +110,53 @@ async def test_field_edits_are_durable_owner_scoped_and_version_checked(api):
     assert foreign_edit.status_code == 404
 
 
+async def test_account_workspace_initializes_once_deletes_and_restores_sample(api):
+    client, identity = api
+    first, concurrent = await asyncio.gather(
+        client.get("/field-shift/workspace"),
+        client.get("/field-shift/workspace"),
+    )
+    assert first.status_code == concurrent.status_code == 200
+    original = first.json()
+    assert len(original["farms"]) == 1
+    assert len(original["fields"]) == 4
+    assert concurrent.json()["farms"][0]["properties"]["id"] == original["farms"][0][
+        "properties"
+    ]["id"]
+
+    emptied = await client.put(
+        "/field-shift/workspace",
+        json={
+            "expected_version": original["version"],
+            "farms": [],
+            "fields": [],
+            "initialized_from": original["initialized_from"],
+        },
+    )
+    assert emptied.status_code == 200
+    assert (await client.get("/field-shift/workspace")).json()["farms"] == []
+    stale = await client.put(
+        "/field-shift/workspace",
+        json={
+            "expected_version": original["version"],
+            "farms": [],
+            "fields": [],
+            "initialized_from": original["initialized_from"],
+        },
+    )
+    assert stale.status_code == 409
+
+    restored = await client.post("/field-shift/workspace/sample")
+    assert len(restored.json()["fields"]) == 4
+    repeated = await client.post("/field-shift/workspace/sample")
+    assert repeated.json()["version"] == restored.json()["version"]
+
+    identity["id"] = str(uuid4())
+    other = (await client.get("/field-shift/workspace")).json()
+    assert len(other["fields"]) == 4
+    assert other["version"] == 1
+
+
 async def test_simultaneous_field_edits_cannot_overwrite_each_other(api):
     client, _ = api
     item = (await client.post("/field-shift/fields", json=field_input())).json()

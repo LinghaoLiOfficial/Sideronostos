@@ -1,5 +1,6 @@
 import csv
 import io
+from datetime import datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Response
@@ -11,6 +12,7 @@ from ..auth.dependencies import AuthPrincipal, require_verified_user
 from ..database.session import get_session
 from .comparison import compare_run_views
 from .profiles import list_profiles
+from .local_knowledge import LocalKnowledgeService
 from .requests import PreflightRequest, RunRequest
 from .schemas import Contract
 from .service import RotationService
@@ -39,12 +41,55 @@ class CompareRequest(Contract):
     second_option_id: str
 
 
+class KnowledgeDraftRequest(Contract):
+    expected_updated_at: datetime
+    profile: dict[str, Any]
+
+
+class KnowledgePublishRequest(Contract):
+    expected_updated_at: datetime
+
+
 @router.get("/profiles")
-async def profiles(user: User) -> dict[str, Any]:
+async def profiles(user: User, session: Session) -> dict[str, Any]:
+    active = await LocalKnowledgeService().active(session, user.id)
     return {
-        "items": list_profiles(),
-        "default_profile_id": get_rotation_settings().default_profile_id,
+        "items": [
+            {
+                **active.data,
+                "sha256": active.sha256,
+                "profile_version_id": active.id,
+                "revision": active.revision,
+            }
+        ],
+        "default_profile_id": active.data["id"],
     }
+
+
+@router.get("/local-knowledge")
+async def local_knowledge(user: User, session: Session) -> dict[str, Any]:
+    return await LocalKnowledgeService().catalogue(session, user.id)
+
+
+@router.put("/local-knowledge/draft")
+async def save_local_knowledge_draft(
+    body: KnowledgeDraftRequest, user: User, session: Session
+) -> dict[str, Any]:
+    return await LocalKnowledgeService().save_draft(
+        session, user.id, body.profile, body.expected_updated_at
+    )
+
+
+@router.post("/local-knowledge/publish")
+async def publish_local_knowledge(
+    body: KnowledgePublishRequest, user: User, session: Session
+) -> dict[str, Any]:
+    return await LocalKnowledgeService().publish(session, user.id, body.expected_updated_at)
+
+
+@router.get("/local-knowledge/versions/{revision}")
+async def local_knowledge_revision(revision: int, user: User, session: Session) -> dict[str, Any]:
+    return await LocalKnowledgeService().get_revision(session, user.id, revision)
 
 
 @router.get("/data-releases")

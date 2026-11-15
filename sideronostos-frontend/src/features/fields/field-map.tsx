@@ -23,12 +23,13 @@ import Map, {
   type MapRef,
   type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import { setWorkerUrl } from "maplibre-gl"
+import { addProtocol, setWorkerUrl } from "maplibre-gl"
 import {
   TerraDraw,
   TerraDrawPolygonMode,
   TerraDrawSelectMode,
   type GeoJSONStoreFeatures,
+  type IdStrategy,
 } from "terra-draw"
 import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter"
 
@@ -41,6 +42,7 @@ import { featureBounds, validatePolygon } from "@/features/fields/geometry"
 import { synchronizeSharedVertices, validateCandidatePartition } from "@/features/fields/partition"
 import { cn } from "@/lib/utils"
 import type { FarmFeature, FieldFeature, LayerState, WorkspaceSettings } from "@/types/workspace"
+import { apiBlob } from "@/lib/api/client"
 
 interface SearchResult {
   id: string
@@ -70,6 +72,7 @@ interface FieldMapProps {
   selectedFieldId: string | null
   settings: WorkspaceSettings
   layers: Record<string, LayerState>
+  nasaLayers?: Array<{ manifest: LayerManifest; opacity: number }>
   date: string
   basemap: "satellite" | "streets"
   onFieldsChange: (fields: FieldFeature[]) => void
@@ -83,8 +86,18 @@ interface FieldMapProps {
 const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY?.trim()
 const CUSTOM_STYLE = process.env.NEXT_PUBLIC_MAP_STYLE_URL?.trim()
 const FALLBACK_STYLE = "https://demotiles.maplibre.org/style.json"
+const FIELD_ID_STRATEGY: IdStrategy<string | number> = {
+  getId: () => crypto.randomUUID(),
+  isValidId: (id) => typeof id === "string" && id.trim().length > 0,
+}
 
 setWorkerUrl("/vendor/maplibre-gl-worker.mjs")
+addProtocol("sideronostos-api", async (params, controller) => {
+  const marker = "sideronostos-api://"
+  const path = params.url.slice(marker.length)
+  const blob = await apiBlob(path.startsWith("/") ? path : `/${path}`, { signal: controller.signal })
+  return { data: await blob.arrayBuffer() }
+})
 
 function mapStyleUrl(basemap: "satellite" | "streets") {
   if (CUSTOM_STYLE) return CUSTOM_STYLE
@@ -93,15 +106,19 @@ function mapStyleUrl(basemap: "satellite" | "streets") {
   return `https://api.maptiler.com/maps/${style}/style.json?key=${MAPTILER_KEY}`
 }
 
+function coordinatesAtDrawPrecision(polygon: Polygon) {
+  return polygon.coordinates.map((ring) =>
+    ring.map((coordinate) => coordinate.map((value) => Number(value.toFixed(7)))),
+  )
+}
+
 function toDrawFeature(field: FieldFeature): GeoJSONStoreFeatures {
   return {
     ...field,
     id: field.properties.id,
     geometry: {
       type: "Polygon",
-      coordinates: field.geometry.coordinates.map((ring) =>
-        ring.map((coordinate) => coordinate.map((value) => Number(value.toFixed(7)))),
-      ),
+      coordinates: coordinatesAtDrawPrecision(field.geometry),
     },
     properties: { ...field.properties, mode: "polygon" },
   } as unknown as GeoJSONStoreFeatures
@@ -200,6 +217,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
     selectedFieldId,
     settings,
     layers,
+    nasaLayers = [],
     date,
     basemap,
     onFieldsChange,
@@ -356,7 +374,16 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       leaveQuery()
       const draw = drawRef.current
       if (draw) {
-        const hasField = () => draw.getSnapshot().some((feature) => String(feature.id) === field.properties.id)
+        const previousSelectedId = selectedIdRef.current
+        if (
+          previousSelectedId
+          && previousSelectedId !== field.properties.id
+          && draw.hasFeature(previousSelectedId)
+        ) {
+          draw.deselectFeature(previousSelectedId)
+        }
+        selectedIdRef.current = field.properties.id
+        const hasField = () => draw.hasFeature(field.properties.id)
         if (!hasField()) {
           const next = fieldsRef.current.some((item) => item.properties.id === field.properties.id)
             ? fieldsRef.current
@@ -394,8 +421,16 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
     setMapLoaded(true)
     const map = mapRef.current?.getMap()
     if (!map) return
+    window.requestAnimationFrame(() => {
+      const attribution = map.getContainer().querySelector<HTMLDetailsElement>(
+        ".maplibregl-ctrl-attrib.maplibregl-compact",
+      )
+      attribution?.classList.remove("maplibregl-compact-show")
+      attribution?.removeAttribute("open")
+    })
     const draw = new TerraDraw({
       adapter: new TerraDrawMapLibreGLAdapter({ map, coordinatePrecision: 7 }),
+      idStrategy: FIELD_ID_STRATEGY,
       modes: [
         new TerraDrawPolygonMode({
           showCoordinatePoints: true,
@@ -430,6 +465,16 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
     draw.start()
     draw.setMode(requestedModeRef.current)
     replaceFields(fields)
+    const initiallySelected = fields.find((field) => field.properties.id === selectedFieldId)
+    if (initiallySelected) {
+      window.requestAnimationFrame(() => {
+        if (draw.hasFeature(initiallySelected.properties.id)) {
+          draw.selectFeature(initiallySelected.properties.id)
+        }
+        const [west, south, east, north] = featureBounds(initiallySelected)
+        map.fitBounds([[west, south], [east, north]], { padding: 90, maxZoom: 16, duration: 0 })
+      })
+    }
     draw.on("finish", (id) => {
       const feature = draw.getSnapshotFeature(id)
       if (!feature || feature.geometry.type !== "Polygon") return
@@ -457,7 +502,13 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
         .filter((field): field is FieldFeature => field !== null)
       const changedId = String(ids[0] ?? "")
       const previousChanged = fieldsRef.current.find((field) => field.properties.id === changedId)
-      if (previousChanged && JSON.stringify(toDrawFeature(previousChanged).geometry) === JSON.stringify(draw.getSnapshotFeature(changedId)?.geometry)) return
+      const nextChanged = snapshot.find((field) => field.properties.id === changedId)
+      if (
+        previousChanged
+        && nextChanged
+        && JSON.stringify(coordinatesAtDrawPrecision(previousChanged.geometry))
+          === JSON.stringify(coordinatesAtDrawPrecision(nextChanged.geometry))
+      ) return
       if (previousChanged?.properties.status === "confirmed") {
         replaceFields(fieldsRef.current)
         onErrorRef.current("Confirmed field boundaries are locked. Create a new draft partition to revise them.")
@@ -480,7 +531,10 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       replaceFields(synced)
       onFieldsChangeRef.current(synced)
     })
-    draw.on("select", (id) => { if (!replacingRef.current && !queryModeRef.current) onSelectFieldRef.current(String(id)) })
+    draw.on("select", (id) => {
+      selectedIdRef.current = String(id)
+      if (!replacingRef.current && !queryModeRef.current) onSelectFieldRef.current(String(id))
+    })
     draw.on("deselect", () => { if (!replacingRef.current && !queryModeRef.current) onSelectFieldRef.current(null) })
   }
 
@@ -564,6 +618,12 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
           )
         })}
         {scienceLayer && <ScienceRaster key={scienceLayer.id} layer={scienceLayer} />}
+        {nasaLayers.map(({ manifest, opacity }) => {
+          const sourceId = `nasa-${manifest.id}`.replace(/[^a-zA-Z0-9_-]/g, "-")
+          return <Source key={sourceId} id={sourceId} type="raster" tiles={manifest.tiles.map((path) => `sideronostos-api://${path}`)} tileSize={manifest.tile_size} minzoom={manifest.minzoom} maxzoom={manifest.maxzoom} bounds={manifest.bounds}>
+            <Layer id={`${sourceId}-layer`} type="raster" paint={{ "raster-opacity": opacity, "raster-fade-duration": 180 }} />
+          </Source>
+        })}
         {farms.length > 0 && (
           <Source
             id="farm-boundaries"
