@@ -30,7 +30,6 @@ export function FieldsEvidencePanel({ context, mapRef, ownerId, onMapInteraction
         <div className="mt-2 flex gap-2"><Button size="sm" variant="outline">{t("应用观测日期")}</Button><Button size="sm" type="button" variant="ghost" onClick={() => { setDateDraft(null); navigation.navigate({ obsStart: null, obsEnd: null }) }}>{t("查看全部")}</Button></div></form></details>
       <p className="text-muted-foreground">{context.window.dates ? `${start}—${end}` : t("全部已发布观测")}{t("。此范围独立于底部 GIBS 显示日期和轮作规划日期。")}</p>
       <label className="block">{t("已处理科学图层")}<select className="mt-1 w-full rounded border p-2" value={navigation.search.get("layer") ?? ""} onChange={e => navigation.navigate({ layer: e.target.value || null })}><option value="">{t("不叠加科学图层")}</option>{layers.data?.items.map(layer => <option key={layer.id} value={layer.id}>{t(layer.title)} · {layer.start.slice(0,10)}</option>)}</select></label>
-      {manifest.data && <div className="space-y-1 rounded border p-2"><p>{manifest.data.title} · {manifest.data.start.slice(0,10)}—{manifest.data.end.slice(0,10)}</p><div aria-label={t("科学图层图例")} className="h-3" style={{ background: `linear-gradient(to right, ${manifest.data.legend.colors.join(",")})` }} /><p>{manifest.data.legend.min}—{manifest.data.legend.max} {t(readableUnit(manifest.data.unit))}</p><p>{manifest.data.spatial_support}</p>{manifest.data.limitations.map((v,i) => <p key={i}>{v}</p>)}</div>}
     </fieldset>
     {!ownerId && <p>{t("登录后可查询已发布数据和使用轮作助手。")}</p>}
     {(context.selecting || facts.isFetching) && <p role="status">{t("正在读取选区与科学资料…")}</p>}

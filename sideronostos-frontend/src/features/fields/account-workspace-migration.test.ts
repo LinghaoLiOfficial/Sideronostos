@@ -1,17 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { createDemoFarm } from "@/features/fields/demo-data"
+import type { FarmFeature, FieldFeature } from "@/types/workspace"
 
 const remote = vi.hoisted(() => ({
-  value: { version: 1, farms: [] as never[], fields: [] as never[], initialized_from: null as string | null,
+  value: { version: 1, farms: [] as FarmFeature[], fields: [] as FieldFeature[], initialized_from: null as string | null,
     created_at: "2026-11-14T00:00:00Z", updated_at: "2026-11-14T00:00:00Z" },
-  saves: [] as Array<{ farms: never[]; fields: never[] }>, failNextSave: false,
+  saves: [] as Array<{ farms: FarmFeature[]; fields: FieldFeature[] }>, failNextSave: false,
 }))
 
 vi.mock("@/lib/api/field-workspace", () => ({
   getFieldWorkspace: vi.fn(async () => structuredClone(remote.value)),
   restoreFieldWorkspaceSample: vi.fn(),
-  saveFieldWorkspace: vi.fn(async (_version: number, farms: never[], fields: never[]) => {
+  saveFieldWorkspace: vi.fn(async (_version: number, farms: FarmFeature[], fields: FieldFeature[]) => {
     remote.saves.push({ farms: structuredClone(farms), fields: structuredClone(fields) })
     if (remote.failNextSave) { remote.failNextSave = false; throw new Error("offline") }
     remote.value = { ...remote.value, version: remote.value.version + 1, farms: structuredClone(farms), fields: structuredClone(fields) }
