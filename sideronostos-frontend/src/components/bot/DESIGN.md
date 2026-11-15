@@ -16,8 +16,8 @@ Reviewed current official sources on 2026-11-13. These are established first-par
 
 ## Visual and interaction contract
 
-- A 62 px lavender character sits within a 72 px map-corner hit target. A soft ground shadow gives separation; an eight-second eye blink gives life without moving the map or constantly bouncing.
-- Hover/focus raises the character 3 px with a small tilt; mouse movement shifts its eyes by at most 3 × 2 px. The label identifies the bot and disappears while chat is open.
+- A 62 px character sits within a 72 px map-corner hit target. The seven roles share eyes and a matte surface while using original leaf, folded field, droplet, mound, cloud, open book and seed-pod silhouettes. One line symbol reinforces each specialty. A thin edge and short shadow separate the body from the map. An eight-second blink is the only idle motion.
+- Hover/focus gives the body one brief greeting, turns the specialty symbol, shifts the eyes and briefly winks. Pointer release on the character plays a 720 ms squash, stretch and settle response; opening chat from the Dock carries the same response onto the new launcher. Reduced motion skips both. The map launcher also tracks the mouse by at most 3 × 2 px; the roster and Dock use a fixed glance. The label identifies the bot and disappears while chat is open.
 - Fine-pointer hover waits 350 ms. Leaving allows 400 ms to cross the gap into the panel. A preview never steals map focus. Clicking the pet, focusing chat, or interacting inside pins it open.
 - Explicit collapse suppresses hover until the pointer leaves, restores launcher focus, and retains messages/draft. Escape is scoped to the chat; a source popover or active voice input handles its own Escape first.
 - Chat opens above the pet: 448 px wide, up to 630 px high, with 26 px corners. Entry is 340 ms (18 px travel, scale 0.94 → 1), exit 180 ms. No backdrop, body-scroll lock, modal focus trap, full-screen button or data slot.

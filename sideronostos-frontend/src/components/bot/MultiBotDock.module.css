@@ -18,7 +18,7 @@
   border: 1px solid var(--si-divider, #77846b66);
   border-radius: 23px;
   background: color-mix(in srgb, var(--si-ink-raised, #131d14) 93%, transparent);
-  box-shadow: 0 12px 40px #0008, inset 0 1px #ffffff1d;
+  box-shadow: 0 10px 28px #0007, inset 0 1px #ffffff12;
   color: var(--si-light, #fafcf7);
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
@@ -34,7 +34,7 @@
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: var(--si-accent, #c9e5b8);
+  color: var(--si-light-muted, #c8d0c3);
   cursor: grab;
   touch-action: none;
 }
@@ -59,7 +59,7 @@
   height: 25px;
   border: 1px solid var(--si-divider, #77846b66);
   border-radius: 50%;
-  color: var(--si-accent, #c9e5b8);
+  color: var(--si-light-muted, #c8d0c3);
   font-size: 12px;
   font-weight: 700;
 }
@@ -97,18 +97,16 @@
   height: 49px;
   margin-left: -25px;
   padding: 3px;
-  border: 1px solid var(--si-divider, #77846b66);
+  border: 1px solid transparent;
   border-radius: 17px;
-  background: var(--si-ink, #0b120f);
+  background: transparent;
   cursor: pointer;
   transition: transform 180ms ease, margin-left 180ms ease, width 180ms ease, height 180ms ease;
 }
 .botButton:first-child { margin-left: 0; }
 .root[data-expanded="true"] .botButton + .botButton { margin-left: 4px; }
-.root[data-expanded="true"] .botButton { width: 74px; height: 68px; align-content: start; }
-.botButton:hover, .botButton:focus-visible { transform: translateY(-4px); z-index: 2; }
-.botButton:hover :global(span[data-avatar]),
-.botButton:focus-visible :global(span[data-avatar]) { animation-play-state: paused; transform: rotate(6deg) scale(1.08); }
+.root[data-expanded="true"] .botButton { width: 74px; height: 68px; align-content: start; border-color: #ffffff18; background: #ffffff0a; }
+.botButton:hover, .botButton:focus-visible { transform: translateY(-2px); border-color: var(--si-divider, #77846b66); background: #ffffff12; z-index: 2; }
 .botButton :global(span[data-avatar]) { width: 39px; height: 38px; box-shadow: none; }
 .avatarLabel {
   position: absolute;
@@ -126,15 +124,6 @@
   transition: opacity 120ms ease, visibility 0s 120ms;
 }
 .root[data-expanded="true"] .avatarLabel { opacity: 1; visibility: visible; transition-delay: 70ms, 0s; }
-.botButton::after {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border: 1px solid var(--si-divider, #77846b66);
-  border-radius: 21px;
-  clip-path: polygon(0 0, 68% 0, 100% 48%, 100% 100%, 0 100%);
-  pointer-events: none;
-}
 .toggle:focus-visible, .botButton:focus-visible, .dragHandle:focus-visible {
   outline: 2px solid var(--si-accent, #c9e5b8);
   outline-offset: 3px;
@@ -196,6 +185,4 @@
 @media (prefers-reduced-motion: reduce) {
   .chevron, .botButton, .avatarLabel { transition: none; }
   .botButton:hover, .botButton:focus-visible { transform: none; }
-  .botButton:hover :global(span[data-avatar]),
-  .botButton:focus-visible :global(span[data-avatar]) { transform: none; }
 }

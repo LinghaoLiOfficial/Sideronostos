@@ -21,15 +21,15 @@ export type CatalogBot = {
 };
 
 export const modulePalette = {
-  general: { bot: "#5a9b79", highlight: "#73bb8d" },
-  "field-management": { bot: "#4d9b75", highlight: "#73bb8d" },
+  general: { bot: "#739069", highlight: "#98ae8e" },
+  "field-management": { bot: "#828a65", highlight: "#a5ab82" },
   "remote-sensing": {
-    bot: "#3a91a7",
-    highlight: "#62b9c6",
-    variants: { water: "#2f88a5", soil: "#4c8091", weather: "#579cab" },
+    bot: "#698692",
+    highlight: "#91aab0",
+    variants: { water: "#638b9b", soil: "#977a5d", weather: "#7888a1" },
   },
-  "local-knowledge": { bot: "#ca9a4e", highlight: "#d6ad6b" },
-  "rotation-recommendation": { bot: "#8671d9", highlight: "#b6a1e6" },
+  "local-knowledge": { bot: "#9a8464", highlight: "#b6a07c" },
+  "rotation-recommendation": { bot: "#857a99", highlight: "#a39ab3" },
 } as const satisfies Record<SiBotModule, {
   bot: string;
   highlight: string;
@@ -41,7 +41,7 @@ export const botCatalog: readonly CatalogBot[] = [
     id: "general-guide",
     module: "general",
     presetId: "general",
-    avatar: "field",
+    avatar: "farm",
     color: modulePalette.general.bot,
     name: { en: "Farm assistant", "zh-CN": "农场综合助手" },
     shortName: { en: "Farm", "zh-CN": "综合" },

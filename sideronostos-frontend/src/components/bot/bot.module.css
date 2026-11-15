@@ -73,67 +73,82 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden;
-  border: 1px solid #ffffff9c;
-  border-radius: 27px 27px 24px 24px;
-  background:
-    radial-gradient(ellipse at 26% 15%, #ffffff78, transparent 60%),
-    var(--bot-accent, #4d9b75);
-  box-shadow:
-    inset 0 1px 1px #ffffff60,
-    inset -4px -7px 10px #19392729,
-    0 7px 18px #18282034;
+  overflow: visible;
   flex-shrink: 0;
-  animation: avatarFloat 3.5s ease-in-out infinite;
-  transition:
-    transform 380ms var(--bot-spring),
-    border-radius 380ms var(--bot-spring);
+  --avatar-icon-tilt: -9deg;
+  --avatar-icon-top: 5px;
+  --avatar-eyes-top: 29px;
+  --avatar-small-icon-top: 2px;
+  --avatar-small-eyes-top: 18px;
+  transition: transform 260ms var(--bot-settle, cubic-bezier(0.2, 0.8, 0.2, 1));
 }
-.avatar[data-avatar="field"] {
-  border-radius: 26px 26px 22px 22px;
+.avatarShape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 4px 6px #00000032);
 }
+.avatarLight {
+  stop-color: var(--bot-accent, #718571);
+  stop-color: color-mix(in srgb, var(--bot-accent, #718571) 94%, #f0f2e9 6%);
+}
+.avatarMid { stop-color: var(--bot-accent, #718571); }
+.avatarDark {
+  stop-color: var(--bot-accent, #718571);
+  stop-color: color-mix(in srgb, var(--bot-accent, #718571) 91%, #18231c 9%);
+}
+.avatarBody {
+  stroke: color-mix(in srgb, var(--bot-accent, #718571) 73%, #f0f2e9 27%);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.avatar[data-avatar="farm"] {
+  --avatar-icon-top: 10px;
+  --avatar-eyes-top: 32px;
+  --avatar-small-icon-top: 5px;
+  --avatar-small-eyes-top: 19px;
+}
+.avatar[data-avatar="field"] { --avatar-icon-tilt: 7deg; }
 .avatar[data-avatar="water"] {
-  border-radius: 28px 27px 26px 25px;
+  --avatar-icon-tilt: 12deg;
+  --avatar-icon-top: 14px;
+  --avatar-eyes-top: 36px;
+  --avatar-small-icon-top: 7px;
+  --avatar-small-eyes-top: 21px;
 }
 .avatar[data-avatar="soil"] {
-  border-radius: 26px 28px 24px 27px;
+  --avatar-icon-tilt: 5deg;
+  --avatar-icon-top: 11px;
+  --avatar-eyes-top: 34px;
+  --avatar-small-icon-top: 6px;
+  --avatar-small-eyes-top: 20px;
 }
 .avatar[data-avatar="weather"] {
-  border-radius: 27px 26px 27px 24px;
+  --avatar-icon-tilt: -13deg;
+  --avatar-icon-top: 14px;
+  --avatar-eyes-top: 36px;
+  --avatar-small-icon-top: 7px;
+  --avatar-small-eyes-top: 20px;
 }
 .avatar[data-avatar="knowledge"] {
-  border-radius: 26px 27px 23px 25px;
+  --avatar-icon-tilt: 8deg;
+  --avatar-icon-top: 9px;
+  --avatar-eyes-top: 31px;
+  --avatar-small-icon-top: 4px;
 }
 .avatar[data-avatar="rotation"] {
-  border-radius: 28px 26px 24px 25px;
+  --avatar-icon-tilt: 28deg;
+  --avatar-icon-top: 9px;
+  --avatar-eyes-top: 32px;
+  --avatar-small-icon-top: 4px;
+  --avatar-small-eyes-top: 19px;
 }
-.avatarSprout {
-  position: absolute;
-  top: 4px;
-  left: calc(50% - 1px);
-  width: 2px;
-  height: 11px;
-  border-radius: 2px;
-  background: #fff8;
-  transform: rotate(-7deg);
-}
-.avatarSprout::before,
-.avatarSprout::after {
-  content: "";
-  position: absolute;
-  width: 9px;
-  height: 5px;
-  top: -2px;
-  background: #eaffdd;
-  border-radius: 9px 0 9px 0;
-  transform: rotate(33deg);
-}
-.avatarSprout::before { left: -8px; }
-.avatarSprout::after { left: 1px; transform: scaleX(-1) rotate(33deg); }
 .avatarEyes {
   position: absolute;
   z-index: 1;
-  top: 27px;
+  top: var(--avatar-eyes-top);
   left: 50%;
   display: flex;
   gap: 10px;
@@ -144,45 +159,94 @@
   width: 7px;
   height: 9px;
   border-radius: 50%;
-  background: #17352c;
-  box-shadow: 0 1px 0 #ffffff8c;
-  animation: avatarBlink 5.2s infinite;
+  background: #1b302b;
+  animation: avatarBlink 8s infinite;
 }
-.avatarSymbol {
+.avatarAccessory {
   position: absolute;
   z-index: 2;
-  right: 4px;
-  bottom: 4px;
-  width: 16px;
-  height: 16px;
-  color: #fff;
-  filter: drop-shadow(0 1px 2px #173c4566);
+  top: var(--avatar-icon-top);
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  color: #fbfcf6;
+  transform: translateX(-50%);
+  transition: transform 300ms var(--bot-spring, cubic-bezier(0.22, 1.18, 0.36, 1));
 }
-.launcher:hover .avatar,
-.launcher:focus-visible .avatar {
-  animation-play-state: paused;
-  transform: translateY(-4px) rotate(7deg) scale(1.06);
+.avatarSymbol {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-.launcher:active .avatar {
-  animation-play-state: paused;
-  transform: translateY(1px) scale(0.94);
+.launcher[data-open="true"] .avatar {
+  animation: avatarOpenBounce 720ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+:global(button:focus-visible) .avatar {
+  animation: avatarGreet 520ms var(--bot-spring, cubic-bezier(0.22, 1.18, 0.36, 1)) both;
+}
+:global(button:focus-visible) .avatarAccessory {
+  transform: translateX(-50%) translateY(-3px) rotate(var(--avatar-icon-tilt));
+}
+:global(button:focus-visible) .avatarEyes {
+  transform: translate(calc(-50% + var(--gaze-x, 2px)), var(--gaze-y, -2px));
+}
+:global(button:focus-visible) .avatarEye:first-child {
+  animation: avatarWink 520ms ease-out both;
+}
+:global(button:focus-visible) .avatarEye:last-child {
+  animation: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  :global(button:hover) .avatar {
+    animation: avatarGreet 520ms var(--bot-spring, cubic-bezier(0.22, 1.18, 0.36, 1)) both;
+  }
+  :global(button:hover) .avatarAccessory {
+    transform: translateX(-50%) translateY(-3px) rotate(var(--avatar-icon-tilt));
+  }
+  :global(button:hover) .avatarEyes {
+    transform: translate(calc(-50% + var(--gaze-x, 2px)), var(--gaze-y, -2px));
+  }
+  :global(button:hover) .avatarEye:first-child {
+    animation: avatarWink 520ms ease-out both;
+  }
+  :global(button:hover) .avatarEye:last-child {
+    animation: none;
+  }
+}
+:global(button:active) .avatar {
+  animation: none;
+  transform: translateY(1px) scale(0.94, 0.89);
 }
 .smallAvatar {
   width: 34px;
   height: 34px;
-  box-shadow: none;
 }
-.smallAvatar .avatarSprout { top: 2px; height: 6px; }
-.smallAvatar .avatarSprout::before,
-.smallAvatar .avatarSprout::after { width: 6px; height: 4px; top: -1px; }
-.smallAvatar .avatarSprout::before { left: -5px; }
-.smallAvatar .avatarEyes { top: 14px; gap: 6px; }
+.smallAvatar .avatarShape { filter: drop-shadow(0 1px 2px #00000042); }
+@keyframes avatarGreet {
+  0% { transform: translateY(0) rotate(0) scale(1); }
+  32% { transform: translateY(-4px) rotate(-4deg) scale(1.06, 0.94); }
+  62% { transform: translateY(-2px) rotate(3deg) scale(0.98, 1.05); }
+  100% { transform: translateY(-3px) rotate(-1deg) scale(1.03); }
+}
+@keyframes avatarWink {
+  0%, 26%, 55%, 100% { transform: scaleY(1); }
+  40% { transform: scaleY(0.18); }
+}
+@keyframes avatarOpenBounce {
+  0% { transform: translateY(1px) scale(1.09, 0.78); }
+  24% { transform: translateY(-7px) scale(0.88, 1.16); }
+  46% { transform: translateY(0) scale(1.09, 0.88); }
+  67% { transform: translateY(-3px) scale(0.96, 1.06); }
+  84% { transform: translateY(0) scale(1.02, 0.98); }
+  100% { transform: none; }
+}
+.smallAvatar .avatarAccessory {
+  top: var(--avatar-small-icon-top);
+  width: 13px;
+  height: 13px;
+}
+.smallAvatar .avatarEyes { top: var(--avatar-small-eyes-top); gap: 6px; }
 .smallAvatar .avatarEye { width: 4px; height: 6px; }
-.smallAvatar .avatarSymbol { width: 10px; height: 10px; right: 2px; bottom: 2px; }
-@keyframes avatarFloat {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-3px) rotate(2deg); }
-}
 @keyframes avatarBlink {
   0%, 42%, 47%, 100% { transform: scaleY(1); }
   44% { transform: scaleY(0.15); }
@@ -342,14 +406,24 @@
   .panel,
   .launcher *,
   .avatar,
+  .avatarAccessory,
+  .avatarEyes,
   .avatarEye {
     transition: none !important;
     animation: none !important;
   }
-  .launcher:hover .avatar,
-  .launcher:focus-visible .avatar,
-  .launcher:active .avatar {
+  :global(button:hover) .avatar,
+  :global(button:focus-visible) .avatar,
+  :global(button:active) .avatar {
     transform: none;
+  }
+  :global(button:hover) .avatarAccessory,
+  :global(button:focus-visible) .avatarAccessory {
+    transform: translateX(-50%);
+  }
+  :global(button:hover) .avatarEyes,
+  :global(button:focus-visible) .avatarEyes {
+    transform: translateX(-50%);
   }
 }
 @media (prefers-reduced-transparency: reduce) {
@@ -359,12 +433,10 @@
   }
 }
 @media (forced-colors: active) {
-  .avatar {
-    background: ButtonText;
-  }
-  .avatarEye {
-    background: ButtonFace;
-  }
+  .avatarBody { fill: ButtonText; stroke: ButtonText; }
+  .avatarEye { background: ButtonFace; }
+  .avatarAccessory { color: ButtonFace; }
+  .avatarShape { filter: none; }
   .panel,
   .petLabel {
     border: 1px solid CanvasText;
