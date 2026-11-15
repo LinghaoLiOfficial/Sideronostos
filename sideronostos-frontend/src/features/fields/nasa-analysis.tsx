@@ -80,7 +80,7 @@ function SummaryStat({ label, value, note }: { label: string; value: string; not
 function DataView({ data }: { data: NASAAnalysisData }) {
   const latest = data.annual.at(-1)
   return <div className="h-full overflow-y-auto">
-    <div className="mx-auto w-full max-w-[1440px] space-y-8 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="si-cream-surface mx-auto my-6 w-[calc(100%_-_2rem)] max-w-[1440px] space-y-8 px-4 py-6 sm:px-6 lg:px-8">
       <section>
         <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-medium uppercase text-primary">Historical observations · Iowa</p><h2 className="mt-1 text-xl font-semibold">Iowa benchmark summary</h2></div><p className="text-sm text-muted-foreground">{data.period.start} — {data.period.end}</p></div>
         <div className="mt-5 grid gap-x-5 sm:grid-cols-2 lg:grid-cols-4">

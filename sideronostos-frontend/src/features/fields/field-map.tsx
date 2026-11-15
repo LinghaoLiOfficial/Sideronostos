@@ -175,7 +175,7 @@ function SearchBox({ mapRef, basemap, onBasemapChange }: { mapRef: React.RefObje
   return (
     <div className="absolute left-3 top-3 z-10 flex w-[min(35rem,calc(100%-1.5rem))] items-start gap-2">
       <div className="min-w-0 flex-1">
-      <div className="flex h-11 items-center border border-black/10 bg-white shadow-lg">
+      <div className="flex h-11 items-center border border-black/10 bg-[var(--si-cream)] text-[var(--si-cream-foreground)] shadow-lg">
         <Search className="ml-3 size-4 shrink-0 text-neutral-500" aria-hidden="true" />
         <input
           value={query}
@@ -191,7 +191,7 @@ function SearchBox({ mapRef, basemap, onBasemapChange }: { mapRef: React.RefObje
         {loading && <span className="mr-3 size-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary" />}
       </div>
       {results.length > 0 && (
-        <div className="mt-1 overflow-hidden border border-black/10 bg-white shadow-xl">
+        <div className="mt-1 overflow-hidden border border-black/10 bg-[var(--si-cream)] text-[var(--si-cream-foreground)] shadow-xl">
           {results.map((result) => (
             <button
               key={result.id}
@@ -206,7 +206,7 @@ function SearchBox({ mapRef, basemap, onBasemapChange }: { mapRef: React.RefObje
         </div>
       )}
       </div>
-      <div className="flex h-11 shrink-0 border border-black/10 bg-white p-0.5 shadow-lg" role="group" aria-label={t("Basemap") }>
+      <div className="flex h-11 shrink-0 border border-black/10 bg-[var(--si-cream)] p-0.5 text-[var(--si-cream-foreground)] shadow-lg" role="group" aria-label={t("Basemap") }>
         <button type="button" onClick={() => onBasemapChange("satellite")} className={cn("flex items-center gap-1 px-2 text-xs", basemap === "satellite" && "bg-primary text-primary-foreground")} aria-pressed={basemap === "satellite"} title={t("Satellite")}><Satellite className="size-4" /><span className="hidden sm:inline">{t("Satellite")}</span></button>
         <button type="button" onClick={() => onBasemapChange("streets")} className={cn("flex items-center gap-1 px-2 text-xs", basemap === "streets" && "bg-primary text-primary-foreground")} aria-pressed={basemap === "streets"} title={t("Streets")}><MapIcon className="size-4" /><span className="hidden sm:inline">{t("Streets")}</span></button>
       </div>
@@ -663,7 +663,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
       {queryMode && <div className="absolute left-3 right-14 top-16 z-20 max-w-sm rounded border bg-background p-3 shadow-lg" role="region" aria-label={t("临时提问选区工具")}><p className="text-sm font-medium">{queryMode === "polygon" ? t("临时提问区域 · {0} 个顶点", { "0": queryVertices.length }) : t("点击地图选择提问位置")}</p><p className="my-1 text-xs">{t("农场与经营地块边界保持锁定。")}</p><div className="flex flex-wrap gap-2">{queryMode === "polygon" && <><Button size="sm" disabled={queryBusy || queryVertices.length < 3} onClick={() => void finishQuery()}>{t("确认提问区域")}</Button><Button size="sm" variant="outline" disabled={queryBusy || !queryVertices.length} onClick={() => setQueryVertices(v => v.slice(0, -1))}>{t("撤回顶点")}</Button></>}<Button size="sm" variant="ghost" disabled={queryBusy} onClick={leaveQuery}>{t("结束提问选区")}</Button></div></div>}
 
 
-      <div className={cn("absolute left-3 top-16 z-10 flex flex-col gap-1 border border-black/10 bg-white p-1 text-neutral-900 shadow-lg", queryMode && "hidden")}>
+      <div className={cn("absolute left-3 top-16 z-10 flex flex-col gap-1 border border-black/10 bg-[var(--si-cream)] p-1 text-[var(--si-cream-foreground)] shadow-lg", queryMode && "hidden")}>
         <Button
           type="button"
           size="icon"
@@ -711,7 +711,7 @@ export const FieldMap = forwardRef<FieldMapHandle, FieldMapProps>(function Field
         </Button>
       </div>
 
-      <div className="absolute bottom-20 xl:bottom-8 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-2 border border-black/10 bg-white/95 px-3 py-2 text-xs text-neutral-700 shadow-lg backdrop-blur md:flex">
+      <div className="absolute bottom-20 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-2 border border-black/10 bg-[var(--si-cream)] px-3 py-2 text-xs text-[var(--si-cream-muted)] shadow-lg md:flex xl:bottom-8">
         {drawMode === "polygon" ? (
           <><Crosshair className="size-4 text-primary" /> {t(" Draw the farm boundary; click the first point to finish")}</>
         ) : (

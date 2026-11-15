@@ -57,6 +57,83 @@
   --calendar-0: #d5dbcd; --calendar-1: #c1d9a5; --calendar-2: #94b871;
   --calendar-3: #668f41; --calendar-4: #3c6221;
 }
+
+/* The SI product uses the palette established by the model-layer story. */
+.si-theme,
+html:has(.si-theme) body {
+  --si-ink: #0b120f;
+  --si-ink-raised: #131d14;
+  --si-cream: #e8ead6;
+  --si-cream-soft: #dce2cc;
+  --si-accent: #c9e5b8;
+  --si-cream-foreground: #23301f;
+  --si-cream-muted: #40513c;
+  --si-light: #fafcf7;
+  --si-light-muted: #c8d0c3;
+  --si-divider: #77846b66;
+
+  color-scheme: dark;
+  --brand-start: var(--si-accent); --brand-end: var(--si-accent);
+  --background: var(--si-ink); --foreground: var(--si-light);
+  --card: var(--si-cream); --card-foreground: var(--si-cream-foreground);
+  --popover: var(--si-cream); --popover-foreground: var(--si-cream-foreground);
+  --primary: var(--si-accent); --primary-foreground: var(--si-cream-foreground);
+  --secondary: #253d29; --secondary-foreground: var(--si-light);
+  --muted: #202c1b; --muted-foreground: var(--si-light-muted);
+  --accent: var(--si-cream-soft); --accent-foreground: var(--si-cream-foreground);
+  --border: var(--si-divider); --input: #77896a; --ring: var(--si-accent);
+  --field: #101913; --subtle: #ffffff08;
+  --sidebar: var(--si-ink-raised); --sidebar-foreground: var(--si-light);
+  --sidebar-primary: var(--si-accent); --sidebar-primary-foreground: var(--si-cream-foreground);
+  --sidebar-accent: #253d29; --sidebar-accent-foreground: var(--si-light);
+  --sidebar-border: var(--si-divider); --sidebar-ring: var(--si-accent);
+  background: var(--si-ink);
+  color: var(--si-light);
+}
+
+/* Portalled controls sit outside .si-theme, so restore the same tokens while an SI route is mounted. */
+html:has(.si-theme) :is([data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="dropdown-menu-content"], [data-slot="popover-content"], [data-slot="card"], .si-cream-surface, .bg-card):not([data-material="glass"]) {
+  color-scheme: light;
+  --background: #fafcf7; --foreground: var(--si-cream-foreground, #23301f);
+  --card: var(--si-cream, #e8ead6); --card-foreground: var(--si-cream-foreground, #23301f);
+  --popover: var(--si-cream, #e8ead6); --popover-foreground: var(--si-cream-foreground, #23301f);
+  --primary: var(--si-accent, #c9e5b8); --primary-foreground: var(--si-cream-foreground, #23301f);
+  --secondary: var(--si-cream-soft, #dce2cc); --secondary-foreground: var(--si-cream-foreground, #23301f);
+  --muted: var(--si-cream-soft, #dce2cc); --muted-foreground: var(--si-cream-muted, #40513c);
+  --accent: #d5ddc5; --accent-foreground: var(--si-cream-foreground, #23301f);
+  --border: var(--si-divider, #77846b66); --input: #77896a; --ring: #77896a;
+  --field: #fafcf7; --subtle: #23301f0a;
+  color: var(--foreground);
+}
+
+html:has(.si-theme) :is([data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="dropdown-menu-content"], [data-slot="popover-content"]):not(.si-header-menu) {
+  background-color: var(--si-cream, #e8ead6);
+}
+
+/* SI navigation is portalled: keep every route on the same readable cream menu surface. */
+html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover, .si-language-popover) {
+  border-color: var(--si-divider, #77846b66);
+  border-radius: 10px;
+  background: var(--si-cream, #e8ead6);
+  color: var(--si-cream-foreground, #23301f);
+  box-shadow: 0 20px 50px #0b120f4d;
+}
+html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover, .si-language-popover) :is([role="menuitem"], [role="menuitemradio"], a) {
+  color: var(--si-cream-foreground, #23301f);
+}
+html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover, .si-language-popover) :is([role="menuitem"], [role="menuitemradio"], a):is(:hover, :focus, [data-highlighted]) {
+  background: var(--si-cream-soft, #dce2cc);
+  color: var(--si-cream-foreground, #23301f);
+}
+
+.si-theme .si-cream-surface { background: var(--si-cream); }
+.si-theme .landing-page {
+  --landing-bg: var(--si-ink);
+  --landing-panel: var(--si-cream);
+  --landing-line: var(--si-divider);
+  --landing-muted: var(--si-light-muted);
+  --landing-green: var(--si-accent);
+}
 @theme inline {
   --font-sans: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", "Inter", sans-serif;
   --font-heading: var(--font-sans);
@@ -493,6 +570,20 @@ body {
 .landing-nav-popover { position: absolute; top: calc(100% + 12px); left: -18px; min-width: 190px; display: grid; gap: 6px; padding: 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: #171918; box-shadow: 0 20px 50px #0009; }
 .landing-nav-popover a { padding: 10px 12px; border-radius: 6px; font-size: 17px; color: #ced1cc; }
 .landing-nav-popover a:hover { background: #303330; color: white; }
+html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover) {
+  width: min(280px, calc(100vw - 24px));
+  min-width: 0;
+  gap: 2px;
+  padding: 6px 8px;
+}
+html:has(.si-theme) :is(.si-header-menu, .landing-nav-popover) :is([role="menuitem"], [role="menuitemradio"], a) {
+  min-height: 36px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.25;
+  white-space: normal;
+}
 .landing-nav button svg { transition: transform .2s ease; }
 .landing-nav button svg.is-rotated { transform: rotate(180deg); }
 @media (min-width: 901px) {

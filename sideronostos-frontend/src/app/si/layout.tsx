@@ -21,12 +21,14 @@ const localModuleRoutes = new Set([
 export default function SiLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  if (localModuleRoutes.has(pathname)) return <SiShell>{children}</SiShell>;
+  if (localModuleRoutes.has(pathname)) return <div className="si-theme"><SiShell>{children}</SiShell></div>;
 
   return (
-    <SiStoryNavigation>
-      <SiHeader />
-      {children}
-    </SiStoryNavigation>
+    <div className="si-theme">
+      <SiStoryNavigation>
+        <SiHeader />
+        {children}
+      </SiStoryNavigation>
+    </div>
   );
 }

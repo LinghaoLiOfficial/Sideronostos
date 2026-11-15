@@ -1,6 +1,6 @@
 .fields-app {
-  --fields-map-control: #f8f9f4;
-  --fields-map-control-text: #151711;
+  --fields-map-control: var(--si-cream, #e8ead6);
+  --fields-map-control-text: var(--si-cream-foreground, #23301f);
 }
 
 .fields-app-embedded,

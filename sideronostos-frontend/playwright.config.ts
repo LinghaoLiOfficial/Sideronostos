@@ -14,7 +14,7 @@ export default defineConfig({
   },
   webServer: {
     command: `pnpm exec next dev --hostname 127.0.0.1 --port ${port}`,
-    url: `http://127.0.0.1:${port}/fields`,
+    url: `http://127.0.0.1:${port}/si`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

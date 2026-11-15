@@ -4,14 +4,14 @@
 
 .guide {
   --guide-gutter: clamp(20px, 6vw, 112px);
-  --guide-accent: #c9e5b8;
+  --guide-accent: var(--si-accent, #c9e5b8);
   position: relative;
   isolation: isolate;
   min-height: 100svh;
   padding-block-start: var(--si-header-height);
   overflow: clip;
-  background: #0b120f;
-  color: #fafcf7;
+  background: var(--si-ink, #0b120f);
+  color: var(--si-light, #fafcf7);
 }
 
 .backdrop {
@@ -38,7 +38,7 @@
   inset: 0;
   overflow: hidden;
   isolation: isolate;
-  background: #0b120f;
+  background: var(--si-ink, #0b120f);
   pointer-events: none;
 }
 
@@ -204,8 +204,8 @@
   isolation: isolate;
   overflow: hidden;
   padding: clamp(18px, 2vw, 32px) clamp(20px, 2.1vw, 38px);
-  background: #e8ead6;
-  color: #23301f;
+  background: var(--si-cream, #e8ead6);
+  color: var(--si-cream-foreground, #23301f);
   animation: drawer-enter .72s cubic-bezier(.2, .68, .24, 1) .16s both;
 }
 
@@ -240,7 +240,7 @@
   margin-block-start: 6px;
   padding: 7px 10px;
   border-inline-start: 2px solid #77896a;
-  background: #dce2cc;
+  background: var(--si-cream-soft, #dce2cc);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -259,7 +259,7 @@
   display: grid;
   grid-area: nav;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  background: #131d14;
+  background: var(--si-ink-raised, #131d14);
 }
 
 .layerNav button {
