@@ -3,7 +3,8 @@ import path from "node:path"
 import { NextResponse } from "next/server"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
 import { isDemoMode } from "@/lib/demo-mode"
-import { demoFields, demoRelease } from "@/lib/demo/data"
+import { demoFields } from "@/lib/demo/data"
+import { iowaAnnual, iowaGraceRows, iowaMonthly } from "@/lib/demo/iowa-backend-data"
 
 export const dynamic = "force-dynamic"
 
@@ -88,14 +89,14 @@ function fieldCollection(input: FeatureCollection): FeatureCollection<Polygon, {
 
 export async function GET() {
   if (isDemoMode()) {
-    const monthly = Array.from({ length: 12 }, (_, index) => ({ month: `2024-${String(index + 1).padStart(2, "0")}`, rain_mm: 36 + (index % 4) * 11, et0_mm: 62 + (index % 3) * 8, rain_minus_et0_mm: -26, tmean_c: 7 + index * 2.1 }))
     return NextResponse.json({
       period: { start: "2022-01-01", end: "2024-12-31" },
-      coverage: { power_days: 1096, expected_days: 1096, gpm_days_with_full_grid: 1096, gpm_unique_cells: 4 },
-      annual: [2022, 2023, 2024].map((year) => ({ year, rain_mm: 612, et0_mm: 830, rain_minus_et0_mm: -218, tmean_c: 12.4, power_complete: true, gpm_complete: true })), monthly,
-      grace: { coordinates: { nearest_grid_latitude: 42, nearest_grid_longitude: -93.5, effective_mascon_resolution_degrees: 1 }, rows: [2022, 2023, 2024].map((year) => ({ date: `${year}-07`, lwe_cm: -1.2 + (year - 2022) * 0.7, uncertainty_cm: 0.4 })) },
-      terrain: { min_elevation_m: 284, max_elevation_m: 301, mean_elevation_m: 292, bounds: demoRelease.bounds },
-      interpretation_limits: ["Synthetic Iowa benchmark values for demonstration only."],
+      coverage: { power_days: 1096, expected_days: 1096, gpm_days_with_full_grid: 1096, gpm_unique_cells: 8 },
+      annual: iowaAnnual,
+      monthly: iowaMonthly,
+      grace: { coordinates: { nearest_grid_latitude: 41.75, nearest_grid_longitude: -93.75, effective_mascon_resolution_degrees: 3 }, rows: iowaGraceRows },
+      terrain: { min_elevation_m: 249, max_elevation_m: 346, mean_elevation_m: 300.33, bounds: [-93.68, 41.89, -93.32, 42.13] },
+      interpretation_limits: ["Synthetic field polygons are not cadastral boundaries.", "GPM 0.1-degree pixels do not resolve individual fields.", "GRACE mascon data are regional water-storage context, not farm soil moisture.", "Precipitation minus reference ET0 is not irrigation demand or crop water stress.", "Historical backend release values are not future planting recommendations."],
       gpm_grid: { type: "FeatureCollection", features: [] },
       fields: { type: "FeatureCollection", features: demoFields.map((field) => ({ type: "Feature", id: field.properties.id, geometry: field.geometry, properties: { field_id: field.properties.id, area_ha: 8.7 } })) },
     }, { headers: { "Cache-Control": "no-store" } })

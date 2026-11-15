@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetClose } from "@
 import { Button } from "@/components/ui/button"
 import { NASA_REMOTE_SENSING_LAYERS, shiftDate, toIsoDate } from "@/data/gibs-layers"
 import { createDemoObservations } from "@/features/fields/demo-data"
+import { DEMO_FARM_ID } from "@/lib/demo/data"
 import { createFarmFeature, featureAreaHectares, featureCentroid, parseFarmGeoJson } from "@/features/fields/geometry"
 import { FieldMap, type FieldMapHandle } from "@/features/fields/field-map"
 import { FieldsShell } from "@/features/fields/fields-shell"
@@ -151,7 +152,7 @@ function OwnedFieldsWorkspace({ owner, unverified, embedded, remote }: { owner: 
     context.navigation.navigate({ field: next?.properties.backendFieldId ?? null, run: null, option: null, plan: null, compare: null, compareOption: null })
   }
 
-  const observations = useMemo(() => selectedField?.properties.status === "confirmed" && selectedFarm?.properties.boundarySource === "synthetic" ? createDemoObservations(selectedField, settings.date) : [], [selectedField, selectedFarm, settings.date])
+  const observations = useMemo(() => selectedField?.properties.status === "confirmed" && selectedFarm?.properties.id === DEMO_FARM_ID ? createDemoObservations(selectedField, settings.date) : [], [selectedField, selectedFarm, settings.date])
   useEffect(() => { if (observations.length) putObservations(observations, ownerId).catch(() => undefined) }, [observations, ownerId])
 
   function installFarm(farm: FarmFeature, nextFields: FieldFeature[]) {

@@ -150,7 +150,14 @@ export class OwnedWorkspace {
     try {
       if (isDemoMode()) {
         const stored = await getStoredWorkspace(this.ownerId)
-        const scoped = this.scoped(stored.farms.length ? stored : demoWorkspace())
+        const seed = demoWorkspace()
+        const hasCurrentSample = stored.farms.some((farm) => farm.properties.id === seed.farms[0]?.properties.id && farm.properties.sampleVersion === seed.farms[0]?.properties.sampleVersion)
+        const hasLegacySample = stored.farms.some((farm) => farm.properties.id === seed.farms[0]?.properties.id && Boolean(farm.properties.sampleVersion))
+        const source = hasCurrentSample || hasLegacySample ? {
+          farms: [...stored.farms.filter((farm) => farm.properties.id !== seed.farms[0]?.properties.id), ...seed.farms],
+          fields: [...stored.fields.filter((field) => field.properties.farmId !== seed.farms[0]?.properties.id), ...seed.fields],
+        } : stored.farms.length ? stored : seed
+        const scoped = this.scoped(source)
         if (!this.active || epoch !== this.epoch) return
         this.publish({ workspace: scoped, error: null, remoteError: null, workspaceRemoteError: null, remoteConflict: false, remoteVersion: null, restoring: false, syncing: [] })
         await replaceStoredWorkspace(scoped.farms, scoped.fields, this.ownerId)
