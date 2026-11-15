@@ -92,7 +92,7 @@ html:has(.si-theme) body {
 }
 
 /* Portalled controls sit outside .si-theme, so restore the same tokens while an SI route is mounted. */
-html:has(.si-theme) :is([data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="dropdown-menu-content"], [data-slot="popover-content"], [data-slot="card"], .si-cream-surface, .bg-card):not([data-material="glass"]) {
+html:has(.si-theme) :is([data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="dropdown-menu-content"], [data-slot="popover-content"], [data-slot="card"], .si-cream-surface, .bg-card:not([data-surface="dark"])):not([data-material="glass"]) {
   color-scheme: light;
   --background: #fafcf7; --foreground: var(--si-cream-foreground, #23301f);
   --card: var(--si-cream, #e8ead6); --card-foreground: var(--si-cream-foreground, #23301f);

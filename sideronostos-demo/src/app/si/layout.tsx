@@ -21,6 +21,8 @@ const localModuleRoutes = new Set([
 export default function SiLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
+  if (pathname === "/si/fields") return <div className="si-theme">{children}</div>;
+
   if (localModuleRoutes.has(pathname)) return <div className="si-theme"><SiShell>{children}</SiShell></div>;
 
   return (
