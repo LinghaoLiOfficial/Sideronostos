@@ -22,6 +22,12 @@ type TaskId = "fields" | "observations" | "plans" | "runs";
 type Choice = { id: TaskId; en: string; zh: string } | { href: string; en: string; zh: string };
 
 function choices(bot: string): Choice[] {
+  if (bot === "general-guide") return [
+    { href: "/si/field-management", en: "Field management", zh: "田地管理" },
+    { href: "/si/remote-sensing", en: "Remote sensing", zh: "遥感分析" },
+    { href: "/si/local-knowledge", en: "Local knowledge", zh: "本地农业知识" },
+    { href: "/si/rotation-recommendation", en: "Crop rotation", zh: "轮作规划" },
+  ];
   if (bot === "field-guide") return [{ id: "fields", en: "My fields", zh: "我的地块" }, { href: "/si/fields?field=new&step=field", en: "Add a field", zh: "添加地块" }, { href: "/si/fields?step=saved", en: "My planting plans", zh: "我的种植计划" }];
   if (bot === "rotation-guide") return [{ id: "plans", en: "My saved plans", zh: "已保存计划" }, { id: "runs", en: "My calculations", zh: "我的计算" }];
   if (bot === "local-knowledge-guide") return [{ href: "/si/local-knowledge", en: "Ask about my area", zh: "询问本地农业" }];

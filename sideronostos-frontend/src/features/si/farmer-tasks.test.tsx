@@ -83,6 +83,15 @@ it("opens the local knowledge workspace instead of a second question form", () =
   expect(screen.queryByRole("button", { name: "Ask about my area" })).not.toBeInTheDocument();
 });
 
+it("offers module destinations instead of water observations to the general assistant", () => {
+  render(<FarmerTasks {...props} botId="general-guide" />);
+  expect(screen.queryByRole("button", { name: "Check water conditions" })).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /Field management/ })).toHaveAttribute("href", "/si/field-management");
+  expect(screen.getByRole("link", { name: /Remote sensing/ })).toHaveAttribute("href", "/si/remote-sensing");
+  expect(screen.getByRole("link", { name: /Local knowledge/ })).toHaveAttribute("href", "/si/local-knowledge");
+  expect(screen.getByRole("link", { name: /Crop rotation/ })).toHaveAttribute("href", "/si/rotation-recommendation");
+});
+
 it("lets a farmer choose a saved field by name and opens its actual page", async () => {
   render(<FarmerTasks {...props} />);
   await userEvent.click(screen.getByRole("button", { name: "My fields" }));
